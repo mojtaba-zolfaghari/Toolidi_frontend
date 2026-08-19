@@ -31,6 +31,21 @@ export interface LoginResponse {
   user?: UserProfile;
 }
 
+/** داده‌ی به‌روزرسانی پروفایل */
+export interface UpdateProfileData {
+  mobileNumber: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+/** داده‌ی تغییر رمز عبور */
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 /** داده‌ی ثبت‌نام مشتری */
 export interface RegisterCustomerData {
   nationalCode: string;
@@ -100,6 +115,16 @@ export class AuthService {
   /** دریافت اطلاعات کاربر جاری (نیازمند احراز هویت) */
   getCurrentUser(): Observable<Result<UserProfile>> {
     return this.api.get<Result<UserProfile>>('/Profile');
+  }
+
+  /** به‌روزرسانی اطلاعات پروفایل کاربر جاری */
+  updateProfile(data: UpdateProfileData): Observable<Result<UserProfile>> {
+    return this.api.put<Result<UserProfile>>('/Profile', data);
+  }
+
+  /** تغییر رمز عبور کاربر جاری */
+  changePassword(data: ChangePasswordData): Observable<Result<boolean>> {
+    return this.api.post<Result<boolean>>('/Profile/change-password', data);
   }
 
   /** ذخیره‌ی توکن‌های دسترسی و تازه‌سازی در localStorage */

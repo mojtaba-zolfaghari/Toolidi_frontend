@@ -1,6 +1,59 @@
-<section class="bg-warm min-h-screen py-12">
-  <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold text-secondary mb-8">فروشگاه</h1>
-    <p class="text-gray-600">محصولات به زودی اضافه می‌شوند.</p>
+<section class="bg-warm min-h-screen py-8">
+  <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- سایدبار فیلتر -->
+    <aside class="md:col-span-1">
+      <div class="bg-white rounded-2xl shadow-card p-4">
+        <h3 class="font-bold text-secondary mb-3">دسته‌بندی‌ها</h3>
+        <ul class="space-y-2">
+          <li>
+            <button type="button" (click)="selectCategory(null)" class="w-full text-right text-gray-600 hover:text-primary transition-colors">
+              همه محصولات
+            </button>
+          </li>
+          <li *ngFor="let cat of categories">
+            <button type="button" (click)="selectCategory(cat.id)" class="w-full text-right text-gray-600 hover:text-primary transition-colors">
+              {{ cat.name }}
+            </button>
+          </li>
+        </ul>
+        <p *ngIf="!categories.length" class="text-sm text-gray-400">دسته‌بندی‌ای موجود نیست.</p>
+      </div>
+    </aside>
+
+    <!-- لیست محصولات -->
+    <div class="md:col-span-3">
+      <!-- جستجو -->
+      <div class="flex gap-2 mb-6">
+        <input
+          #searchInput
+          type="text"
+          placeholder="جستجوی محصول…"
+          class="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <button
+          type="button"
+          (click)="submitSearch(searchInput.value)"
+          class="bg-primary text-white font-bold rounded-xl px-5 py-2 hover:bg-primary-dark transition-colors">
+          جستجو
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="text-center text-gray-400 py-16">در حال بارگذاری…</div>
+
+      <div *ngIf="!loading && products.length" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+      </div>
+
+      <p *ngIf="!loading && !products.length" class="text-center text-gray-400 py-16">
+        محصولی مطابق فیلترها یافت نشد.
+      </p>
+
+      <app-pagination
+        *ngIf="!loading && products.length"
+        [page]="page"
+        [totalPages]="totalPages"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
+    </div>
   </div>
 </section>

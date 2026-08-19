@@ -1,4 +1,25 @@
-node_modules
-dist
+# dependencies
+node_modules/
+
+# build output
+dist/
+out-tsc/
+
+# environment files
 .env
-angular
+.env.*
+!.env.example
+
+# Angular CLI cache
+.angular/
+.angular/cache/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

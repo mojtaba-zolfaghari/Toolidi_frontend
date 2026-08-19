@@ -1,0 +1,91 @@
+<section class="bg-warm min-h-screen py-10">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <div class="flex items-center justify-between gap-4 mb-8">
+      <div>
+        <p class="text-sm text-primary font-medium mb-1">حساب کاربری</p>
+        <h1 class="text-3xl font-bold text-secondary">پروفایل من</h1>
+      </div>
+      <button type="button" (click)="logout()" class="border border-red-200 text-red-600 rounded-xl px-5 py-2 hover:bg-red-50 transition-colors">
+        خروج از حساب
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="bg-white rounded-2xl shadow-card py-20 text-center text-gray-400">در حال بارگذاری اطلاعات…</div>
+    <div *ngIf="!loading && errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 mb-6">{{ errorMessage }}</div>
+
+    <ng-container *ngIf="!loading && profile">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <aside class="bg-white rounded-2xl shadow-card p-6 h-fit">
+          <div class="w-20 h-20 rounded-full bg-bg-muted text-primary flex items-center justify-center text-3xl font-bold mx-auto mb-4">
+            {{ (profile.firstName || profile.username).charAt(0) }}
+          </div>
+          <h2 class="text-xl font-bold text-secondary text-center">{{ profile.firstName || profile.username }}</h2>
+          <p class="text-gray-500 text-center mt-1">{{ profile.roleName }}</p>
+          <div class="border-t mt-6 pt-5 space-y-3 text-sm">
+            <div class="flex justify-between gap-3"><span class="text-gray-500">نام کاربری</span><strong>{{ profile.username }}</strong></div>
+            <div class="flex justify-between gap-3"><span class="text-gray-500">کد ملی</span><strong>{{ profile.nationalCode }}</strong></div>
+            <div class="flex justify-between gap-3"><span class="text-gray-500">وضعیت</span><strong [class.text-green-600]="profile.isActive" [class.text-red-600]="!profile.isActive">{{ profile.isActive ? 'فعال' : 'غیرفعال' }}</strong></div>
+            <div class="flex justify-between gap-3"><span class="text-gray-500">عضویت</span><strong>{{ profile.createdAt | date:'yyyy/MM/dd' }}</strong></div>
+          </div>
+        </aside>
+
+        <div class="lg:col-span-2 space-y-6">
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="bg-white rounded-2xl shadow-card p-6 space-y-5">
+            <div>
+              <h2 class="text-xl font-bold text-secondary">اطلاعات تماس</h2>
+              <p class="text-sm text-gray-500 mt-1">نام کاربری و کد ملی از این بخش قابل تغییر نیستند.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label class="block"><span class="block text-secondary font-medium mb-1">نام</span><input formControlName="firstName" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1">نام خانوادگی</span><input formControlName="lastName" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1">شماره موبایل</span><input formControlName="mobileNumber" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1">ایمیل</span><input type="email" formControlName="email" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+            </div>
+            <p *ngIf="profileForm.get('mobileNumber')?.invalid && profileForm.get('mobileNumber')?.touched" class="text-red-500 text-sm">شماره موبایل الزامی است.</p>
+            <p *ngIf="profileMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">{{ profileMessage }}</p>
+            <button type="submit" [disabled]="savingProfile" class="bg-primary text-white rounded-xl px-6 py-2.5 font-bold hover:bg-primary-dark disabled:opacity-50">{{ savingProfile ? 'در حال ذخیره…' : 'ذخیره تغییرات' }}</button>
+          </form>
+
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="bg-white rounded-2xl shadow-card p-6 space-y-5">
+            <div><h2 class="text-xl font-bold text-secondary">تغییر رمز عبور</h2><p class="text-sm text-gray-500 mt-1">برای امنیت بیشتر، رمز عبور حداقل ۶ کاراکتر باشد.</p></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <label class="block"><span class="block text-secondary font-medium mb-1">رمز فعلی</span><input type="password" formControlName="currentPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1">رمز جدید</span><input type="password" formControlName="newPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1">تکرار رمز جدید</span><input type="password" formControlName="confirmNewPassword" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" /></label>
+            </div>
+            <p *ngIf="passwordError" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{{ passwordError }}</p>
+            <p *ngIf="passwordMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">{{ passwordMessage }}</p>
+            <button type="submit" [disabled]="changingPassword" class="bg-secondary text-white rounded-xl px-6 py-2.5 font-bold hover:bg-secondary-light disabled:opacity-50">{{ changingPassword ? 'در حال تغییر…' : 'تغییر رمز عبور' }}</button>
+          </form>
+
+          <section class="bg-white rounded-2xl shadow-card p-6 space-y-5">
+            <div><h2 class="text-xl font-bold text-secondary">نشانی‌های من</h2><p class="text-sm text-gray-500 mt-1">آدرس ارسال و صورتحساب خود را مدیریت کنید.</p></div>
+            <div *ngIf="addressesLoading" class="text-center text-gray-400 py-5">در حال بارگذاری آدرس‌ها…</div>
+            <div *ngIf="!addressesLoading && addresses.length" class="space-y-3">
+              <div *ngFor="let address of addresses" class="border rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div><div class="flex items-center gap-2"><strong class="text-secondary">{{ address.city }}، {{ address.addressLine }}</strong><span *ngIf="address.isDefault" class="text-xs bg-green-50 text-green-600 rounded px-2 py-1">پیش‌فرض</span></div><p class="text-sm text-gray-500 mt-1">{{ address.state }} — کد پستی {{ address.postalCode }} — {{ address.phoneNumber || 'شماره تماس ثبت نشده' }}</p></div>
+                <div class="flex gap-2"><button type="button" (click)="editAddress(address)" class="text-primary text-sm hover:underline">ویرایش</button><button type="button" (click)="deleteAddress(address)" class="text-red-600 text-sm hover:underline">حذف</button></div>
+              </div>
+            </div>
+            <p *ngIf="!addressesLoading && !addresses.length" class="text-gray-400 text-center py-4">هنوز آدرسی ثبت نشده است.</p>
+            <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="border-t pt-5 space-y-4">
+              <h3 class="font-bold text-secondary">{{ selectedAddressId ? 'ویرایش آدرس' : 'افزودن آدرس جدید' }}</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="block"><span class="block text-secondary font-medium mb-1">نوع آدرس</span><select formControlName="addressType" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white"><option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option></select></label>
+                <label class="block"><span class="block text-secondary font-medium mb-1">کشور</span><input formControlName="country" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+                <label class="block"><span class="block text-secondary font-medium mb-1">استان</span><input formControlName="state" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+                <label class="block"><span class="block text-secondary font-medium mb-1">شهر</span><input formControlName="city" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+                <label class="block"><span class="block text-secondary font-medium mb-1">کد پستی</span><input formControlName="postalCode" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+                <label class="block"><span class="block text-secondary font-medium mb-1">شماره تماس</span><input formControlName="phoneNumber" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+                <label class="block md:col-span-2"><span class="block text-secondary font-medium mb-1">نشانی کامل</span><textarea rows="2" formControlName="addressLine" class="w-full border border-gray-300 rounded-xl px-4 py-2"></textarea></label>
+              </div>
+              <label class="inline-flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="isDefault" /> این آدرس پیش‌فرض باشد</label>
+              <p *ngIf="addressError" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{{ addressError }}</p><p *ngIf="addressMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">{{ addressMessage }}</p>
+              <div class="flex gap-3"><button type="submit" [disabled]="savingAddress" class="bg-primary text-white rounded-xl px-6 py-2.5 font-bold disabled:opacity-50">{{ savingAddress ? 'در حال ذخیره…' : 'ذخیره آدرس' }}</button><button *ngIf="selectedAddressId" type="button" (click)="cancelAddressEdit()" class="border border-gray-300 rounded-xl px-5 py-2.5">انصراف</button></div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</section>

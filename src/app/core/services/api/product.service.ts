@@ -23,6 +23,9 @@ export interface Product {
   height?: number;
   isPhysical: boolean;
   isDigital: boolean;
+  isFeatured: boolean;
+  isNewArrival: boolean;
+  isBestSeller: boolean;
   digitalFileUrl?: string;
   viewCount: number;
   ratingAverage?: number;
@@ -63,6 +66,9 @@ export interface ProductQueryParams {
   search?: string;
   page?: number;
   pageSize?: number;
+  isFeatured?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
 }
 
 /**

@@ -1,0 +1,19 @@
+<div class="flex items-center justify-center gap-3 mt-8">
+  <button
+    type="button"
+    (click)="goTo(page - 1)"
+    [disabled]="!hasPrev"
+    class="px-4 py-2 rounded-xl border border-gray-300 text-secondary disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
+    قبلی
+  </button>
+
+  <span class="text-sm text-gray-500">صفحه {{ page }} از {{ totalPages }}</span>
+
+  <button
+    type="button"
+    (click)="goTo(page + 1)"
+    [disabled]="!hasNext"
+    class="px-4 py-2 rounded-xl border border-gray-300 text-secondary disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
+    بعدی
+  </button>
+</div>

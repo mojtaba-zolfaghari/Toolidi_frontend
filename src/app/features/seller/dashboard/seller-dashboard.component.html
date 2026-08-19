@@ -1,0 +1,60 @@
+<section class="bg-warm min-h-screen py-10">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <div class="flex items-end justify-between gap-4 mb-8"><div><p class="text-sm text-primary font-medium mb-1">مدیریت فروش</p><h1 class="text-3xl font-bold text-secondary">داشبورد فروشنده</h1></div><button type="button" (click)="loadDashboard()" class="border border-primary text-primary rounded-xl px-4 py-2 hover:bg-bg-muted">بازخوانی</button></div>
+    <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 mb-6">{{ errorMessage }}</div>
+    <div *ngIf="loading && !dashboard" class="bg-white rounded-2xl shadow-card py-20 text-center text-gray-400">در حال دریافت آمار فروش…</div>
+
+    <ng-container *ngIf="dashboard">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">فروش کل</p><p class="text-2xl font-bold text-primary mt-2">{{ dashboard.totalSales | number }} <small class="text-sm">تومان</small></p></div>
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">تعداد سفارش</p><p class="text-2xl font-bold text-secondary mt-2">{{ dashboard.totalOrders | number }}</p></div>
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">کمیسیون</p><p class="text-2xl font-bold text-accent-warning mt-2">{{ dashboard.totalCommission | number }} <small class="text-sm">تومان</small></p></div>
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">سود خالص</p><p class="text-2xl font-bold text-accent-success mt-2">{{ dashboard.netProfit | number }} <small class="text-sm">تومان</small></p></div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-2xl shadow-card p-4"><span class="text-sm text-gray-500">محصولات فعال</span><strong class="block text-xl text-secondary mt-1">{{ dashboard.activeProducts | number }}</strong></div>
+        <div class="bg-white rounded-2xl shadow-card p-4"><span class="text-sm text-gray-500">محصولات فروخته‌شده</span><strong class="block text-xl text-secondary mt-1">{{ dashboard.totalProductsSold | number }}</strong></div>
+        <div class="bg-white rounded-2xl shadow-card p-4"><span class="text-sm text-gray-500">سفارش‌های باز</span><strong class="block text-xl text-secondary mt-1">{{ dashboard.openOrders | number }}</strong></div>
+        <div class="bg-white rounded-2xl shadow-card p-4"><span class="text-sm text-gray-500">امتیاز میانگین</span><strong class="block text-xl text-secondary mt-1">{{ dashboard.averageRating | number:'1.1-1' }} از ۵</strong></div>
+      </div>
+    </ng-container>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="bg-white rounded-2xl shadow-card p-6" *ngIf="orderStats as stats">
+        <h2 class="text-xl font-bold text-secondary mb-5">آمار سفارش‌ها</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+          <div><span class="text-gray-500">در انتظار</span><strong class="block text-lg text-secondary">{{ stats.pendingOrders }}</strong></div>
+          <div><span class="text-gray-500">در حال پردازش</span><strong class="block text-lg text-secondary">{{ stats.processingOrders }}</strong></div>
+          <div><span class="text-gray-500">ارسال‌شده</span><strong class="block text-lg text-secondary">{{ stats.shippedOrders }}</strong></div>
+          <div><span class="text-gray-500">تحویل‌شده</span><strong class="block text-lg text-accent-success">{{ stats.deliveredOrders }}</strong></div>
+          <div><span class="text-gray-500">لغوشده</span><strong class="block text-lg text-accent-danger">{{ stats.cancelledOrders }}</strong></div>
+          <div><span class="text-gray-500">مرجوعی</span><strong class="block text-lg text-accent-warning">{{ stats.returnedOrders }}</strong></div>
+        </div>
+        <div class="border-t mt-5 pt-4 flex justify-between text-sm"><span>فروش این دوره</span><strong class="text-primary">{{ stats.totalSales | number }} تومان</strong></div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-card p-6" *ngIf="statistics as stats">
+        <h2 class="text-xl font-bold text-secondary mb-5">شاخص‌های عملکرد</h2>
+        <div class="space-y-4">
+          <div class="flex justify-between border-b pb-3"><span class="text-gray-500">میانگین ارزش سفارش</span><strong>{{ stats.averageOrderValue | number }} تومان</strong></div>
+          <div class="flex justify-between border-b pb-3"><span class="text-gray-500">بازدید محصولات</span><strong>{{ stats.totalViews | number }}</strong></div>
+          <div class="flex justify-between border-b pb-3"><span class="text-gray-500">نرخ تبدیل</span><strong>{{ stats.conversionRate | number:'1.1-2' }}٪</strong></div>
+          <div class="flex justify-between"><span class="text-gray-500">امتیاز میانگین</span><strong>{{ stats.averageRating | number:'1.1-1' }}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-card p-6 mb-6">
+      <h2 class="text-xl font-bold text-secondary mb-5">عملکرد محصولات</h2>
+      <div class="overflow-x-auto" *ngIf="productStats.length; else noProducts"><table class="w-full text-sm text-right"><thead><tr class="border-b text-gray-500"><th class="p-3">محصول</th><th class="p-3">بازدید</th><th class="p-3">خرید</th><th class="p-3">نرخ تبدیل</th><th class="p-3">فروش</th></tr></thead><tbody><tr *ngFor="let product of productStats" class="border-b last:border-0"><td class="p-3 font-medium text-secondary">{{ product.productName }}</td><td class="p-3">{{ product.views | number }}</td><td class="p-3">{{ product.purchases | number }}</td><td class="p-3">{{ product.conversionRate | number:'1.1-2' }}٪</td><td class="p-3 text-primary font-medium">{{ product.salesAmount | number }} تومان</td></tr></tbody></table></div>
+      <ng-template #noProducts><p class="text-gray-400 text-center py-6">آمار محصولی برای نمایش وجود ندارد.</p></ng-template>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-card p-6">
+      <h2 class="text-xl font-bold text-secondary mb-5">ریز کمیسیون‌ها</h2>
+      <div class="overflow-x-auto" *ngIf="commissions.length; else noCommissions"><table class="w-full text-sm text-right"><thead><tr class="border-b text-gray-500"><th class="p-3">سفارش</th><th class="p-3">محصول</th><th class="p-3">مبلغ فروش</th><th class="p-3">نرخ</th><th class="p-3">کمیسیون</th></tr></thead><tbody><tr *ngFor="let commission of commissions" class="border-b last:border-0"><td class="p-3">{{ commission.orderNumber }}</td><td class="p-3">{{ commission.productName }}</td><td class="p-3">{{ commission.saleAmount | number }} تومان</td><td class="p-3">{{ commission.commissionRate | number:'1.1-2' }}٪</td><td class="p-3 text-accent-warning font-bold">{{ commission.commissionAmount | number }} تومان</td></tr></tbody></table></div>
+      <ng-template #noCommissions><p class="text-gray-400 text-center py-6">ریز کمیسیونی برای نمایش وجود ندارد.</p></ng-template>
+    </div>
+  </div>
+</section>

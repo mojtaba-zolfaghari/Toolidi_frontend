@@ -1,0 +1,55 @@
+<section class="bg-warm min-h-screen py-10">
+  <div class="container mx-auto px-4 max-w-2xl">
+    <h1 class="text-3xl font-bold text-secondary mb-8">تسویه‌حساب</h1>
+
+    <div *ngIf="loadingOptions" class="bg-white rounded-2xl shadow-card py-8 text-center text-gray-400 mb-6">در حال دریافت گزینه‌های ارسال و پرداخت…</div>
+    <div *ngIf="!loadingOptions && !addresses.length" class="bg-orange-50 text-orange-700 rounded-xl px-4 py-3 mb-6">برای ادامه، ابتدا یک آدرس در <a routerLink="/profile" class="font-bold underline">پروفایل</a> ثبت کنید.</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="bg-white rounded-2xl shadow-card p-6 space-y-5">
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="shippingAddressId">آدرس ارسال</label>
+        <select id="shippingAddressId" formControlName="shippingAddressId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+          <option value="">انتخاب آدرس ارسال</option>
+          <option *ngFor="let address of addresses" [value]="address.id">{{ address.city }}، {{ address.addressLine }} — {{ address.postalCode }}</option>
+        </select>
+        <p *ngIf="form.get('shippingAddressId')?.invalid && form.get('shippingAddressId')?.touched" class="text-red-500 text-sm mt-1">آدرس ارسال الزامی است.</p>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="billingAddressId">آدرس صورتحساب</label>
+        <select id="billingAddressId" formControlName="billingAddressId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+          <option value="">انتخاب آدرس صورتحساب</option>
+          <option *ngFor="let address of addresses" [value]="address.id">{{ address.city }}، {{ address.addressLine }} — {{ address.postalCode }}</option>
+        </select>
+        <p *ngIf="form.get('billingAddressId')?.invalid && form.get('billingAddressId')?.touched" class="text-red-500 text-sm mt-1">آدرس صورتحساب الزامی است.</p>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="shippingMethodId">روش ارسال</label>
+        <select id="shippingMethodId" formControlName="shippingMethodId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+          <option value="">انتخاب روش ارسال</option>
+          <option *ngFor="let method of shippingMethods" [value]="method.id">{{ method.name }} — {{ method.baseCost | number }} تومان<ng-container *ngIf="method.estimatedDeliveryDays"> ({{ method.estimatedDeliveryDays }} روز)</ng-container></option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="paymentGatewayId">درگاه پرداخت</label>
+        <select id="paymentGatewayId" formControlName="paymentGatewayId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+          <option value="">پرداخت در مرحله بعد</option>
+          <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.displayName || gateway.name }}<ng-container *ngIf="gateway.isSandbox"> (آزمایشی)</ng-container></option>
+        </select>
+        <p *ngIf="!gateways.length" class="text-xs text-gray-400 mt-1">درگاه فعالی برای انتخاب موجود نیست.</p>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="userNotes">یادداشت سفارش</label>
+        <textarea id="userNotes" formControlName="userNotes" rows="3" placeholder="توضیحات اختیاری" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+      </div>
+
+      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-2 text-sm">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-2 text-sm">{{ successMessage }}</div>
+
+      <button type="submit" [disabled]="form.invalid || loading || !addresses.length" class="w-full bg-primary text-white font-bold rounded-xl py-3 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{{ loading ? 'در حال ثبت سفارش…' : 'ثبت سفارش' }}</button>
+    </form>
+  </div>
+</section>

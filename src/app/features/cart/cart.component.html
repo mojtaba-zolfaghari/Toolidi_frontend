@@ -1,0 +1,83 @@
+<section class="bg-warm min-h-screen py-10">
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold text-secondary mb-8">سبد خرید</h1>
+
+    <div *ngIf="loading" class="text-center text-gray-400 py-20">در حال بارگذاری…</div>
+
+    <!-- سبد خالی -->
+    <div *ngIf="!loading && (!cart || !cart.items.length)" class="text-center py-20">
+      <p class="text-gray-500 text-lg mb-4">سبد خرید شما خالی است.</p>
+      <a routerLink="/shop" class="inline-block bg-primary text-white font-bold rounded-xl px-6 py-2.5 hover:bg-primary-dark transition-colors">
+        مشاهده محصولات
+      </a>
+    </div>
+
+    <!-- آیتم‌های سبد -->
+    <div *ngIf="!loading && cart && cart.items.length" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-4">
+        <div *ngFor="let item of cart.items" class="bg-white rounded-2xl shadow-card p-4 flex items-center gap-4">
+          <div class="w-20 h-20 bg-gradient-to-br from-primary-light to-primary rounded-xl flex items-center justify-center text-3xl shrink-0">
+            🛍️
+          </div>
+
+          <div class="flex-1">
+            <h3 class="font-bold text-secondary">{{ item.productName }}</h3>
+            <p *ngIf="item.variationName" class="text-sm text-gray-500">{{ item.variationName }}</p>
+            <p class="text-primary font-bold mt-1">{{ item.unitPrice | number }} تومان</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="updateQuantity(item.id, item.quantity + 1)" class="w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-50">+</button>
+            <span class="w-10 text-center font-bold">{{ item.quantity }}</span>
+            <button type="button" (click)="updateQuantity(item.id, item.quantity - 1)" class="w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-50">-</button>
+          </div>
+
+          <div class="text-left">
+            <p class="font-bold text-secondary">{{ item.lineTotal | number }} تومان</p>
+            <button type="button" (click)="removeItem(item.id)" class="text-red-500 text-sm hover:underline mt-1">حذف</button>
+          </div>
+        </div>
+
+        <button type="button" (click)="clearCart()" class="text-red-500 text-sm hover:underline">خالی‌کردن سبد</button>
+      </div>
+
+      <!-- خلاصه سفارش -->
+      <div class="bg-white rounded-2xl shadow-card p-5 h-fit">
+        <h3 class="font-bold text-secondary mb-4">خلاصه سفارش</h3>
+
+        <div class="space-y-2 text-sm mb-4">
+          <div class="flex justify-between">
+            <span class="text-gray-500">جمع کل</span>
+            <span>{{ cart.subtotal | number }} تومان</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">تخفیف</span>
+            <span class="text-green-600">{{ cart.discountAmount | number }} تومان</span>
+          </div>
+          <div class="flex justify-between font-bold text-secondary border-t pt-2">
+            <span>قابل پرداخت</span>
+            <span>{{ cart.totalPrice | number }} تومان</span>
+          </div>
+        </div>
+
+        <!-- کد تخفیف -->
+        <div class="flex gap-2 mb-4">
+          <input
+            #couponInput
+            type="text"
+            placeholder="کد تخفیف"
+            class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+          <button type="button" (click)="applyDiscount(couponInput.value)" class="bg-gray-800 text-white rounded-xl px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
+            اعمال
+          </button>
+        </div>
+        <p *ngIf="cart.discountCode" class="text-sm text-green-600 mb-3">کد تخفیف: {{ cart.discountCode }}</p>
+        <p *ngIf="errorMessage" class="text-sm text-red-500 mb-3">{{ errorMessage }}</p>
+
+        <a routerLink="/checkout" class="block w-full bg-primary text-white font-bold rounded-xl py-2.5 text-center hover:bg-primary-dark transition-colors">
+          ادامه فرآیند خرید
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

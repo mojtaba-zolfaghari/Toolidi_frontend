@@ -1,0 +1,35 @@
+<div class="bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all cursor-pointer" (click)="openDetail()">
+  <!-- تصویر محصول (placeholder چون بک‌اند فعلاً تصویر ندارد) -->
+  <div class="w-full h-44 bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-5xl">
+    🛍️
+  </div>
+
+  <div class="p-4">
+    <h3 class="font-bold text-secondary mb-1 truncate">{{ product.name }}</h3>
+
+    <!-- امتیاز -->
+    <div class="flex items-center gap-1 mb-2">
+      <span
+        *ngFor="let star of [1, 2, 3, 4, 5]"
+        class="text-sm"
+        [class.text-yellow-400]="star <= (product.ratingAverage ?? 0)"
+        [class.text-gray-300]="star > (product.ratingAverage ?? 0)">★</span>
+      <span class="text-xs text-gray-400 mr-1">({{ product.ratingCount }})</span>
+    </div>
+
+    <!-- قیمت -->
+    <div class="flex items-center gap-2 mb-3">
+      <span class="text-primary font-bold text-lg">{{ product.unitPrice | number }} تومان</span>
+      <span *ngIf="product.comparePrice" class="text-gray-400 line-through text-sm">
+        {{ product.comparePrice | number }} تومان
+      </span>
+    </div>
+
+    <button
+      type="button"
+      (click)="$event.stopPropagation(); addToCart()"
+      class="w-full bg-primary text-white font-bold rounded-xl py-2 hover:bg-primary-dark transition-colors">
+      افزودن به سبد
+    </button>
+  </div>
+</div>

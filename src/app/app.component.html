@@ -2,11 +2,35 @@
   <nav class="bg-secondary text-white shadow-md">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
       <a routerLink="/" class="text-2xl font-bold text-primary">تولیدی</a>
-      <div class="flex gap-6">
+
+      <div class="flex gap-6 items-center">
         <a routerLink="/shop" class="hover:text-primary transition-colors">فروشگاه</a>
         <a routerLink="/blog" class="hover:text-primary transition-colors">بلاگ</a>
         <a routerLink="/contact" class="hover:text-primary transition-colors">تماس با ما</a>
         <a routerLink="/cart" class="hover:text-primary transition-colors">سبد خرید</a>
+
+        <!-- حالت مهمان -->
+        <ng-container *ngIf="!currentUser">
+          <a routerLink="/login" class="hover:text-primary transition-colors">ورود</a>
+          <a routerLink="/register" class="hover:text-primary transition-colors">ثبت‌نام</a>
+        </ng-container>
+
+        <!-- حالت ورود -->
+        <ng-container *ngIf="currentUser">
+          <a routerLink="/profile" class="hover:text-primary transition-colors">پروفایل</a>
+          <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller" class="hover:text-primary transition-colors">
+            داشبورد فروشنده
+          </a>
+          <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin" class="hover:text-primary transition-colors">
+            پنل مدیریت
+          </a>
+          <button
+            type="button"
+            (click)="logout()"
+            class="hover:text-primary transition-colors">
+            خروج
+          </button>
+        </ng-container>
       </div>
     </div>
   </nav>

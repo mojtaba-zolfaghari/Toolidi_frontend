@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { AuthGuard } from './core/guards/auth.guard';
+import { RoleGuard } from './core/guards/role.guard';
 export const routes: Routes = [
   {
     path: '',
@@ -9,6 +11,50 @@ export const routes: Routes = [
     path: 'shop',
     loadChildren: () => import('./features/shop/shop.module').then(m => m.ShopModule)
   },
-  // Phase 2+: product, cart, checkout, profile, auth, blog, contact, admin
+  {
+    path: 'product',
+    loadChildren: () => import('./features/product/product.module').then(m => m.ProductModule)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
+  { path: 'login', redirectTo: 'auth/login' },
+  { path: 'register', redirectTo: 'auth/register' },
+
+  // مسیرهای محافظت‌شده — نیازمند ورود
+  {
+    path: 'profile',
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'orders',
+    loadChildren: () => import('./features/orders/orders.module').then(m => m.OrdersModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'cart',
+    loadChildren: () => import('./features/cart/cart.module').then(m => m.CartModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'checkout',
+    loadChildren: () => import('./features/checkout/checkout.module').then(m => m.CheckoutModule),
+    canActivate: [AuthGuard]
+  },
+
+  // مسیرهای ویژه‌ی نقش
+  {
+    path: 'seller',
+    loadChildren: () => import('./features/seller/seller.module').then(m => m.SellerModule),
+    canActivate: [AuthGuard, RoleGuard('Seller')]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
+    canActivate: [AuthGuard, RoleGuard('Admin')]
+  },
+
   { path: '**', redirectTo: '' }
 ];

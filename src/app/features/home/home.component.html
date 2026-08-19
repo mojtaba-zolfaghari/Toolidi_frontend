@@ -1,6 +1,5 @@
-<!-- Home Page — Toolidi Phase 1 -->
 <section class="bg-warm min-h-screen">
-  <!-- Hero Section -->
+  <!-- Hero -->
   <div class="bg-gradient-to-br from-primary to-primary-dark text-white">
     <div class="container mx-auto px-4 py-16 text-center">
       <h1 class="text-4xl md:text-6xl font-bold mb-4">به تولیدی خوش آمدید</h1>
@@ -12,38 +11,31 @@
     </div>
   </div>
 
-  <!-- Categories Grid -->
+  <!-- دسته‌بندی‌ها -->
   <div class="container mx-auto px-4 py-12">
     <h2 class="text-2xl font-bold text-secondary mb-8 text-center">دسته‌بندی محصولات</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div *ngFor="let cat of categories"
-           class="bg-white rounded-2xl p-6 text-center shadow-card hover:shadow-card-hover transition-all cursor-pointer">
-        <div class="text-4xl mb-3">{{ cat.icon }}</div>
+      <a *ngFor="let cat of categories"
+         [routerLink]="['/shop']"
+         [queryParams]="{ categoryId: cat.id }"
+         class="bg-white rounded-2xl p-6 text-center shadow-card hover:shadow-card-hover transition-all cursor-pointer">
+        <div class="text-4xl mb-3">🏷️</div>
         <h3 class="font-bold text-secondary">{{ cat.name }}</h3>
-      </div>
+      </a>
     </div>
+    <p *ngIf="!categories.length" class="text-center text-gray-400">دسته‌بندی‌ای یافت نشد.</p>
   </div>
 
-  <!-- Featured Products -->
+  <!-- محصولات -->
   <div class="container mx-auto px-4 py-12">
-    <h2 class="text-2xl font-bold text-secondary mb-8 text-center">محصولات ویژه</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let product of featuredProducts"
-           class="bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all">
-        <img [src]="product.image" [alt]="product.name" class="w-full h-48 object-cover">
-        <div class="p-4">
-          <h3 class="font-bold text-secondary mb-2">{{ product.name }}</h3>
-          <div class="flex items-center gap-1 mb-2">
-            <span *ngFor="let star of [1,2,3,4,5]" class="text-sm"
-                  [class.text-yellow-400]="star <= product.rating"
-                  [class.text-gray-300]="star > product.rating">★</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-primary font-bold text-lg">{{ product.price | number }} تومان</span>
-            <span *ngIf="product.oldPrice" class="text-gray-400 line-through text-sm">{{ product.oldPrice | number }} تومان</span>
-          </div>
-        </div>
-      </div>
+    <h2 class="text-2xl font-bold text-secondary mb-8 text-center">محصولات</h2>
+
+    <div *ngIf="loading" class="text-center text-gray-400 py-10">در حال بارگذاری…</div>
+
+    <div *ngIf="!loading && products.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
     </div>
+
+    <p *ngIf="!loading && !products.length" class="text-center text-gray-400">محصولی یافت نشد.</p>
   </div>
 </section>

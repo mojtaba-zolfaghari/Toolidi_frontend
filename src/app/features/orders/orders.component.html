@@ -1,0 +1,31 @@
+<section class="bg-warm min-h-screen py-10">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <div class="mb-8"><p class="text-sm text-primary font-medium mb-1">حساب کاربری</p><h1 class="text-3xl font-bold text-secondary">سفارش‌های من</h1></div>
+
+    <div *ngIf="loading" class="bg-white rounded-2xl shadow-card py-20 text-center text-gray-400">در حال بارگذاری سفارش‌ها…</div>
+    <div *ngIf="!loading && errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3">{{ errorMessage }}</div>
+    <div *ngIf="!loading && !errorMessage && !orders.length" class="bg-white rounded-2xl shadow-card py-20 text-center">
+      <div class="text-5xl mb-4">📦</div><p class="text-gray-500 mb-5">هنوز سفارشی ثبت نکرده‌اید.</p>
+      <a routerLink="/shop" class="inline-block bg-primary text-white rounded-xl px-6 py-2.5 font-bold">مشاهده محصولات</a>
+    </div>
+
+    <div *ngIf="!loading && orders.length" class="space-y-4">
+      <button *ngFor="let order of orders" type="button" (click)="openOrder(order.id)" class="w-full bg-white rounded-2xl shadow-card p-5 text-right hover:shadow-card-hover transition-shadow">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div><p class="text-sm text-gray-500">شماره سفارش</p><h2 class="font-bold text-secondary mt-1">{{ order.orderNumber }}</h2></div>
+          <div><p class="text-sm text-gray-500">تاریخ ثبت</p><p class="font-medium text-secondary mt-1">{{ order.createdAt | date:'yyyy/MM/dd - HH:mm' }}</p></div>
+          <div><p class="text-sm text-gray-500">تعداد اقلام</p><p class="font-medium text-secondary mt-1">{{ itemCount(order) }} قلم</p></div>
+          <div><p class="text-sm text-gray-500">مبلغ نهایی</p><p class="font-bold text-primary mt-1">{{ order.grandTotal | number }} تومان</p></div>
+          <span class="rounded-full px-3 py-1 text-sm bg-bg-muted text-primary">{{ order.status || 'در انتظار بررسی' }}</span>
+          <span class="text-primary text-sm font-medium">مشاهده جزئیات ←</span>
+        </div>
+      </button>
+
+      <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-4 pt-4">
+        <button type="button" (click)="changePage(page - 1)" [disabled]="page === 1" class="rounded-xl border border-gray-300 px-4 py-2 disabled:opacity-40">قبلی</button>
+        <span class="text-sm text-gray-500">صفحه {{ page }} از {{ totalPages }}</span>
+        <button type="button" (click)="changePage(page + 1)" [disabled]="page === totalPages" class="rounded-xl border border-gray-300 px-4 py-2 disabled:opacity-40">بعدی</button>
+      </div>
+    </div>
+  </div>
+</section>
