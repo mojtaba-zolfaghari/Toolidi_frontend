@@ -1,0 +1,100 @@
+<section class="bg-warm min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-card w-full max-w-md p-8">
+    <h1 class="text-2xl font-bold text-secondary text-center mb-6">ایجاد حساب کاربری</h1>
+
+    <!-- انتخاب نوع حساب -->
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <button
+        type="button"
+        (click)="setRole(false)"
+        [class.bg-primary]="!isSeller"
+        [class.text-white]="!isSeller"
+        class="py-2 rounded-xl border border-gray-300 font-medium transition-colors">
+        مشتری
+      </button>
+      <button
+        type="button"
+        (click)="setRole(true)"
+        [class.bg-primary]="isSeller"
+        [class.text-white]="isSeller"
+        class="py-2 rounded-xl border border-gray-300 font-medium transition-colors">
+        فروشنده
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="nationalCode">کد ملی</label>
+        <input
+          id="nationalCode"
+          type="text"
+          formControlName="nationalCode"
+          placeholder="۱۰ رقم کد ملی"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <p *ngIf="form.get('nationalCode')?.invalid && form.get('nationalCode')?.touched" class="text-red-500 text-sm mt-1">
+          کد ملی معتبر (۱۰ رقم) وارد کنید.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="username">نام کاربری</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          placeholder="نام کاربری دلخواه"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <p *ngIf="form.get('username')?.invalid && form.get('username')?.touched" class="text-red-500 text-sm mt-1">
+          نام کاربری الزامی است.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="password">رمز عبور</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="حداقل ۶ کاراکتر"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <p *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="text-red-500 text-sm mt-1">
+          رمز عبور باید حداقل ۶ کاراکتر باشد.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-secondary font-medium mb-1" for="confirmPassword">تکرار رمز عبور</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          placeholder="رمز عبور را دوباره وارد کنید"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        <p *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched" class="text-red-500 text-sm mt-1">
+          تکرار رمز عبور الزامی است.
+        </p>
+      </div>
+
+      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-2 text-sm">
+        {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-2 text-sm">
+        {{ successMessage }}
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="form.invalid || loading"
+        class="w-full bg-primary text-white font-bold rounded-xl py-2.5 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        {{ loading ? 'در حال ثبت‌نام…' : (isSeller ? 'ثبت‌نام فروشنده' : 'ثبت‌نام مشتری') }}
+      </button>
+    </form>
+
+    <div class="mt-5 text-center text-sm">
+      <p class="text-gray-500">
+        قبلاً ثبت‌نام کرده‌اید؟
+        <a routerLink="/login" class="text-primary font-medium hover:underline">وارد شوید</a>
+      </p>
+    </div>
+  </div>
+</section>
