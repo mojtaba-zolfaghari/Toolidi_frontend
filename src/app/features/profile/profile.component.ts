@@ -145,6 +145,7 @@ export class ProfileComponent implements OnInit {
 
   /** حذف آدرس */
   deleteAddress(address: Address): void {
+    if (!window.confirm('آیا از حذف این آدرس مطمئن هستید؟')) return;
     this.addressService.deleteAddress(address.id).subscribe({
       next: (result) => {
         if (result.isSuccess) {

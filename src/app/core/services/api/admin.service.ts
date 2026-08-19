@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ApiService } from '../api.service';
 import { PagedList, Result } from '../../models/api-response.model';
 import { buildQueryString } from './query.util';
+import { SalesReport } from './reports.service';
 
 /** کاربر قابل مدیریت در پنل مدیر */
 export interface AdminUser {
@@ -14,6 +15,7 @@ export interface AdminUser {
   email?: string;
   firstName?: string;
   lastName?: string;
+  roleId?: string;
   roleName?: string;
   isActive: boolean;
   createdAt: string;
@@ -28,6 +30,7 @@ export interface AdminProduct {
   name: string;
   sku: string;
   unitPrice: number;
+  imageUrl?: string;
   publishStatus: string;
   isActive: boolean;
   isDeleted: boolean;
@@ -42,12 +45,41 @@ export interface AdminProduct {
 export interface AdminSeller {
   id: string;
   companyName: string;
+  nationalId?: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
+  address?: string;
+  city?: string;
+  province?: string;
+  postalCode?: string;
+  country?: string;
+  commissionRate?: number;
   isVerified: boolean;
   isActive: boolean;
   createdAt: string;
+}
+
+/** داده‌ی ایجاد فروشنده */
+export interface CreateSellerData {
+  companyName: string;
+  nationalId: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  country: string;
+  commissionRate: number;
+}
+
+/** مدرک ثبت‌شده برای فروشنده */
+export interface SellerDocument {
+  name: string;
+  url: string;
+  type?: string;
 }
 
 /** فیلترهای فهرست کاربران مدیر */
@@ -68,45 +100,65 @@ export interface AdminProductQueryParams {
   pageSize?: number;
 }
 
-/**
- * سرویس عملیات مدیریتی کاربران، محصولات و فروشندگان.
- */
+/** سرویس عملیات مدیریتی کاربران، محصولات، فروشندگان و گزارش‌ها */
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   constructor(private readonly api: ApiService) {}
 
-  /** دریافت فهرست صفحه‌بندی‌شده کاربران */
   getUsers(params?: AdminUserQueryParams): Observable<Result<PagedList<AdminUser>>> {
     return this.api.get<Result<PagedList<AdminUser>>>(`/admin/Admin${buildQueryString(params)}`);
   }
 
-  /** دریافت یک کاربر */
   getUserById(userId: string): Observable<Result<AdminUser>> {
     return this.api.get<Result<AdminUser>>(`/admin/Admin/${userId}`);
   }
 
-  /** تغییر نقش کاربر با شناسه نقش */
   updateUserRole(userId: string, roleId: string): Observable<Result<boolean>> {
     return this.api.put<Result<boolean>>(`/admin/Admin/${userId}/role`, roleId);
   }
 
-  /** فعال یا غیرفعال کردن کاربر */
   toggleUserStatus(userId: string, isActive: boolean): Observable<Result<boolean>> {
     return this.api.put<Result<boolean>>(`/admin/Admin/${userId}/status`, { isActive });
   }
 
-  /** دریافت همه محصولات برای مدیریت انتشار */
+  /** حذف نرم کاربر */
+  deleteUser(userId: string): Observable<Result<boolean>> {
+    return this.api.delete<Result<boolean>>(`/admin/Admin/${userId}`);
+  }
+
   getAdminProducts(params?: AdminProductQueryParams): Observable<Result<PagedList<AdminProduct>>> {
     return this.api.get<Result<PagedList<AdminProduct>>>(`/admin/products${buildQueryString(params)}`);
   }
 
-  /** دریافت فهرست فروشندگان */
   getSellers(params?: { page?: number; pageSize?: number }): Observable<Result<PagedList<AdminSeller>>> {
     return this.api.get<Result<PagedList<AdminSeller>>>(`/admin/sellers${buildQueryString(params)}`);
   }
 
-  /** تأیید فروشنده */
+  /** ایجاد فروشنده توسط مدیر */
+  createSeller(data: CreateSellerData): Observable<Result<string>> {
+    return this.api.post<Result<string>>('/admin/sellers', data);
+  }
+
+  /** حذف نرم فروشنده */
+  deleteSeller(sellerId: string): Observable<Result<boolean>> {
+    return this.api.delete<Result<boolean>>(`/admin/sellers/${sellerId}`);
+  }
+
   verifySeller(sellerId: string): Observable<Result<boolean>> {
     return this.api.put<Result<boolean>>(`/admin/sellers/${sellerId}/verify`, {});
+  }
+
+  getSellerDocuments(sellerId: string): Observable<Result<SellerDocument[]>> {
+    return this.api.get<Result<SellerDocument[]>>(`/admin/sellers/${sellerId}/documents`);
+  }
+
+  /** گزارش فروش روزانه */
+  getDailyReport(date: string): Observable<Result<SalesReport>> {
+    return this.api.get<Result<SalesReport>>(`/admin/reports/daily${buildQueryString({ date })}`);
+  }
+
+  /** گزارش فروش ماهانه */
+  getMonthlyReport(month: string): Observable<Result<SalesReport>> {
+    return this.api.get<Result<SalesReport>>(`/admin/reports/monthly${buildQueryString({ month })}`);
   }
 }

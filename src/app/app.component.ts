@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { routeAnimations } from './shared/animations';
 import { AuthService } from './core/services/api/auth.service';
@@ -16,6 +17,7 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'toolidi';
   currentUser: AuthUser | null = null;
   menuOpen = false;
+  isAdminArea = false;
 
   private subscription?: Subscription;
 
@@ -29,6 +31,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.authState.currentUser$.subscribe((user) => {
       this.currentUser = user;
     });
+
+    // پنهان‌کردن هدر و فوتر عمومی داخل پنل مدیریت/فروشنده
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.isAdminArea =
+          event.urlAfterRedirects.startsWith('/admin') ||
+          event.urlAfterRedirects.startsWith('/seller');
+      });
+    this.isAdminArea = this.router.url.startsWith('/admin') || this.router.url.startsWith('/seller');
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

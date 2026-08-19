@@ -6,6 +6,7 @@ import { ProductCardComponent } from './components/product-card/product-card.com
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { BarChartComponent } from './components/bar-chart/bar-chart.component';
+import { StatusBadgeComponent } from './components/status-badge/status-badge.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { BarChartComponent } from './components/bar-chart/bar-chart.component';
     ProductCardComponent,
     PaginationComponent,
     SpinnerComponent,
-    BarChartComponent
+    BarChartComponent,
+    StatusBadgeComponent
   ],
   imports: [CommonModule],
   exports: [
@@ -22,7 +24,8 @@ import { BarChartComponent } from './components/bar-chart/bar-chart.component';
     ProductCardComponent,
     PaginationComponent,
     SpinnerComponent,
-    BarChartComponent
+    BarChartComponent,
+    StatusBadgeComponent
   ]
 })
 export class SharedModule { }

@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../api.service';
-import { Result } from '../../models/api-response.model';
+import { PagedList, Result } from '../../models/api-response.model';
+import { Product } from './product.service';
+import { buildQueryString } from './query.util';
 
 /** خلاصه‌ی داشبورد فروشنده برای ماه جاری */
 export interface DashboardSummary {
@@ -119,5 +121,10 @@ export class SellerService {
   /** دریافت جزئیات کمیسیون به تفکیک سفارش و محصول */
   getCommissionBreakdown(): Observable<Result<CommissionBreakdown[]>> {
     return this.api.get<Result<CommissionBreakdown[]>>('/seller/commissions');
+  }
+
+  /** دریافت فهرست محصولات فروشنده‌ی جاری */
+  getProducts(params?: { page?: number; pageSize?: number }): Observable<Result<PagedList<Product>>> {
+    return this.api.get<Result<PagedList<Product>>>(`/Seller/products${buildQueryString(params)}`);
   }
 }

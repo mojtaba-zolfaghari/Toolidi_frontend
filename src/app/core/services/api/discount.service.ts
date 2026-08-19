@@ -11,6 +11,11 @@ export interface Discount {
   name: string;
   description?: string;
   percentage: number;
+  /** در صورت پشتیبانی API، نوع تخفیف */
+  type?: 'percentage' | 'fixed';
+  /** مقدار نمایشی تخفیف */
+  value?: number;
+  minOrderAmount?: number;
   startDate: string;
   endDate: string;
   isActive: boolean;
@@ -23,6 +28,11 @@ export interface DiscountData {
   name: string;
   description?: string;
   percentage: number;
+  /** در صورت پشتیبانی API، نوع تخفیف */
+  type?: 'percentage' | 'fixed';
+  /** مقدار نمایشی تخفیف */
+  value?: number;
+  minOrderAmount?: number;
   startDate: string;
   endDate: string;
   isActive: boolean;

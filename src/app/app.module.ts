@@ -15,6 +15,9 @@ import { CoreModule } from './core/core.module';
 // Shared Module (reusable UI components)
 import { SharedModule } from './shared/shared.module';
 
+// Layouts Module (admin/seller layout)
+import { LayoutsModule } from './layouts/layouts.module';
+
 // Feature Modules (built incrementally)
 import { HomeModule } from './features/home/home.module';
 
@@ -29,6 +32,7 @@ import { HomeModule } from './features/home/home.module';
     AppRoutingModule,
     CoreModule,
     SharedModule,
+    LayoutsModule,
     HomeModule,
   ],
   providers: [

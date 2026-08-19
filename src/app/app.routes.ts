@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -52,16 +54,28 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
 
-  // مسیرهای ویژه‌ی نقش
+  // مسیرهای ویژه‌ی نقش — با قالب مشترک پنل
   {
     path: 'seller',
-    loadChildren: () => import('./features/seller/seller.module').then(m => m.SellerModule),
-    canActivate: [AuthGuard, RoleGuard('Seller')]
+    component: AdminLayoutComponent,
+    canActivate: [AuthGuard, RoleGuard('Seller')],
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./features/seller/seller.module').then(m => m.SellerModule)
+      }
+    ]
   },
   {
     path: 'admin',
-    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
-    canActivate: [AuthGuard, RoleGuard('Admin')]
+    component: AdminLayoutComponent,
+    canActivate: [AuthGuard, RoleGuard('Admin')],
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+      }
+    ]
   },
 
   { path: '**', redirectTo: '' }

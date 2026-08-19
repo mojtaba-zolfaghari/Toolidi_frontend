@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { Result } from '../core/models/api-response.model';
@@ -61,14 +62,28 @@ export class AdminPanelComponent implements OnInit {
   settingsMessage = '';
 
   constructor(
+    private readonly route: ActivatedRoute,
     private readonly adminService: AdminService,
     private readonly productService: ProductService,
     private readonly discountService: DiscountService
   ) {}
 
   ngOnInit(): void {
-    this.loadUsers();
     this.settings = this.loadSettings();
+
+    // خواندن تب از پارامتر کوئری (برای لینک‌های سایدبار)
+    this.route.queryParamMap.subscribe((params) => {
+      const tab = params.get('tab') as AdminTab | null;
+      if (tab && this.isValidTab(tab)) {
+        this.selectTab(tab);
+      } else {
+        this.loadUsers();
+      }
+    });
+  }
+
+  private isValidTab(tab: string): tab is AdminTab {
+    return ['users', 'products', 'sellers', 'discounts', 'reports', 'settings'].includes(tab);
   }
 
   // ===== کاربران =====

@@ -32,13 +32,47 @@ export interface ProductAttribute {
   value: string;
 }
 
+/** درخواست افزودن تصویر محصول (ImageUrl می‌تواند base64 باشد) */
+export interface ProductImageRequest {
+  imageUrl: string;
+  altText?: string;
+  displayOrder: number;
+  isPrimary: boolean;
+}
+
+/** درخواست افزودن/ویرایش مشخصه */
+export interface ProductAttributeRequest {
+  name: string;
+  value: string;
+}
+
+/** درخواست افزودن/ویرایش تنوع */
+export interface ProductVariationRequest {
+  sku: string;
+  displayName: string;
+  priceAdjustment: number;
+  stockQuantity: number;
+  isDefault: boolean;
+}
+
+/** درخواست اعمال تخفیف روی محصول */
+export interface ProductDiscountRequest {
+  price: number;
+  startDate: string;
+  endDate: string;
+  variationId?: string;
+}
+
 /** محصول (اطلاعات عمومی بازگشتی از API) */
 export interface Product {
   id: string;
   categoryId: string;
+  brandId?: string;
   name: string;
   sku: string;
   slug: string;
+  publishStatus?: string;
+  imageUrl?: string;
   shortDescription?: string;
   fullDescription?: string;
   unitPrice: number;
@@ -67,6 +101,8 @@ export interface Product {
 /** داده‌ی ایجاد محصول جدید */
 export interface CreateProductData {
   categoryId: string;
+  /** در APIهای قدیمی اختیاری است و در نسخه‌های دارای برند ذخیره می‌شود. */
+  brandId?: string;
   name: string;
   sku: string;
   shortDescription?: string;
@@ -148,5 +184,55 @@ export class ProductService {
   /** انتشار محصول تأییدشده توسط فروشنده */
   publishProduct(id: string): Observable<Result<boolean>> {
     return this.api.post<Result<boolean>>(`/v1/products/${id}/publish`, {});
+  }
+
+  /** افزودن تصویر به محصول */
+  uploadImage(productId: string, data: ProductImageRequest): Observable<Result<string>> {
+    return this.api.post<Result<string>>(`/v1/products/${productId}/images`, data);
+  }
+
+  /** حذف تصویر محصول */
+  deleteImage(imageId: string): Observable<Result<boolean>> {
+    return this.api.delete<Result<boolean>>(`/v1/products/images/${imageId}`);
+  }
+
+  /** افزودن مشخصه به محصول */
+  addAttribute(productId: string, data: ProductAttributeRequest): Observable<Result<string>> {
+    return this.api.post<Result<string>>(`/v1/products/${productId}/attributes`, data);
+  }
+
+  /** ویرایش مشخصه محصول */
+  updateAttribute(attributeId: string, data: ProductAttributeRequest): Observable<Result<boolean>> {
+    return this.api.put<Result<boolean>>(`/v1/products/attributes/${attributeId}`, data);
+  }
+
+  /** حذف مشخصه محصول */
+  deleteAttribute(attributeId: string): Observable<Result<boolean>> {
+    return this.api.delete<Result<boolean>>(`/v1/products/attributes/${attributeId}`);
+  }
+
+  /** افزودن تنوع به محصول */
+  addVariation(productId: string, data: ProductVariationRequest): Observable<Result<string>> {
+    return this.api.post<Result<string>>(`/v1/products/${productId}/variations`, data);
+  }
+
+  /** ویرایش تنوع محصول */
+  updateVariation(variationId: string, data: ProductVariationRequest): Observable<Result<boolean>> {
+    return this.api.put<Result<boolean>>(`/v1/products/variations/${variationId}`, data);
+  }
+
+  /** حذف تنوع محصول */
+  deleteVariation(variationId: string): Observable<Result<boolean>> {
+    return this.api.delete<Result<boolean>>(`/v1/products/variations/${variationId}`);
+  }
+
+  /** اعمال تخفیف روی محصول */
+  applyDiscount(productId: string, data: ProductDiscountRequest): Observable<Result<string>> {
+    return this.api.post<Result<string>>(`/v1/products/${productId}/discount`, data);
+  }
+
+  /** حذف تخفیف محصول */
+  removeDiscount(productId: string): Observable<Result<boolean>> {
+    return this.api.delete<Result<boolean>>(`/v1/products/${productId}/discount`);
   }
 }

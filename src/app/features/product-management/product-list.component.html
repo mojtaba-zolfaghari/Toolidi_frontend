@@ -1,0 +1,114 @@
+<section>
+  <div class="container mx-auto px-4 max-w-7xl">
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-sm text-primary font-medium mb-1">{{ isAdmin ? 'مدیریت محصولات' : 'فروشگاه من' }}</p>
+        <h1 class="text-3xl font-bold text-secondary">محصولات</h1>
+      </div>
+      <button type="button" (click)="createProduct()" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary-dark">
+        + افزودن محصول جدید
+      </button>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="mb-6 flex flex-wrap items-end gap-3 rounded-2xl bg-white p-4 shadow-card">
+      <label class="min-w-44">
+        <span class="mb-1 block text-xs text-gray-500">جستجو</span>
+        <input type="text" [(ngModel)]="search" (keyup.enter)="applyFilters()" placeholder="نام یا شناسه کالا…" class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" />
+      </label>
+      <ng-container *ngIf="isAdmin">
+        <label class="min-w-40">
+          <span class="mb-1 block text-xs text-gray-500">وضعیت</span>
+          <select [(ngModel)]="statusFilter" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm">
+            <option value="">همه</option>
+            <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
+        <label class="min-w-40">
+          <span class="mb-1 block text-xs text-gray-500">فروشنده</span>
+          <select [(ngModel)]="sellerFilter" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm">
+            <option value="">همه</option>
+            <option *ngFor="let seller of sellers" [value]="seller.id">{{ seller.companyName }}</option>
+          </select>
+        </label>
+      </ng-container>
+      <button type="button" (click)="applyFilters()" class="rounded-xl bg-secondary px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-secondary-light">اعمال فیلتر</button>
+    </div>
+
+    <p *ngIf="errorMessage" class="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage }}</p>
+    <p *ngIf="actionMessage" class="mb-4 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-600">{{ actionMessage }}</p>
+
+    <div *ngIf="loading" class="rounded-2xl bg-white py-16 shadow-card"><app-spinner label="در حال بارگذاری محصولات…"></app-spinner></div>
+
+    <!-- جدول مدیر -->
+    <div *ngIf="!loading && isAdmin" class="overflow-x-auto rounded-2xl bg-white shadow-card">
+      <table class="w-full min-w-[720px] text-sm text-right">
+        <thead>
+          <tr class="border-b bg-gray-50 text-gray-500">
+            <th class="p-3">تصویر</th>
+            <th class="p-3">نام</th>
+            <th class="p-3">شناسه کالا</th>
+            <th class="p-3">قیمت</th>
+            <th class="p-3">وضعیت</th>
+            <th class="p-3">فروشنده</th>
+            <th class="p-3">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of adminProducts" class="border-b last:border-0">
+            <td class="p-3"><div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-light to-primary text-xl"><img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" class="h-full w-full object-cover" /><span *ngIf="!product.imageUrl">🛍️</span></div></td>
+            <td class="p-3 font-bold text-secondary">{{ product.name }}</td>
+            <td class="p-3">{{ product.sku }}</td>
+            <td class="p-3">{{ product.unitPrice | number }} تومان</td>
+            <td class="p-3"><app-status-badge [status]="product.publishStatus"></app-status-badge></td>
+            <td class="p-3 text-xs text-gray-500">{{ sellerName(product.sellerId) }}</td>
+            <td class="p-3">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" (click)="editProduct(product.id)" class="rounded-lg bg-accent-info px-3 py-1.5 text-xs font-bold text-white">✏️ ویرایش</button>
+                <button type="button" (click)="approve(product)" [disabled]="actionLoading || product.publishStatus === 'Approved' || product.publishStatus === 'Published'" class="rounded-lg bg-accent-success px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40">✅ تأیید</button>
+                <button type="button" (click)="publish(product)" [disabled]="actionLoading || product.publishStatus !== 'Approved'" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white disabled:opacity-40">🚀 انتشار</button>
+                <button type="button" (click)="reject(product)" [disabled]="actionLoading" class="rounded-lg border border-orange-200 px-3 py-1.5 text-xs text-orange-600 hover:bg-orange-50 disabled:opacity-40">رد</button>
+                <button type="button" (click)="removeProduct(product.id)" [disabled]="actionLoading" class="rounded-lg border border-red-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 disabled:opacity-40">🗑️ حذف</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!adminProducts.length" class="py-10 text-center text-gray-400">محصولی برای نمایش وجود ندارد.</p>
+    </div>
+
+    <!-- جدول فروشنده -->
+    <div *ngIf="!loading && !isAdmin" class="overflow-x-auto rounded-2xl bg-white shadow-card">
+      <table class="w-full min-w-[640px] text-sm text-right">
+        <thead>
+          <tr class="border-b bg-gray-50 text-gray-500">
+            <th class="p-3">تصویر</th>
+            <th class="p-3">نام</th>
+            <th class="p-3">شناسه کالا</th>
+            <th class="p-3">قیمت</th>
+            <th class="p-3">وضعیت</th>
+            <th class="p-3">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of sellerProducts" class="border-b last:border-0">
+            <td class="p-3"><div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-light to-primary text-xl"><img *ngIf="product.images?.[0]?.imageUrl" [src]="product.images?.[0]?.imageUrl" [alt]="product.name" class="h-full w-full object-cover" /><span *ngIf="!product.images?.[0]?.imageUrl">🛍️</span></div></td>
+            <td class="p-3 font-bold text-secondary">{{ product.name }}</td>
+            <td class="p-3">{{ product.sku }}</td>
+            <td class="p-3">{{ product.unitPrice | number }} تومان</td>
+            <td class="p-3"><app-status-badge [status]="product.publishStatus || 'PendingApproval'"></app-status-badge></td>
+            <td class="p-3"><div class="flex flex-wrap gap-2"><button type="button" (click)="editProduct(product.id)" class="rounded-lg bg-accent-info px-3 py-1.5 text-xs font-bold text-white">✏️ ویرایش</button><button type="button" (click)="removeProduct(product.id)" [disabled]="actionLoading" class="rounded-lg border border-red-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 disabled:opacity-40">🗑️ حذف</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!sellerProducts.length" class="py-10 text-center text-gray-400">محصولی برای نمایش وجود ندارد.</p>
+    </div>
+
+    <app-pagination
+      *ngIf="!loading && totalPages > 1"
+      [page]="page"
+      [totalPages]="totalPages"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+</section>
