@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><title>API Smoke Test</title></head>
+<body>
+  <h3>آزمون اتصال به API (GET /api/Category)</h3>
+  <pre id="result">در حال بارگذاری...</pre>
+  <script>
+    fetch('https://localhost:7182/api/Category')
+      .then(function (r) {
+        return r.text();
+      })
+      .then(function (text) {
+        document.getElementById('result').textContent = 'HTTP ' + text.slice(0, 400);
+      })
+      .catch(function (e) {
+        document.getElementById('result').textContent = 'ERROR: ' + e.message;
+      });
+  </script>
+</body>
+</html>

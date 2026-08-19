@@ -15,4 +15,24 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 
 // Feature Modules (built incrementally)
-import { HomeModule } from './features/home/ho
+import { HomeModule } from './features/home/home.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule,
+    CoreModule,
+    SharedModule,
+    HomeModule,
+  ],
+  providers: [
+    // ثبت اینترسپتور توکن برای تمام درخواست‌های HTTP
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
