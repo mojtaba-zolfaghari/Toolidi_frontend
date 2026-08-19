@@ -1,0 +1,23 @@
+<header>
+  <nav class="bg-secondary text-white shadow-md">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <a routerLink="/" class="text-2xl font-bold text-primary">تولیدی</a>
+      <div class="flex gap-6">
+        <a routerLink="/shop" class="hover:text-primary transition-colors">فروشگاه</a>
+        <a routerLink="/blog" class="hover:text-primary transition-colors">بلاگ</a>
+        <a routerLink="/contact" class="hover:text-primary transition-colors">تماس با ما</a>
+        <a routerLink="/cart" class="hover:text-primary transition-colors">سبد خرید</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="bg-secondary text-white mt-12 py-8">
+  <div class="container mx-auto px-4 text-center">
+    <p>&copy; 2024 تولیدی. تمامی حقوق محفوظ است.</p>
+  </div>
+</footer>

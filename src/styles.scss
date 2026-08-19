@@ -1,0 +1,53 @@
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Global Styles === */
+
+/* Base RTL typography */
+html {
+  font-family: 'Vazirmatn', sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #FBFAF8;
+  color: #1B2A4A;
+  direction: rtl;
+  min-height: 100vh;
+}
+
+/* Persian digit support — Vazirmatn includes them */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth box-sizing for all elements */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Scrollbar styling — subtle */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c4b5fd;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6C3FC5;
+}
+
+/* Utility: container for RTL-friendly spacing */
+.container-rtl {
+  padding-inline-start: 1rem;
+  padding-inline-end: 1rem;
+}

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسویه حساب — toolidi.ir</title>
+    
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C3FC5',
+                        'primary-dark': '#5331A0',
+                        'primary-light': '#8B6CD9',
+                        'primary-surface': '#F5F0FF',
+                        secondary: '#1B2A4A',
+                        'secondary-light': '#2A3F6A',
+                        'success': '#059669',
+                        'warning': '#D97706',
+                        'danger': '#DC2626',
+                        'bg-warm': '#FBFAF8',
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
+                        'card-hover': '0 10px 30px rgba(108, 63, 197, 0.12), 0 4px 8px rgba(0,0,0,0.06)',
+                        'stripe': '0 30px 45px -30px rgba(50,50,93,0.25), 0 18px 36px -18px rgba(0,0,0,0.1)',
+                        'notion': '0 4px 18px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Vazirmatn', system-ui, sans-serif; }
+        
+        /* RTL-aware spacing */
+        [dir="rtl"] .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 1;
+        }
+        .ml-2 { margin-right: 0.5rem; margin-left: 0; }
+        .mr-2 { margin-left: 0.5rem; margin-right: 0; }
+        .ml-4 { margin-right: 1rem; margin-left: 0; }
+        .mr-4 { margin-left: 1rem; margin-right: 0; }
+        
+        /* Persian number styling */
+        .price { font-feature-settings: 'tnum'; letter-spacing: 0.5px; }
+        
+        /* Smooth transitions */
+        .stepper-step {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stepper-step.active {
+            @apply bg-primary text-white;
+        }
+        .stepper-step.completed {
+            @apply bg-success text-white;
+        }
+        .stepper-step:hover:not(.active):not(.completed) {
+            @apply bg-gray-50;
+        }
+        
+        /* Form styles */
+        .form-input {
+            @apply w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-2;
+        }
+        .form-error {
+            @apply text-sm text-danger mt-1 block;
+        }
+        
+        /* Cart item */
+        .cart-item {
+            @apply border-b py-4 flex items-center gap-4;
+        }
+        .cart-item-image {
+            @apply w-16 h-16 object-cover rounded-lg bg-gray-100;
+        }
+        .cart-item-details {
+            @apply flex-1 min-w-0;
+        }
+        .cart-item-title {
+            @apply font-medium text-gray-900 mb-1 line-clamp-2;
+        }
+        .cart-item-price {
+            @apply font-semibold text-primary space-x-1;
+        }
+        
+        /* Payment method */
+        .payment-method {
+            @apply flex items-center gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-primary/20 transition-colors;
+        }
+        .payment-method.selected {
+            @apply border-primary bg-primary/5;
+        }
+        .payment-method-icon {
+            @apply w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg;
+        }
+        .payment-method-details {
+            @apply flex-1 min-w-0;
+        }
+        .payment-method-title {
+            @apply font-medium text-gray-900 mb-1;
+        }
+        .payment-method-description {
+            @apply text-sm text-gray-500;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+
+    <!-- ========== HEADER ========== -->
+    <header class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">ت</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold text-secondary">toolidi</span>
+                        <span class="text-lg font-bold text-primary">.ir</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">خانه</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">فروشگاه</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">دسته‌بندی‌ها</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">وبلاگ</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">تماس با ما</a>
+                </nav>
+
+                <!-- Left Actions -->
+                <div class="flex items-center gap-4">
+                    <!-- Search -->
+                    <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <span>جستجو...</span>
+                        <kbd class="hidden lg:inline px-1.5 py-0.5 text-xs bg-gray-100 rounded">Ctrl+K</kbd>
+                    </button>
+
+                    <!-- Cart -->
+                    <button class="relative p-2 text-gray-500 hover:text-primary transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span class="absolute -top-0.5 -left-0.5 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">۳</span>
+                    </button>
+
+                    <!-- Auth Buttons -->
+                    <div class="hidden sm:flex items-center gap-3">
+                        <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">ورود</a>
+                        <a href="#" class="text-sm font-medium bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors shadow-stripe-sm">ثبت‌نام</a>
+                    </div>
+                    
+                    <!-- Mobile Menu -->
+                    <button class="md:hidden p-2 text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== BREADCRUMBS ========== -->
+    <div class="bg-bg-warm py-4 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="text-sm text-gray-500">
+                <ol class="flex items-center gap-2">
+                    <li><a href="#" class="hover:text-primary transition-colors">فروشگاه</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li><a href="#" class="hover:text-primary transition-colors">سبد خرید</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li class="text-primary font-medium">تسویه حساب</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ========== CHECKOUT ========== -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Order Summary -->
+                <div class="space-y-6">
+                    <h2 class="text-2xl font-bold text-secondary mb-4">مراجعة و پرداخت</h2>
+                    
+                    <!-- Stepper -->
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex-1 stepper-step flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-lg hover:bg-gray-50">
+                            <span>سبد خرید</span>
+                        </div>
+                        <div class="w-px bg-gray-200"></div>
+                        <div class="flex-1 stepper-step flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-lg hover:bg-gray-50">
+                            <span>اطلاعات</span>
+                        </div>
+                        <div class="w-px bg-gray-200"></div>
+                        <div class="flex-1 stepper-step active flex items-center justify-center px-4 py-2 text-sm font-medium bg-primary text-white border rounded-lg">
+                            <span>پرداخت</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Cart Items -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-lg text-gray-900">محصولات سبد خرید</h3>
+                            <span class="text-sm text-gray-500">۳ محصول</span>
+                        </div>
+                        
+                        <!-- Cart Item 1 -->
+                        <div class="cart-item">
+                            <img src="https://placehold.co/80x80/8B6CD9/FFFFFF?text=دریل+برقی" alt="دریل برقی" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <p class="cart-item-title">دریل برقی ۸۰۰ وات حرفه‌ای</p>
+                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                    <span>× ۱</span>
+                                    <span class="text-gray-400">|</span>
+                                    <span>AB-800-Pro</span>
+                                </div>
+                            </div>
+                            <div class="cart-item-price">
+                                <span class="text-lg font-bold">۲,۴۵۰,۰۰۰</span>
+                                <span class="text-sm text-gray-400 line-through">۳,۱۰۰,۰۰۰</span>
+                                <span class="text-xs text-gray-400 ml-2">تومان</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Cart Item 2 -->
+                        <div class="cart-item">
+                            <img src="https://placehold.co/80x80/6C3FC5/FFFFFF?text=ست+ابزار" alt="ست ابزار" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <p class="cart-item-title">ست ابزار ۲۰۴ قطعه حرفه‌ای</p>
+                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                    <span>× ۱</span>
+                                    <span class="text-gray-400">|</span>
+                                    <span>TK-204-Pro</span>
+                                </div>
+                            </div>
+                            <div class="cart-item-price">
+                                <span class="text-lg font-bold">۴,۸۵۰,۰۰۰</span>
+                                <span class="text-sm text-gray-400 line-through">۵,۹۰۰,۰۰۰</span>
+                                <span class="text-xs text-gray-400 ml-2">تومان</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Cart Item 3 -->
+                        <div class="cart-item">
+                            <img src="https://placehold.co/80x80/5331A0/FFFFFF?text=مولتی+متر" alt="مولتی متر" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <p class="cart-item-title">مولتی متر دیجیتال پیشرفته</p>
+                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                    <span>× ۱</span>
+                                    <span class="text-gray-400">|</span>
+                                    <span>MT-Digital-Pro</span>
+                                </div>
+                            </div>
+                            <div class="cart-item-price">
+                                <span class="text-lg font-bold">۸۹۰,۰۰۰</span>
+                                <span class="text-sm text-gray-400 line-through">۱,۲۰۰,۰۰۰</span>
+                                <span class="text-xs text-gray-400 ml-2">تومان</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary -->
+                    <div class="bg-bg-warm rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4 pt-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-700">جمع موقت</span>
+                            <span class="text-sm font-medium text-gray-900">۸,۱۹۰,۰۰۰ تومان</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-2 pt-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-700">کودکاه</span>
+                            <span class="text-sm font-medium text-gray-900">-۴۰۹,۵۰۰ تومان</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-4 pt-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-700">هزینه ارسال</span>
+                            <span class="text-sm font-medium text-gray-900">مجانی</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <span class="text-xl font-bold text-secondary">مجموع قابل پرداخت</span>
+                            <span class="text-2xl font-bold text-primary price">۷,۷۸۰,۵۰۰ تومان</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Form -->
+                <div class="space-y-6">
+                    <h2 class="text-2xl font-bold text-secondary mb-4">روش پرداخت</h2>
+                    
+                    <!-- Payment Methods -->
+                    <div class="space-y-4">
+                        <!-- Sep -->
+                        <label class="payment-method" id="sep-method">
+                            <input type="radio" name="payment" class="hidden" checked>
+                            <div class="payment-method-icon">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4h16c0-2.21-1.79-4-4-4zm0 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                                </svg>
+                            </div>
+                            <div class="payment-method-details">
+                                <div class="payment-method-title">سپ (بانک سامان)</div>
+                                <div class="payment-method-description">پرداخت trựcواری با کارت‌های شتاب</div>
+                            </div>
+                        </label>
+                        
+                        <!-- Zarinpal -->
+                        <label class="payment-method">
+                            <input type="radio" name="payment" class="hidden">
+                            <div class="payment-method-icon">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                            <div class="payment-method-details">
+                                <div class="payment-method-title">زرین‌پال</div>
+                                <div class="payment-method-description">پرداخت آنلاین با تمام کارت‌ها</div>
+                            </div>
+                        </label>
+                        
+                        <!-- Tarb -->
+                        <label class="payment-method">
+                            <input type="radio" name="payment" class="hidden">
+                            <div class="payment-method-icon">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3zm2 2h14v14H5V5z" />
+                                </svg>
+                            </div>
+                            <div class="payment-method-details">
+                                <div class="payment-method-title">ترب</div>
+                                <div class="payment-method-description">پرداخت با کیف پول điện tử</div>
+                            </div>
+                        </label>
+                        
+                        <!-- Emalz -->
+                        <label class="payment-method">
+                            <input type="radio" name="payment" class="hidden">
+                            <div class="payment-method-icon">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-.707-1.293a1 1 0 00-1.414 0l-1.293.707V5a1 1 0 00-2 0v4l-.707-1.297a1 1 0 00-1.414 0l-1.293.703V5a1 1 0 00-2 0v4l-.707-1.293a1 1 0 00-1.414 0l-1.293.707V5a1 1 0 00-2 0v4l-.707-1.293a1 1 0 00-1.414 0l-1.293.707V5a1 1 0 00-2 0v4l-.707-1.293a1 1 0 00-1.414 0l-1.293.707V5a1 1 0 00-2 0v4z" />
+                                </svg>
+                            </div>
+                            <div class="payment-method-details">
+                                <div class="payment-method-title">ایمالز</div>
+                                <div class="payment-method-description">پرداخت با کیف پول điện ایرانی</div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Payment Button -->
+                    <button class="w-full bg-primary text-white py-4 rounded-xl hover:bg-primary-dark transition-all font-medium active:scale-[0.98] shadow-stripe-sm">
+                        پرداخت نهایی و سفارش
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-secondary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">ت</span>
+                        </div>
+                        <span class="text-lg font-bold">toolidi.ir</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        فروشگاه اینترنتی تخصصی ابزارآلات صنعتی و حرفه‌ای. ارائه‌دهنده انواع ابزار برقی، دستی، دقیق و ایمنی با بهترین کیفیت و قیمت.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">دسترسی سریع</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">صفحه اصلی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">فروشگاه</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">دسته‌بندی‌ها</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">تخفیف‌های ویژه</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">وبلاگ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-semibold mb-4">دسته‌بندی‌ها</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار برقی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار دستی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار دقیق</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار ایمنی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">لوازم جانبی</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4">اطلاعات تماس</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📍</span>
+                            <span>تهران، خیابان ولیعصر، پلاک ۱۲۳۴</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📞</span>
+                            <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📱</span>
+                            <span>۰۹۱۲-۳۴۵-۶۷۸۹</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>✉️</span>
+                            <span>info@toolidi.ir</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Payment Methods Strip -->
+    <div class="bg-gray-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-xs text-gray-400 mb-3">درگاه‌های پرداخت و سکوهای همکار</p>
+            <div class="flex flex-wrap items-center justify-center gap-6 text-gray-300">
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">سپ (بانک سامان)</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">زرین‌پال</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">ترب</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">ایمالز</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">باسلام</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

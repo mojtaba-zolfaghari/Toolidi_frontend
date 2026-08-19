@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای خرید دریل برقی حرفه‌ای — blog.toolidi.ir</title>
+    
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C3FC5',
+                        'primary-dark': '#5331A0',
+                        'primary-light': '#8B6CD9',
+                        'primary-surface': '#F5F0FF',
+                        secondary: '#1B2A4A',
+                        'secondary-light': '#2A3F6A',
+                        'success': '#059669',
+                        'warning': '#D97706',
+                        'danger': '#DC2626',
+                        'bg-warm': '#FBFAF8',
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
+                        'card-hover': '0 10px 30px rgba(108, 63, 197, 0.12), 0 4px 8px rgba(0,0,0,0.06)',
+                        'stripe': '0 30px 45px -30px rgba(50,50,93,0.25), 0 18px 36px -18px rgba(0,0,0,0.1)',
+                        'notion': '0 4px 18px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03)',
+                        'stripe-card': 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.1) 0px 8px 16px -8px',
+                        'stripe-sm': 'rgba(50, 50, 93, 0.15) 0px 6px 12px -2px, rgba(0, 0, 0, 0.08) 0px 3px 7px -3px',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(12px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Vazirmatn', system-ui, sans-serif; }
+        
+        /* RTL-aware spacing */
+        [dir="rtl"] .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 1;
+        }
+        .ml-2 { margin-right: 0.5rem; margin-left: 0; }
+        .mr-2 { margin-left: 0.5rem; margin-right: 0; }
+        .ml-4 { margin-right: 1rem; margin-left: 0; }
+        .mr-4 { margin-left: 1rem; margin-right: 0; }
+
+        /* Persian number styling */
+        .price { font-feature-settings: 'tnum'; letter-spacing: 0.5px; }
+
+        /* Smooth transitions */
+        .card-transition {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-transition:hover {
+            transform: translateY(-4px);
+            box-shadow: rgba(108, 63, 197, 0.12) 0px 20px 40px -8px, rgba(0, 0, 0, 0.08) 0px 8px 16px -6px;
+        }
+
+        /* Badge pill */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6C3FC5; }
+
+        /* ========== Blog Prose Styling ========== */
+        .blog-prose {
+            color: #374151;
+            line-height: 1.9;
+            font-size: 1.05rem;
+        }
+        .blog-prose p {
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+        }
+        .blog-prose h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1B2A4A;
+            margin-top: 2.5em;
+            margin-bottom: 0.75em;
+            padding-bottom: 0.5em;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .blog-prose h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1B2A4A;
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+        .blog-prose ul, .blog-prose ol {
+            margin-top: 1em;
+            margin-bottom: 1.5em;
+            padding-right: 1.5rem;
+        }
+        .blog-prose li {
+            margin-bottom: 0.5em;
+        }
+        .blog-prose ul li {
+            list-style-type: disc;
+        }
+        .blog-prose ol li {
+            list-style-type: persian;
+        }
+        .blog-prose a {
+            color: #6C3FC5;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .blog-prose a:hover {
+            color: #5331A0;
+        }
+
+        /* Blockquote - Notion inspired */
+        .blog-prose blockquote {
+            margin-top: 2em;
+            margin-bottom: 2em;
+            padding: 1.25em 1.5em;
+            background: #F5F0FF;
+            border-right: 4px solid #6C3FC5;
+            border-radius: 0 12px 12px 0;
+            color: #4B5563;
+        }
+        .blog-prose blockquote p {
+            margin: 0;
+        }
+        .blog-prose blockquote footer {
+            margin-top: 0.75em;
+            font-size: 0.875rem;
+            color: #6C3FC5;
+            font-weight: 500;
+        }
+
+        /* Code */
+        .blog-prose code {
+            background-color: #f3f4f6;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            direction: ltr;
+            display: inline-block;
+        }
+        .blog-prose pre {
+            background-color: #1B2A4A;
+            color: #e5e7eb;
+            padding: 1.25rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+        }
+        .blog-prose pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Image in prose */
+        .blog-prose img {
+            border-radius: 12px;
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+
+        /* Highlight Box */
+        .tip-box {
+            background: #ECFDF5;
+            border-right: 4px solid #059669;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+        }
+        .tip-box-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 0.5rem;
+        }
+        .warning-box {
+            background: #FFFBEB;
+            border-right: 4px solid #D97706;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+        }
+        .warning-box-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #D97706;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table of Contents - sticky sidebar */
+        .toc-link {
+            display: block;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            color: #6B7280;
+            border-right: 2px solid transparent;
+            transition: all 0.2s;
+            border-radius: 0 4px 4px 0;
+        }
+        .toc-link:hover {
+            color: #6C3FC5;
+            background: #F5F0FF;
+            border-right-color: #6C3FC5;
+        }
+        .toc-link.active {
+            color: #6C3FC5;
+            font-weight: 500;
+            background: #F5F0FF;
+            border-right-color: #6C3FC5;
+        }
+        .toc-link.h2 { padding-right: 0.75rem; }
+        .toc-link.h3 { padding-right: 1.5rem; }
+
+        /* Progress bar for scroll reading */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6C3FC5, #8B6CD9);
+            z-index: 9999;
+            transition: width 0.05s linear;
+        }
+
+        /* Share button pulse */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .share-btn:hover {
+            animation: pulse-subtle 0.6s ease-in-out;
+        }
+
+        /* Related post card image zoom */
+        .related-img-wrapper {
+            overflow: hidden;
+        }
+        .related-img-wrapper img {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .related-img-wrapper:hover img {
+            transform: scale(1.06);
+        }
+
+        /* Line clamp */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-bg-warm text-gray-900 antialiased">
+
+    <!-- ========== READING PROGRESS BAR ========== -->
+    <div id="readingProgress" class="reading-progress"></div>
+
+    <!-- ========== HEADER ========== -->
+    <header class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">ت</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold text-secondary">toolidi</span>
+                        <span class="text-lg font-bold text-primary">.ir</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">خانه</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">فروشگاه</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">دسته‌بندی‌ها</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors font-semibold text-secondary">وبلاگ</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">تماس با ما</a>
+                </nav>
+
+                <!-- Left Actions -->
+                <div class="flex items-center gap-4">
+                    <!-- Search -->
+                    <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <span>جستجو...</span>
+                        <kbd class="hidden lg:inline px-1.5 py-0.5 text-xs bg-gray-100 rounded">Ctrl+K</kbd>
+                    </button>
+
+                    <!-- Cart -->
+                    <button class="relative p-2 text-gray-500 hover:text-primary transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span class="absolute -top-0.5 -left-0.5 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">۳</span>
+                    </button>
+
+                    <!-- Auth Buttons -->
+                    <div class="hidden sm:flex items-center gap-3">
+                        <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">ورود</a>
+                        <a href="#" class="text-sm font-medium bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors shadow-stripe-sm">ثبت‌نام</a>
+                    </div>
+                    
+                    <!-- Mobile Menu -->
+                    <button class="md:hidden p-2 text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== BREADCRUMBS ========== -->
+    <div class="bg-white border-b border-gray-100 py-4">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="text-sm text-gray-500">
+                <ol class="flex items-center gap-2 flex-wrap">
+                    <li><a href="#" class="hover:text-primary transition-colors">خانه</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li><a href="#" class="hover:text-primary transition-colors">وبلاگ</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li class="text-primary font-medium">راهنمای خرید دریل برقی حرفه‌ای</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+        <div class="flex gap-10">
+            
+            <!-- ===== SIDEBAR - TABLE OF CONTENTS ===== -->
+            <aside class="hidden lg:block w-64 flex-shrink-0">
+                <div class="sticky top-24">
+                    <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-notion">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">فهرست مطالب</h4>
+                        <nav id="toc" class="space-y-1">
+                            <a href="#intro" class="toc-link h2">مقدمه</a>
+                            <a href="#power" class="toc-link h2">۱. توان و قدرت موتور</a>
+                            <a href="#battery" class="toc-link h2">۲. سیستم باتری</a>
+                            <a href="#ergonomics" class="toc-link h2">۳. ارگونومی و ایمنی</a>
+                            <a href="#brand" class="toc-link h2">۴. برند و گارانتی</a>
+                            <a href="#recommend" class="toc-link h2">۵. توصیه‌های خرید</a>
+                            <a href="#faq" class="toc-link h2">سوالات متداول</a>
+                        </nav>
+                    </div>
+
+                    <!-- Share in sidebar -->
+                    <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-notion mt-4">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">اشتراک‌گذاری</h4>
+                        <div class="flex items-center gap-2">
+                            <button class="share-btn w-9 h-9 rounded-lg bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center hover:bg-[#1DA1F2]/20 transition-colors" title="اشتراک در توییتر">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            </button>
+                            <button class="share-btn w-9 h-9 rounded-lg bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center hover:bg-[#1877F2]/20 transition-colors" title="اشتراک در فیسبوک">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            </button>
+                            <button class="share-btn w-9 h-9 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center hover:bg-[#25D366]/20 transition-colors" title="اشتراک در واتساپ">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </button>
+                            <button class="share-btn w-9 h-9 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 transition-colors" title="کپی لینک">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Related in sidebar (desktop) -->
+                    <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-notion mt-4 hidden xl:block">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">مطالب داغ</h4>
+                        <div class="space-y-3">
+                            <a href="#" class="flex items-start gap-3 group">
+                                <div class="w-10 h-10 rounded-lg bg-primary-surface flex-shrink-0 flex items-center justify-center text-primary font-bold text-xs">۱</div>
+                                <p class="text-xs text-gray-600 group-hover:text-primary transition-colors line-clamp-2">۱۰ ابزار ضروری برای هر کارگاه حرفه‌ای</p>
+                            </a>
+                            <a href="#" class="flex items-start gap-3 group">
+                                <div class="w-10 h-10 rounded-lg bg-primary-surface flex-shrink-0 flex items-center justify-center text-primary font-bold text-xs">۲</div>
+                                <p class="text-xs text-gray-600 group-hover:text-primary transition-colors line-clamp-2">نحوه نگهداری صحیح از باتری ابزارهای بیسیم</p>
+                            </a>
+                            <a href="#" class="flex items-start gap-3 group">
+                                <div class="w-10 h-10 rounded-lg bg-primary-surface flex-shrink-0 flex items-center justify-center text-primary font-bold text-xs">۳</div>
+                                <p class="text-xs text-gray-600 group-hover:text-primary transition-colors line-clamp-2">مقایسه برندهای معتبر ابزار برقی بازار ایران</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ===== ARTICLE ===== -->
+            <article class="flex-1 min-w-0 animate-fade-in">
+
+                <!-- Article Header -->
+                <header class="mb-8">
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <span class="badge bg-primary/10 text-primary font-medium">راهنمای خرید</span>
+                        <span class="badge bg-success/10 text-success font-medium">ابزار برقی</span>
+                        <span class="flex items-center gap-1 text-xs text-gray-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>۲۳ اردیبهشت ۱۴۰۳</span>
+                        </span>
+                        <span class="flex items-center gap-1 text-xs text-gray-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>۸ دقیقه مطالعه</span>
+                        </span>
+                    </div>
+
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-secondary leading-tight mb-6">
+                        راهنمای جامع خرید دریل برقی حرفه‌ای
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-500 leading-relaxed mb-8">
+                        از توان موتور تا سیستم باتری و نکات ایمنی — هرآنچه برای خرید یک دریل برقی مناسب نیاز دارید در این مقاله بخوانید.
+                    </p>
+
+                    <!-- Author Info -->
+                    <div class="flex items-center justify-between flex-wrap gap-4 pb-6 border-b border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <img src="https://placehold.co/48x48/6C3FC5/FFFFFF?text=رض" alt="نویسنده" class="w-11 h-11 rounded-full object-cover">
+                            <div>
+                                <p class="font-semibold text-sm text-gray-900">رضا کریمی</p>
+                                <p class="text-xs text-gray-400">کارشناس ابزارهای صنعتی</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-gray-400">دیدگاه: ۲۴ نظر</span>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Featured Image -->
+                <div class="relative mb-10 rounded-2xl overflow-hidden shadow-stripe-card">
+                    <img src="https://placehold.co/1200x600/6C3FC5/FFFFFF?text=راهنمای+خرید+دریل+برقی+حرفه‌ای" alt="راهنمای خرید دریل برقی حرفه‌ای" class="w-full h-auto">
+                    <div class="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent"></div>
+                </div>
+
+                <!-- ===== ARTICLE BODY ===== -->
+                <div class="blog-prose">
+
+                    <p id="intro">
+                        انتخاب یک دریل برقی مناسب برای کارهای حرفه‌ای و صنعتی یکی از مهم‌ترین تصمیماتی است که یک تکنسین یا صنعتگر باید بگیرد. تنوع بالای برندها، مدل‌ها و مشخصات فنی در بازار باعث سردرگمی بسیاری از خریداران شده است. در این مقاله قصد داریم به صورت جامع و گام‌به‌گام شما را با فاکتورهای کلیدی در خرید یک دریل برقی حرفه‌ای آشنا کنیم.
+                    </p>
+                    <p>
+                        چه به دنبال یک دریل برای مصارف عمومی باشید و چه نیاز به ابزاری تخصصی برای کار روی فلز، بتن یا چوب داشته باشید، این راهنما به شما کمک می‌کند تا بهترین انتخاب را متناسب با نیاز و بودجه خود داشته باشید.
+                    </p>
+
+                    <!-- ====== SECTION 1 ====== -->
+                    <h2 id="power">۱. توان و قدرت موتور</h2>
+                    <p>
+                        توان موتور بر حسب وات (Watt) مهم‌ترین پارامتر در تعیین کارایی یک دریل برقی است. هرچه توان بیشتر باشد، دریل قدرت بیشتری برای غلبه بر مقاومت مواد سخت خواهد داشت.
+                    </p>
+                    <p>
+                        برای کاربردهای مختلف، توان‌های متفاوتی توصیه می‌شود:
+                    </p>
+                    <ul>
+                        <li><strong>کارهای سبک</strong> (سوراخ‌کاری چوب و پلاستیک): ۴۰۰ تا ۶۰۰ وات</li>
+                        <li><strong>کارهای نیمه‌صنعتی</strong> (سوراخ‌کاری فلز و دیوار): ۶۰۰ تا ۸۰۰ وات</li>
+                        <li><strong>کارهای صنعتی و سنگین</strong> (بتن و فولاد): ۸۰۰ تا ۱۲۰۰ وات</li>
+                    </ul>
+
+                    <div class="tip-box">
+                        <div class="tip-box-title">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            <span>نکته حرفه‌ای</span>
+                        </div>
+                        <p class="text-sm text-gray-700 m-0">برای کارهای مداوم صنعتی، دریل‌هایی با توان بالای ۸۰۰ وات و سیستم خنک‌کننده مجزا انتخاب کنید. موتورهای دارای محافظ حرارتی عمر بیشتری دارند.</p>
+                    </div>
+
+                    <p>
+                        همچنین به <strong>سرعت چرخش</strong> (RPM) توجه کنید. دریل‌های حرفه‌ای معمولاً دارای سرعت متغیر بین ۰ تا ۳۲۰۰ دور در دقیقه هستند که امکان تنظیم سرعت متناسب با جنس ماده را فراهم می‌کند. وجود دکمه قفل سرعت نیز برای کارهای طولانی‌مدت بسیار کاربردی است.
+                    </p>
+
+                    <!-- ====== SECTION 2 ====== -->
+                    <h2 id="battery">۲. سیستم باتری در دریل‌های شارژی</h2>
+                    <p>
+                        اگر به دنبال آزادی عمل بیشتر و کار در محیط‌های بدون دسترسی به برق هستید، دریل‌های شارژی گزینه ایده‌آلی هستند. اما انتخاب باتری مناسب خود نیازمند دانش فنی است.
+                    </p>
+
+                    <h3>ولتاژ باتری</h3>
+                    <p>
+                        ولتاژ باتری (V) تعیین‌کننده قدرت خروجی دریل است. استانداردهای رایج در بازار:
+                    </p>
+                    <ul>
+                        <li><strong>۱۲ ولت:</strong> مناسب برای کارهای سبک و مصارف خانگی</li>
+                        <li><strong>۱۸ ولت:</strong> استاندارد حرفه‌ای، مناسب برای اکثر کارهای صنعتی</li>
+                        <li><strong>۲۰ تا ۳۶ ولت:</strong> مخصوص کارهای فوق سنگین و حرفه‌ای</li>
+                    </ul>
+
+                    <h3>ظرفیت باتری (Ah)</h3>
+                    <p>
+                        ظرفیت باتری بر حسب آمپر-ساعت (Ah) نشان‌دهنده میزان انرژی ذخیره‌شده و مدت زمان کارکرد دستگاه است. برای کار نیمه‌وقت، باتری ۲.۰ تا ۴.۰ Ah کافی است، اما برای کار تمام‌وقت حرفه‌ای، باتری‌های ۵.۰ Ah به بالا توصیه می‌شوند.
+                    </p>
+
+                    <div class="warning-box">
+                        <div class="warning-box-title">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                            <span>هشدار مهم</span>
+                        </div>
+                        <p class="text-sm text-gray-700 m-0">همیشه از باتری و شارژر اصلی برند استفاده کنید. باتری‌های غیر اصل نه تنها عمر کوتاهی دارند، بلکه می‌توانند به دستگاه آسیب بزنند و خطر آتش‌سوزی دارند.</p>
+                    </div>
+
+                    <!-- ====== SECTION 3 ====== -->
+                    <h2 id="ergonomics">۳. ویژگی‌های ارگونومیک و ایمنی</h2>
+                    <p>
+                        کار با دریل برقی می‌تواند ساعات طولانی به طول انجامد. بنابراین راحتی و ایمنی در حین کار از اهمیت ویژه‌ای برخوردار است. به ویژگی‌های زیر دقت کنید:
+                    </p>
+                    <ol>
+                        <li><strong>دسته ضد لرزش (Anti-Vibration):</strong> کاهش لرزش دست هنگام کار طولانی‌مدت</li>
+                        <li><strong>دکمه قفل ایمنی:</strong> جلوگیری از روشن شدن ناخواسته دستگاه</li>
+                        <li><strong>نور LED:</strong> روشنایی محل کار در فضاهای تاریک</li>
+                        <li><strong>کلاچ تنظیم گشتاور:</strong> جلوگیری از پیچ‌شدگی و شکستن سری</li>
+                        <li><strong>وزن متعادل:</strong> توزیع مناسب وزن برای کاهش خستگی</li>
+                    </ol>
+
+                    <blockquote>
+                        <p>«در انتخاب ابزار، کیفیت همیشه مقدم بر قیمت است؛ چون ابزار ضعیف نه تنها کار را کندتر می‌کند، بلکه ایمنی کاربر را نیز به خطر می‌اندازد.»</p>
+                        <footer>— مهندس رضا کریمی، متخصص ابزارهای صنعتی</footer>
+                    </blockquote>
+
+                    <!-- ====== SECTION 4 ====== -->
+                    <h2 id="brand">۴. برند و گارانتی</h2>
+                    <p>
+                        در بازار ایران برندهای متنوعی از دریل برقی وجود دارند که هرکدام دارای نقاط قوت و ضعف خاص خود هستند. برخی از معتبرترین برندها عبارتند از:
+                    </p>
+                    <ul>
+                        <li><strong>بوش (Bosch):</strong> کیفیت آلمانی، خدمات پس از فروش عالی در ایران، تنوع بالا</li>
+                        <li><strong>ماکیتا (Makita):</strong> تخصص در ابزارهای شارژی، دوام بالا و طراحی ارگونومیک</li>
+                        <li><strong>دیوالت (DeWalt):</strong> قدرت بالا، مناسب برای کارهای صنعتی سنگین</li>
+                        <li><strong>میلواکی (Milwaukee):</strong> نوآوری در فناوری باتری، ابزارهای فوق حرفه‌ای</li>
+                    </ul>
+                    <p>
+                        هنگام خرید حتماً از <strong>گارانتی معتبر ۱۲ تا ۲۴ ماهه</strong> اطمینان حاصل کنید. وجود نمایندگی رسمی و مراکز خدمات پس از فروش در شهر خود را بررسی نمایید.
+                    </p>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto my-8">
+                        <table class="w-full border-collapse bg-white rounded-xl overflow-hidden shadow-card">
+                            <thead>
+                                <tr class="bg-secondary text-white">
+                                    <th class="p-3 text-sm font-medium text-right">برند</th>
+                                    <th class="p-3 text-sm font-medium text-right">کیفیت</th>
+                                    <th class="p-3 text-sm font-medium text-right">قیمت</th>
+                                    <th class="p-3 text-sm font-medium text-right">خدمات پس از فروش</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 font-medium">Bosch</td>
+                                    <td class="p-3 text-gray-600">عالی</td>
+                                    <td class="p-3 text-gray-600">$$$$</td>
+                                    <td class="p-3"><span class="badge bg-success/10 text-success">عالی</span></td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 font-medium">Makita</td>
+                                    <td class="p-3 text-gray-600">عالی</td>
+                                    <td class="p-3 text-gray-600">$$$</td>
+                                    <td class="p-3"><span class="badge bg-success/10 text-success">خوب</span></td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 font-medium">DeWalt</td>
+                                    <td class="p-3 text-gray-600">خوب</td>
+                                    <td class="p-3 text-gray-600">$$$</td>
+                                    <td class="p-3"><span class="badge bg-warning/10 text-warning">متوسط</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Milwaukee</td>
+                                    <td class="p-3 text-gray-600">فوق‌العاده</td>
+                                    <td class="p-3 text-gray-600">$$$$$</td>
+                                    <td class="p-3"><span class="badge bg-warning/10 text-warning">متوسط</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ====== SECTION 5 ====== -->
+                    <h2 id="recommend">۵. توصیه‌های خرید بر اساس کاربرد</h2>
+                    <p>
+                        بسته به نوع کاربری، پیشنهادات زیر می‌تواند راهگشای شما باشد:
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+                        <div class="bg-primary-surface p-5 rounded-xl border border-primary/10">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center text-sm font-bold">۱</span>
+                                <h3 class="font-semibold text-primary m-0">برق‌کاری و تاسیسات</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 m-0">دریل ۵۰۰-۶۰۰ وات با قابلیت ضربه‌ای (Hammer) و کلاچ تنظیم گشتاور برای جلوگیری از آسیب به پیچ‌ها.</p>
+                        </div>
+                        <div class="bg-amber-50 p-5 rounded-xl border border-amber-100">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-8 h-8 rounded-lg bg-warning text-white flex items-center justify-center text-sm font-bold">۲</span>
+                                <h3 class="font-semibold text-warning m-0">ساختمانی و بنایی</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 m-0">دریل چکشی ۸۰۰+ وات با سیستم ضد غبار و بیت مخصوص بتن. سرعت بالا و قدرت ضربه مناسب.</p>
+                        </div>
+                        <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-100">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-8 h-8 rounded-lg bg-success text-white flex items-center justify-center text-sm font-bold">۳</span>
+                                <h3 class="font-semibold text-success m-0">صنایع چوب و مبلمان</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 m-0">دریل بادی یا برقی با کنترل دور دقیق، وزن سبک و سیستم جمع‌آوری خاک اره.</p>
+                        </div>
+                        <div class="bg-sky-50 p-5 rounded-xl border border-sky-100">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-8 h-8 rounded-lg bg-secondary text-white flex items-center justify-center text-sm font-bold">۴</span>
+                                <h3 class="font-semibold text-secondary m-0">خودرویی و فلزکاری</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 m-0">دریل دو سرعته با گشتاور بالا، بدنه فلزی و سیستم خنک‌کننده قوی برای کار مداوم.</p>
+                        </div>
+                    </div>
+
+                    <p>
+                        در نهایت، قبل از خرید حتماً مشخصات فنی را به دقت بررسی کنید و در صورت امکان ابزار را قبل از خرید به صورت عملی تست کنید. خرید هوشمندانه نه تنها هزینه‌های شما را بهینه می‌کند، بلکه ایمنی و کیفیت کار را نیز تضمین می‌کند.
+                    </p>
+
+                    <!-- ====== FAQ ====== -->
+                    <h2 id="faq">سوالات متداول</h2>
+
+                    <div class="space-y-4 my-6">
+                        <details class="bg-white rounded-xl border border-gray-100 p-5 shadow-card group open:shadow-card-hover transition-shadow">
+                            <summary class="font-semibold text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                                <span>فرق دریل شارژی با دریل باسیم چیست؟</span>
+                                <svg class="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </summary>
+                            <p class="mt-3 text-sm text-gray-600">دریل شارژی آزادی عمل بیشتری دارد و برای کار در ارتفاع و مکان‌های بدون برق مناسب‌است. اما دریل باسیم قدرت بیشتر و وزن کمتری دارد و برای کار مداوم صنعتی گزینه بهتری است.</p>
+                        </details>
+                        <details class="bg-white rounded-xl border border-gray-100 p-5 shadow-card group open:shadow-card-hover transition-shadow">
+                            <summary class="font-semibold text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                                <span>آیا برندهای چینی ارزش خرید دارند؟</span>
+                                <svg class="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </summary>
+                            <p class="mt-3 text-sm text-gray-600">برندهای چینی میان‌رده (مانند رونیکس و ادون) برای مصارف نیمه‌حرفه‌ای و بودجه محدود گزینه‌های قابل قبولی هستند. اما برای کار صنعتی مداوم، برندهای معروف جهانی توصیه می‌شوند.</p>
+                        </details>
+                        <details class="bg-white rounded-xl border border-gray-100 p-5 shadow-card group open:shadow-card-hover transition-shadow">
+                            <summary class="font-semibold text-gray-900 cursor-pointer list-none flex items-center justify-between">
+                                <span>گارانتی چند ماهه برای دریل برقی مناسب است؟</span>
+                                <svg class="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </summary>
+                            <p class="mt-3 text-sm text-gray-600">حداقل گارانتی ۱۲ ماهه و ترجیحاً ۲۴ ماهه برای ابزارهای برقی توصیه می‌شود. وجود نمایندگی رسمی در شهر محل سکونت خود را حتماً بررسی کنید.</p>
+                        </details>
+                    </div>
+
+                    <!-- ====== SHARE (Mobile) ====== -->
+                    <div class="mt-12 pt-8 border-t border-gray-100 lg:hidden">
+                        <h4 class="text-sm font-semibold text-gray-500 mb-3">اشتراک‌گذاری این مطلب</h4>
+                        <div class="flex items-center gap-3">
+                            <button class="share-btn w-10 h-10 rounded-xl bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center hover:bg-[#1DA1F2]/20 transition-colors">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            </button>
+                            <button class="share-btn w-10 h-10 rounded-xl bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center hover:bg-[#1877F2]/20 transition-colors">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            </button>
+                            <button class="share-btn w-10 h-10 rounded-xl bg-[#25D366]/10 text-[#25D366] flex items-center justify-center hover:bg-[#25D366]/20 transition-colors">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </button>
+                            <button class="share-btn w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <!-- ========== AUTHOR SECTION ========== -->
+    <section class="bg-white border-t border-gray-100 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-bg-warm rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
+                <img src="https://placehold.co/100x100/6C3FC5/FFFFFF?text=رض" alt="رضا کریمی" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover">
+                <div class="text-center md:text-right">
+                    <h3 class="text-xl font-bold text-secondary mb-1">رضا کریمی</h3>
+                    <p class="text-sm text-primary font-medium mb-3">کارشناس ابزارهای صنعتی و مکانیک</p>
+                    <p class="text-gray-500 text-sm leading-relaxed max-w-2xl">با بیش از ۱۲ سال سابقه در حوزه ابزارآلات صنعتی و مکانیک، تاکنون بیش از ۲۰۰ مقاله تخصصی در زمینه انتخاب و نگهداری ابزار منتشر کرده و با چندین مجله معتبر صنعتی همکاری داشته است.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== RELATED POSTS ========== -->
+    <section class="py-16 bg-bg-warm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-secondary">مطالب مرتبط</h2>
+                <a href="#" class="text-sm text-primary font-medium hover:underline">مشاهده همه ←</a>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Related Post 1 -->
+                <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden card-transition shadow-card">
+                    <div class="related-img-wrapper">
+                        <img src="https://placehold.co/400x250/DC2626/FFFFFF?text=ست+ابزار+دستی" alt="ست ابزار دستی" class="w-full h-44 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="badge bg-primary/10 text-primary text-[10px]">ابزار دستی</span>
+                            <span class="text-[10px] text-gray-400">۴ خرداد ۱۴۰۳</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm leading-snug">۱۰ ابزار دستی ضروری برای هر کارگاه حرفه‌ای</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">لیست کاملی از ابزارهای دستی که هیچ کارگاه حرفه‌ای نباید بدون آنها باشد...</p>
+                        <a href="#" class="inline-flex items-center gap-1 text-primary text-xs font-medium hover:underline">
+                            ادامه مطلب
+                            <svg class="w-3 h-3 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Related Post 2 -->
+                <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden card-transition shadow-card">
+                    <div class="related-img-wrapper">
+                        <img src="https://placehold.co/400x250/059669/FFFFFF?text=نگهداری+باتری" alt="نگهداری باتری" class="w-full h-44 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="badge bg-success/10 text-success text-[10px]">ابزار شارژی</span>
+                            <span class="text-[10px] text-gray-400">۲۸ فروردین ۱۴۰۳</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm leading-snug">نحوه نگهداری صحیح از باتری ابزارهای بیسیم</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">راهنمایی کامل برای افزایش عمر باتری‌های لیتیوم-یون و نگهداری اصولی...</p>
+                        <a href="#" class="inline-flex items-center gap-1 text-success text-xs font-medium hover:underline">
+                            ادامه مطلب
+                            <svg class="w-3 h-3 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Related Post 3 -->
+                <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden card-transition shadow-card">
+                    <div class="related-img-wrapper">
+                        <img src="https://placehold.co/400x250/D97706/FFFFFF?text=مقایسه+برندها" alt="مقایسه برندها" class="w-full h-44 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="badge bg-warning/10 text-warning text-[10px]">راهنما</span>
+                            <span class="text-[10px] text-gray-400">۱۵ فروردین ۱۴۰۳</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm leading-snug">مقایسه برندهای معتبر ابزار برقی در بازار ایران</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">بررسی کامل مزایا و معایب برندهای بوش، ماکیتا، دیوالت و میلواکی...</p>
+                        <a href="#" class="inline-flex items-center gap-1 text-warning text-xs font-medium hover:underline">
+                            ادامه مطلب
+                            <svg class="w-3 h-3 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Related Post 4 -->
+                <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden card-transition shadow-card">
+                    <div class="related-img-wrapper">
+                        <img src="https://placehold.co/400x250/6C3FC5/FFFFFF?text=ایمنی+کار" alt="ایمنی کار با ابزار" class="w-full h-44 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="badge bg-danger/10 text-danger text-[10px]">ایمنی</span>
+                            <span class="text-[10px] text-gray-400">۱۰ اسفند ۱۴۰۲</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2 text-sm leading-snug">اصول ایمنی کار با ابزارهای برقی صنعتی</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">مهم‌ترین نکات ایمنی که هر کاربر ابزار برقی باید بداند و رعایت کند...</p>
+                        <a href="#" class="inline-flex items-center gap-1 text-danger text-xs font-medium hover:underline">
+                            ادامه مطلب
+                            <svg class="w-3 h-3 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEWSLETTER CTA ========== -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative bg-gradient-to-br from-primary via-primary-dark to-secondary rounded-3xl overflow-hidden shadow-stripe">
+                <!-- Decorative blobs -->
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-primary-light/10 rounded-full blur-3xl"></div>
+                <div class="absolute top-1/2 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+
+                <div class="relative px-8 py-12 md:px-16 md:py-16 text-center">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h2 class="text-2xl md:text-4xl font-bold text-white mb-3">از آخرین مقالات و تخفیف‌ها باخبر شوید!</h2>
+                        <p class="text-white/70 text-sm md:text-base mb-8 max-w-lg mx-auto">
+                            هر هفته جدیدترین مقالات تخصصی، راهنماهای خرید و تخفیف‌های ویژه را در ایمیل خود دریافت کنید.
+                        </p>
+                        <form class="flex flex-col sm:flex-row items-center gap-3 max-w-md mx-auto">
+                            <div class="relative flex-1 w-full">
+                                <input type="email" placeholder="آدرس ایمیل خود را وارد کنید..." class="w-full px-5 py-3.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl placeholder-white/50 focus:outline-none focus:border-white/50 focus:ring-2 focus:ring-white/20 transition-all text-sm" required>
+                            </div>
+                            <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-white text-primary font-semibold rounded-xl hover:bg-gray-50 transition-all active:scale-[0.98] shadow-lg text-sm whitespace-nowrap">
+                                عضویت رایگان
+                            </button>
+                        </form>
+                        <p class="text-white/40 text-xs mt-4">بدون اسپم — هر هفته یک ایمیل مفید. می‌توانید هر زمان لغو کنید.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-secondary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">ت</span>
+                        </div>
+                        <span class="text-lg font-bold">toolidi.ir</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        فروشگاه اینترنتی تخصصی ابزارآلات صنعتی و حرفه‌ای. ارائه‌دهنده انواع ابزار برقی، دستی، دقیق و ایمنی با بهترین کیفیت و قیمت.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">دسترسی سریع</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">صفحه اصلی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">فروشگاه</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">دسته‌بندی‌ها</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">تخفیف‌های ویژه</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">وبلاگ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-semibold mb-4">دسته‌بندی‌ها</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار برقی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار دستی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار دقیق</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار ایمنی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">لوازم جانبی</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4">اطلاعات تماس</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📍</span>
+                            <span>تهران، خیابان ولیعصر، پلاک ۱۲۳۴</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📞</span>
+                            <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📱</span>
+                            <span>۰۹۱۲-۳۴۵-۶۷۸۹</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>✉️</span>
+                            <span>info@toolidi.ir</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== PAYMENT STRIP ========== -->
+    <div class="bg-gray-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-xs text-gray-400 mb-3">درگاه‌های پرداخت و سکوهای همکار</p>
+            <div class="flex flex-wrap items-center justify-center gap-6 text-gray-300">
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">سپ (بانک سامان)</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">زرین‌پال</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">ترب</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">ایمالز</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">باسلام</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== READING PROGRESS SCRIPT ========== -->
+    <script>
+        // Reading progress bar
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('readingProgress').style.width = scrollPercent + '%';
+        });
+
+        // TOC active link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = [];
+            tocLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    const section = document.getElementById(href.substring(1));
+                    if (section) sections.push({ link, section });
+                }
+            });
+
+            window.addEventListener('scroll', function() {
+                let current = '';
+                sections.forEach(({ link, section }) => {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 120) {
+                        current = section.id;
+                    }
+                });
+
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

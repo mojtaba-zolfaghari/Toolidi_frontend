@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دریل برقی ۸۰۰ وات حرفه‌ای — toolidi.ir</title>
+    
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C3FC5',
+                        'primary-dark': '#5331A0',
+                        'primary-light': '#8B6CD9',
+                        'primary-surface': '#F5F0FF',
+                        secondary: '#1B2A4A',
+                        'secondary-light': '#2A3F6A',
+                        'success': '#059669',
+                        'warning': '#D97706',
+                        'danger': '#DC2626',
+                        'bg-warm': '#FBFAF8',
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
+                        'card-hover': '0 10px 30px rgba(108, 63, 197, 0.12), 0 4px 8px rgba(0,0,0,0.06)',
+                        'stripe': '0 30px 45px -30px rgba(50,50,93,0.25), 0 18px 36px -18px rgba(0,0,0,0.1)',
+                        'notion': '0 4px 18px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Vazirmatn', system-ui, sans-serif; }
+        
+        /* RTL-aware spacing */
+        [dir="rtl"] .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+            --tw-space-x-reverse: 1;
+        }
+        .ml-2 { margin-right: 0.5rem; margin-left: 0; }
+        .mr-2 { margin-left: 0.5rem; margin-right: 0; }
+        .ml-4 { margin-right: 1rem; margin-left: 0; }
+        .mr-4 { margin-left: 1rem; margin-right: 0; }
+        
+        /* Persian number styling */
+        .price { font-feature-settings: 'tnum'; letter-spacing: 0.5px; }
+        
+        /* Slider animation */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .slide { animation: fadeIn 0.6s ease-in-out; }
+        
+        /* Stripe-inspired shadows */
+        .shadow-stripe-card {
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.1) 0px 8px 16px -8px;
+        }
+        .shadow-stripe-sm {
+            box-shadow: rgba(50, 50, 93, 0.15) 0px 6px 12px -2px, rgba(0, 0, 0, 0.08) 0px 3px 7px -3px;
+        }
+        
+        /* Smooth transitions */
+        .product-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: rgba(108, 63, 197, 0.12) 0px 20px 40px -8px, rgba(0, 0, 0, 0.08) 0px 8px 16px -6px;
+        }
+        
+        /* Badge pill */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+
+    <!-- ========== HEADER ========== -->
+    <header class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">ت</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold text-secondary">toolidi</span>
+                        <span class="text-lg font-bold text-primary">.ir</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">خانه</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">فروشگاه</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">دسته‌بندی‌ها</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">وبلاگ</a>
+                    <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">تماس با ما</a>
+                </nav>
+
+                <!-- Left Actions -->
+                <div class="flex items-center gap-4">
+                    <!-- Search -->
+                    <button class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <span>جستجو...</span>
+                        <kbd class="hidden lg:inline px-1.5 py-0.5 text-xs bg-gray-100 rounded">Ctrl+K</kbd>
+                    </button>
+
+                    <!-- Cart -->
+                    <button class="relative p-2 text-gray-500 hover:text-primary transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span class="absolute -top-0.5 -left-0.5 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">۳</span>
+                    </button>
+
+                    <!-- Auth Buttons -->
+                    <div class="hidden sm:flex items-center gap-3">
+                        <a href="#" class="text-sm font-medium text-gray-600 hover:text-primary transition-colors">ورود</a>
+                        <a href="#" class="text-sm font-medium bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors shadow-stripe-sm">ثبت‌نام</a>
+                    </div>
+                    
+                    <!-- Mobile Menu -->
+                    <button class="md:hidden p-2 text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== BREADCRUMBS ========== -->
+    <div class="bg-bg-warm py-4 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="text-sm text-gray-500">
+                <ol class="flex items-center gap-2">
+                    <li><a href="#" class="hover:text-primary transition-colors">فروشگاه</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li><a href="#" class="hover:text-primary transition-colors">ابزار برقی</a></li>
+                    <li class="text-gray-400">/</li>
+                    <li class="text-primary font-medium">دریل برقی ۸۰۰ وات</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ========== PRODUCT DETAIL ========== -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Product Images -->
+                <div class="space-y-4">
+                    <!-- Main Image -->
+                    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden aspect-square">
+                        <img id="mainImage" src="https://placehold.co/800x800/8B6CD9/FFFFFF?text=دریل+برقی+۸۰۰+وات" alt="دریل برقی ۸۰۰ وات حرفه‌ای" class="w-full h-full object-cover slide">
+                    </div>
+                    
+                    <!-- Thumbnails -->
+                    <div class="grid grid-cols-5 gap-3">
+                        <button onclick="document.getElementById('mainImage').src='https://placehold.co/800x800/8B6CD9/FFFFFF?text=دریل+برقی+۸۰۰+وات'" class="aspect-square rounded-lg border-2 border-primary overflow-hidden">
+                            <img src="https://placehold.co/200x200/8B6CD9/FFFFFF?text=1" alt="Thumbnail 1" class="w-full h-full object-cover">
+                        </button>
+                        <button onclick="document.getElementById('mainImage').src='https://placehold.co/800x800/5331A0/FFFFFF?text=VIEW+2'" class="aspect-square rounded-lg border border-gray-200 overflow-hidden hover:border-primary transition-colors">
+                            <img src="https://placehold.co/200x200/5331A0/FFFFFF?text=2" alt="Thumbnail 2" class="w-full h-full object-cover">
+                        </button>
+                        <button onclick="document.getElementById('mainImage').src='https://placehold.co/800x800/8B6CD9/FFFFFF?text=VIEW+3'" class="aspect-square rounded-lg border border-gray-200 overflow-hidden hover:border-primary transition-colors">
+                            <img src="https://placehold.co/200x200/8B6CD9/FFFFFF?text=3" alt="Thumbnail 3" class="w-full h-full object-cover">
+                        </button>
+                        <button onclick="document.getElementById('mainImage').src='https://placehold.co/800x800/8B6CD9/FFFFFF?text=VIEW+4'" class="aspect-square rounded-lg border border-gray-200 overflow-hidden hover:border-primary transition-colors">
+                            <img src="https://placehold.co/200x200/8B6CD9/FFFFFF?text=4" alt="Thumbnail 4" class="w-full h-full object-cover">
+                        </button>
+                        <button onclick="document.getElementById('mainImage').src='https://placehold.co/800x800/8B6CD9/FFFFFF?text=VIEW+5'" class="aspect-square rounded-lg border border-gray-200 overflow-hidden hover:border-primary transition-colors">
+                            <img src="https://placehold.co/200x200/8B6CD9/FFFFFF?text=5" alt="Thumbnail 5" class="w-full h-full object-cover">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="space-y-8">
+                    <div>
+                        <span class="text-xs text-gray-400 font-medium uppercase tracking-wide">ابزار برقی</span>
+                        <h1 class="text-2xl md:text-3xl font-bold text-secondary mt-2 mb-4">دریل برقی ۸۰۰ وات حرفه‌ای</h1>
+                        
+                        <!-- Rating -->
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="flex items-center gap-1 text-yellow-400">
+                                ★★★★★
+                            </div>
+                            <span class="text-gray-400 text-sm">(۲۴ نظر)</span>
+                            <span class="text-green-600 text-sm font-medium">فروشنده برتر</span>
+                        </div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="bg-primary-surface rounded-xl p-6">
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-3xl font-bold text-primary price">۲,۴۵۰,۰۰۰</span>
+                            <span class="text-xl text-gray-400 line-through price">۳,۱۰۰,۰۰۰</span>
+                            <span class="bg-danger text-white px-2 py-1 rounded text-sm font-bold">۲۰٪</span>
+                            <span class="text-gray-400">تومان</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">ارسال رایگان برای سفارشات بالای ۵۰۰,۰۰۰ تومان</p>
+                    </div>
+
+                    <!-- Variant Selection -->
+                    <div class="space-y-6">
+                        <!-- Size -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">اندازه</label>
+                            <div class="flex gap-3">
+                                <label class="relative">
+                                    <input type="radio" name="size" value="regular" class="sr-only" checked>
+                                    <div class="w-12 h-12 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-white">
+                                        <span class="text-sm font-medium">سایز م</span>
+                                    </div>
+                                </label>
+                                <label class="relative">
+                                    <input type="radio" name="size" value="large" class="sr-only">
+                                    <div class="w-12 h-12 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-white">
+                                        <span class="text-sm font-medium">L</span>
+                                    </div>
+                                </label>
+                                <label class="relative">
+                                    <input type="radio" name="size" value="xl" class="sr-only">
+                                    <div class="w-12 h-12 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-white">
+                                        <span class="text-sm font-medium">XL</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Color -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">رنگ</label>
+                            <div class="flex gap-3">
+                                <label class="relative">
+                                    <input type="radio" name="color" value="black" class="sr-only" checked>
+                                    <div class="w-10 h-10 rounded-full border-2 border-gray-200 cursor-pointer hover:border-primary transition-colors shadow-stripe-sm" style="background: #000;"></div>
+                                </label>
+                                <label class="relative">
+                                    <input type="radio" name="color" value="blue" class="sr-only">
+                                    <div class="w-10 h-10 rounded-full border-2 border-gray-200 cursor-pointer hover:border-primary transition-colors shadow-stripe-sm" style="background: #3B82F6;"></div>
+                                </label>
+                                <label class="relative">
+                                    <input type="radio" name="color" value="red" class="sr-only">
+                                    <div class="w-10 h-10 rounded-full border-2 border-gray-200 cursor-pointer hover:border-primary transition-colors shadow-stripe-sm" style="background: #EF4444;"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Brand -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">برند</label>
+                            <select class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors">
+                                <option>BOSCH (پیش‌فرض)</option>
+                                <option>MAKITA</option>
+                                <option>DEWALT</option>
+                                <option>Milwaukee</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Quantity & Actions -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">تعداد</label>
+                            <div class="flex items-center gap-3">
+                                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                    </svg>
+                                </button>
+                                <span class="text-lg font-medium w-12 text-center">۱</span>
+                                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <button class="flex-1 bg-primary text-white py-4 rounded-xl hover:bg-primary-dark transition-all font-medium active:scale-[0.98] shadow-stripe-sm">
+                                افزودن به سبد خرید
+                            </button>
+                            <button class="w-14 h-14 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Key Features -->
+                    <div class="bg-bg-warm rounded-xl p-6">
+                        <h3 class="font-semibold text-lg mb-4">ویژگی‌های اصلی</h3>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                تیغه‌های فولادی با کیفیت بالا
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                سرعت قابل تنظیم (۰-۳۲۰۰ آرپی‌ام)
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                بدنه مستحکم از جنس آلیاژ آلومینیوم
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-success rounded-full"></div>
+                                گارانتی ۱۸ ماهه کامل
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SPECIFICATIONS ========== -->
+    <section class="py-16 bg-bg-warm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-secondary mb-8">مشخصات فنی</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl p-6 border border-gray-100">
+                    <h3 class="font-semibold text-lg mb-3">مشخصات کلی</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>توان موتور:</span>
+                            <span class="font-medium">۸۰۰ وات</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>سرعت:</span>
+                            <span class="font-medium">۰-۳۲۰۰ آرپی‌ام</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>وزن:</span>
+                            <span class="font-medium">۱.۵ کیلوگرم</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>طول کل:</span>
+                            <span class="font-medium">۲۲۰ میلی‌متر</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 border border-gray-100">
+                    <h3 class="font-semibold text-lg mb-3">ساخته شده از</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex justify-between">
+                            <span>بدنه:</span>
+                            <span class="font-medium">آلیاژ آلومینیوم</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>تیغه‌ها:</span>
+                            <span class="font-medium">فولاد کروم
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>باتری:</span>
+                            <span class="font-medium">لیتیوم-یون ۲۰۱۵ میلی‌آمپر</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 border border-gray-100">
+                    <h3 class="font-semibold text-lg mb-3">لوازم همراه</h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                            <span>دریل برقی ۸۰۰ وات</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                            <span>دو عدد سری تعویضی (پلوس و منهای)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                            <span>قلاب بنده</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                            <span>کوشن ضد لرزش</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== RELATED PRODUCTS ========== -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-secondary mb-8">محصولات مرتبط</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Related Product 1 -->
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden product-card">
+                    <div class="relative">
+                        <img src="https://placehold.co/300x200/6C3FC5/FFFFFF?text=دریل+برقی+۲" alt="دریل برقی ۲" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <span class="text-xs text-gray-400 font-medium">ابزار برقی</span>
+                        <h3 class="font-semibold text-gray-900 mt-1 mb-2 text-sm">دریل برقی ۷۰۰ وات</h3>
+                        <div class="flex items-center gap-1 text-yellow-400 text-xs mb-3">
+                            ★★★★☆ <span class="text-gray-400 text-xs mr-1">(۱۵)</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-base font-bold text-primary price">۱,۸۰۰,۰۰۰</span>
+                            <span class="text-xs text-gray-400">تومان</span>
+                        </div>
+                        <button class="w-full bg-primary text-white py-2 rounded-xl hover:bg-primary-dark transition-all text-xs font-medium active:scale-[0.98]">
+                            افزودن به سبد خرید
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Related Product 2 -->
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden product-card">
+                    <div class="relative">
+                        <span class="absolute top-3 right-3 badge bg-success/10 text-success text-xs">تخفیف ویژه</span>
+                        <img src="https://placehold.co/300x200/5331A0/FFFFFF?text=ابزار+ترکیبی" alt="ابزار ترکیبی" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <span class="text-xs text-gray-400 font-medium">ابزار دستی</span>
+                        <h3 class="font-semibold text-gray-900 mt-1 mb-2 text-sm">ابزار ترکیبی چندکاره</h3>
+                        <div class="flex items-center gap-1 text-yellow-400 text-xs mb-3">
+                            ★★★★★ <span class="text-gray-400 text-xs mr-1">(۳۸)</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-base font-bold text-primary price">۳,۲۵۰,۰۰۰</span>
+                            <span class="text-xs text-gray-400">تومان</span>
+                        </div>
+                        <button class="w-full bg-primary text-white py-2 rounded-xl hover:bg-primary-dark transition-all text-xs font-medium active:scale-[0.98]">
+                            افزودن به سبد خرید
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Related Product 3 -->
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden product-card">
+                    <div class="relative">
+                        <img src="https://placehold.co/300x200/8B6CD9/FFFFFF?text=مولتی+متر+۲" alt="مولتی متر ۲" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <span class="text-xs text-gray-400 font-medium">ابزار دقیق</span>
+                        <h3 class="font-semibold text-gray-900 mt-1 mb-2 text-sm">مولتی متر دیجیتال</h3>
+                        <div class="flex items-center gap-1 text-yellow-400 text-xs mb-3">
+                            ★★★★☆ <span class="text-gray-400 text-xs mr-1">(۱۲)</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-base font-bold text-primary price">۹۵۰,۰۰۰</span>
+                            <span class="text-xs text-gray-400">تومان</span>
+                        </div>
+                        <button class="w-full bg-primary text-white py-2 rounded-xl hover:bg-primary-dark transition-all text-xs font-medium active:scale-[0.98]">
+                            افزودن به سبد خرید
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Related Product 4 -->
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden product-card">
+                    <div class="relative">
+                        <span class="absolute top-3 right-3 badge bg-warning/10 text-warning text-xs">فروش داغ</span>
+                        <img src="https://placehold.co/300x200/5331A0/FFFFFF?text=سامسونت+برقی" alt="سامسونت برقی" class="w-full h-48 object-cover">
+                    </div>
+                    <div class="p-5">
+                        <span class="text-xs text-gray-400 font-medium">ابزار برقی</span>
+                        <h3 class="font-semibold text-gray-900 mt-1 mb-2 text-sm">سامسونت برقی ۱۲ میلی‌متر</h3>
+                        <div class="flex items-center gap-1 text-yellow-400 text-xs mb-3">
+                            ★★★★★ <span class="text-gray-400 text-xs mr-1">(۲۱)</span>
+                        </div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="text-base font-bold text-primary price">۱,۲۰۰,۰۰۰</span>
+                            <span class="text-xs text-gray-400">تومان</span>
+                        </div>
+                        <button class="w-full bg-primary text-white py-2 rounded-xl hover:bg-primary-dark transition-all text-xs font-medium active:scale-[0.98]">
+                            افزودن به سبد خرید
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-secondary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">ت</span>
+                        </div>
+                        <span class="text-lg font-bold">toolidi.ir</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        فروشگاه اینترنتی تخصصی ابزارآلات صنعتی و حرفه‌ای. ارائه‌دهنده انواع ابزار برقی، دستی، دقیق و ایمنی با بهترین کیفیت و قیمت.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">دسترسی سریع</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">صفحه اصلی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">فروشگاه</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">دسته‌بندی‌ها</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">تخفیف‌های ویژه</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">وبلاگ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-semibold mb-4">دسته‌بندی‌ها</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار برقی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار دستی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار دقیق</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">ابزار ایمنی</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">لوازم جانبی</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4">اطلاعات تماس</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📍</span>
+                            <span>تهران، خیابان ولیعصر، پلاک ۱۲۳۴</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📞</span>
+                            <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>📱</span>
+                            <span>۰۹۱۲-۳۴۵-۶۷۸۹</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-gray-400">
+                            <span>✉️</span>
+                            <span>info@toolidi.ir</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Payment Methods Strip -->
+    <div class="bg-gray-50 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-xs text-gray-400 mb-3">درگاه‌های پرداخت و سکوهای همکار</p>
+            <div class="flex flex-wrap items-center justify-center gap-6 text-gray-300">
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">سپ (بانک سامان)</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">زرین‌پال</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">ترب</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">ایمالز</span>
+                <span class="px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">باسلام</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>;
