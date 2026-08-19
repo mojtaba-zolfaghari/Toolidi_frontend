@@ -1,10 +1,27 @@
-/* Root component styles — mostly handled by Tailwind utilities */
+/* Root component styles — page styling is handled by Tailwind utilities */
 :host {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
+  flex-direction: column;
 }
 
 main {
   flex: 1;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  color: rgb(255 255 255 / 0.9);
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus-visible {
+  background: rgb(108 63 197 / 0.28);
+  color: white;
+  transform: translateX(-2px);
 }

@@ -1,18 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { routeAnimations } from './shared/animations';
 import { AuthService } from './core/services/api/auth.service';
 import { AuthStateService, AuthUser } from './core/services/auth-state.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  animations: [routeAnimations]
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'toolidi';
   currentUser: AuthUser | null = null;
+  menuOpen = false;
 
   private subscription?: Subscription;
 
@@ -26,14 +29,38 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.authState.currentUser$.subscribe((user) => {
       this.currentUser = user;
     });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
   }
 
+  /** آماده‌سازی وضعیت انیمیشن برای انتقال بین صفحات */
+  prepareRoute(outlet: RouterOutlet): string {
+    return outlet?.isActivated
+      ? (outlet.activatedRoute.snapshot.routeConfig?.path ?? 'default')
+      : 'default';
+  }
+
+  /** باز و بسته کردن منوی موبایل */
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  /** بستن منوی موبایل پس از انتخاب مسیر */
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
   /** خروج از حساب کاربری و هدایت به صفحه اصلی */
   logout(): void {
+    this.closeMenu();
     this.authService.logout().subscribe(() => {
       this.authState.clear();
       this.router.navigate(['/']);

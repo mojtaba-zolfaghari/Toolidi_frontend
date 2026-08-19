@@ -74,8 +74,8 @@ export class CheckoutComponent implements OnInit {
       }
     });
     this.paymentGatewayService.getGateways().subscribe({
-      next: (gateways) => {
-        this.gateways = gateways;
+      next: (result) => {
+        this.gateways = result.data ?? [];
         optionLoaded();
       },
       error: () => {

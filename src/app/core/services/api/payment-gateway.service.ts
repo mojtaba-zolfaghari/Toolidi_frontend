@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from '../api.service';
+import { Result } from '../../models/api-response.model';
 
 /** درگاه پرداخت قابل انتخاب در تسویه‌حساب */
 export interface PaymentGatewayOption {
@@ -17,7 +18,7 @@ export class PaymentGatewayService {
   constructor(private readonly api: ApiService) {}
 
   /** دریافت درگاه‌های فعال بدون اطلاعات محرمانه */
-  getGateways(): Observable<PaymentGatewayOption[]> {
-    return this.api.get<PaymentGatewayOption[]>('/payment/gateways');
+  getGateways(): Observable<Result<PaymentGatewayOption[]>> {
+    return this.api.get<Result<PaymentGatewayOption[]>>('/payment/gateways');
   }
 }

@@ -10,6 +10,7 @@ import {
 } from '../../core/services/api/auth.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { Address, AddressData, AddressService } from '../../core/services/api/address.service';
+import { Result } from '../../core/models/api-response.model';
 
 /** صفحه پروفایل کاربر و مدیریت اطلاعات حساب */
 @Component({
@@ -112,26 +113,34 @@ export class ProfileComponent implements OnInit {
     this.addressMessage = '';
     this.addressError = '';
     const data = this.addressForm.value as AddressData;
-    const request = this.selectedAddressId
-      ? this.addressService.updateAddress(this.selectedAddressId, data)
-      : this.addressService.addAddress(data);
+    const editingId = this.selectedAddressId;
+    if (editingId) {
+      this.addressService.updateAddress(editingId, data).subscribe({
+        next: (result) => this.finishAddressSave(result, true),
+        error: (err: Error) => this.failAddressSave(err)
+      });
+    } else {
+      this.addressService.addAddress(data).subscribe({
+        next: (result) => this.finishAddressSave(result, false),
+        error: (err: Error) => this.failAddressSave(err)
+      });
+    }
+  }
 
-    request.subscribe({
-      next: (result) => {
-        this.savingAddress = false;
-        if (result.isSuccess) {
-          this.addressMessage = this.selectedAddressId ? 'آدرس ویرایش شد.' : 'آدرس جدید اضافه شد.';
-          this.cancelAddressEdit();
-          this.loadAddresses();
-        } else {
-          this.addressError = result.errorMessage ?? 'ذخیره آدرس انجام نشد.';
-        }
-      },
-      error: (err: Error) => {
-        this.savingAddress = false;
-        this.addressError = err.message;
-      }
-    });
+  private finishAddressSave(result: Result<unknown>, editing: boolean): void {
+    this.savingAddress = false;
+    if (result.isSuccess) {
+      this.addressMessage = editing ? 'آدرس ویرایش شد.' : 'آدرس جدید اضافه شد.';
+      this.cancelAddressEdit();
+      this.loadAddresses();
+    } else {
+      this.addressError = result.errorMessage ?? 'ذخیره آدرس انجام نشد.';
+    }
+  }
+
+  private failAddressSave(error: Error): void {
+    this.savingAddress = false;
+    this.addressError = error.message;
   }
 
   /** حذف آدرس */

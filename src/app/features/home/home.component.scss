@@ -1,4 +1,8 @@
-/* Home page component styles */
 :host {
   display: block;
+}
+
+:host ::ng-deep app-product-card {
+  display: block;
+  height: 100%;
 }

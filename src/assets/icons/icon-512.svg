@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Toolidi">
+  <rect width="512" height="512" rx="116" fill="#6C3FC5"/>
+  <circle cx="384" cy="112" r="80" fill="#8B6AD8" opacity=".7"/>
+  <path d="M139 155h234v59h-82v147h-68V214h-84z" fill="#fff"/>
+</svg>
