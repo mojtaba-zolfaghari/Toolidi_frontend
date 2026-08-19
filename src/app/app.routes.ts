@@ -16,6 +16,14 @@ export const routes: Routes = [
     loadChildren: () => import('./features/product/product.module').then(m => m.ProductModule)
   },
   {
+    path: 'blog',
+    loadChildren: () => import('./features/blog/blog.module').then(m => m.BlogModule)
+  },
+  {
+    path: 'contact',
+    loadChildren: () => import('./features/contact/contact.module').then(m => m.ContactModule)
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },

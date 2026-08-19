@@ -1,0 +1,41 @@
+<section class="bg-warm min-h-screen py-10">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <div class="mb-8">
+      <p class="text-sm text-primary font-medium mb-1">وبلاگ</p>
+      <h1 class="text-3xl font-bold text-secondary">آخرین مطالب</h1>
+    </div>
+
+    <app-spinner *ngIf="loading" label="در حال بارگذاری مطالب…"></app-spinner>
+    <p *ngIf="!loading && errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3">{{ errorMessage }}</p>
+
+    <div *ngIf="!loading && posts.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <article
+        *ngFor="let post of posts"
+        (click)="openPost(post.id)"
+        [@slideUp]
+        class="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover">
+        <div class="h-48 overflow-hidden bg-gradient-to-br from-primary-light to-secondary">
+          <img *ngIf="post.featuredImage" [src]="post.featuredImage" [alt]="post.title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <div *ngIf="!post.featuredImage" class="flex h-full w-full items-center justify-center text-6xl text-white/70">✦</div>
+        </div>
+        <div class="p-5">
+          <h2 class="text-lg font-bold text-secondary leading-7 line-clamp-2 group-hover:text-primary transition-colors">{{ post.title }}</h2>
+          <p class="mt-2 text-sm text-gray-500 leading-6 line-clamp-3">{{ post.shortDescription || post.content }}</p>
+          <div class="mt-4 flex items-center justify-between text-xs text-gray-400">
+            <span>{{ post.publishedAt | date:'yyyy/MM/dd' }}</span>
+            <span>{{ post.authorId ? 'نویسنده' : 'تیم Toolidi' }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p *ngIf="!loading && !posts.length && !errorMessage" class="text-center text-gray-400 py-16">مطلبی برای نمایش وجود ندارد.</p>
+
+    <app-pagination
+      *ngIf="!loading && posts.length"
+      [page]="page"
+      [totalPages]="totalPages"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+</section>

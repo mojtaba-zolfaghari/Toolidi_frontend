@@ -2,45 +2,80 @@
   <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
     <!-- سایدبار فیلتر -->
     <aside class="md:col-span-1">
-      <div class="bg-white rounded-2xl shadow-card p-4">
-        <h3 class="font-bold text-secondary mb-3">دسته‌بندی‌ها</h3>
-        <ul class="space-y-2">
-          <li>
-            <button type="button" (click)="selectCategory(null)" class="w-full text-right text-gray-600 hover:text-primary transition-colors">
-              همه محصولات
-            </button>
-          </li>
-          <li *ngFor="let cat of categories">
-            <button type="button" (click)="selectCategory(cat.id)" class="w-full text-right text-gray-600 hover:text-primary transition-colors">
-              {{ cat.name }}
-            </button>
-          </li>
-        </ul>
-        <p *ngIf="!categories.length" class="text-sm text-gray-400">دسته‌بندی‌ای موجود نیست.</p>
+      <div class="bg-white rounded-2xl shadow-card p-4 space-y-6">
+        <!-- جستجو -->
+        <div>
+          <h3 class="font-bold text-secondary mb-3">جستجو</h3>
+          <div class="flex gap-2">
+            <input
+              #searchInput
+              type="text"
+              [value]="search"
+              placeholder="جستجوی محصول…"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            <button type="button" (click)="submitSearch(searchInput.value)" class="shrink-0 bg-primary text-white rounded-xl px-4 py-2 text-sm font-bold hover:bg-primary-dark transition-colors">جستجو</button>
+          </div>
+        </div>
+
+        <!-- دسته‌بندی‌ها -->
+        <div>
+          <h3 class="font-bold text-secondary mb-3">دسته‌بندی‌ها</h3>
+          <ul class="space-y-1">
+            <li>
+              <button type="button" (click)="selectCategory(null)" class="w-full text-right text-sm rounded-lg px-2 py-1.5 transition-colors" [class]="!categoryId ? 'bg-bg-muted text-primary font-bold' : 'text-gray-600 hover:bg-gray-50'">
+                همه محصولات
+              </button>
+            </li>
+            <ng-container *ngTemplateOutlet="tree; context: { nodes: categories, level: 0 }"></ng-container>
+          </ul>
+          <p *ngIf="!categories.length" class="text-sm text-gray-400">دسته‌بندی‌ای موجود نیست.</p>
+        </div>
+
+        <!-- فیلتر قیمت -->
+        <div>
+          <h3 class="font-bold text-secondary mb-3">محدوده قیمت</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="flex justify-between text-xs text-gray-500 mb-1"><span>حداقل</span><span class="font-bold text-secondary">{{ priceMin | number }} تومان</span></label>
+              <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMin" class="w-full accent-primary" />
+            </div>
+            <div>
+              <label class="flex justify-between text-xs text-gray-500 mb-1"><span>حداکثر</span><span class="font-bold text-secondary">{{ priceMax | number }} تومان</span></label>
+              <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMax" class="w-full accent-primary" />
+            </div>
+            <button type="button" (click)="applyPrice()" class="w-full bg-secondary text-white rounded-xl px-4 py-2 text-sm font-bold hover:bg-secondary-light transition-colors">اعمال فیلتر قیمت</button>
+          </div>
+        </div>
+
+        <button type="button" (click)="clearFilters()" class="w-full border border-gray-300 text-gray-600 rounded-xl px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors">
+          پاک‌کردن فیلترها
+        </button>
       </div>
     </aside>
 
     <!-- لیست محصولات -->
     <div class="md:col-span-3">
-      <!-- جستجو -->
-      <div class="flex gap-2 mb-6">
-        <input
-          #searchInput
-          type="text"
-          placeholder="جستجوی محصول…"
-          class="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <button
-          type="button"
-          (click)="submitSearch(searchInput.value)"
-          class="bg-primary text-white font-bold rounded-xl px-5 py-2 hover:bg-primary-dark transition-colors">
-          جستجو
-        </button>
+      <!-- نوار عنوان و مرتب‌سازی -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+          <h1 class="text-xl font-bold text-secondary">{{ activeCategoryName || 'فروشگاه' }}</h1>
+          <p class="text-sm text-gray-500 mt-1">{{ totalCount | number }} محصول</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-gray-500" for="sortSelect">مرتب‌سازی:</label>
+          <select id="sortSelect" [value]="sort" (change)="changeSort($any($event.target).value)" class="border border-gray-300 rounded-xl px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="newest">جدیدترین</option>
+            <option value="price-asc">قیمت (صعودی)</option>
+            <option value="price-desc">قیمت (نزولی)</option>
+            <option value="best">پرفروش‌ترین</option>
+          </select>
+        </div>
       </div>
 
-      <div *ngIf="loading" class="text-center text-gray-400 py-16">در حال بارگذاری…</div>
+      <app-spinner *ngIf="loading" label="در حال بارگذاری محصولات…"></app-spinner>
 
-      <div *ngIf="!loading && products.length" class="grid grid-cols-2 md:grid-cols-3 gap-6">
-        <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+      <div *ngIf="!loading && products.length" class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <app-product-card *ngFor="let product of products" [product]="product" [@slideUp]></app-product-card>
       </div>
 
       <p *ngIf="!loading && !products.length" class="text-center text-gray-400 py-16">
@@ -51,9 +86,27 @@
         *ngIf="!loading && products.length"
         [page]="page"
         [totalPages]="totalPages"
-        [pageSize]="pageSize"
         (pageChange)="onPageChange($event)">
       </app-pagination>
     </div>
   </div>
 </section>
+
+<!-- الگوی بازگشتی درخت دسته‌بندی -->
+<ng-template #tree let-nodes="nodes" let-level="level">
+  <ng-container *ngFor="let cat of nodes">
+    <li>
+      <button
+        type="button"
+        (click)="selectCategory(cat.id)"
+        class="w-full text-right text-sm rounded-lg px-2 py-1.5 transition-colors"
+        [style.padding-right.px]="8 + level * 14"
+        [class]="categoryId === cat.id ? 'bg-bg-muted text-primary font-bold' : 'text-gray-600 hover:bg-gray-50'">
+        {{ cat.name }}
+      </button>
+      <ul *ngIf="cat.children && cat.children.length" class="space-y-1">
+        <ng-container *ngTemplateOutlet="tree; context: { nodes: cat.children, level: level + 1 }"></ng-container>
+      </ul>
+    </li>
+  </ng-container>
+</ng-template>

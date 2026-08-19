@@ -1,55 +1,159 @@
 <section class="bg-warm min-h-screen py-10">
-  <div class="container mx-auto px-4 max-w-2xl">
+  <div class="container mx-auto px-4 max-w-3xl">
     <h1 class="text-3xl font-bold text-secondary mb-8">تسویه‌حساب</h1>
 
-    <div *ngIf="loadingOptions" class="bg-white rounded-2xl shadow-card py-8 text-center text-gray-400 mb-6">در حال دریافت گزینه‌های ارسال و پرداخت…</div>
-    <div *ngIf="!loadingOptions && !addresses.length" class="bg-orange-50 text-orange-700 rounded-xl px-4 py-3 mb-6">برای ادامه، ابتدا یک آدرس در <a routerLink="/profile" class="font-bold underline">پروفایل</a> ثبت کنید.</div>
+    <!-- شاخص مراحل -->
+    <ol class="flex items-center gap-2 mb-8">
+      <ng-container *ngFor="let s of [1, 2, 3]; let i = index">
+        <li class="flex items-center gap-2" [@fadeIn]>
+          <span class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold"
+                [class.bg-primary]="step >= s"
+                [class.text-white]="step >= s"
+                [class.bg-gray-200]="step < s"
+                [class.text-gray-500]="step < s">{{ s }}</span>
+          <span class="text-sm font-medium" [class.text-primary]="step >= s" [class.text-gray-400]="step < s">
+            {{ s === 1 ? 'آدرس' : s === 2 ? 'ارسال' : 'پرداخت' }}
+          </span>
+        </li>
+        <li *ngIf="i < 2" class="h-px flex-1 bg-gray-200"></li>
+      </ng-container>
+    </ol>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="bg-white rounded-2xl shadow-card p-6 space-y-5">
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="shippingAddressId">آدرس ارسال</label>
-        <select id="shippingAddressId" formControlName="shippingAddressId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-          <option value="">انتخاب آدرس ارسال</option>
-          <option *ngFor="let address of addresses" [value]="address.id">{{ address.city }}، {{ address.addressLine }} — {{ address.postalCode }}</option>
-        </select>
-        <p *ngIf="form.get('shippingAddressId')?.invalid && form.get('shippingAddressId')?.touched" class="text-red-500 text-sm mt-1">آدرس ارسال الزامی است.</p>
+    <div *ngIf="loadingOptions" class="bg-white rounded-2xl shadow-card py-10"><app-spinner label="در حال دریافت گزینه‌ها…"></app-spinner></div>
+
+    <!-- مرحله ۱: آدرس -->
+    <div *ngIf="!loadingOptions && step === 1" [@fadeIn] class="space-y-5">
+      <div *ngIf="!addresses.length" class="bg-orange-50 text-orange-700 rounded-xl px-4 py-3">
+        هنوز آدرسی ثبت نکرده‌اید. لطفاً یک آدرس جدید اضافه کنید.
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="billingAddressId">آدرس صورتحساب</label>
-        <select id="billingAddressId" formControlName="billingAddressId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-          <option value="">انتخاب آدرس صورتحساب</option>
-          <option *ngFor="let address of addresses" [value]="address.id">{{ address.city }}، {{ address.addressLine }} — {{ address.postalCode }}</option>
-        </select>
-        <p *ngIf="form.get('billingAddressId')?.invalid && form.get('billingAddressId')?.touched" class="text-red-500 text-sm mt-1">آدرس صورتحساب الزامی است.</p>
+      <div class="bg-white rounded-2xl shadow-card p-6">
+        <h2 class="font-bold text-secondary mb-4">آدرس ارسال</h2>
+        <div class="space-y-3">
+          <label *ngFor="let address of addresses" class="flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
+                 [class.border-primary]="shippingAddressId === address.id"
+                 [class.bg-bg-muted]="shippingAddressId === address.id"
+                 [class.border-gray-200]="shippingAddressId !== address.id">
+            <input type="radio" name="shippingAddress" [checked]="shippingAddressId === address.id" (change)="selectAddress('shipping', address.id)" class="mt-1 accent-primary" />
+            <span>
+              <strong class="block text-secondary">{{ address.city }}، {{ address.addressLine }}</strong>
+              <span class="text-sm text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
+              <span *ngIf="address.isDefault" class="block text-xs text-green-600 mt-1">آدرس پیش‌فرض</span>
+            </span>
+          </label>
+        </div>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="shippingMethodId">روش ارسال</label>
-        <select id="shippingMethodId" formControlName="shippingMethodId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-          <option value="">انتخاب روش ارسال</option>
-          <option *ngFor="let method of shippingMethods" [value]="method.id">{{ method.name }} — {{ method.baseCost | number }} تومان<ng-container *ngIf="method.estimatedDeliveryDays"> ({{ method.estimatedDeliveryDays }} روز)</ng-container></option>
-        </select>
+      <div class="bg-white rounded-2xl shadow-card p-6">
+        <h2 class="font-bold text-secondary mb-4">آدرس صورتحساب</h2>
+        <div class="space-y-3">
+          <label *ngFor="let address of addresses" class="flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
+                 [class.border-primary]="billingAddressId === address.id"
+                 [class.bg-bg-muted]="billingAddressId === address.id"
+                 [class.border-gray-200]="billingAddressId !== address.id">
+            <input type="radio" name="billingAddress" [checked]="billingAddressId === address.id" (change)="selectAddress('billing', address.id)" class="mt-1 accent-primary" />
+            <span>
+              <strong class="block text-secondary">{{ address.city }}، {{ address.addressLine }}</strong>
+              <span class="text-sm text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
+            </span>
+          </label>
+        </div>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="paymentGatewayId">درگاه پرداخت</label>
-        <select id="paymentGatewayId" formControlName="paymentGatewayId" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-          <option value="">پرداخت در مرحله بعد</option>
-          <option *ngFor="let gateway of gateways" [value]="gateway.id">{{ gateway.displayName || gateway.name }}<ng-container *ngIf="gateway.isSandbox"> (آزمایشی)</ng-container></option>
-        </select>
-        <p *ngIf="!gateways.length" class="text-xs text-gray-400 mt-1">درگاه فعالی برای انتخاب موجود نیست.</p>
+      <button type="button" (click)="showAddressForm = !showAddressForm" class="text-primary font-medium text-sm hover:underline">
+        {{ showAddressForm ? 'انصراف از افزودن آدرس' : '+ افزودن آدرس جدید' }}
+      </button>
+
+      <form *ngIf="showAddressForm" [formGroup]="addressForm" (ngSubmit)="saveAddress()" [@scaleUp] class="bg-white rounded-2xl shadow-card p-6 space-y-4">
+        <h3 class="font-bold text-secondary">آدرس جدید</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label class="block"><span class="block text-secondary font-medium mb-1">نوع آدرس</span><select formControlName="addressType" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white"><option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option></select></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">کشور</span><input formControlName="country" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">استان</span><input formControlName="state" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">شهر</span><input formControlName="city" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">کد پستی</span><input formControlName="postalCode" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">شماره تماس</span><input formControlName="phoneNumber" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block md:col-span-2"><span class="block text-secondary font-medium mb-1">نشانی کامل</span><textarea rows="2" formControlName="addressLine" class="w-full border border-gray-300 rounded-xl px-4 py-2"></textarea></label>
+        </div>
+        <p *ngIf="addressError" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{{ addressError }}</p>
+        <p *ngIf="addressMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">{{ addressMessage }}</p>
+        <button type="submit" [disabled]="savingAddress" class="bg-primary text-white rounded-xl px-6 py-2.5 font-bold disabled:opacity-50">{{ savingAddress ? 'در حال ذخیره…' : 'ذخیره آدرس' }}</button>
+      </form>
+
+      <div class="flex justify-end pt-2">
+        <button type="button" (click)="next()" [disabled]="!canContinueStep1" class="bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">ادامه</button>
+      </div>
+    </div>
+
+    <!-- مرحله ۲: ارسال -->
+    <div *ngIf="!loadingOptions && step === 2" [@fadeIn] class="space-y-5">
+      <div class="bg-white rounded-2xl shadow-card p-6">
+        <h2 class="font-bold text-secondary mb-4">روش ارسال</h2>
+        <div class="space-y-3">
+          <label *ngFor="let method of shippingMethods" class="flex items-center justify-between gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
+                 [class.border-primary]="shippingMethodId === method.id"
+                 [class.bg-bg-muted]="shippingMethodId === method.id"
+                 [class.border-gray-200]="shippingMethodId !== method.id">
+            <span class="flex items-center gap-3">
+              <input type="radio" name="shippingMethod" [checked]="shippingMethodId === method.id" (change)="shippingMethodId = method.id" class="accent-primary" />
+              <span>
+                <strong class="block text-secondary">{{ method.name }}</strong>
+                <span class="text-sm text-gray-500">{{ method.description || '' }}</span>
+              </span>
+            </span>
+            <span class="text-left">
+              <strong class="block text-primary">{{ method.baseCost | number }} تومان</strong>
+              <span *ngIf="method.estimatedDeliveryDays" class="text-sm text-gray-500">{{ method.estimatedDeliveryDays }} روز کاری</span>
+            </span>
+          </label>
+        </div>
+        <p *ngIf="!shippingMethods.length" class="text-gray-400 text-center py-4">روش ارسالی موجود نیست.</p>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="userNotes">یادداشت سفارش</label>
-        <textarea id="userNotes" formControlName="userNotes" rows="3" placeholder="توضیحات اختیاری" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+      <div class="flex justify-between pt-2">
+        <button type="button" (click)="back()" class="border border-gray-300 rounded-xl px-6 py-3 font-medium hover:bg-gray-50 transition-colors">بازگشت</button>
+        <button type="button" (click)="next()" class="bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors">ادامه</button>
+      </div>
+    </div>
+
+    <!-- مرحله ۳: پرداخت -->
+    <div *ngIf="!loadingOptions && step === 3" [@fadeIn] class="space-y-5">
+      <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-2xl p-6 text-center">
+        <div class="text-4xl mb-3">✅</div>
+        <p class="font-bold text-lg">{{ successMessage }}</p>
+        <button type="button" (click)="goToOrders()" class="mt-4 bg-primary text-white rounded-xl px-6 py-2.5 font-bold">مشاهده سفارش‌ها</button>
       </div>
 
-      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-2 text-sm">{{ errorMessage }}</div>
-      <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-2 text-sm">{{ successMessage }}</div>
+      <ng-container *ngIf="!successMessage">
+        <div class="bg-white rounded-2xl shadow-card p-6">
+          <h2 class="font-bold text-secondary mb-4">درگاه پرداخت</h2>
+          <div class="space-y-3">
+            <label *ngFor="let gateway of gateways" class="flex items-center justify-between gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
+                   [class.border-primary]="paymentGatewayId === gateway.id"
+                   [class.bg-bg-muted]="paymentGatewayId === gateway.id"
+                   [class.border-gray-200]="paymentGatewayId !== gateway.id">
+              <span class="flex items-center gap-3">
+                <input type="radio" name="paymentGateway" [checked]="paymentGatewayId === gateway.id" (change)="paymentGatewayId = gateway.id" class="accent-primary" />
+                <strong class="text-secondary">{{ gateway.displayName || gateway.name }}</strong>
+                <span *ngIf="gateway.isSandbox" class="text-xs bg-orange-50 text-orange-600 rounded px-2 py-1">آزمایشی</span>
+              </span>
+            </label>
+          </div>
+          <p *ngIf="!gateways.length" class="text-gray-400 text-center py-4">درگاه فعالی برای انتخاب موجود نیست.</p>
+        </div>
 
-      <button type="submit" [disabled]="form.invalid || loading || !addresses.length" class="w-full bg-primary text-white font-bold rounded-xl py-3 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{{ loading ? 'در حال ثبت سفارش…' : 'ثبت سفارش' }}</button>
-    </form>
+        <div class="bg-white rounded-2xl shadow-card p-6">
+          <label class="block"><span class="block text-secondary font-medium mb-1">یادداشت سفارش (اختیاری)</span><textarea rows="3" [(ngModel)]="userNotes" placeholder="توضیحات سفارش…" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea></label>
+          <div *ngIf="selectedShipping" class="mt-4 flex justify-between text-sm text-gray-500"><span>هزینه ارسال</span><strong class="text-secondary">{{ selectedShipping.baseCost | number }} تومان</strong></div>
+        </div>
+
+        <p *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{{ errorMessage }}</p>
+
+        <div class="flex justify-between pt-2">
+          <button type="button" (click)="back()" class="border border-gray-300 rounded-xl px-6 py-3 font-medium hover:bg-gray-50 transition-colors">بازگشت</button>
+          <button type="button" (click)="submit()" [disabled]="loading" class="bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors disabled:opacity-50">{{ loading ? 'در حال ثبت سفارش…' : 'ثبت سفارش' }}</button>
+        </div>
+      </ng-container>
+    </div>
   </div>
 </section>

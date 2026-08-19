@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
 import { SellerDashboardComponent } from './dashboard/seller-dashboard.component';
+import { SharedModule } from '../../shared/shared.module';
 
 const routes: Routes = [
   { path: '', component: SellerDashboardComponent }
@@ -12,7 +13,8 @@ const routes: Routes = [
   declarations: [SellerDashboardComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    SharedModule
   ]
 })
 export class SellerModule { }

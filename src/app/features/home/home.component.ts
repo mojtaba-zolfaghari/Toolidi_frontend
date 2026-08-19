@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
+import { slideUp } from '../../shared/animations';
 import { Category, CategoryService } from '../../core/services/api/category.service';
 import { Product, ProductService } from '../../core/services/api/product.service';
 
@@ -7,13 +8,14 @@ import { Product, ProductService } from '../../core/services/api/product.service
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  animations: [slideUp]
 })
 export class HomeComponent implements OnInit {
   categories: Category[] = [];
-  products: Product[] = [];
   featuredProducts: Product[] = [];
   loading = true;
+  categoriesLoading = true;
 
   constructor(
     private readonly categoryService: CategoryService,
@@ -21,21 +23,32 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // همان درخواست قبلی دسته‌بندی‌ها
-    this.categoryService.getCategories().subscribe({
-      next: (paged) => (this.categories = paged.items ?? []),
-      error: () => (this.categories = [])
-    });
+    this.loadCategories();
+    this.loadFeaturedProducts();
+  }
 
-    // همان درخواست قبلی محصولات؛ انتخاب محصولات منتخب فقط در لایه نمایش انجام می‌شود.
-    this.productService.getProducts({ page: 1, pageSize: 20 }).subscribe({
+  /** دریافت دسته‌بندی‌های فعال */
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (paged) => {
+        this.categories = (paged.items ?? []).filter((category) => category.isActive);
+        this.categoriesLoading = false;
+      },
+      error: () => {
+        this.categories = [];
+        this.categoriesLoading = false;
+      }
+    });
+  }
+
+  /** دریافت فقط محصولات منتخب (isFeatured) */
+  private loadFeaturedProducts(): void {
+    this.productService.getProducts({ isFeatured: true, page: 1, pageSize: 8 }).subscribe({
       next: (result) => {
-        this.products = result.data?.items ?? [];
-        this.featuredProducts = this.products.filter((product) => product.isFeatured || product.isNewArrival);
+        this.featuredProducts = result.data?.items ?? [];
         this.loading = false;
       },
       error: () => {
-        this.products = [];
         this.featuredProducts = [];
         this.loading = false;
       }

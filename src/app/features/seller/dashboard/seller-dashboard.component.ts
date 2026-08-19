@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
+import { BarChartDatum } from '../../../shared/components/bar-chart/bar-chart.component';
 import {
   CommissionBreakdown,
   DashboardSummary,
@@ -60,5 +61,14 @@ export class SellerDashboardComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /** داده‌ی نمودار روند فروش (۷ یا ۳۰ روز اخیر) */
+  get salesTrendData(): BarChartDatum[] {
+    const trend = this.orderStats?.trend ?? this.statistics?.salesTrend ?? [];
+    return trend.slice(-30).map((point) => ({
+      label: new Date(point.date).toLocaleDateString('fa-IR', { day: 'numeric', month: 'numeric' }),
+      value: point.salesAmount
+    }));
   }
 }

@@ -64,4 +64,37 @@ export class OrdersComponent implements OnInit {
   itemCount(order: Order): number {
     return order.items?.reduce((count, item) => count + item.quantity, 0) ?? 0;
   }
+
+  /** کلاس رنگ وضعیت سفارش */
+  statusClass(status: string): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'pending':
+        return 'bg-orange-50 text-orange-600';
+      case 'processing':
+        return 'bg-blue-50 text-blue-600';
+      case 'shipped':
+        return 'bg-indigo-50 text-indigo-600';
+      case 'delivered':
+        return 'bg-green-50 text-green-600';
+      case 'cancelled':
+        return 'bg-red-50 text-red-600';
+      case 'returned':
+        return 'bg-amber-50 text-amber-600';
+      default:
+        return 'bg-gray-100 text-gray-600';
+    }
+  }
+
+  /** عنوان فارسی وضعیت */
+  statusLabel(status: string): string {
+    const map: Record<string, string> = {
+      pending: 'در انتظار بررسی',
+      processing: 'در حال پردازش',
+      shipped: 'ارسال‌شده',
+      delivered: 'تحویل‌شده',
+      cancelled: 'لغوشده',
+      returned: 'مرجوعی'
+    };
+    return map[(status ?? '').toLowerCase()] ?? (status || 'در انتظار بررسی');
+  }
 }

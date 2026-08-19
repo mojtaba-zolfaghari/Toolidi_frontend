@@ -16,7 +16,7 @@
           <div><p class="text-sm text-gray-500">تاریخ ثبت</p><p class="font-medium text-secondary mt-1">{{ order.createdAt | date:'yyyy/MM/dd - HH:mm' }}</p></div>
           <div><p class="text-sm text-gray-500">تعداد اقلام</p><p class="font-medium text-secondary mt-1">{{ itemCount(order) }} قلم</p></div>
           <div><p class="text-sm text-gray-500">مبلغ نهایی</p><p class="font-bold text-primary mt-1">{{ order.grandTotal | number }} تومان</p></div>
-          <span class="rounded-full px-3 py-1 text-sm bg-bg-muted text-primary">{{ order.status || 'در انتظار بررسی' }}</span>
+          <span class="rounded-full px-3 py-1 text-sm font-medium" [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
           <span class="text-primary text-sm font-medium">مشاهده جزئیات ←</span>
         </div>
       </button>

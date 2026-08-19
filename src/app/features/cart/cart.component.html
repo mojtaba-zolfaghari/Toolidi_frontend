@@ -68,14 +68,14 @@
             placeholder="کد تخفیف"
             class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
           <button type="button" (click)="applyDiscount(couponInput.value)" class="bg-gray-800 text-white rounded-xl px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
-            اعمال
+            اعمال کد تخفیف
           </button>
         </div>
         <p *ngIf="cart.discountCode" class="text-sm text-green-600 mb-3">کد تخفیف: {{ cart.discountCode }}</p>
         <p *ngIf="errorMessage" class="text-sm text-red-500 mb-3">{{ errorMessage }}</p>
 
         <a routerLink="/checkout" class="block w-full bg-primary text-white font-bold rounded-xl py-2.5 text-center hover:bg-primary-dark transition-colors">
-          ادامه فرآیند خرید
+          پرداخت
         </a>
       </div>
     </div>

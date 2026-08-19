@@ -1,55 +1,166 @@
 <section class="bg-warm min-h-screen py-10">
-  <div class="container mx-auto px-4">
-    <div *ngIf="loading" class="text-center text-gray-400 py-20">در حال بارگذاری…</div>
+  <div class="container mx-auto px-4 max-w-7xl">
+    <div *ngIf="loading" class="py-20"><app-spinner label="در حال بارگذاری محصول…"></app-spinner></div>
 
-    <div *ngIf="errorMessage" class="text-center text-red-500 py-20">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage" class="text-center py-20">
+      <p class="text-red-500 mb-4">{{ errorMessage }}</p>
+      <a routerLink="/shop" class="inline-block bg-primary text-white rounded-xl px-6 py-2.5 font-bold">بازگشت به فروشگاه</a>
+    </div>
 
-    <div *ngIf="product" class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <!-- تصویر (placeholder چون بک‌اند فعلاً تصویر ندارد) -->
-      <div class="bg-gradient-to-br from-primary-light to-primary rounded-2xl h-80 flex items-center justify-center text-8xl">
-        🛍️
-      </div>
+    <ng-container *ngIf="!loading && product">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <!-- گالری تصویر -->
+        <div>
+          <div
+            [@imageSwap]="activeImageIndex"
+            class="bg-gradient-to-br from-primary-light to-primary rounded-2xl h-80 md:h-96 flex items-center justify-center overflow-hidden relative">
+            <img
+              *ngIf="hasGallery"
+              [src]="galleryImages[activeImageIndex]"
+              [alt]="product.name"
+              class="h-full w-full object-cover" />
+            <span *ngIf="!hasGallery" class="text-8xl select-none">🛍️</span>
+          </div>
 
-      <!-- اطلاعات -->
-      <div>
-        <h1 class="text-3xl font-bold text-secondary mb-3">{{ product.name }}</h1>
-
-        <div class="flex items-center gap-1 mb-4">
-          <span
-            *ngFor="let star of [1, 2, 3, 4, 5]"
-            class="text-lg"
-            [class.text-yellow-400]="star <= (product.ratingAverage ?? 0)"
-            [class.text-gray-300]="star > (product.ratingAverage ?? 0)">★</span>
-          <span class="text-sm text-gray-400 mr-2">({{ product.ratingCount }} نظر)</span>
-        </div>
-
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-primary font-bold text-3xl">{{ product.unitPrice | number }} تومان</span>
-          <span *ngIf="product.comparePrice" class="text-gray-400 line-through text-lg">
-            {{ product.comparePrice | number }} تومان
-          </span>
-        </div>
-
-        <p class="text-gray-600 mb-6 leading-relaxed">
-          {{ product.fullDescription || product.shortDescription || 'توضیحاتی برای این محصول ثبت نشده است.' }}
-        </p>
-
-        <div class="flex items-center gap-4 mb-6">
-          <span class="font-medium text-secondary">تعداد:</span>
-          <div class="flex items-center gap-2">
-            <button type="button" (click)="changeQuantity(1)" class="w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">+</button>
-            <span class="w-12 text-center font-bold">{{ quantity }}</span>
-            <button type="button" (click)="changeQuantity(-1)" class="w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">-</button>
+          <!-- بندانگشتی‌ها -->
+          <div *ngIf="galleryImages.length > 1" class="mt-4 flex gap-3 overflow-x-auto pb-1">
+            <button
+              *ngFor="let image of galleryImages; let i = index"
+              type="button"
+              (click)="selectImage(i)"
+              class="h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-colors"
+              [class.border-primary]="i === activeImageIndex"
+              [class.border-transparent]="i !== activeImageIndex">
+              <img [src]="image" [alt]="product.name + ' ' + (i + 1)" class="h-full w-full object-cover" />
+            </button>
           </div>
         </div>
 
-        <button
-          type="button"
-          (click)="addToCart()"
-          class="w-full md:w-auto bg-primary text-white font-bold rounded-xl px-8 py-3 hover:bg-primary-dark transition-colors">
-          افزودن به سبد خرید
-        </button>
+        <!-- اطلاعات -->
+        <div [@slideUp]>
+          <div class="flex items-center gap-2 mb-3">
+            <span *ngIf="product.isFeatured" class="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">منتخب</span>
+            <span *ngIf="product.isNewArrival" class="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-600">تازه‌وارد</span>
+            <span *ngIf="product.isBestSeller" class="rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-orange-600">پرفروش</span>
+          </div>
+
+          <h1 class="text-3xl font-bold text-secondary mb-3">{{ product.name }}</h1>
+          <p *ngIf="product.categoryName" class="text-sm text-gray-500 mb-4">دسته‌بندی: {{ product.categoryName }}</p>
+
+          <div class="flex items-center gap-1 mb-4">
+            <span *ngFor="let star of [1, 2, 3, 4, 5]" class="text-lg" [class.text-yellow-400]="star <= (product.ratingAverage ?? 0)" [class.text-gray-300]="star > (product.ratingAverage ?? 0)">★</span>
+            <span class="text-sm text-gray-400 mr-2">({{ product.ratingCount }} نظر)</span>
+            <span class="mr-auto text-sm font-medium" [class]="stockStatus.cssClass">{{ stockStatus.text }}</span>
+          </div>
+
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-primary font-bold text-3xl">{{ effectivePrice | number }} تومان</span>
+            <span *ngIf="product.comparePrice" class="text-gray-400 line-through text-lg">{{ product.comparePrice | number }} تومان</span>
+          </div>
+
+          <p class="text-gray-600 mb-6 leading-relaxed">
+            {{ product.shortDescription || 'توضیح کوتاهی برای این محصول ثبت نشده است.' }}
+          </p>
+
+          <!-- تنوع‌ها -->
+          <div *ngIf="variations.length" class="mb-6">
+            <label class="block font-medium text-secondary mb-2" for="variationSelect">انتخاب تنوع</label>
+            <select
+              id="variationSelect"
+              [value]="selectedVariationId"
+              (change)="onVariationChange($any($event.target).value)"
+              class="w-full md:w-80 border border-gray-300 rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+              <option *ngFor="let variation of variations" [value]="variation.id">
+                {{ variation.displayName }} — {{ (product.unitPrice + variation.priceAdjustment) | number }} تومان
+              </option>
+            </select>
+          </div>
+
+          <!-- تعداد و افزودن به سبد -->
+          <div class="flex flex-wrap items-center gap-4 mb-6">
+            <span class="font-medium text-secondary">تعداد:</span>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="changeQuantity(1)" class="w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">+</button>
+              <span class="w-12 text-center font-bold">{{ quantity }}</span>
+              <button type="button" (click)="changeQuantity(-1)" class="w-9 h-9 rounded-lg border border-gray-300 hover:bg-gray-50">-</button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="addToCart()"
+            [disabled]="!stockStatus.inStock"
+            class="w-full md:w-auto bg-primary text-white font-bold rounded-xl px-8 py-3 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            افزودن به سبد خرید
+          </button>
+        </div>
       </div>
-    </div>
+
+      <!-- تب‌ها -->
+      <div class="mt-12 bg-white rounded-2xl shadow-card overflow-hidden">
+        <div class="flex border-b border-gray-100">
+          <button
+            type="button"
+            (click)="activeTab = 'description'"
+            class="flex-1 px-4 py-4 font-bold text-sm transition-colors"
+            [class.text-primary]="activeTab === 'description'"
+            [class.border-b-2]="activeTab === 'description'"
+            [class.border-primary]="activeTab === 'description'"
+            [class.text-gray-500]="activeTab !== 'description'">توضیحات</button>
+          <button
+            type="button"
+            (click)="activeTab = 'specs'"
+            class="flex-1 px-4 py-4 font-bold text-sm transition-colors"
+            [class.text-primary]="activeTab === 'specs'"
+            [class.border-b-2]="activeTab === 'specs'"
+            [class.border-primary]="activeTab === 'specs'"
+            [class.text-gray-500]="activeTab !== 'specs'">مشخصات فنی</button>
+          <button
+            type="button"
+            (click)="activeTab = 'reviews'"
+            class="flex-1 px-4 py-4 font-bold text-sm transition-colors"
+            [class.text-primary]="activeTab === 'reviews'"
+            [class.border-b-2]="activeTab === 'reviews'"
+            [class.border-primary]="activeTab === 'reviews'"
+            [class.text-gray-500]="activeTab !== 'reviews'">نظرات</button>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="activeTab === 'description'" [@fadeIn] class="leading-8 text-gray-700 whitespace-pre-line">
+            {{ product.fullDescription || product.shortDescription || 'توضیحاتی برای این محصول ثبت نشده است.' }}
+          </div>
+
+          <div *ngIf="activeTab === 'specs'" [@fadeIn]>
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div *ngFor="let spec of specs" class="flex justify-between gap-4 border-b border-gray-100 py-2">
+                <dt class="text-gray-500">{{ spec.label }}</dt>
+                <dd class="font-medium text-secondary">{{ spec.value }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div *ngIf="activeTab === 'reviews'" [@fadeIn]>
+            <div class="flex items-center gap-4 mb-6">
+              <span class="text-4xl font-bold text-secondary">{{ product.ratingAverage ?? 0 | number:'1.1-1' }}</span>
+              <div>
+                <div class="flex items-center gap-1">
+                  <span *ngFor="let star of [1, 2, 3, 4, 5]" class="text-lg" [class.text-yellow-400]="star <= (product.ratingAverage ?? 0)" [class.text-gray-300]="star > (product.ratingAverage ?? 0)">★</span>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">بر اساس {{ product.ratingCount }} نظر</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-center py-8">هنوز نظری برای این محصول ثبت نشده است.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- محصولات مرتبط -->
+      <div *ngIf="relatedProducts.length" class="mt-12">
+        <h2 class="text-2xl font-bold text-secondary mb-6">محصولات مرتبط</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <app-product-card *ngFor="let related of relatedProducts" [product]="related" [@slideUp]></app-product-card>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </section>

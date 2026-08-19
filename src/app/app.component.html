@@ -21,6 +21,7 @@
         </ng-container>
         <ng-container *ngIf="currentUser">
           <a routerLink="/profile" class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">پروفایل</a>
+          <a routerLink="/orders" class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">سفارش‌ها</a>
           <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller" class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">داشبورد فروشنده</a>
           <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin" class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">پنل مدیریت</a>
           <button type="button" (click)="logout()" class="rounded-xl border border-white/15 px-4 py-2 text-sm font-medium transition-colors hover:border-red-300/50 hover:text-red-200">خروج</button>
@@ -34,8 +35,15 @@
     </div>
   </nav>
 
-  <div *ngIf="menuOpen" class="fixed inset-0 z-40 bg-secondary/40 backdrop-blur-sm md:hidden" (click)="closeMenu()">
-    <aside id="mobile-menu" class="absolute right-0 top-0 h-full w-[min(88vw,22rem)] border-l border-white/20 bg-secondary/95 px-5 pb-8 pt-24 text-white shadow-2xl backdrop-blur-2xl" (click)="$event.stopPropagation()">
+  <!-- منوی موبایل: کشوی لغزنده از راست -->
+  <div class="fixed inset-0 z-40 bg-secondary/40 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+       [class.opacity-0]="!menuOpen"
+       [class.pointer-events-none]="!menuOpen"
+       (click)="closeMenu()">
+    <aside id="mobile-menu"
+           class="absolute right-0 top-0 h-full w-[min(88vw,22rem)] border-l border-white/20 bg-secondary/95 px-5 pb-8 pt-24 text-white shadow-2xl backdrop-blur-2xl transition-transform duration-300 ease-in-out"
+           [class.translate-x-full]="!menuOpen"
+           (click)="$event.stopPropagation()">
       <div class="mb-8 flex items-center gap-3 border-b border-white/10 pb-5">
         <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-xl font-bold">T</span>
         <div><p class="font-bold">Toolidi</p><p class="text-xs text-white/55">فروشگاهی برای حرفه‌ای‌ها</p></div>
@@ -55,6 +63,7 @@
         </ng-container>
         <ng-container *ngIf="currentUser">
           <a routerLink="/profile" (click)="closeMenu()" class="mobile-nav-link">پروفایل <span>◎</span></a>
+          <a routerLink="/orders" (click)="closeMenu()" class="mobile-nav-link">سفارش‌ها <span>☰</span></a>
           <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller" (click)="closeMenu()" class="mobile-nav-link">داشبورد فروشنده <span>↗</span></a>
           <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin" (click)="closeMenu()" class="mobile-nav-link">پنل مدیریت <span>⚙</span></a>
           <button type="button" (click)="logout()" class="mt-3 w-full rounded-2xl border border-red-300/30 px-4 py-3 text-red-200">خروج از حساب</button>
@@ -65,7 +74,9 @@
 </header>
 
 <main>
-  <router-outlet></router-outlet>
+  <div [@routeAnimations]="prepareRoute(outlet)">
+    <router-outlet #outlet="outlet"></router-outlet>
+  </div>
 </main>
 
 <footer class="mt-12 bg-secondary py-10 text-white">

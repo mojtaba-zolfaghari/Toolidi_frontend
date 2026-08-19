@@ -5,6 +5,33 @@ import { ApiService } from '../api.service';
 import { PagedList, Result } from '../../models/api-response.model';
 import { buildQueryString } from './query.util';
 
+/** تصویر محصول */
+export interface ProductImage {
+  id: string;
+  imageUrl: string;
+  altText?: string;
+  isPrimary: boolean;
+  displayOrder: number;
+}
+
+/** تنوع محصول (رنگ/سایز و…) */
+export interface ProductVariation {
+  id: string;
+  sku: string;
+  displayName: string;
+  priceAdjustment: number;
+  stockQuantity: number;
+  isDefault: boolean;
+  imageUrl?: string;
+}
+
+/** مشخصه‌ی فنی محصول */
+export interface ProductAttribute {
+  id: string;
+  name: string;
+  value: string;
+}
+
 /** محصول (اطلاعات عمومی بازگشتی از API) */
 export interface Product {
   id: string;
@@ -30,6 +57,11 @@ export interface Product {
   viewCount: number;
   ratingAverage?: number;
   ratingCount: number;
+  stockQuantity?: number;
+  categoryName?: string;
+  images?: ProductImage[];
+  variations?: ProductVariation[];
+  attributes?: ProductAttribute[];
 }
 
 /** داده‌ی ایجاد محصول جدید */

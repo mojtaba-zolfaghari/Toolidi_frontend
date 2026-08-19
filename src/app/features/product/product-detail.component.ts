@@ -1,35 +1,77 @@
-import { Component, OnInit } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
+import { fadeIn, scaleUp, slideUp } from '../../shared/animations';
 import { CartService } from '../../core/services/api/cart.service';
-import { Product, ProductService } from '../../core/services/api/product.service';
+import {
+  Product,
+  ProductService,
+  ProductVariation
+} from '../../core/services/api/product.service';
+import { AuthStateService } from '../../core/services/auth-state.service';
+
+/** انیمیشن تعویض تصویر اصلی با محو شدن */
+const imageSwap = trigger('imageSwap', [
+  transition('* => *', [
+    style({ opacity: 0, transform: 'scale(0.98)' }),
+    animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+  ])
+]);
+
+/** گزینه‌ی تب‌های جزئیات محصول */
+export type ProductTab = 'description' | 'specs' | 'reviews';
+
+/** یک ردیف مشخصات فنی برای نمایش */
+interface SpecRow {
+  label: string;
+  value: string;
+}
 
 /**
- * صفحه جزئیات محصول؛ دریافت محصول با شناسه یا اسلاگ و افزودن به سبد.
+ * صفحه جزئیات محصول؛ گالری تصویر، تب‌های توضیحات/مشخصات/نظرات،
+ * تنوع‌ها، افزودن به سبد و محصولات مرتبط.
  */
 @Component({
   selector: 'app-product-detail',
-  templateUrl: './product-detail.component.html'
+  templateUrl: './product-detail.component.html',
+  animations: [fadeIn, slideUp, scaleUp, imageSwap]
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent implements OnInit, OnDestroy {
   product: Product | null = null;
+  relatedProducts: Product[] = [];
   loading = true;
   errorMessage = '';
   quantity = 1;
+  activeTab: ProductTab = 'description';
+  activeImageIndex = 0;
+  selectedVariationId: string | null = null;
+  isLoggedIn = false;
+
+  private subscription?: Subscription;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly productService: ProductService,
-    private readonly cartService: CartService
+    private readonly cartService: CartService,
+    private readonly authState: AuthStateService
   ) {}
 
   ngOnInit(): void {
+    this.subscription = this.authState.currentUser$.subscribe((user) => {
+      this.isLoggedIn = !!user;
+    });
+
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       const slug = params.get('slug');
       this.loading = true;
       this.errorMessage = '';
+      this.activeImageIndex = 0;
+      this.selectedVariationId = null;
+      this.quantity = 1;
 
       const request = id
         ? this.productService.getProductById(id)
@@ -39,6 +81,8 @@ export class ProductDetailComponent implements OnInit {
         next: (result) => {
           this.product = result.data ?? null;
           this.loading = false;
+          this.autoSelectVariation();
+          this.loadRelated();
         },
         error: (err: Error) => {
           this.errorMessage = err?.message ?? 'محصول یافت نشد.';
@@ -46,6 +90,113 @@ export class ProductDetailComponent implements OnInit {
         }
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  /** تصاویر گالری (در صورت وجود) */
+  get galleryImages(): string[] {
+    const images = this.product?.images ?? [];
+    if (!images.length) {
+      return [];
+    }
+    return [...images]
+      .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary) || a.displayOrder - b.displayOrder)
+      .map((image) => image.imageUrl);
+  }
+
+  /** نمایش گالری یا جای‌گذاری تصویر */
+  get hasGallery(): boolean {
+    return this.galleryImages.length > 0;
+  }
+
+  /** تنوع‌های محصول */
+  get variations(): ProductVariation[] {
+    return this.product?.variations ?? [];
+  }
+
+  /** تنوع انتخاب‌شده */
+  get selectedVariation(): ProductVariation | null {
+    return this.variations.find((variation) => variation.id === this.selectedVariationId) ?? null;
+  }
+
+  /** قیمت نهایی با احتساب تنوع */
+  get effectivePrice(): number {
+    return (this.product?.unitPrice ?? 0) + (this.selectedVariation?.priceAdjustment ?? 0);
+  }
+
+  /** انتخاب خودکار تنوع پیش‌فرض */
+  private autoSelectVariation(): void {
+    if (!this.variations.length) {
+      return;
+    }
+    const defaultVariation = this.variations.find((variation) => variation.isDefault) ?? this.variations[0];
+    this.selectedVariationId = defaultVariation.id;
+  }
+
+  /** انتخاب تصویر گالری */
+  selectImage(index: number): void {
+    this.activeImageIndex = index;
+  }
+
+  /** انتخاب تنوع */
+  onVariationChange(variationId: string): void {
+    this.selectedVariationId = variationId || null;
+    const variation = this.selectedVariation;
+    if (variation?.imageUrl && this.hasGallery) {
+      const index = this.galleryImages.indexOf(variation.imageUrl);
+      if (index >= 0) {
+        this.activeImageIndex = index;
+      }
+    }
+  }
+
+  /** وضعیت موجودی کالا */
+  get stockStatus(): { text: string; cssClass: string; inStock: boolean } {
+    const stock = this.selectedVariation
+      ? this.selectedVariation.stockQuantity
+      : this.product?.stockQuantity;
+
+    if (stock === undefined || stock === null) {
+      return { text: 'موجود', cssClass: 'text-green-600', inStock: true };
+    }
+    if (stock <= 0) {
+      return { text: 'ناموجود', cssClass: 'text-red-600', inStock: false };
+    }
+    if (stock < 10) {
+      return { text: `تنها ${stock} عدد باقی مانده`, cssClass: 'text-orange-600', inStock: true };
+    }
+    return { text: 'موجود', cssClass: 'text-green-600', inStock: true };
+  }
+
+  /** مشخصات فنی استخراج‌شده از محصول */
+  get specs(): SpecRow[] {
+    const product = this.product;
+    if (!product) {
+      return [];
+    }
+    const rows: SpecRow[] = [
+      { label: 'شناسه کالا', value: product.sku },
+      { label: 'دسته‌بندی', value: product.categoryName ?? product.categoryId },
+      { label: 'نوع کالا', value: product.isDigital ? 'دیجیتال' : 'فیزیکی' },
+      { label: 'وضعیت نمایش', value: product.isFeatured ? 'محصول منتخب' : 'عادی' }
+    ];
+    if (product.weight !== undefined && product.weight !== null) {
+      rows.push({ label: 'وزن', value: `${product.weight} گرم` });
+    }
+    if (product.length !== undefined && product.width !== undefined && product.height !== undefined) {
+      rows.push({ label: 'ابعاد', value: `${product.length}×${product.width}×${product.height} سانتی‌متر` });
+    }
+    if (product.taxRate !== undefined && product.taxRate !== null) {
+      rows.push({ label: 'نرخ مالیات', value: `${product.taxRate}٪` });
+    }
+    rows.push({ label: 'بازدید', value: `${product.viewCount} بار` });
+    for (const attribute of product.attributes ?? []) {
+      rows.push({ label: attribute.name, value: attribute.value });
+    }
+    return rows;
   }
 
   /** کم و زیاد کردن تعداد */
@@ -58,12 +209,37 @@ export class ProductDetailComponent implements OnInit {
     if (!this.product) {
       return;
     }
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login']);
+      return;
+    }
 
-    this.cartService.addItem(this.product.id, undefined, this.quantity).subscribe({
-      next: () => this.router.navigate(['/cart']),
-      error: () => {
-        /* اینترسپتور توکن در صورت 401 کاربر را به صفحه ورود می‌برد */
-      }
-    });
+    this.cartService
+      .addItem(this.product.id, this.selectedVariationId ?? undefined, this.quantity)
+      .subscribe({
+        next: () => this.router.navigate(['/cart']),
+        error: () => {
+          /* اینترسپتور توکن در صورت 401 کاربر را به صفحه ورود می‌برد */
+        }
+      });
+  }
+
+  /** دریافت محصولات مرتبط (یا از همان دسته‌بندی) */
+  private loadRelated(): void {
+    if (!this.product) {
+      return;
+    }
+    const categoryId = this.product.categoryId;
+    this.productService
+      .getProducts({ categoryId, page: 1, pageSize: 12 })
+      .subscribe({
+        next: (result) => {
+          const items = (result.data?.items ?? []).filter(
+            (item) => item.id !== this.product?.id
+          );
+          this.relatedProducts = items.slice(0, 4);
+        },
+        error: () => (this.relatedProducts = [])
+      });
   }
 }

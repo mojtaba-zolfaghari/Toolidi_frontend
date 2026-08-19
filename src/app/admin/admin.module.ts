@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AdminPanelComponent } from './admin-panel.component';
+import { SharedModule } from '../shared/shared.module';
 
 const routes: Routes = [
   { path: '', component: AdminPanelComponent }
@@ -12,7 +14,9 @@ const routes: Routes = [
   declarations: [AdminPanelComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    FormsModule,
+    RouterModule.forChild(routes),
+    SharedModule
   ]
 })
 export class AdminModule { }

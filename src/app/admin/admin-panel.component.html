@@ -6,33 +6,89 @@
       <button type="button" (click)="selectTab('users')" [class.bg-primary]="activeTab === 'users'" [class.text-white]="activeTab === 'users'" class="bg-white rounded-xl shadow-card p-4 text-right hover:shadow-card-hover"><span class="block text-sm opacity-70">کاربران</span><strong class="text-xl">{{ userTotal }}</strong></button>
       <button type="button" (click)="selectTab('products')" [class.bg-primary]="activeTab === 'products'" [class.text-white]="activeTab === 'products'" class="bg-white rounded-xl shadow-card p-4 text-right hover:shadow-card-hover"><span class="block text-sm opacity-70">محصولات</span><strong class="text-xl">{{ productTotal }}</strong></button>
       <button type="button" (click)="selectTab('sellers')" [class.bg-primary]="activeTab === 'sellers'" [class.text-white]="activeTab === 'sellers'" class="bg-white rounded-xl shadow-card p-4 text-right hover:shadow-card-hover"><span class="block text-sm opacity-70">فروشندگان</span><strong class="text-xl">{{ sellerTotal }}</strong></button>
-      <div class="bg-white rounded-xl shadow-card p-4 opacity-60"><span class="block text-sm text-gray-500">سفارش‌ها</span><strong class="text-sm text-gray-400">به‌زودی</strong></div>
-      <div class="bg-white rounded-xl shadow-card p-4 opacity-60"><span class="block text-sm text-gray-500">تخفیف‌ها</span><strong class="text-sm text-gray-400">به‌زودی</strong></div>
-      <div class="bg-white rounded-xl shadow-card p-4 opacity-60"><span class="block text-sm text-gray-500">گزارش‌ها</span><strong class="text-sm text-gray-400">به‌زودی</strong></div>
+      <button type="button" (click)="selectTab('discounts')" [class.bg-primary]="activeTab === 'discounts'" [class.text-white]="activeTab === 'discounts'" class="bg-white rounded-xl shadow-card p-4 text-right hover:shadow-card-hover"><span class="block text-sm opacity-70">تخفیف‌ها</span><strong class="text-xl">{{ discountTotal }}</strong></button>
+      <button type="button" (click)="selectTab('reports')" [class.bg-primary]="activeTab === 'reports'" [class.text-white]="activeTab === 'reports'" class="bg-white rounded-xl shadow-card p-4 text-right hover:shadow-card-hover"><span class="block text-sm opacity-70">گزارش‌ها</span><strong class="text-xl">{{ productTotal }}</strong></button>
+      <button type="button" (click)="selectTab('settings')" [class.bg-primary]="activeTab === 'settings'" [class.text-white]="activeTab === 'settings'" class="bg-white rounded-xl shadow-card p-4 text-right hover:shadow-card-hover"><span class="block text-sm opacity-70">تنظیمات</span><strong class="text-xl">⚙</strong></button>
     </div>
 
     <p *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 mb-4">{{ errorMessage }}</p>
     <p *ngIf="actionMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 mb-4">{{ actionMessage }}</p>
 
+    <!-- کاربران -->
     <div *ngIf="activeTab === 'users'" class="bg-white rounded-2xl shadow-card p-6">
       <div class="flex items-center justify-between gap-4 mb-5"><div><h2 class="text-xl font-bold text-secondary">مدیریت کاربران</h2><p class="text-sm text-gray-500 mt-1">فعال‌سازی، غیرفعال‌سازی و تغییر نقش کاربران</p></div><button type="button" (click)="loadUsers()" class="border border-primary text-primary rounded-xl px-4 py-2">بازخوانی</button></div>
-      <div *ngIf="usersLoading" class="text-center text-gray-400 py-10">در حال بارگذاری کاربران…</div>
+      <div *ngIf="usersLoading" class="py-10"><app-spinner label="در حال بارگذاری کاربران…"></app-spinner></div>
       <div *ngIf="!usersLoading" class="overflow-x-auto"><table class="w-full text-sm text-right"><thead><tr class="border-b text-gray-500"><th class="p-3">کاربر</th><th class="p-3">کد ملی</th><th class="p-3">نقش</th><th class="p-3">وضعیت</th><th class="p-3">عملیات</th></tr></thead><tbody><tr *ngFor="let user of users" class="border-b last:border-0"><td class="p-3"><strong class="block text-secondary">{{ user.username }}</strong><span class="text-xs text-gray-400">{{ user.email || 'ایمیل ثبت نشده' }}</span></td><td class="p-3">{{ user.nationalCode }}</td><td class="p-3">{{ user.roleName || 'نامشخص' }}</td><td class="p-3"><span [class.text-green-600]="user.isActive" [class.text-red-600]="!user.isActive">{{ user.isActive ? 'فعال' : 'غیرفعال' }}</span></td><td class="p-3"><div class="flex flex-wrap items-center gap-2"><button type="button" (click)="toggleUser(user)" class="rounded-lg border border-gray-300 px-3 py-1.5 hover:bg-gray-50">{{ user.isActive ? 'غیرفعال کردن' : 'فعال کردن' }}</button><input #roleId type="text" placeholder="شناسه نقش" class="w-28 border border-gray-300 rounded-lg px-2 py-1.5" /><button type="button" (click)="changeRole(user, roleId.value)" class="rounded-lg bg-primary text-white px-3 py-1.5">تغییر نقش</button></div></td></tr></tbody></table></div>
       <p *ngIf="!usersLoading && !users.length" class="text-center text-gray-400 py-8">کاربری برای نمایش وجود ندارد.</p>
     </div>
 
+    <!-- محصولات -->
     <div *ngIf="activeTab === 'products'" class="bg-white rounded-2xl shadow-card p-6">
       <div class="flex items-center justify-between gap-4 mb-5"><div><h2 class="text-xl font-bold text-secondary">مدیریت محصولات</h2><p class="text-sm text-gray-500 mt-1">همه محصولات، حتی پیش‌نویس و در انتظار تأیید</p></div><button type="button" (click)="loadProducts()" class="border border-primary text-primary rounded-xl px-4 py-2">بازخوانی</button></div>
-      <div *ngIf="productsLoading" class="text-center text-gray-400 py-10">در حال بارگذاری محصولات…</div>
+      <div *ngIf="productsLoading" class="py-10"><app-spinner label="در حال بارگذاری محصولات…"></app-spinner></div>
       <div *ngIf="!productsLoading" class="overflow-x-auto"><table class="w-full text-sm text-right"><thead><tr class="border-b text-gray-500"><th class="p-3">محصول</th><th class="p-3">شناسه کالا</th><th class="p-3">قیمت</th><th class="p-3">وضعیت</th><th class="p-3">پرچم‌ها</th><th class="p-3">عملیات</th></tr></thead><tbody><tr *ngFor="let product of products" class="border-b last:border-0"><td class="p-3 font-bold text-secondary">{{ product.name }}</td><td class="p-3">{{ product.sku }}</td><td class="p-3">{{ product.unitPrice | number }} تومان</td><td class="p-3"><span class="rounded-full px-2 py-1 text-xs" [class.bg-gray-100]="product.publishStatus === 'Draft'" [class.bg-orange-50]="product.publishStatus === 'PendingApproval'" [class.bg-blue-50]="product.publishStatus === 'Approved'" [class.bg-green-50]="product.publishStatus === 'Published'" [class.text-gray-600]="product.publishStatus === 'Draft'" [class.text-orange-600]="product.publishStatus === 'PendingApproval'" [class.text-blue-600]="product.publishStatus === 'Approved'" [class.text-green-600]="product.publishStatus === 'Published'">{{ product.publishStatus }}</span></td><td class="p-3"><span *ngIf="product.isFeatured" class="text-xs bg-bg-muted text-primary rounded px-2 py-1 ml-1">ویژه</span><span *ngIf="product.isNewArrival" class="text-xs bg-green-50 text-green-600 rounded px-2 py-1 ml-1">جدید</span><span *ngIf="product.isBestSeller" class="text-xs bg-orange-50 text-orange-600 rounded px-2 py-1">پرفروش</span></td><td class="p-3"><div class="flex gap-2"><button type="button" (click)="approveProduct(product)" [disabled]="product.publishStatus === 'Approved' || product.publishStatus === 'Published'" class="rounded-lg bg-accent-success text-white px-3 py-1.5 disabled:opacity-40">تأیید</button><button type="button" (click)="publishProduct(product)" [disabled]="product.publishStatus !== 'Approved'" class="rounded-lg bg-primary text-white px-3 py-1.5 disabled:opacity-40">انتشار</button></div></td></tr></tbody></table></div>
       <p *ngIf="!productsLoading && !products.length" class="text-center text-gray-400 py-8">محصولی برای نمایش وجود ندارد.</p>
     </div>
 
+    <!-- فروشندگان -->
     <div *ngIf="activeTab === 'sellers'" class="bg-white rounded-2xl shadow-card p-6">
       <div class="flex items-center justify-between gap-4 mb-5"><div><h2 class="text-xl font-bold text-secondary">مدیریت فروشندگان</h2><p class="text-sm text-gray-500 mt-1">بررسی و تأیید فروشندگان</p></div><button type="button" (click)="loadSellers()" class="border border-primary text-primary rounded-xl px-4 py-2">بازخوانی</button></div>
-      <div *ngIf="sellersLoading" class="text-center text-gray-400 py-10">در حال بارگذاری فروشندگان…</div>
+      <div *ngIf="sellersLoading" class="py-10"><app-spinner label="در حال بارگذاری فروشندگان…"></app-spinner></div>
       <div *ngIf="!sellersLoading" class="overflow-x-auto"><table class="w-full text-sm text-right"><thead><tr class="border-b text-gray-500"><th class="p-3">شرکت</th><th class="p-3">تماس</th><th class="p-3">وضعیت</th><th class="p-3">عملیات</th></tr></thead><tbody><tr *ngFor="let seller of sellers" class="border-b last:border-0"><td class="p-3"><strong class="block text-secondary">{{ seller.companyName }}</strong><span class="text-xs text-gray-400">{{ seller.contactName }}</span></td><td class="p-3">{{ seller.contactPhone || seller.contactEmail }}</td><td class="p-3"><span [class.text-green-600]="seller.isVerified" [class.text-orange-600]="!seller.isVerified">{{ seller.isVerified ? 'تأییدشده' : 'در انتظار تأیید' }}</span></td><td class="p-3"><button type="button" (click)="verifySeller(seller)" [disabled]="seller.isVerified" class="rounded-lg bg-accent-success text-white px-3 py-1.5 disabled:opacity-40">تأیید فروشنده</button></td></tr></tbody></table></div>
       <p *ngIf="!sellersLoading && !sellers.length" class="text-center text-gray-400 py-8">فروشنده‌ای برای نمایش وجود ندارد.</p>
+    </div>
+
+    <!-- تخفیف‌ها -->
+    <div *ngIf="activeTab === 'discounts'" class="bg-white rounded-2xl shadow-card p-6">
+      <div class="flex items-center justify-between gap-4 mb-5"><div><h2 class="text-xl font-bold text-secondary">مدیریت تخفیف‌ها</h2><p class="text-sm text-gray-500 mt-1">ایجاد، ویرایش و حذف کدهای تخفیف</p></div><button type="button" (click)="loadDiscounts()" class="border border-primary text-primary rounded-xl px-4 py-2">بازخوانی</button></div>
+
+      <form (ngSubmit)="saveDiscount()" class="border rounded-2xl p-5 mb-6 space-y-4">
+        <h3 class="font-bold text-secondary">{{ editingDiscountId ? 'ویرایش تخفیف' : 'ایجاد تخفیف جدید' }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <label class="block"><span class="block text-secondary font-medium mb-1">کد تخفیف</span><input [(ngModel)]="discountForm.name" name="name" placeholder="مثلاً WELCOME10" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">درصد تخفیف</span><input [(ngModel)]="discountForm.percentage" name="percentage" type="number" min="0" max="100" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">توضیحات</span><input [(ngModel)]="discountForm.description" name="description" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">تاریخ شروع</span><input [(ngModel)]="discountForm.startDate" name="startDate" type="date" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1">تاریخ پایان</span><input [(ngModel)]="discountForm.endDate" name="endDate" type="date" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+          <label class="flex items-center gap-2 pt-6 text-secondary"><input [(ngModel)]="discountForm.isActive" name="isActive" type="checkbox" class="accent-primary" /> فعال</label>
+        </div>
+        <div class="flex gap-3">
+          <button type="submit" class="bg-primary text-white rounded-xl px-6 py-2.5 font-bold">{{ editingDiscountId ? 'ذخیره تغییرات' : 'ایجاد تخفیف' }}</button>
+          <button *ngIf="editingDiscountId" type="button" (click)="cancelDiscountEdit()" class="border border-gray-300 rounded-xl px-5 py-2.5">انصراف</button>
+        </div>
+      </form>
+
+      <div *ngIf="discountsLoading" class="py-10"><app-spinner label="در حال بارگذاری تخفیف‌ها…"></app-spinner></div>
+      <div *ngIf="!discountsLoading" class="overflow-x-auto"><table class="w-full text-sm text-right"><thead><tr class="border-b text-gray-500"><th class="p-3">کد</th><th class="p-3">درصد</th><th class="p-3">شروع</th><th class="p-3">پایان</th><th class="p-3">وضعیت</th><th class="p-3">عملیات</th></tr></thead><tbody><tr *ngFor="let discount of discounts" class="border-b last:border-0"><td class="p-3 font-bold text-secondary">{{ discount.name }}</td><td class="p-3">{{ discount.percentage }}٪</td><td class="p-3">{{ discount.startDate | date:'yyyy/MM/dd' }}</td><td class="p-3">{{ discount.endDate | date:'yyyy/MM/dd' }}</td><td class="p-3"><span [class.text-green-600]="discount.isActive" [class.text-red-600]="!discount.isActive">{{ discount.isActive ? 'فعال' : 'غیرفعال' }}</span></td><td class="p-3"><div class="flex gap-2"><button type="button" (click)="editDiscount(discount)" class="text-primary hover:underline">ویرایش</button><button type="button" (click)="deleteDiscount(discount)" class="text-red-600 hover:underline">حذف</button></div></td></tr></tbody></table></div>
+      <p *ngIf="!discountsLoading && !discounts.length" class="text-center text-gray-400 py-8">تخفیفی برای نمایش وجود ندارد.</p>
+    </div>
+
+    <!-- گزارش‌ها -->
+    <div *ngIf="activeTab === 'reports'" class="space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">کل کاربران</p><p class="text-2xl font-bold text-secondary mt-2">{{ userTotal | number }}</p></div>
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">کل محصولات</p><p class="text-2xl font-bold text-secondary mt-2">{{ productTotal | number }}</p></div>
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">فروشندگان تأییدشده</p><p class="text-2xl font-bold text-green-600 mt-2">{{ verifiedSellersCount | number }}</p></div>
+        <div class="bg-white rounded-2xl shadow-card p-5"><p class="text-sm text-gray-500">محصولات منتشرشده</p><p class="text-2xl font-bold text-primary mt-2">{{ publishedProductsCount | number }}</p></div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-card p-6">
+        <h2 class="text-xl font-bold text-secondary mb-5">محصولات بر اساس وضعیت</h2>
+        <app-bar-chart *ngIf="productStatusChart.length" [data]="productStatusChart"></app-bar-chart>
+        <p *ngIf="!productStatusChart.length" class="text-gray-400 text-center py-6">داده‌ای برای نمایش موجود نیست.</p>
+      </div>
+    </div>
+
+    <!-- تنظیمات -->
+    <div *ngIf="activeTab === 'settings'" class="bg-white rounded-2xl shadow-card p-6">
+      <div class="mb-5"><h2 class="text-xl font-bold text-secondary">تنظیمات سامانه</h2><p class="text-sm text-gray-500 mt-1">نرخ مالیات و اطلاعات درگاه‌های پرداخت</p></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+        <label class="block"><span class="block text-secondary font-medium mb-1">نرخ مالیات (٪)</span><input [(ngModel)]="settings.taxRate" name="taxRate" type="number" min="0" max="100" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+        <label class="block"><span class="block text-secondary font-medium mb-1">شناسه مرچنت زرین‌پال</span><input [(ngModel)]="settings.zarinpalMerchantId" name="zarinpal" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+        <label class="block"><span class="block text-secondary font-medium mb-1">شناسه مرچنت SEP</span><input [(ngModel)]="settings.sepMerchantId" name="sep" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
+      </div>
+      <p *ngIf="settingsMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 mt-4 text-sm">{{ settingsMessage }}</p>
+      <button type="button" (click)="saveSettings()" class="mt-5 bg-primary text-white rounded-xl px-6 py-2.5 font-bold">ذخیره تنظیمات</button>
     </div>
   </div>
 </section>

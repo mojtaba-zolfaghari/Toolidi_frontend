@@ -20,6 +20,12 @@
       </div>
     </ng-container>
 
+    <div class="bg-white rounded-2xl shadow-card p-6 mb-6">
+      <h2 class="text-xl font-bold text-secondary mb-5">روند فروش</h2>
+      <app-bar-chart *ngIf="salesTrendData.length" [data]="salesTrendData"></app-bar-chart>
+      <p *ngIf="!salesTrendData.length" class="text-gray-400 text-center py-6">داده‌ای برای روند فروش موجود نیست.</p>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div class="bg-white rounded-2xl shadow-card p-6" *ngIf="orderStats as stats">
         <h2 class="text-xl font-bold text-secondary mb-5">آمار سفارش‌ها</h2>
