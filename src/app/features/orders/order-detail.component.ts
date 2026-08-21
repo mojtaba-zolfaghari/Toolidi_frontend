@@ -29,7 +29,13 @@ export class OrderDetailComponent implements OnInit {
       return;
     }
 
-    this.orderService.getOrderById(id).subscribe({
+    // Check if id is an order number string (starts with ORD-) or a GUID
+    const isOrderNumber = id.startsWith('ORD-');
+    const orderObs = isOrderNumber
+      ? this.orderService.getOrderOrderByNumber(id)
+      : this.orderService.getOrderById(id);
+
+    orderObs.subscribe({
       next: (result) => {
         this.order = result.data ?? null;
         this.loading = false;

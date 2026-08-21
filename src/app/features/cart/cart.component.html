@@ -22,7 +22,7 @@
 
           <div class="flex-1">
             <h3 class="font-bold text-secondary">{{ item.productName }}</h3>
-            <p *ngIf="item.variationName" class="text-sm text-gray-500">{{ item.variationName }}</p>
+            <p *ngIf="item.variationName && item.variationName !== 'Default'" class="text-sm text-gray-500">{{ item.variationName }}</p>
             <p class="text-primary font-bold mt-1">{{ item.unitPrice | number }} تومان</p>
           </div>
 

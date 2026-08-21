@@ -252,6 +252,11 @@ export class CheckoutComponent implements OnInit {
       });
   }
 
+  /** رفتن به جزئیات سفارش */
+  goToOrderDetail(orderNumber: string): void {
+    this.router.navigate(['/orders', orderNumber]);
+  }
+
   /** رفتن به سفارش‌ها پس از ثبت موفق */
   goToOrders(): void {
     this.router.navigate(['/orders']);

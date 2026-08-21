@@ -108,6 +108,11 @@ export class OrderService {
     return this.api.get<Result<Order>>(`/v1/orders/${id}`);
   }
 
+  /** دریافت یک سفارش با شماره سفارش (رشته ORD-...) */
+  getOrderOrderByNumber(orderNumber: string): Observable<Result<Order>> {
+    return this.api.get<Result<Order>>(`/v1/orders/by-order-number/${encodeURIComponent(orderNumber)}`);
+  }
+
   /** لغو یک سفارش */
   cancelOrder(id: string): Observable<Result<boolean>> {
     return this.api.post<Result<boolean>>(`/v1/orders/${id}/cancel`, {});
