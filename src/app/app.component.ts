@@ -18,6 +18,8 @@ export class AppComponent implements OnInit, OnDestroy {
   currentUser: AuthUser | null = null;
   menuOpen = false;
   isAdminArea = false;
+  searchQuery = '';
+  newsletterEmail = '';
 
   private subscription?: Subscription;
 
@@ -77,5 +79,24 @@ export class AppComponent implements OnInit, OnDestroy {
       this.authState.clear();
       this.router.navigate(['/']);
     });
+  }
+
+  /** هدایت به صفحه فروشگاه با عبارت جستجو */
+  onSearch(): void {
+    const term = this.searchQuery.trim();
+    if (!term) {
+      return;
+    }
+    this.router.navigate(['/shop'], { queryParams: { search: term } });
+    this.searchQuery = '';
+  }
+
+  /** عضویت در خبرنامه */
+  onNewsletterSubmit(): void {
+    const email = this.newsletterEmail.trim();
+    if (email) {
+      // TODO: integrate with newsletter API
+      this.newsletterEmail = '';
+    }
   }
 }

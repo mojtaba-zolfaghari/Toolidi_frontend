@@ -6,6 +6,24 @@
         <span>Toolidi</span>
       </a>
 
+      <form (ngSubmit)="onSearch()" class="hidden lg:flex items-center">
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="جستجو..."
+            class="w-48 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-white/50 outline-none transition-colors focus:border-primary focus:bg-white/10"
+          />
+          <button
+            type="submit"
+            class="absolute inset-y-0 right-2 flex items-center text-white/50 hover:text-primary"
+            aria-label="جستجو"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
+          </button>
+        </div>
+      </form>
+
       <div class="hidden items-center gap-7 text-sm font-medium md:flex">
         <a routerLink="/" routerLinkActive="text-primary-light" [routerLinkActiveOptions]="{ exact: true }" class="transition-colors hover:text-primary-light">خانه</a>
         <a routerLink="/shop" routerLinkActive="text-primary-light" class="transition-colors hover:text-primary-light">فروشگاه</a>
@@ -79,9 +97,39 @@
   </div>
 </main>
 
-<footer *ngIf="!isAdminArea" class="mt-12 bg-secondary py-10 text-white">
-  <div class="container mx-auto flex flex-col items-center justify-between gap-3 px-4 text-center sm:flex-row sm:text-right lg:px-8">
-    <div><p class="font-bold">Toolidi</p><p class="mt-1 text-sm text-white/55">تجربه‌ای حرفه‌ای برای خرید و فروش</p></div>
-    <p class="text-sm text-white/55">© ۲۰۲۴ Toolidi — تمامی حقوق محفوظ است.</p>
+<footer *ngIf="!isAdminArea" class="mt-12 bg-secondary text-white">
+  <div class="container mx-auto px-4 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 py-12 md:grid-cols-4">
+      <div>
+        <p class="font-bold">Toolidi</p>
+        <p class="mt-2 text-sm text-white/70">پلتفرم B2B برای خرید و فروش عمده.</p>
+      </div>
+      <div>
+        <p class="mb-3 text-sm font-bold text-white/90">برای خریداران</p>
+        <ul class="space-y-2 text-sm text-white/70">
+          <li><a routerLink="/shop" class="hover:text-white">فروشگاه</a></li>
+          <li><a routerLink="/contact" class="hover:text-white">تماس با ما</a></li>
+          <li><a routerLink="/cart" class="hover:text-white">سبد خرید</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="mb-3 text-sm font-bold text-white/90">برای فروشندگان</p>
+        <ul class="space-y-2 text-sm text-white/70">
+          <li><a routerLink="/register" class="hover:text-white">ثبت نام فروشنده</a></li>
+          <li><a routerLink="/seller" class="hover:text-white">داشبورد فروشنده</a></li>
+          <li><a routerLink="/admin" class="hover:text-white">پنل مدیریت</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="mb-3 text-sm font-bold text-white/90">خبرنامه</p>
+        <form (ngSubmit)="onNewsletterSubmit()" class="space-y-2">
+          <input type="email" [(ngModel)]="newsletterEmail" placeholder="ایمیل شما" class="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-primary" />
+          <button type="submit" class="w-full rounded-xl bg-primary px-4 py-2 text-sm font-bold shadow-lg shadow-primary/20 transition-colors hover:bg-primary-light">عضویت</button>
+        </form>
+      </div>
+    </div>
+    <div class="border-t border-white/10 py-6 text-center text-xs text-white/60">
+      © ۲۰۲۴ Toolidi — تمامی حقوق محفوظ است.
+    </div>
   </div>
 </footer>

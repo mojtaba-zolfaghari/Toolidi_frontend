@@ -4,7 +4,9 @@ import {
   query,
   style,
   transition,
-  trigger
+  trigger,
+  state,
+  sequence
 } from '@angular/animations';
 
 /**
@@ -27,6 +29,28 @@ export const slideUp = trigger('slideUp', [
     animate(
       '450ms cubic-bezier(0.2, 0.8, 0.2, 1)',
       style({ opacity: 1, transform: 'translateY(0)' })
+    )
+  ])
+]);
+
+/** لغزیدن از چپ (slide-from-right در RTL) */
+export const slideFromRight = trigger('slideFromRight', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'translateX(-40px)' }),
+    animate(
+      '500ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+      style({ opacity: 1, transform: 'translateX(0)' })
+    )
+  ])
+]);
+
+/** لغزیدن از راست (slide-from-left در RTL) */
+export const slideFromLeft = trigger('slideFromLeft', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'translateX(40px)' }),
+    animate(
+      '500ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+      style({ opacity: 1, transform: 'translateX(0)' })
     )
   ])
 ]);
@@ -62,5 +86,52 @@ export const staggerList = trigger('staggerList', [
         )
       ])
     ], { optional: true })
+  ])
+]);
+
+/** انیمیشن zoom-in برای نقشه */
+export const zoomIn = trigger('zoomIn', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'scale(0.85)' }),
+    animate(
+      '600ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+      style({ opacity: 1, transform: 'scale(1)' })
+    )
+  ])
+]);
+
+/** انیمیشن pulse برای نقاط نقشه */
+export const pulse = trigger('pulse', [
+  state('active', style({ transform: 'scale(1)', opacity: 1 })),
+  transition('* => active', [
+    style({ transform: 'scale(0)', opacity: 0 }),
+    animate('300ms ease-out', style({ transform: 'scale(1)', opacity: 1 }))
+  ])
+]);
+
+/** انیمیشن خط رسم‌شونده */
+export const drawLine = trigger('drawLine', [
+  transition(':enter', [
+    style({ 'stroke-dashoffset': '{{dashLength}}' }),
+    animate('{{duration}}ms ease-in-out', style({ 'stroke-dashoffset': '0' }))
+  ], { params: { dashLength: 1000, duration: 2000 } })
+]);
+
+/** انیمیشن fade-in-up با تأخیر */
+export const fadeSlideUp = trigger('fadeSlideUp', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'translateY(30px)' }),
+    animate(
+      '{{delay}}ms {{duration}}ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+      style({ opacity: 1, transform: 'translateY(0)' })
+    )
+  ], { params: { delay: 0, duration: 500 } })
+]);
+
+/** شمارنده متحرک */
+export const countUp = trigger('countUp', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'translateY(10px)' }),
+    animate('500ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
   ])
 ]);
