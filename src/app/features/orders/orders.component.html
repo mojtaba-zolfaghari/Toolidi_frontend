@@ -13,8 +13,8 @@
       <button *ngFor="let order of orders" type="button" (click)="openOrder(order.id)" class="w-full bg-white rounded-2xl shadow-card p-5 text-right hover:shadow-card-hover transition-shadow">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div><p class="text-sm text-gray-500">شماره سفارش</p><h2 class="font-bold text-secondary mt-1">{{ order.orderNumber }}</h2></div>
-          <div><p class="text-sm text-gray-500">تاریخ ثبت</p><p class="font-medium text-secondary mt-1">{{ order.createdAt | date:'yyyy/MM/dd - HH:mm' }}</p></div>
-          <div><p class="text-sm text-gray-500">تعداد اقلام</p><p class="font-medium text-secondary mt-1">{{ itemCount(order) }} قلم</p></div>
+          <div><p class="text-sm text-gray-500">تاریخ ثبت</p><p class="font-medium text-secondary mt-1">{{ order.createdAt | persianDate:'yyyy/MM/dd - HH:mm' }}</p></div>
+          <div><p class="text-sm text-gray-500">تعداد اقلام</p><p class="font-medium text-secondary mt-1">{{ itemCount(order) | number:'1.0-0':'fa-IR' }} قلم</p></div>
           <div><p class="text-sm text-gray-500">مبلغ نهایی</p><p class="font-bold text-primary mt-1">{{ order.grandTotal | number }} تومان</p></div>
           <span class="rounded-full px-3 py-1 text-sm font-medium" [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
           <span class="text-primary text-sm font-medium">مشاهده جزئیات ←</span>
@@ -23,7 +23,7 @@
 
       <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-4 pt-4">
         <button type="button" (click)="changePage(page - 1)" [disabled]="page === 1" class="rounded-xl border border-gray-300 px-4 py-2 disabled:opacity-40">قبلی</button>
-        <span class="text-sm text-gray-500">صفحه {{ page }} از {{ totalPages }}</span>
+        <span class="text-sm text-gray-500">صفحه {{ page | number:'1.0-0':'fa-IR' }} از {{ totalPages | number:'1.0-0':'fa-IR' }}</span>
         <button type="button" (click)="changePage(page + 1)" [disabled]="page === totalPages" class="rounded-xl border border-gray-300 px-4 py-2 disabled:opacity-40">بعدی</button>
       </div>
     </div>

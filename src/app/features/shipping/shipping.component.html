@@ -1,0 +1,192 @@
+<!-- ═══════════════════ صفحه روش‌های ارسال ═══════════════════ -->
+<section class="bg-warm min-h-screen py-6 sm:py-10">
+  <div class="container mx-auto px-4 max-w-7xl">
+
+    <!-- هدر صفحه -->
+    <div class="mb-8">
+      <nav class="text-sm text-gray-500 mb-4">
+        <a routerLink="/" class="hover:text-primary">خانه</a>
+        <span class="mx-1">/</span>
+        <span class="text-secondary font-medium">روش‌های ارسال</span>
+      </nav>
+      <h1 class="text-2xl sm:text-3xl font-bold text-secondary mb-2">روش‌های ارسال و تحویل</h1>
+      <p class="text-gray-500 text-sm">زمان و هزینه ارسال بر اساس فروشنده و شهر مقصد</p>
+    </div>
+
+    <!-- لودینگ -->
+    <div *ngIf="loading" class="text-center py-20">
+      <div class="inline-block w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-400">در حال بارگذاری…</p>
+    </div>
+
+    <!-- خالی -->
+    <div *ngIf="!loading && (!data || !data.sellerShipping?.length)" class="text-center py-20">
+      <div class="text-6xl mb-4">📦</div>
+      <p class="text-gray-500 text-lg mb-2">اطلاعات ارسال موجود نیست</p>
+      <p class="text-gray-400 text-sm">فروشندگانی برای ارسال یافت نشدند</p>
+    </div>
+
+    <!-- محتوا -->
+    <div *ngIf="!loading && data && data.sellerShipping?.length">
+
+      <!-- خلاصه آمار -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <div class="stat-card bg-white rounded-xl p-4 text-center shadow-card">
+          <div class="text-2xl font-bold text-primary">{{ sellerCount | number:'1.0-0':'fa-IR' }}</div>
+          <div class="text-xs text-gray-500 mt-1">فروشنده فعال</div>
+        </div>
+        <div class="stat-card bg-white rounded-xl p-4 text-center shadow-card">
+          <div class="text-2xl font-bold text-green-600">{{ fastestOverall | number:'1.0-0':'fa-IR' }}</div>
+          <div class="text-xs text-gray-500 mt-1">روز سریع‌ترین ارسال</div>
+        </div>
+        <div class="stat-card bg-white rounded-xl p-4 text-center shadow-card">
+          <div class="text-2xl font-bold text-blue-600">۳</div>
+          <div class="text-xs text-gray-500 mt-1">روش ارسال</div>
+        </div>
+        <div class="stat-card bg-white rounded-xl p-4 text-center shadow-card">
+          <div class="text-2xl font-bold text-gold-dark">۳۱</div>
+          <div class="text-xs text-gray-500 mt-1">استان تحت پوشش</div>
+        </div>
+      </div>
+
+      <!-- فیلتر فروشنده -->
+      <div class="mb-6 flex flex-wrap gap-2">
+        <button type="button" (click)="selectedSellerId = null"
+                class="px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                [class.bg-primary]="!selectedSellerId"
+                [class.text-white]="!selectedSellerId"
+                [class.bg-white]="selectedSellerId"
+                [class.text-gray-600]="selectedSellerId"
+                [class.shadow-card]="selectedSellerId">
+          همه فروشندگان
+        </button>
+        <button *ngFor="let s of data.sellerShipping" type="button"
+                (click)="selectedSellerId = s.sellerId"
+                class="px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                [class.bg-primary]="selectedSellerId === s.sellerId"
+                [class.text-white]="selectedSellerId === s.sellerId"
+                [class.bg-white]="selectedSellerId !== s.sellerId"
+                [class.text-gray-600]="selectedSellerId !== s.sellerId"
+                [class.shadow-card]="selectedSellerId !== s.sellerId">
+          {{ s.sellerName }}
+        </button>
+      </div>
+
+      <!-- لیست فروشندگان -->
+      <div class="space-y-6">
+        <div *ngFor="let seller of filteredSellers; let si = index"
+             class="seller-card bg-white rounded-2xl shadow-card overflow-hidden"
+             [style.animation-delay]="si * 80 + 'ms'">
+
+          <!-- هدر فروشنده -->
+          <div class="seller-header flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center shrink-0">
+              <img *ngIf="seller.sellerLogoUrl" [src]="seller.sellerLogoUrl" class="w-full h-full object-cover rounded-xl" />
+              <span *ngIf="!seller.sellerLogoUrl" class="text-primary font-bold text-lg">{{ seller.sellerName.charAt(0) }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-secondary truncate">{{ seller.sellerName }}</h3>
+                <span *ngIf="seller.sellerVerified" class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">تأیید شده</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                <span>📍 {{ seller.sellerCity }}، {{ seller.sellerProvince }}</span>
+                <span *ngIf="seller.sellerRating > 0">⭐ {{ seller.sellerRating | number:'1.1-1' }}</span>
+              </div>
+            </div>
+            <div class="text-center shrink-0">
+              <div class="text-xs text-gray-400">آماده‌سازی</div>
+              <div class="text-sm font-bold text-secondary">{{ seller.cityDeliveryDays | number:'1.0-0':'fa-IR' }} روز</div>
+            </div>
+          </div>
+
+          <!-- روش‌های ارسال -->
+          <div class="divide-y divide-gray-50">
+            <div *ngFor="let option of seller.shippingOptions; let oi = index"
+                 class="shipping-option flex flex-col sm:flex-row items-start sm:items-center gap-3 px-5 py-4 hover:bg-gray-50/50 transition-colors">
+
+              <!-- آیکون + نام روش -->
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <span class="text-3xl shrink-0">{{ getMethodIcon(option.methodName) }}</span>
+                <div>
+                  <h4 class="font-bold text-secondary text-sm">{{ option.methodName }}</h4>
+                  <p *ngIf="option.description" class="text-xs text-gray-400 mt-0.5">{{ option.description }}</p>
+                </div>
+              </div>
+
+              <!-- زمان تحویل -->
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="delivery-badge text-xs font-bold px-3 py-1 rounded-full"
+                      [ngClass]="getDeliveryBadgeClass(option)">
+                  {{ getDeliveryText(option) }}
+                </span>
+              </div>
+
+              <!-- جزئیات -->
+              <div class="flex items-center gap-4 shrink-0 text-xs text-gray-500">
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  {{ option.preparationDays | number:'1.0-0':'fa-IR' }} روز آماده
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                  </svg>
+                  {{ option.shippingDays | number:'1.0-0':'fa-IR' }} روز ارسال
+                </span>
+              </div>
+
+              <!-- هزینه -->
+              <div class="text-left shrink-0 min-w-[100px]">
+                <div *ngIf="option.freeShipping" class="text-green-600 font-bold text-sm">
+                  ارسال رایگان
+                  <div class="text-[10px] text-gray-400 font-normal">بالای {{ formatPrice(option.freeShippingThreshold) }} تومان</div>
+                </div>
+                <div *ngIf="!option.freeShipping" class="font-bold text-secondary text-sm">
+                  {{ formatPrice(option.totalCost) }} تومان
+                  <div class="text-[10px] text-gray-400 font-normal">
+                    پایه {{ formatPrice(option.baseCost) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- فوتر -->
+          <div class="px-5 py-3 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+            <span>{{ seller.shippingOptions.length | number:'1.0-0':'fa-IR' }} روش ارسال موجود</span>
+            <span>حداکثر تحویل: {{ seller.nationwideDeliveryDays | number:'1.0-0':'fa-IR' }} روز سراسری</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- توضیحات -->
+      <div class="mt-8 bg-white rounded-2xl shadow-card p-5 sm:p-6">
+        <h3 class="font-bold text-secondary mb-3 flex items-center gap-2">
+          <span class="text-xl">ℹ️</span>
+          توضیحات ارسال
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+          <div class="flex items-start gap-2">
+            <span class="text-primary mt-0.5">•</span>
+            <span>زمان آماده‌سازی شامل بسته‌بندی و تحویل به پست توسط فروشنده است.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-primary mt-0.5">•</span>
+            <span>هزینه ارسال بر اساس وزن و شهر مقصد محاسبه می‌شود.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-primary mt-0.5">•</span>
+            <span>ارسال رایگان برای سفارش‌های بالای مبلغ تعیین شده فعال است.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="text-primary mt-0.5">•</span>
+            <span>فروشندگان مختلف ممکن است زمان ارسال متفاوتی داشته باشند.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

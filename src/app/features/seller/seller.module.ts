@@ -11,19 +11,30 @@ import { ProductFormComponent } from '../product-management/product-form.compone
 import { SellerPayoutsComponent } from './pages/payouts/seller-payouts.component';
 import { SellerSurveysComponent } from './pages/surveys/seller-surveys.component';
 import { SellerCostsComponent } from './pages/costs/seller-costs.component';
+import { SellerOrdersComponent } from './pages/orders/seller-orders.component';
+import { SellerProfileComponent } from './pages/profile/seller-profile.component';
 
 const routes: Routes = [
   { path: '', component: SellerDashboardComponent },
   { path: 'products', component: ProductListComponent },
   { path: 'products/new', component: ProductFormComponent },
   { path: 'products/edit/:id', component: ProductFormComponent },
+  { path: 'orders', component: SellerOrdersComponent },
   { path: 'payouts', component: SellerPayoutsComponent },
   { path: 'surveys', component: SellerSurveysComponent },
-  { path: 'costs', component: SellerCostsComponent }
+  { path: 'costs', component: SellerCostsComponent },
+  { path: 'profile', component: SellerProfileComponent }
 ];
 
 @NgModule({
-  declarations: [SellerDashboardComponent, SellerPayoutsComponent, SellerSurveysComponent, SellerCostsComponent],
+  declarations: [
+    SellerDashboardComponent,
+    SellerOrdersComponent,
+    SellerProfileComponent,
+    SellerPayoutsComponent,
+    SellerSurveysComponent,
+    SellerCostsComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -33,4 +44,4 @@ const routes: Routes = [
     ProductManagementModule
   ]
 })
-export class SellerModule { }
+export class SellerModule {}

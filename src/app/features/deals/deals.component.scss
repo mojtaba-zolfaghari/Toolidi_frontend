@@ -1,0 +1,115 @@
+:host { display: block; }
+
+/* ═══ Particles ═══ */
+.particle-deal {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  animation: floatParticle 6s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-30px) scale(1.5); opacity: 0.7; }
+}
+
+/* ═══ Countdown ═══ */
+.countdown-box {
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+@keyframes countdownPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ═══ Deal Cards ═══ */
+.deal-card {
+  animation: dealSlideIn 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  display: block;
+}
+
+.deal-card .product-card {
+  border-radius: 1rem;
+}
+
+@keyframes dealSlideIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.deal-badge {
+  animation: badgeBounce 2s ease-in-out infinite;
+}
+
+@keyframes badgeBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ═══ Supplier Cards ═══ */
+.supplier-deal-card {
+  animation: supplierSlideIn 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+@keyframes supplierSlideIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.deal-delivery-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.deal-delivery-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 100%;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid rgba(220, 38, 38, 0.12);
+  border-radius: 0.55rem;
+  color: #64748b;
+  background: #fff8f8;
+  font-size: 0.58rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.deal-delivery-chip svg {
+  width: 0.78rem;
+  height: 0.78rem;
+  color: #dc2626;
+  flex: 0 0 auto;
+}
+
+/* ═══ Hover Effects ═══ */
+.deal-card:hover .deal-badge {
+  animation: none;
+  transform: scale(1.15);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.deal-card:hover img {
+  filter: brightness(1.05);
+}
+
+/* ═══ Mobile ═══ */
+@media (max-width: 640px) {
+  .deal-card .p-4 { padding: 0.625rem; }
+  .deal-badge { font-size: 10px; padding: 4px 8px; }
+  .deal-delivery-chip { font-size: 0.52rem; max-width: 100%; }
+  .deal-delivery-chip svg { width: 0.68rem; height: 0.68rem; }
+}

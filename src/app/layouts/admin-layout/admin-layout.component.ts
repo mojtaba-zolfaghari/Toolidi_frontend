@@ -38,7 +38,14 @@ export class AdminLayoutComponent implements OnInit {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY) ?? '';
     this.isAdmin = getRoleFromToken(token) === 'Admin';
     this.username = getUsernameFromToken(token) ?? 'کاربر';
-    this.roleLabel = this.isAdmin ? 'مدیر' : 'فروشنده';
+    const url = window.location.pathname;
+    if (this.isAdmin) {
+      this.roleLabel = 'مدیر';
+    } else if (url.startsWith('/supplier')) {
+      this.roleLabel = 'تأمین‌کننده';
+    } else {
+      this.roleLabel = 'فروشنده';
+    }
     this.buildNav();
   }
 
@@ -58,15 +65,22 @@ export class AdminLayoutComponent implements OnInit {
         { label: 'گزارش‌ها', path: '/admin/reports', icon: 'report' },
         { label: 'تنظیمات', path: '/admin/settings', icon: 'settings' }
       ];
+    } else if (this.roleLabel === 'تأمین‌کننده' || this.router.url.startsWith('/supplier')) {
+      this.navItems = [
+        { label: 'داشبورد', path: '/supplier', icon: 'dashboard' },
+        { label: 'محصولات', path: '/supplier/products', icon: 'products' },
+        { label: 'سفارشات', path: '/supplier/orders', icon: 'orders' },
+        { label: 'پروفایل', path: '/supplier/profile', icon: 'settings' }
+      ];
     } else {
       this.navItems = [
         { label: 'داشبورد', path: '/seller', icon: 'dashboard' },
         { label: 'محصولات من', path: '/seller/products', icon: 'products' },
-        { label: 'سفارشات من', path: '/orders', icon: 'orders' },
+        { label: 'سفارشات من', path: '/seller/orders', icon: 'orders' },
         { label: 'کیف پول و تسویه', path: '/seller/payouts', icon: 'wallet' },
         { label: 'نظرسنجی‌ها', path: '/seller/surveys', icon: 'report' },
         { label: 'سهم هزینه‌ها', path: '/seller/costs', icon: 'wallet' },
-        { label: 'آموزش‌ها', path: '/blog', icon: 'education' }
+        { label: 'پروفایل', path: '/seller/profile', icon: 'settings' }
       ];
     }
   }

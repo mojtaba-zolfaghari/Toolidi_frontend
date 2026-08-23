@@ -1,0 +1,170 @@
+/* ═══════════════════ صفحه وبلاگ ═══════════════════ */
+
+/* ─── هدر ─── */
+.blog-hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #7c3aed 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    right: -20%;
+    width: 50%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(251,191,36,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+/* ─── دکمه دسته‌بندی ─── */
+.category-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #c4b5fd;
+    color: #7c3aed;
+    background: #f5f3ff;
+  }
+}
+
+.category-btn-active {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border: 1.5px solid transparent;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+  white-space: nowrap;
+}
+
+/* ─── کارت ویژه ─── */
+.blog-featured-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: all 0.4s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  }
+}
+
+/* ─── کارت پست ─── */
+.blog-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.02);
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  animation: blogCardIn 0.4s ease-out both;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    border-color: #e2e8f0;
+
+    .blog-card-image img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.blog-card-image {
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes blogCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── صفحه‌بندی ─── */
+.page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #7c3aed;
+    color: #7c3aed;
+  }
+}
+
+.page-btn-active {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  border: none;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+}
+
+/* ─── لودینگ ─── */
+.blog-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── scrollbar hide ─── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* ─── ریسپانسیو ─── */
+@media (max-width: 640px) {
+  .blog-hero {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+}

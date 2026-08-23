@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+/* Card hover effects */
+.stat-card {
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Quick action hover */
+.quick-action {
+  transition: all 0.2s ease;
+}
+
+.quick-action:hover {
+  background: #f8fafc;
+  transform: translateX(-4px);
+}
+
+/* Order item animation */
+.order-item {
+  animation: slideIn 0.3s ease-out backwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

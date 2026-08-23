@@ -10,12 +10,50 @@ import {
 } from '../../core/services/api/auth.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { Address, AddressData, AddressService } from '../../core/services/api/address.service';
-import { Result } from '../../core/models/api-response.model';
+import { OrderService, Order } from '../../core/services/api/order.service';
+import { Result, PagedList } from '../../core/models/api-response.model';
+import { fadeIn, slideUp } from '../../shared/animations';
+import { CartService } from '../../core/services/api/cart.service';
 
-/** صفحه پروفایل کاربر و مدیریت اطلاعات حساب */
+/** تب‌های پروفایل */
+type ProfileTab = 'overview' | 'orders' | 'addresses' | 'security';
+
+/** وضعیت سفارش به فارسی */
+const ORDER_STATUS_MAP: Record<string, string> = {
+  'Pending': 'در انتظار تأیید',
+  'Processing': 'در حال پردازش',
+  'Shipped': 'ارسال شده',
+  'Delivered': 'تحویل شده',
+  'Cancelled': 'لغو شده'
+};
+
+/** آیکون وضعیت سفارش */
+const ORDER_STATUS_ICON: Record<string, string> = {
+  'Pending': '⏳',
+  'Processing': '⚙️',
+  'Shipped': '🚚',
+  'Delivered': '✅',
+  'Cancelled': '❌'
+};
+
+/** رنگ وضعیت سفارش */
+const ORDER_STATUS_COLOR: Record<string, string> = {
+  'Pending': 'bg-amber-50 text-amber-700 ring-amber-200',
+  'Processing': 'bg-blue-50 text-blue-700 ring-blue-200',
+  'Shipped': 'bg-indigo-50 text-indigo-700 ring-indigo-200',
+  'Delivered': 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  'Cancelled': 'bg-red-50 text-red-700 ring-red-200'
+};
+
+/**
+ * صفحه پروفایل خریدار
+ * شامل: نمای کلی، سفارشات، آدرس‌ها، امنیت
+ */
 @Component({
   selector: 'app-profile',
-  templateUrl: './profile.component.html'
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss'],
+  animations: [fadeIn, slideUp]
 })
 export class ProfileComponent implements OnInit {
   profile: UserProfile | null = null;
@@ -23,8 +61,19 @@ export class ProfileComponent implements OnInit {
   passwordForm: FormGroup;
   addressForm: FormGroup;
   addresses: Address[] = [];
+  orders: Order[] = [];
   selectedAddressId: string | null = null;
+
+  /** تب فعال */
+  activeTab: ProfileTab = 'overview';
+  /** آمار */
+  totalOrders = 0;
+  deliveredOrders = 0;
+  pendingOrders = 0;
+  totalSpent = 0;
+
   loading = true;
+  ordersLoading = true;
   addressesLoading = true;
   savingAddress = false;
   savingProfile = false;
@@ -35,11 +84,16 @@ export class ProfileComponent implements OnInit {
   passwordError = '';
   addressMessage = '';
   addressError = '';
+  /** شناسه سفارش در حال سفارش مجدد */
+  reorderingOrderId: string | null = null;
+  reorderMessage = '';
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly addressService: AddressService,
+    private readonly orderService: OrderService,
+    private readonly cartService: CartService,
     private readonly authState: AuthStateService,
     private readonly router: Router
   ) {
@@ -70,10 +124,213 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
+    this.loadOrders();
     this.loadAddresses();
   }
 
-  /** دریافت آدرس‌های کاربر جاری */
+  /** تغییر تب فعال */
+  setTab(tab: ProfileTab): void {
+    this.activeTab = tab;
+  }
+
+  /** دریافت متن وضعیت سفارش */
+  orderStatusLabel(status: string): string {
+    return ORDER_STATUS_MAP[status] ?? status;
+  }
+
+  /** دریافت آیکون وضعیت سفارش */
+  orderStatusIcon(status: string): string {
+    return ORDER_STATUS_ICON[status] ?? '📦';
+  }
+
+  /** دریافت کلاس رنگ وضعیت سفارش */
+  orderStatusColor(status: string): string {
+    return ORDER_STATUS_COLOR[status] ?? 'bg-gray-50 text-gray-700 ring-gray-200';
+  }
+
+  /** دریافت حرف اول نام */
+  get initial(): string {
+    if (this.profile?.firstName) return this.profile.firstName.charAt(0);
+    if (this.profile?.username) return this.profile.username.charAt(0);
+    return '?';
+  }
+
+  /** تاریخ عضویت فرمت‌شده */
+  get memberSince(): string {
+    if (!this.profile?.createdAt) return '';
+    const d = new Date(this.profile.createdAt);
+    return d.toLocaleDateString('fa-IR-u-ca-persian-nu-arabext', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  // ────── Profile ──────
+
+  loadProfile(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.authService.getCurrentUser().subscribe({
+      next: (result) => {
+        this.profile = result.data ?? null;
+        if (this.profile) {
+          this.profileForm.patchValue({
+            mobileNumber: this.profile.mobileNumber ?? '',
+            email: this.profile.email ?? '',
+            firstName: this.profile.firstName ?? '',
+            lastName: this.profile.lastName ?? ''
+          });
+        }
+        this.loading = false;
+      },
+      error: (err: Error) => {
+        this.errorMessage = err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  saveProfile(): void {
+    if (this.profileForm.invalid) {
+      this.profileForm.markAllAsTouched();
+      return;
+    }
+    this.savingProfile = true;
+    this.profileMessage = '';
+    const data = this.profileForm.value as UpdateProfileData;
+    this.authService.updateProfile(data).subscribe({
+      next: (result) => {
+        this.savingProfile = false;
+        if (result.isSuccess && result.data) {
+          this.profile = result.data;
+          this.profileMessage = 'اطلاعات پروفایل با موفقیت ذخیره شد.';
+        } else {
+          this.errorMessage = result.errorMessage ?? 'ذخیره اطلاعات انجام نشد.';
+        }
+      },
+      error: (err: Error) => {
+        this.savingProfile = false;
+        this.errorMessage = err.message;
+      }
+    });
+  }
+
+  // ────── Orders ──────
+
+  loadOrders(): void {
+    this.ordersLoading = true;
+    this.orderService.getOrders({ page: 1, pageSize: 100 }).subscribe({
+      next: (result) => {
+        const paged = result.data;
+        this.orders = paged?.items ?? [];
+        this.totalOrders = paged?.totalCount ?? this.orders.length;
+        this.deliveredOrders = this.orders.filter(o => o.status === 'Delivered').length;
+        this.pendingOrders = this.orders.filter(o => ['Pending', 'Processing'].includes(o.status)).length;
+        this.totalSpent = this.orders
+          .filter(o => o.isPaid)
+          .reduce((sum, o) => sum + (o.grandTotal || o.totalAmount || 0), 0);
+        this.ordersLoading = false;
+      },
+      error: (_err: Error) => {
+        this.ordersLoading = false;
+      }
+    });
+  }
+
+  /** مبلغ فرمت‌شده */
+  formatAmount(amount: number): string {
+    return amount.toLocaleString('fa-IR');
+  }
+
+  /** تاریخ فرمت‌شده */
+  formatDate(date: string): string {
+    return new Date(date).toLocaleDateString('fa-IR-u-ca-persian-nu-arabext', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  /** ────── سفارش مجدد ────── */
+
+  /** آیا سفارش قابل سفارش مجدد است (تحویل شده یا لغو شده) */
+  canReorder(order: Order): boolean {
+    return order.status === 'Delivered' || order.status === 'Cancelled';
+  }
+
+  /** سفارش مجدد: اضافه کردن تمام آیتم‌های یک سفارش قبلی به سبد خرید */
+  reorder(order: Order): void {
+    if (this.reorderingOrderId) return; // در حال پردازش
+
+    if (!order.items?.length) return;
+
+    this.reorderingOrderId = order.id;
+    this.reorderMessage = '';
+
+    // اضافه کردن آیتم‌ها به سبد خرید به صورت پشت سر هم
+    const items = order.items;
+    let added = 0;
+    let failed = 0;
+
+    const addNext = (index: number): void => {
+      if (index >= items.length) {
+        // تمام آیتم‌ها اضافه شدند
+        this.reorderingOrderId = null;
+        if (added > 0) {
+          this.reorderMessage = `${added} آیتم به سبد خرید اضافه شد. 🛒`;
+          setTimeout(() => {
+            this.router.navigate(['/cart']);
+          }, 1200);
+        } else {
+          this.reorderMessage = 'هیچ آیتمی اضافه نشد. ممکن است محصولات دیگر موجود نباشند.';
+        }
+        return;
+      }
+
+      const item = items[index];
+      this.cartService.addItem(item.productId, undefined, item.quantity).subscribe({
+        next: (result) => {
+          if (result.isSuccess) added++;
+          else failed++;
+          addNext(index + 1);
+        },
+        error: () => {
+          failed++;
+          addNext(index + 1);
+        }
+      });
+    };
+
+    addNext(0);
+  }
+
+  // ────── Password ──────
+
+  changePassword(): void {
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    const value = this.passwordForm.value as ChangePasswordData;
+    if (value.newPassword !== value.confirmNewPassword) {
+      this.passwordError = 'رمز عبور جدید و تکرار آن یکسان نیستند.';
+      return;
+    }
+    this.changingPassword = true;
+    this.passwordError = '';
+    this.passwordMessage = '';
+    this.authService.changePassword(value).subscribe({
+      next: (result) => {
+        this.changingPassword = false;
+        if (result.isSuccess) {
+          this.passwordForm.reset();
+          this.passwordMessage = 'رمز عبور با موفقیت تغییر کرد.';
+        } else {
+          this.passwordError = result.errorMessage ?? 'تغییر رمز عبور انجام نشد.';
+        }
+      },
+      error: (err: Error) => {
+        this.changingPassword = false;
+        this.passwordError = err.message;
+      }
+    });
+  }
+
+  // ────── Addresses ──────
+
   loadAddresses(): void {
     this.addressesLoading = true;
     this.addressService.getAddresses().subscribe({
@@ -88,7 +345,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  /** آماده‌سازی فرم برای ویرایش آدرس */
   editAddress(address: Address): void {
     this.selectedAddressId = address.id;
     this.addressForm.patchValue(address);
@@ -96,19 +352,16 @@ export class ProfileComponent implements OnInit {
     this.addressError = '';
   }
 
-  /** پاک‌کردن حالت ویرایش آدرس */
   cancelAddressEdit(): void {
     this.selectedAddressId = null;
     this.addressForm.reset({ addressType: 'Both', country: 'ایران', isDefault: false });
   }
 
-  /** ذخیره آدرس جدید یا ویرایش‌شده */
   saveAddress(): void {
     if (this.addressForm.invalid) {
       this.addressForm.markAllAsTouched();
       return;
     }
-
     this.savingAddress = true;
     this.addressMessage = '';
     this.addressError = '';
@@ -143,16 +396,13 @@ export class ProfileComponent implements OnInit {
     this.addressError = error.message;
   }
 
-  /** حذف آدرس */
   deleteAddress(address: Address): void {
     if (!window.confirm('آیا از حذف این آدرس مطمئن هستید؟')) return;
     this.addressService.deleteAddress(address.id).subscribe({
       next: (result) => {
         if (result.isSuccess) {
           this.addressMessage = 'آدرس حذف شد.';
-          if (this.selectedAddressId === address.id) {
-            this.cancelAddressEdit();
-          }
+          if (this.selectedAddressId === address.id) this.cancelAddressEdit();
           this.loadAddresses();
         } else {
           this.addressError = result.errorMessage ?? 'حذف آدرس انجام نشد.';
@@ -162,91 +412,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  /** دریافت اطلاعات کاربر جاری */
-  loadProfile(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.authService.getCurrentUser().subscribe({
-      next: (result) => {
-        this.profile = result.data ?? null;
-        if (this.profile) {
-          this.profileForm.patchValue({
-            mobileNumber: this.profile.mobileNumber ?? '',
-            email: this.profile.email ?? '',
-            firstName: this.profile.firstName ?? '',
-            lastName: this.profile.lastName ?? ''
-          });
-        }
-        this.loading = false;
-      },
-      error: (err: Error) => {
-        this.errorMessage = err.message;
-        this.loading = false;
-      }
-    });
-  }
-
-  /** ذخیره اطلاعات تکمیلی پروفایل */
-  saveProfile(): void {
-    if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
-      return;
-    }
-
-    this.savingProfile = true;
-    this.profileMessage = '';
-    const data = this.profileForm.value as UpdateProfileData;
-    this.authService.updateProfile(data).subscribe({
-      next: (result) => {
-        this.savingProfile = false;
-        if (result.isSuccess && result.data) {
-          this.profile = result.data;
-          this.profileMessage = 'اطلاعات پروفایل با موفقیت ذخیره شد.';
-        } else {
-          this.errorMessage = result.errorMessage ?? 'ذخیره اطلاعات انجام نشد.';
-        }
-      },
-      error: (err: Error) => {
-        this.savingProfile = false;
-        this.errorMessage = err.message;
-      }
-    });
-  }
-
-  /** تغییر رمز عبور */
-  changePassword(): void {
-    if (this.passwordForm.invalid) {
-      this.passwordForm.markAllAsTouched();
-      return;
-    }
-
-    const value = this.passwordForm.value as ChangePasswordData;
-    if (value.newPassword !== value.confirmNewPassword) {
-      this.passwordError = 'رمز عبور جدید و تکرار آن یکسان نیستند.';
-      return;
-    }
-
-    this.changingPassword = true;
-    this.passwordError = '';
-    this.passwordMessage = '';
-    this.authService.changePassword(value).subscribe({
-      next: (result) => {
-        this.changingPassword = false;
-        if (result.isSuccess) {
-          this.passwordForm.reset();
-          this.passwordMessage = 'رمز عبور با موفقیت تغییر کرد.';
-        } else {
-          this.passwordError = result.errorMessage ?? 'تغییر رمز عبور انجام نشد.';
-        }
-      },
-      error: (err: Error) => {
-        this.changingPassword = false;
-        this.passwordError = err.message;
-      }
-    });
-  }
-
-  /** خروج از حساب و بازگشت به صفحه اصلی */
   logout(): void {
     this.authService.logout().subscribe(() => {
       this.authState.clear();

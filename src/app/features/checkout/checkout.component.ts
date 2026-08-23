@@ -16,6 +16,7 @@ export type CheckoutStep = 1 | 2 | 3;
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
+  styleUrls: ['./checkout.component.scss'],
   animations: [fadeIn, scaleUp]
 })
 export class CheckoutComponent implements OnInit {
@@ -77,11 +78,10 @@ export class CheckoutComponent implements OnInit {
     this.addressService.getAddresses().subscribe({
       next: (result) => {
         this.addresses = result.data ?? [];
-        const defaultAddress = this.addresses.find((address) => address.isDefault) ?? this.addresses[0];
-        if (defaultAddress) {
-          this.shippingAddressId = defaultAddress.id;
-          this.billingAddressId = defaultAddress.id;
-        }
+        const defaultShipping = this.shippingAddresses.find((address) => address.isDefault) ?? this.shippingAddresses[0];
+        const defaultBilling = this.billingAddresses.find((address) => address.isDefault) ?? this.billingAddresses[0];
+        this.shippingAddressId = defaultShipping?.id ?? '';
+        this.billingAddressId = defaultBilling?.id ?? '';
         optionLoaded();
       },
       error: () => {
@@ -112,6 +112,21 @@ export class CheckoutComponent implements OnInit {
         optionLoaded();
       }
     });
+  }
+
+  /** آدرس‌هایی که برای ارسال قابل انتخاب هستند. */
+  get shippingAddresses(): Address[] {
+    return this.addresses.filter((address) => this.supportsAddressType(address, 'Shipping'));
+  }
+
+  /** آدرس‌هایی که برای صورتحساب قابل انتخاب هستند. */
+  get billingAddresses(): Address[] {
+    return this.addresses.filter((address) => this.supportsAddressType(address, 'Billing'));
+  }
+
+  private supportsAddressType(address: Address, type: 'Shipping' | 'Billing'): boolean {
+    const addressType = (address.addressType || 'Both').trim().toLowerCase();
+    return addressType === 'both' || addressType === type.toLowerCase();
   }
 
   /** روش ارسال انتخاب‌شده */
@@ -158,14 +173,15 @@ export class CheckoutComponent implements OnInit {
     this.savingAddress = true;
     this.addressMessage = '';
     this.addressError = '';
-    this.addressService.addAddress(this.addressForm.value as AddressData).subscribe({
+    const addressData = this.addressForm.value as AddressData;
+    this.addressService.addAddress(addressData).subscribe({
       next: (result) => {
         this.savingAddress = false;
         if (result.isSuccess) {
           this.addressMessage = 'آدرس جدید اضافه شد.';
           this.addressForm.reset({ addressType: 'Both', country: 'ایران', isDefault: false });
           this.showAddressForm = false;
-          this.reloadAddresses();
+          this.reloadAddresses(result.data ?? undefined);
         } else {
           this.addressError = result.errorMessage ?? 'ذخیره آدرس انجام نشد.';
         }
@@ -177,14 +193,24 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
-  private reloadAddresses(): void {
+  private reloadAddresses(selectedAddressId?: string): void {
     this.addressService.getAddresses().subscribe({
       next: (result) => {
         this.addresses = result.data ?? [];
-        const newest = this.addresses[this.addresses.length - 1];
-        if (newest) {
-          this.shippingAddressId = newest.id;
-          this.billingAddressId = newest.id;
+        const selected = selectedAddressId
+          ? this.addresses.find((address) => address.id === selectedAddressId)
+          : undefined;
+
+        if (selected) {
+          if (this.supportsAddressType(selected, 'Shipping')) this.shippingAddressId = selected.id;
+          if (this.supportsAddressType(selected, 'Billing')) this.billingAddressId = selected.id;
+        }
+
+        if (!this.shippingAddressId || !this.shippingAddresses.some((address) => address.id === this.shippingAddressId)) {
+          this.shippingAddressId = this.shippingAddresses.find((address) => address.isDefault)?.id ?? this.shippingAddresses[0]?.id ?? '';
+        }
+        if (!this.billingAddressId || !this.billingAddresses.some((address) => address.id === this.billingAddressId)) {
+          this.billingAddressId = this.billingAddresses.find((address) => address.isDefault)?.id ?? this.billingAddresses[0]?.id ?? '';
         }
       },
       error: () => (this.addresses = [])

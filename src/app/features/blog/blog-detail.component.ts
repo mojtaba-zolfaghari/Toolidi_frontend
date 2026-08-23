@@ -8,6 +8,7 @@ import { BlogPost, BlogService } from '../../core/services/api/blog.service';
 @Component({
   selector: 'app-blog-detail',
   templateUrl: './blog-detail.component.html',
+  styleUrls: ['./blog-detail.component.scss'],
   animations: [fadeIn]
 })
 export class BlogDetailComponent implements OnInit {

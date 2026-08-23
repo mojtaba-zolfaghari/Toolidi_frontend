@@ -37,11 +37,15 @@ export class TokenInterceptor implements HttpInterceptor {
 
     return next.handle(authRequest).pipe(
       catchError((error: HttpErrorResponse) => {
-        // در صورت 401: پاک کردن نشست و هدایت به صفحه ورود
+        // در صورت 401 فقط در مسیرهای محافظت‌شده: هدایت به صفحه ورود
         if (error.status === 401) {
-          localStorage.removeItem(ACCESS_TOKEN_KEY);
-          localStorage.removeItem(REFRESH_TOKEN_KEY);
-          this.router.navigate(['/login']);
+          const protectedPaths = ['/profile', '/orders', '/cart', '/checkout', '/seller', '/admin'];
+          const isProtected = protectedPaths.some(p => window.location.pathname.startsWith(p));
+          if (isProtected) {
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
+            this.router.navigate(['/login']);
+          }
         }
         return throwError(() => error);
       })

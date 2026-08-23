@@ -1,0 +1,104 @@
+<section class="top-performers-page">
+  <section class="top-performers-hero">
+    <div class="hero-orbit hero-orbit-one"></div>
+    <div class="hero-orbit hero-orbit-two"></div>
+    <div class="container mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:px-8">
+      <div class="hero-copy">
+        <span class="hero-kicker"><span aria-hidden="true">🏆</span> تالار افتخارات تولیدی</span>
+        <h1>برترین‌های شبکه تولیدی</h1>
+        <p>عملکرد فروشندگان و کالارسان‌ها را بر اساس امتیاز، سفارش و سرعت تحویل مقایسه کنید.</p>
+      </div>
+
+      <div *ngIf="stats" class="hero-stats">
+        <article class="hero-stat">
+          <span class="hero-stat-icon" aria-hidden="true">🏭</span>
+          <div><strong>{{ stats.sellers | number }}</strong><span>فروشنده فعال</span></div>
+        </article>
+        <article class="hero-stat">
+          <span class="hero-stat-icon" aria-hidden="true">📦</span>
+          <div><strong>{{ stats.products | number }}+</strong><span>محصول قابل عرضه</span></div>
+        </article>
+        <article class="hero-stat">
+          <span class="hero-stat-icon" aria-hidden="true">⚡</span>
+          <div><strong>{{ stats.orders | number }}+</strong><span>سفارش تکمیل‌شده</span></div>
+        </article>
+        <article class="hero-stat">
+          <span class="hero-stat-icon" aria-hidden="true">★</span>
+          <div><strong>{{ stats.avgRating | number:'1.1-1':'fa-IR' }}/۵</strong><span>میانگین رضایت</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <main class="container mx-auto max-w-7xl px-4 py-8 lg:px-8 lg:py-10">
+    <div class="leaderboard-toolbar">
+      <div class="leaderboard-tabs" role="tablist" aria-label="نوع برترین‌ها">
+        <button type="button" role="tab" [attr.aria-selected]="activeTab === 'sellers'" (click)="switchTab('sellers')" [class.is-active]="activeTab === 'sellers'">
+          <span aria-hidden="true">🏭</span><span>فروشندگان برتر</span>
+        </button>
+        <button type="button" role="tab" [attr.aria-selected]="activeTab === 'couriers'" (click)="switchTab('couriers')" [class.is-active]="activeTab === 'couriers'">
+          <span aria-hidden="true">🚚</span><span>کالارسان‌های برتر</span>
+        </button>
+      </div>
+
+      <div class="sort-switcher" aria-label="مرتب‌سازی برترین‌ها">
+        <span class="sort-label">مرتب‌سازی:</span>
+        <button type="button" *ngFor="let opt of [
+          { value: 'rating', label: 'امتیاز', icon: '★' },
+          { value: 'orders', label: 'سفارش', icon: '▣' },
+          { value: 'delivery', label: 'سرعت', icon: '⚡' }
+        ]" (click)="switchSort(opt.value)" [class.is-active]="sortBy === opt.value">
+          <span aria-hidden="true">{{ opt.icon }}</span>{{ opt.label }}
+        </button>
+      </div>
+    </div>
+
+    <div class="leaderboard-heading">
+      <div>
+        <span class="section-kicker">رتبه‌بندی زنده</span>
+        <h2>{{ activeTab === 'sellers' ? 'فروشندگان مورد اعتماد خریداران' : 'کالارسان‌های سریع و خوش‌امتیاز' }}</h2>
+      </div>
+      <span class="result-count" *ngIf="!loading">{{ (activeTab === 'sellers' ? sellers.length : couriers.length) | number }} نفر</span>
+    </div>
+
+    <div *ngIf="loading" class="leaderboard-grid loading-grid" aria-live="polite" aria-label="در حال بارگذاری">
+      <div class="performer-skeleton" *ngFor="let item of [1, 2, 3, 4, 5, 6]"></div>
+    </div>
+
+    <ng-container *ngIf="!loading && activeTab === 'sellers'">
+      <div *ngIf="sellers.length; else emptyState" class="leaderboard-grid">
+        <article *ngFor="let seller of sellers; let i = index; trackBy: trackById" class="performer-card" [class.is-gold]="i === 0" [class.is-silver]="i === 1" [class.is-bronze]="i === 2" [style.animation-delay]="(i * 60) + 'ms'">
+          <div class="card-topline"><span class="rank-number">{{ getRankBadge(i) }}</span><span class="rank-label">{{ i < 3 ? 'رتبه ویژه' : 'رتبه ' + (i + 1 | number:'1.0-0':'fa-IR') }}</span><span *ngIf="seller.isVerified" class="verified-badge">✓ تاییدشده</span></div>
+          <div class="performer-identity">
+            <div class="performer-avatar seller-avatar">{{ (seller.companyName || 'ف').charAt(0) }}</div>
+            <div class="identity-copy"><h3>{{ seller.companyName || 'فروشنده تولیدی' }}</h3><p><span aria-hidden="true">⌖</span> {{ seller.city || 'ایران' }}<span *ngIf="seller.province">، {{ seller.province }}</span></p></div>
+          </div>
+          <p *ngIf="seller.description" class="performer-description">{{ seller.description }}</p>
+          <div class="primary-metric"><span>امتیاز عملکرد</span><strong>{{ (seller.rating || 0) | number:'1.1-1':'fa-IR' }}<small>/۵</small></strong><div class="rating-bar"><i [style.width.%]="((seller.rating || 0) / 5) * 100"></i></div></div>
+          <div class="metric-row"><div><strong>{{ seller.ratingCount || 0 | number }}</strong><span>نظر ثبت‌شده</span></div><div><strong>{{ seller.totalOrdersCompleted || 0 | number }}</strong><span>سفارش موفق</span></div><div><strong>{{ seller.cityDeliveryDays ? (seller.cityDeliveryDays | number:'1.0-0':'fa-IR') : '-' }}<small *ngIf="seller.cityDeliveryDays"> روز</small></strong><span>تحویل محلی</span></div></div>
+          <div class="card-footer"><span><i class="status-dot"></i> فعال در شبکه</span><span *ngIf="seller.nationwideDeliveryDays">ارسال کشوری: {{ seller.nationwideDeliveryDays | number:'1.0-0':'fa-IR' }} روز</span></div>
+        </article>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!loading && activeTab === 'couriers'">
+      <div *ngIf="couriers.length; else emptyState" class="leaderboard-grid">
+        <article *ngFor="let courier of couriers; let i = index; trackBy: trackById" class="performer-card" [class.is-gold]="i === 0" [class.is-silver]="i === 1" [class.is-bronze]="i === 2" [style.animation-delay]="(i * 60) + 'ms'">
+          <div class="card-topline"><span class="rank-number">{{ getRankBadge(i) }}</span><span class="rank-label">{{ i < 3 ? 'رتبه ویژه' : 'رتبه ' + (i + 1 | number:'1.0-0':'fa-IR') }}</span><span *ngIf="courier.isVerified" class="verified-badge">✓ تاییدشده</span></div>
+          <div class="performer-identity">
+            <div class="performer-avatar courier-avatar">{{ (courier.fullName || 'ک').charAt(0) }}</div>
+            <div class="identity-copy"><h3>{{ courier.fullName || 'کالارسان تولیدی' }}</h3><p><span aria-hidden="true">⌖</span> {{ courier.city || 'ایران' }}<span *ngIf="courier.province">، {{ courier.province }}</span></p></div>
+          </div>
+          <p *ngIf="courier.vehicleType" class="performer-description"><span aria-hidden="true">▣</span> {{ courier.vehicleType }}<span *ngIf="courier.vehiclePlate"> · {{ courier.vehiclePlate }}</span></p>
+          <div class="primary-metric"><span>امتیاز عملکرد</span><strong>{{ (courier.rating || 0) | number:'1.1-1':'fa-IR' }}<small>/۵</small></strong><div class="rating-bar"><i [style.width.%]="((courier.rating || 0) / 5) * 100"></i></div></div>
+          <div class="metric-row"><div><strong>{{ courier.ratingCount || 0 | number }}</strong><span>نظر ثبت‌شده</span></div><div><strong>{{ courier.totalOrdersCompleted || 0 | number }}</strong><span>تحویل موفق</span></div><div><strong>{{ courier.maxConcurrentOrders ? (courier.maxConcurrentOrders | number:'1.0-0':'fa-IR') : '-' }}</strong><span>ظرفیت همزمان</span></div></div>
+          <div class="card-footer"><span><i class="status-dot"></i> آماده ارسال</span><span>پوشش {{ courier.city || 'شهری' }}</span></div>
+        </article>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="empty-state"><div class="empty-icon">🏆</div><h3>هنوز رتبه‌ای ثبت نشده است</h3><p>با افزایش امتیاز و تکمیل سفارش‌ها، این بخش به‌زودی به‌روز می‌شود.</p></div>
+    </ng-template>
+  </main>
+</section>

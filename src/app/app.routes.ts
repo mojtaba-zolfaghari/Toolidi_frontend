@@ -26,6 +26,18 @@ export const routes: Routes = [
     loadChildren: () => import('./features/contact/contact.module').then(m => m.ContactModule)
   },
   {
+    path: 'deals',
+    loadChildren: () => import('./features/deals/deals.module').then(m => m.DealsModule)
+  },
+  {
+    path: 'top-performers',
+    loadChildren: () => import('./features/top-performers/top-performers.module').then(m => m.TopPerformersModule)
+  },
+  {
+    path: 'shipping',
+    loadChildren: () => import('./features/shipping/shipping.module').then(m => m.ShippingModule)
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },
@@ -63,6 +75,17 @@ export const routes: Routes = [
       {
         path: '',
         loadChildren: () => import('./features/seller/seller.module').then(m => m.SellerModule)
+      }
+    ]
+  },
+  {
+    path: 'supplier',
+    component: AdminLayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./features/supplier/supplier.module').then(m => m.SupplierModule)
       }
     ]
   },

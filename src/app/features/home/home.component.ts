@@ -7,6 +7,7 @@ import { CategoryService, CategoryTreeNode } from '../../core/services/api/categ
 import { ProductService, Product } from '../../core/services/api/product.service';
 import { SellerService, DashboardSummary, SellerStatistics } from '../../core/services/api/seller.service';
 import { AuthStateService, AuthUser } from '../../core/services/auth-state.service';
+import { PlatformStats as ApiPlatformStats, PublicService, PublicSeller } from '../../core/services/api/public.service';
 
 /* ─────────────────── Data Interfaces ─────────────────── */
 
@@ -23,6 +24,7 @@ export interface PlatformStats {
   activeAgents: number;
   completedOrders: number;
   satisfactionRate: number;
+  updatedAt?: string;
 }
 
 export interface AgentLocation {
@@ -46,50 +48,20 @@ export interface WorkflowStep {
 
 export interface SupplierInfo {
   id: string;
-  companyName: string;
+  trade: string;
   city: string;
   province: string;
-  productCategories: string[];
-  capacity: number;
-  preparationTime: string;
-  rating: number;
-  isVerified: boolean;
 }
 
-/* ─────────────────── Iran City Coordinates (SVG %) ─────────────────── */
+export interface SupplierNetworkGroup {
+  trade: string;
+  icon: string;
+  suppliers: SupplierInfo[];
+  locations: { city: string; province: string; count: number }[];
+}
 
-const IRAN_CITY_COORDINATES: Record<string, { x: number; y: number }> = {
-  'تهران': { x: 52.5, y: 22.5 },
-  'مشهد': { x: 76.5, y: 18.5 },
-  'شیراز': { x: 42.5, y: 52.5 },
-  'اصفهان': { x: 40.5, y: 36.5 },
-  'تبریز': { x: 22.5, y: 15.5 },
-  'کرج': { x: 48.5, y: 23.5 },
-  'قم': { x: 48.5, y: 31.5 },
-  'اهواز': { x: 32.5, y: 62.5 },
-  'کرمانشاه': { x: 30.5, y: 28.5 },
-  'ارومیه': { x: 18.5, y: 18.5 },
-  'رشت': { x: 42.5, y: 14.5 },
-  'زاهدان': { x: 73.5, y: 54.5 },
-  'همدان': { x: 37.5, y: 29.5 },
-  'کرمان': { x: 59.5, y: 48.5 },
-  'یزد': { x: 47.5, y: 44.5 },
-};
-
-/* ─────────────────── SVG Iran Map Outline ─────────────────── */
-
-const IRAN_SVG_PATH = `M 45 8 C 42 7, 38 9, 35 10 C 30 12, 25 11, 22 13
-  C 18 15, 15 14, 13 17 C 11 19, 12 22, 14 25
-  C 16 27, 15 30, 13 33 C 11 36, 10 39, 13 42
-  C 15 44, 14 47, 12 50 C 10 53, 12 56, 14 58
-  C 16 60, 15 63, 17 65 C 19 67, 22 66, 25 68
-  C 28 70, 30 72, 33 70 C 36 68, 38 70, 40 68
-  C 42 66, 44 68, 46 66 C 48 64, 50 66, 52 64
-  C 54 62, 56 64, 58 62 C 60 60, 62 58, 65 56
-  C 68 54, 70 52, 72 50 C 74 48, 76 45, 78 42
-  C 80 39, 82 36, 80 33 C 78 30, 80 27, 78 24
-  C 76 21, 74 20, 72 18 C 70 16, 68 15, 65 14
-  C 62 13, 58 12, 55 11 C 52 10, 48 9, 45 8 Z`;
+import { IRAN_PROVINCES, IRAN_CITIES, IRAN_VIEWBOX } from '../../shared/iran-map-data';
+import { IRAN_LOCATIONS, IRAN_MAP_CONNECTIONS } from '../../shared/iran-locations';
 
 @Component({
   selector: 'app-home',
@@ -105,12 +77,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   agentLocations: AgentLocation[] = [];
   workflowSteps: WorkflowStep[] = [];
   suppliers: SupplierInfo[] = [];
+  selectedSupplierTrade = '';
 
   /* ── Animated Counters ── */
   animatedProducers = 0;
   animatedAgents = 0;
   animatedOrders = 0;
   animatedRating = 0;
+  statsUpdatedAt = '';
   private counterIntervals: any[] = [];
 
   /* ── UI State ── */
@@ -142,8 +116,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private observer: IntersectionObserver | null = null;
 
   /* ── Map ── */
-  readonly iranPath = IRAN_SVG_PATH;
-  mapConnections: { from: { x: number; y: number }; to: { x: number; y: number } }[] = [];
+  readonly iranProvinces = IRAN_PROVINCES;
+  readonly iranCities = IRAN_CITIES;
+  readonly iranViewBox = IRAN_VIEWBOX;
+  mapConnections: { from: { svgX: number; svgY: number }; to: { svgX: number; svgY: number } }[] = [];
+  hoveredProvince: string | null = null;
 
   /* ── Category Icons ── */
   private categoryIcons: Record<string, string> = {
@@ -171,6 +148,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly productService: ProductService,
     private readonly sellerService: SellerService,
     private readonly authState: AuthStateService,
+    private readonly publicService: PublicService,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
@@ -210,7 +188,13 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
     setTimeout(() => this.loadFeaturedProducts(), 200);
 
-    setTimeout(() => { this.heroLoaded = true; this.cdr.detectChanges(); }, 100);
+    setTimeout(() => {
+      this.heroLoaded = true;
+      // Make hero section visible immediately
+      const heroEl = document.querySelector('[data-section="hero"]');
+      if (heroEl) heroEl.classList.add('animate-in');
+      this.cdr.detectChanges();
+    }, 100);
   }
 
   /* ─────────── Intersection Observer ─────────── */
@@ -222,17 +206,27 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
           const sectionId = entry.target.getAttribute('data-section');
           if (sectionId && !this.sectionVisibility[sectionId]) {
             this.sectionVisibility[sectionId] = true;
+            entry.target.classList.add('animate-in');
+
+            // Animate child feature cards
+            const cards = entry.target.querySelectorAll('.feature-card');
+            cards.forEach(card => card.classList.add('animate-in'));
+
+            // Animate supplier cards
+            const supplierTabs = entry.target.querySelectorAll('.supplier-trade-tab');
+            supplierTabs.forEach((tab, i) => {
+              setTimeout(() => tab.classList.add('animate-in'), i * 100);
+            });
+
             this.cdr.detectChanges();
-            // Start counters when stats section becomes visible
             if (sectionId === 'stats') {
               this.startCounters();
             }
           }
         }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 
-    // Observe all sections after a brief delay
     setTimeout(() => {
       const sections = document.querySelectorAll('[data-section]');
       sections.forEach(section => this.observer!.observe(section));
@@ -242,10 +236,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   /* ─────────── Animated Counters ─────────── */
 
   startCounters(): void {
-    this.animateCounter('producers', 500, 2000);
-    this.animateCounter('agents', 1200, 2200);
-    this.animateCounter('orders', 5000, 2400);
-    this.animateCounterRating(4.8, 1500);
+    this.animateCounter('producers', this.platformStats.activeProducers, 2000);
+    this.animateCounter('agents', this.platformStats.activeAgents, 2200);
+    this.animateCounter('orders', this.platformStats.completedOrders, 2400);
+    this.animateCounterRating(this.platformStats.satisfactionRate, 1500);
   }
 
   private animateCounter(type: 'producers' | 'agents' | 'orders', target: number, duration: number): void {
@@ -285,17 +279,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   /* ─────────── Map Connections ─────────── */
 
   private buildMapConnections(): void {
-    const connections = [
-      ['تهران', 'کرج'], ['تهران', 'قم'], ['تهران', 'اصفهان'],
-      ['تهران', 'مشهد'], ['اصفهان', 'شیراز'], ['تبریز', 'ارومیه'],
-      ['اهواز', 'شیراز'], ['تهران', 'همدان'], ['تبریز', 'تهران'],
-      ['مشهد', 'زاهدان'], ['کرمان', 'اهواز'], ['یزد', 'کرمان'],
-      ['یزد', 'اصفهان'], ['قم', 'همدان']
-    ];
-    this.mapConnections = connections.map(([from, to]) => ({
-      from: IRAN_CITY_COORDINATES[from],
-      to: IRAN_CITY_COORDINATES[to]
+    this.mapConnections = IRAN_MAP_CONNECTIONS.map(([from, to]) => ({
+      from: IRAN_CITIES[from],
+      to: IRAN_CITIES[to]
     })).filter(c => c.from && c.to);
+  }
+
+  onProvinceHover(nameFa: string | null): void {
+    this.hoveredProvince = nameFa;
   }
 
   /* ─────────── Data Loading ─────────── */
@@ -313,24 +304,30 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   loadPlatformStats(): void {
     this.statsLoading = true;
-    this.sellerService.getDashboard().pipe(
+    this.publicService.getPlatformStats().pipe(
       catchError(() => {
-        this.platformStats = { activeProducers: 500, activeAgents: 1200, completedOrders: 15000, satisfactionRate: 4.8 };
+        this.platformStats = { activeProducers: 0, activeAgents: 0, completedOrders: 0, satisfactionRate: 0 };
         this.statsLoading = false;
         this.cdr.detectChanges();
         return [];
       })
-    ).subscribe((result: any) => {
-      if (result?.data) {
-        this.platformStats = {
-          activeProducers: result.data.activeProducts || 500,
-          activeAgents: result.data.openOrders || 1200,
-          completedOrders: result.data.totalOrders || 15000,
-          satisfactionRate: result.data.averageRating || 4.8
-        };
-      }
+    ).subscribe((result: { data?: ApiPlatformStats }) => {
+      const data = result?.data;
+      this.platformStats = data
+        ? {
+            activeProducers: data.activeSellers,
+            activeAgents: data.activeAgents,
+            completedOrders: data.completedOrders,
+            satisfactionRate: data.satisfactionRate,
+            updatedAt: data.updatedAt
+          }
+        : { activeProducers: 0, activeAgents: 0, completedOrders: 0, satisfactionRate: 0 };
+      this.statsUpdatedAt = data?.updatedAt ?? '';
       this.statsLoading = false;
       this.cdr.detectChanges();
+      if (this.sectionVisibility['stats']) {
+        this.startCounters();
+      }
     });
   }
 
@@ -338,6 +335,13 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.mapLoading = true;
     timer(800).pipe(take(1)).subscribe(() => {
       this.agentLocations = this.getMockAgentLocations();
+      // Set city coordinates from iran-map-data
+      this.agentLocations.forEach(a => {
+        const cityData = IRAN_CITIES[a.city];
+        if (cityData) {
+          a.coordinates = { x: cityData.svgX, y: cityData.svgY };
+        }
+      });
       this.mapLoading = false;
       this.cdr.detectChanges();
     });
@@ -357,16 +361,17 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   /* ─────────── Mock Data ─────────── */
 
   private getMockAgentLocations(): AgentLocation[] {
-    return [
-      { id: '1', name: 'عامل تهران', city: 'تهران', province: 'تهران', rating: 4.9, activeOrders: 234, coordinates: IRAN_CITY_COORDINATES['تهران'] },
-      { id: '2', name: 'عامل مشهد', city: 'مشهد', province: 'خراسان رضوی', rating: 4.8, activeOrders: 156, coordinates: IRAN_CITY_COORDINATES['مشهد'] },
-      { id: '3', name: 'عامل شیراز', city: 'شیراز', province: 'فارس', rating: 4.7, activeOrders: 98, coordinates: IRAN_CITY_COORDINATES['شیراز'] },
-      { id: '4', name: 'عامل اصفهان', city: 'اصفهان', province: 'اصفهان', rating: 4.8, activeOrders: 112, coordinates: IRAN_CITY_COORDINATES['اصفهان'] },
-      { id: '5', name: 'عامل تبریز', city: 'تبریز', province: 'آذربایجان شرقی', rating: 4.6, activeOrders: 87, coordinates: IRAN_CITY_COORDINATES['تبریز'] },
-      { id: '6', name: 'عامل کرج', city: 'کرج', province: 'البرز', rating: 4.5, activeOrders: 76, coordinates: IRAN_CITY_COORDINATES['کرج'] },
-      { id: '7', name: 'عامل قم', city: 'قم', province: 'قم', rating: 4.7, activeOrders: 65, coordinates: IRAN_CITY_COORDINATES['قم'] },
-      { id: '8', name: 'عامل اهواز', city: 'اهواز', province: 'خوزستان', rating: 4.4, activeOrders: 54, coordinates: IRAN_CITY_COORDINATES['اهواز'] },
-    ];
+    const metrics = [4.9, 4.8, 4.7, 4.8, 4.6, 4.5, 4.7, 4.4];
+    const orders = [234, 156, 98, 112, 87, 76, 65, 54];
+    return IRAN_LOCATIONS.slice(0, 8).map((location, i) => ({
+      id: String(i + 1),
+      name: `پیک ${location.city}`,
+      city: location.city,
+      province: location.province,
+      rating: metrics[i],
+      activeOrders: orders[i],
+      coordinates: IRAN_CITIES[location.city] ? { x: IRAN_CITIES[location.city].svgX, y: IRAN_CITIES[location.city].svgY } : { x: 0, y: 0 }
+    }));
   }
 
   private initializeWorkflowSteps(): void {
@@ -389,12 +394,84 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  get supplierGroups(): SupplierNetworkGroup[] {
+    const groups = new Map<string, SupplierInfo[]>();
+    this.suppliers.forEach((supplier) => {
+      const trade = supplier.trade?.trim() || 'تولید و توزیع عمومی';
+      const items = groups.get(trade) ?? [];
+      items.push(supplier);
+      groups.set(trade, items);
+    });
+
+    return Array.from(groups.entries())
+      .map(([trade, suppliers]) => {
+        const locations = new Map<string, { city: string; province: string; count: number }>();
+        suppliers.forEach((supplier) => {
+          const key = `${supplier.province}|${supplier.city}`;
+          const current = locations.get(key);
+          if (current) current.count++;
+          else locations.set(key, { city: supplier.city || 'نامشخص', province: supplier.province || 'نامشخص', count: 1 });
+        });
+        return {
+          trade,
+          icon: this.getCategoryIcon(trade),
+          suppliers,
+          locations: Array.from(locations.values()).sort((a, b) => a.province.localeCompare(b.province, 'fa'))
+        };
+      })
+      .sort((a, b) => b.suppliers.length - a.suppliers.length || a.trade.localeCompare(b.trade, 'fa'));
+  }
+
+  get activeSupplierGroup(): SupplierNetworkGroup | null {
+    return this.supplierGroups.find((group) => group.trade === this.selectedSupplierTrade) ?? this.supplierGroups[0] ?? null;
+  }
+
+  get activeSupplierCity(): string {
+    return this.activeSupplierGroup?.locations[0]?.city ?? '';
+  }
+
+  selectSupplierTrade(trade: string): void {
+    this.selectedSupplierTrade = trade;
+  }
+
+  trackBySupplierTrade(index: number, group: SupplierNetworkGroup): string {
+    return group.trade;
+  }
+
+  trackBySupplierLocation(index: number, location: { city: string; province: string; count: number }): string {
+    return `${location.province}|${location.city}`;
+  }
+
   private initializeSuppliers(): void {
-    this.suppliers = [
-      { id: '1', companyName: 'تولیدی طلای زرین', city: 'تهران', province: 'تهران', productCategories: ['طلای زرد', 'طلای سفید'], capacity: 200, preparationTime: '۲ روز', rating: 4.9, isVerified: true },
-      { id: '2', companyName: 'کارگاه نقره سیمین', city: 'اصفهان', province: 'اصفهان', productCategories: ['نقره‌آلات', 'انگشتر نقره'], capacity: 150, preparationTime: '۳ روز', rating: 4.7, isVerified: true },
-      { id: '3', companyName: 'سنگ‌نگار خراسان', city: 'مشهد', province: 'خراسان رضوی', productCategories: ['سنگ‌های قیمتی', 'فیروزه'], capacity: 80, preparationTime: '۱ روز', rating: 4.8, isVerified: true },
-      { id: '4', companyName: 'معدن‌یار کرمان', city: 'کرمان', province: 'کرمان', productCategories: ['ابزار معدن', 'تجهیزات'], capacity: 300, preparationTime: '۴ روز', rating: 4.5, isVerified: true },
+    this.publicService.getSellers().pipe(
+      catchError(() => {
+        this.suppliers = this.getFallbackSuppliers();
+        this.cdr.detectChanges();
+        return [];
+      })
+    ).subscribe((result: any) => {
+      const data = result?.data;
+      if (data && data.length) {
+        this.suppliers = data.map((s: PublicSeller) => ({
+          id: s.id,
+          trade: s.trade || 'تولید و توزیع',
+          city: s.city,
+          province: s.province,
+        }));
+      } else {
+        this.suppliers = this.getFallbackSuppliers();
+      }
+      this.selectedSupplierTrade = this.supplierGroups[0]?.trade ?? '';
+      this.cdr.detectChanges();
+    });
+  }
+
+  private getFallbackSuppliers(): SupplierInfo[] {
+    return [
+      { id: '1', trade: 'طلا و زیورآلات', city: IRAN_LOCATIONS[7].city, province: IRAN_LOCATIONS[7].province },
+      { id: '2', trade: 'نقره و زیورآلات دست‌ساز', city: IRAN_LOCATIONS[3].city, province: IRAN_LOCATIONS[3].province },
+      { id: '3', trade: 'سنگ‌های قیمتی', city: IRAN_LOCATIONS[10].city, province: IRAN_LOCATIONS[10].province },
+      { id: '4', trade: 'ابزار و تجهیزات معدن', city: IRAN_LOCATIONS[20].city, province: IRAN_LOCATIONS[20].province },
     ];
   }
 
@@ -439,9 +516,18 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     return new Intl.NumberFormat('fa-IR', { style: 'currency', currency: 'IRR', maximumFractionDigits: 0 }).format(amount);
   }
 
+  formatStatsUpdatedAt(): string {
+    if (!this.statsUpdatedAt) return 'در انتظار داده زنده';
+    return new Date(this.statsUpdatedAt).toLocaleTimeString('fa-IR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   trackByCategoryId(index: number, cat: CategoryTreeNode): string { return cat.id; }
   trackByProductId(index: number, product: Product): string { return product.id; }
   trackByAgentId(index: number, agent: AgentLocation): string { return agent.id; }
   trackBySupplierId(index: number, supplier: SupplierInfo): string { return supplier.id; }
   trackByStepId(index: number, step: WorkflowStep): number { return step.id; }
+  trackByProvinceFa(index: number, province: { nameFa: string }): string { return province.nameFa; }
 }

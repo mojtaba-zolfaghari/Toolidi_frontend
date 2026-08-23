@@ -1,0 +1,181 @@
+<section class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm text-green-600 font-medium mb-1">تأمین‌کننده</p>
+      <h1 class="text-3xl font-extrabold text-secondary">داشبورد تأمین‌کننده 🏭</h1>
+      <p class="text-gray-500 mt-1">مدیریت محصولات و سفارشات تأمین</p>
+    </div>
+    <button (click)="loadDashboard()" class="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+      🔄 بروزرسانی
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="bg-yellow-50 text-yellow-700 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
+    <span>⚠️</span> {{ errorMessage }} — از داده‌های نمونه استفاده می‌شود
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-5 text-white shadow-lg shadow-green-500/20 transition-transform hover:scale-[1.02]">
+      <div class="absolute -left-4 -bottom-4 h-20 w-20 rounded-full bg-white/10 group-hover:scale-150 transition-transform duration-500"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between mb-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">📦</span>
+          <span class="text-xs text-white/70 bg-white/10 px-2 py-0.5 rounded-full">{{ (dashboard?.activeProducts || 0) | number:'1.0-0':'fa-IR' }} فعال</span>
+        </div>
+        <p class="text-3xl font-extrabold">{{ (dashboard?.totalProducts || 0) | number:'1.0-0':'fa-IR' }}</p>
+        <p class="text-sm text-white/70 mt-1">کل محصولات</p>
+      </div>
+    </div>
+
+    <div class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-5 text-white shadow-lg shadow-blue-500/20 transition-transform hover:scale-[1.02]">
+      <div class="absolute -left-4 -bottom-4 h-20 w-20 rounded-full bg-white/10 group-hover:scale-150 transition-transform duration-500"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between mb-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">🛒</span>
+          <span class="text-xs text-white/70 bg-white/10 px-2 py-0.5 rounded-full">{{ (dashboard?.pendingOrders || 0) | number:'1.0-0':'fa-IR' }} در انتظار</span>
+        </div>
+        <p class="text-3xl font-extrabold">{{ (dashboard?.totalOrders || 0) | number:'1.0-0':'fa-IR' }}</p>
+        <p class="text-sm text-white/70 mt-1">کل سفارشات</p>
+      </div>
+    </div>
+
+    <div class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-5 text-white shadow-lg shadow-amber-500/20 transition-transform hover:scale-[1.02]">
+      <div class="absolute -left-4 -bottom-4 h-20 w-20 rounded-full bg-white/10 group-hover:scale-150 transition-transform duration-500"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between mb-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">💰</span>
+        </div>
+        <p class="text-xl font-extrabold">{{ formatCurrency(dashboard?.totalRevenue || 0) }}</p>
+        <p class="text-sm text-white/70 mt-1">کل درآمد</p>
+      </div>
+    </div>
+
+    <div class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 p-5 text-white shadow-lg shadow-purple-500/20 transition-transform hover:scale-[1.02]">
+      <div class="absolute -left-4 -bottom-4 h-20 w-20 rounded-full bg-white/10 group-hover:scale-150 transition-transform duration-500"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between mb-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">🌍</span>
+        </div>
+        <p class="text-3xl font-extrabold">{{ (dashboard?.citiesServed || 0) | number:'1.0-0':'fa-IR' }}</p>
+        <p class="text-sm text-white/70 mt-1">شهر تحت پوشش</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div class="flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-lg">⭐</span>
+        <div>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.averageRating || 0) | number:'1.1-1':'fa-IR' }}</p>
+          <p class="text-xs text-gray-500">امتیاز میانگین</p>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div class="flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-lg">✅</span>
+        <div>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.deliverySuccessRate || 0) | number:'1.1-1':'fa-IR' }}٪</p>
+          <p class="text-xs text-gray-500">نرخ تحویل موفق</p>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div class="flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-100 text-lg">⏳</span>
+        <div>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.pendingOrders || 0) | number:'1.0-0':'fa-IR' }}</p>
+          <p class="text-xs text-gray-500">سفارش در انتظار</p>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div class="flex items-center gap-3">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-lg">📦</span>
+        <div>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.activeProducts || 0) | number:'1.0-0':'fa-IR' }}</p>
+          <p class="text-xs text-gray-500">محصول فعال</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-bold text-secondary text-lg">آخرین سفارشات</h2>
+      <a routerLink="/supplier/orders" class="text-sm text-green-600 hover:underline">مشاهده همه ←</a>
+    </div>
+    <div *ngIf="recentOrders.length" class="overflow-x-auto">
+      <table class="w-full text-sm text-right">
+        <thead>
+          <tr class="border-b text-gray-500">
+            <th class="p-3">شماره سفارش</th>
+            <th class="p-3">فروشنده</th>
+            <th class="p-3">محصول</th>
+            <th class="p-3">تعداد</th>
+            <th class="p-3">مبلغ</th>
+            <th class="p-3">شهر</th>
+            <th class="p-3">وضعیت</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of recentOrders" class="border-b last:border-0 hover:bg-gray-50 transition-colors">
+            <td class="p-3 font-mono text-xs">{{ order.orderNumber }}</td>
+            <td class="p-3 font-medium text-secondary">{{ order.customerName }}</td>
+            <td class="p-3">{{ order.productName }}</td>
+            <td class="p-3 text-center">{{ order.quantity | number:'1.0-0':'fa-IR' }}</td>
+            <td class="p-3 text-green-600 font-bold">{{ formatCurrency(order.totalAmount) }}</td>
+            <td class="p-3">
+              <span class="inline-flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 text-xs">
+                📍 {{ order.city }}
+              </span>
+            </td>
+            <td class="p-3">
+              <span class="text-xs px-2 py-1 rounded-full font-medium" [ngClass]="getStatusColor(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p *ngIf="!recentOrders.length && !loading" class="text-gray-400 text-center py-8">سفارشی موجود نیست</p>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a routerLink="/supplier/products" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+      <div class="flex items-center gap-4">
+        <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-2xl group-hover:scale-110 transition-transform">📦</span>
+        <div>
+          <h3 class="font-bold text-secondary">مدیریت محصولات</h3>
+          <p class="text-sm text-gray-500">افزودن، ویرایش و حذف محصولات</p>
+        </div>
+      </div>
+    </a>
+    <a routerLink="/supplier/orders" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+      <div class="flex items-center gap-4">
+        <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-2xl group-hover:scale-110 transition-transform">🛒</span>
+        <div>
+          <h3 class="font-bold text-secondary">مدیریت سفارشات</h3>
+          <p class="text-sm text-gray-500">پیگیری و پردازش سفارشات</p>
+        </div>
+      </div>
+    </a>
+    <a routerLink="/supplier/profile" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+      <div class="flex items-center gap-4">
+        <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-2xl group-hover:scale-110 transition-transform">⚙️</span>
+        <div>
+          <h3 class="font-bold text-secondary">پروفایل و تنظیمات</h3>
+          <p class="text-sm text-gray-500">ویرایش اطلاعات شرکت</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>

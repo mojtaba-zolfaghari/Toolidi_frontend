@@ -1,100 +1,80 @@
-<section class="bg-warm min-h-screen flex items-center justify-center px-4">
-  <div class="bg-white rounded-2xl shadow-card w-full max-w-md p-8">
-    <h1 class="text-2xl font-bold text-secondary text-center mb-6">ایجاد حساب کاربری</h1>
+<section class="quick-register-shell" dir="rtl">
+  <div class="quick-register-glow quick-register-glow-one"></div>
+  <div class="quick-register-glow quick-register-glow-two"></div>
 
-    <!-- انتخاب نوع حساب -->
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <button
-        type="button"
-        (click)="setRole(false)"
-        [class.bg-primary]="!isSeller"
-        [class.text-white]="!isSeller"
-        class="py-2 rounded-xl border border-gray-300 font-medium transition-colors">
-        مشتری
-      </button>
-      <button
-        type="button"
-        (click)="setRole(true)"
-        [class.bg-primary]="isSeller"
-        [class.text-white]="isSeller"
-        class="py-2 rounded-xl border border-gray-300 font-medium transition-colors">
-        فروشنده
-      </button>
-    </div>
+  <div class="quick-register-layout">
+    <aside class="quick-register-story">
+      <a routerLink="/" class="quick-brand" aria-label="بازگشت به خانه">
+        <span class="quick-brand-mark">ت</span>
+        <span>تولیدی</span>
+      </a>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="nationalCode">کد ملی</label>
-        <input
-          id="nationalCode"
-          type="text"
-          formControlName="nationalCode"
-          placeholder="۱۰ رقم کد ملی"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <p *ngIf="form.get('nationalCode')?.invalid && form.get('nationalCode')?.touched" class="text-red-500 text-sm mt-1">
-          کد ملی معتبر (۱۰ رقم) وارد کنید.
-        </p>
+      <div class="story-copy">
+        <span class="story-kicker"><span class="story-pulse"></span> شروع در کمتر از یک دقیقه</span>
+        <h1>برای خریدهای بهتر،<br /><strong>یک قدم کافی است.</strong></h1>
+        <p>حساب خودت را بساز، محصولات منتخب را ببین و مسیر سفارش‌هایت را همیشه همراه داشته باش.</p>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="username">نام کاربری</label>
-        <input
-          id="username"
-          type="text"
-          formControlName="username"
-          placeholder="نام کاربری دلخواه"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <p *ngIf="form.get('username')?.invalid && form.get('username')?.touched" class="text-red-500 text-sm mt-1">
-          نام کاربری الزامی است.
-        </p>
+      <div class="benefit-list" aria-label="مزایای ایجاد حساب">
+        <div class="benefit-item"><span class="benefit-icon">◈</span><div><strong>پیشنهادهای شخصی</strong><small>محصولات مناسب‌تر برای تو</small></div></div>
+        <div class="benefit-item"><span class="benefit-icon">⌁</span><div><strong>پیگیری ساده سفارش</strong><small>همه‌چیز در یک حساب</small></div></div>
+        <div class="benefit-item"><span class="benefit-icon">✓</span><div><strong>خرید مطمئن</strong><small>شبکه‌ای از کسب‌وکارهای واقعی</small></div></div>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="password">رمز عبور</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="حداقل ۶ کاراکتر"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <p *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="text-red-500 text-sm mt-1">
-          رمز عبور باید حداقل ۶ کاراکتر باشد.
-        </p>
+      <div class="story-route" aria-hidden="true">
+        <span class="route-node route-node-a"></span>
+        <span class="route-line route-line-a"></span>
+        <span class="route-node route-node-b"></span>
+        <span class="route-line route-line-b"></span>
+        <span class="route-node route-node-c"></span>
+        <span class="route-package">✦</span>
+      </div>
+    </aside>
+
+    <main class="quick-register-card">
+      <div class="card-topline">
+        <span class="step-counter">۰۱ <i>/ ۰۱</i></span>
+        <span class="secure-note">ثبت‌نام امن <span>⌁</span></span>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="confirmPassword">تکرار رمز عبور</label>
-        <input
-          id="confirmPassword"
-          type="password"
-          formControlName="confirmPassword"
-          placeholder="رمز عبور را دوباره وارد کنید"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <p *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched" class="text-red-500 text-sm mt-1">
-          تکرار رمز عبور الزامی است.
-        </p>
+      <div class="card-heading">
+        <span class="heading-icon">ت</span>
+        <div><p class="eyebrow">ورود به بازار حرفه‌ای‌ها</p><h2>حساب خریدار بساز</h2></div>
       </div>
+      <p class="card-description">فقط دو مورد لازم است. اطلاعات تکمیلی را هر زمان خواستی از پروفایلت کامل کن.</p>
 
-      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-2 text-sm">
-        {{ errorMessage }}
-      </div>
-      <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-2 text-sm">
-        {{ successMessage }}
-      </div>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field-group">
+          <label for="identifier">شماره موبایل یا ایمیل</label>
+          <div class="input-wrap" [class.input-error]="form.get('identifier')?.invalid && form.get('identifier')?.touched">
+            <span class="input-icon">◎</span>
+            <input id="identifier" type="text" formControlName="identifier" inputmode="email" autocomplete="username" placeholder="مثلاً ۰۹۱۲۱۲۳۴۵۶۷ یا شما@example.com" />
+          </div>
+          <p *ngIf="form.get('identifier')?.invalid && form.get('identifier')?.touched" class="field-error">شماره موبایل یا ایمیل معتبر وارد کنید.</p>
+        </div>
 
-      <button
-        type="submit"
-        [disabled]="form.invalid || loading"
-        class="w-full bg-primary text-white font-bold rounded-xl py-2.5 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-        {{ loading ? 'در حال ثبت‌نام…' : (isSeller ? 'ثبت‌نام فروشنده' : 'ثبت‌نام مشتری') }}
-      </button>
-    </form>
+        <div class="field-group">
+          <div class="label-row"><label for="password">رمز عبور</label><span>حداقل ۶ کاراکتر</span></div>
+          <div class="input-wrap" [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched">
+            <span class="input-icon">◇</span>
+            <input id="password" type="password" formControlName="password" autocomplete="new-password" placeholder="یک رمز عبور امن انتخاب کنید" />
+          </div>
+          <p *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="field-error">رمز عبور باید حداقل ۶ کاراکتر باشد.</p>
+        </div>
 
-    <div class="mt-5 text-center text-sm">
-      <p class="text-gray-500">
-        قبلاً ثبت‌نام کرده‌اید؟
-        <a routerLink="/login" class="text-primary font-medium hover:underline">وارد شوید</a>
-      </p>
-    </div>
+        <div *ngIf="errorMessage" class="form-message form-message-error" role="alert">{{ errorMessage }}</div>
+        <div *ngIf="successMessage" class="form-message form-message-success" role="status">{{ successMessage }}</div>
+
+        <button type="submit" class="quick-submit" [disabled]="form.invalid || loading">
+          <span>{{ loading ? 'در حال ساخت حساب…' : 'شروع خرید در تولیدی' }}</span>
+          <span class="submit-arrow">←</span>
+        </button>
+      </form>
+
+      <div class="trust-row"><span>✓ بدون فرم طولانی</span><span>✓ تکمیل پروفایل بعداً</span><span>✓ ورود خودکار</span></div>
+
+      <p class="login-link">قبلاً حساب ساخته‌ای؟ <a routerLink="/login">وارد شو</a></p>
+      <div class="business-link"><span>برای فروش عمده ثبت‌نام می‌کنی؟</span><a routerLink="/auth/seller-register">صفحه فروشنده ←</a></div>
+    </main>
   </div>
 </section>

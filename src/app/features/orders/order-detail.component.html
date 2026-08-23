@@ -22,7 +22,7 @@
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-card p-6">
           <h2 class="text-xl font-bold text-secondary mb-5">اقلام سفارش</h2>
           <div *ngFor="let item of order.items" class="flex items-center justify-between gap-4 border-b last:border-0 py-4">
-            <div><p class="font-bold text-secondary">{{ item.productName }}</p><p class="text-sm text-gray-500 mt-1">تعداد: {{ item.quantity }} × {{ item.unitPrice | number }} تومان</p></div>
+            <div><p class="font-bold text-secondary">{{ item.productName }}</p><p class="text-sm text-gray-500 mt-1">تعداد: {{ item.quantity | number:'1.0-0':'fa-IR' }} × {{ item.unitPrice | number }} تومان</p></div>
             <strong class="text-primary">{{ item.totalPrice | number }} تومان</strong>
           </div>
           <p *ngIf="!order.items.length" class="text-gray-400 py-6 text-center">جزئیات اقلام موجود نیست.</p>
@@ -45,7 +45,7 @@
             <p *ngIf="tracking.carrierName" class="text-sm text-gray-500 mb-2">حامل: {{ tracking.carrierName }}</p>
             <p *ngIf="tracking.currentLocation" class="text-sm text-gray-500">موقعیت فعلی: {{ tracking.currentLocation }}</p>
             <div *ngIf="tracking.history.length" class="border-r-2 border-primary pr-4 mt-5 space-y-4">
-              <div *ngFor="let event of tracking.history"><p class="font-medium text-secondary">{{ event.status }}</p><p class="text-xs text-gray-400">{{ event.changedAt | date:'yyyy/MM/dd HH:mm' }}<span *ngIf="event.note"> — {{ event.note }}</span></p></div>
+              <div *ngFor="let event of tracking.history"><p class="font-medium text-secondary">{{ event.status }}</p><p class="text-xs text-gray-400">{{ event.changedAt | persianDate:'yyyy/MM/dd HH:mm' }}<span *ngIf="event.note"> — {{ event.note }}</span></p></div>
             </div>
           </div>
         </aside>
@@ -54,7 +54,7 @@
       <div *ngIf="order.history.length" class="bg-white rounded-2xl shadow-card p-6 mt-6">
         <h2 class="text-xl font-bold text-secondary mb-5">تاریخچه وضعیت</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div *ngFor="let event of order.history" class="border-r-2 border-primary pr-4"><p class="font-medium text-secondary">{{ event.previousStatus }} ← {{ event.newStatus }}</p><p class="text-xs text-gray-400 mt-1">{{ event.createdAt | date:'yyyy/MM/dd HH:mm' }}<span *ngIf="event.comments"> — {{ event.comments }}</span></p></div>
+          <div *ngFor="let event of order.history" class="border-r-2 border-primary pr-4"><p class="font-medium text-secondary">{{ event.previousStatus }} ← {{ event.newStatus }}</p><p class="text-xs text-gray-400 mt-1">{{ event.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}<span *ngIf="event.comments"> — {{ event.comments }}</span></p></div>
         </div>
       </div>
     </ng-container>

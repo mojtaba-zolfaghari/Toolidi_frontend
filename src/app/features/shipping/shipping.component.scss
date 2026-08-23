@@ -1,0 +1,45 @@
+$primary: #FF6B35;
+$primary-dark: #E55A24;
+$secondary: #1A2D52;
+
+:host { display: block; }
+
+// ── کارت آمار ──
+.stat-card {
+  transition: transform 0.2s ease;
+  &:hover { transform: translateY(-2px); }
+}
+
+// ── کارت فروشنده ──
+.seller-card {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+.seller-header {
+  background: linear-gradient(135deg, #FAFBFC 0%, #F8F9FA 100%);
+}
+
+// ── بج زمان تحویل ──
+.badge-fast {
+  background: linear-gradient(135deg, rgba(#22C55E, 0.12), rgba(#22C55E, 0.06));
+  color: #16A34A;
+  border: 1px solid rgba(#22C55E, 0.25);
+}
+
+.badge-medium {
+  background: linear-gradient(135deg, rgba(#F59E0B, 0.12), rgba(#F59E0B, 0.06));
+  color: #D97706;
+  border: 1px solid rgba(#F59E0B, 0.25);
+}
+
+.badge-slow {
+  background: linear-gradient(135deg, rgba(#6B7280, 0.12), rgba(#6B7280, 0.06));
+  color: #4B5563;
+  border: 1px solid rgba(#6B7280, 0.25);
+}
+
+// ── انیمیشن ──
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}

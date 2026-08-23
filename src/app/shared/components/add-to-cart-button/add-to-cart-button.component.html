@@ -1,0 +1,73 @@
+<!--
+  دکمه افزودن به سبد خرید با انیمیشن‌های جذاب.
+  سه حالت: idle → adding → success
+-->
+<button
+  type="button"
+  class="cart-btn"
+  [class.sm]="size === 'sm'"
+  [class.md]="size === 'md'"
+  [class.lg]="size === 'lg'"
+  [class.full-width]="fullWidth"
+  [class.is-adding]="state === 'adding'"
+  [class.is-success]="state === 'success'"
+  [class.is-disabled]="disabled"
+  [disabled]="disabled || state === 'adding'"
+  (click)="onClick($event)"
+  (mouseenter)="isHovered = true"
+  (mouseleave)="isHovered = false"
+  [attr.aria-label]="labelText"
+  [attr.aria-busy]="state === 'adding'">
+
+  <!-- Ripple Effect -->
+  <span *ngFor="let ripple of ripples"
+        class="ripple"
+        [style.left.px]="ripple.x"
+        [style.top.px]="ripple.y"></span>
+
+  <!-- Fly-to-cart Particle -->
+  <span *ngIf="state === 'success'" class="fly-cart"></span>
+
+  <!-- Confetti Particles -->
+  <span *ngFor="let p of particles"
+        class="confetti-particle"
+        [style.background]="p.color"
+        [style.animation-delay]="p.delay + 'ms'"
+        [style.--tx]="p.tx + 'px'"
+        [style.--ty]="p.ty + 'px'"></span>
+
+  <!-- Content -->
+  <span class="btn-content">
+    <!-- Idle: Cart Icon -->
+    <svg *ngIf="showIcon && state === 'idle'"
+         class="btn-icon"
+         xmlns="http://www.w3.org/2000/svg"
+         fill="none" viewBox="0 0 24 24"
+         stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    </svg>
+
+    <!-- Adding: Spinner -->
+    <svg *ngIf="state === 'adding'"
+         class="btn-spinner"
+         xmlns="http://www.w3.org/2000/svg"
+         fill="none" viewBox="0 0 24 24">
+      <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/>
+      <path class="spinner-head" d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+
+    <!-- Success: Checkmark -->
+    <svg *ngIf="state === 'success'"
+         class="btn-check"
+         xmlns="http://www.w3.org/2000/svg"
+         fill="none" viewBox="0 0 24 24">
+      <path class="check-path"
+            d="M5 13l4 4L19 7"
+            stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- Text -->
+    <span class="btn-text" [class.sr-only]="size === 'sm' && state === 'idle'">{{ labelText }}</span>
+  </span>
+</button>

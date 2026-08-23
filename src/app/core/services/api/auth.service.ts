@@ -20,6 +20,7 @@ export interface UserProfile {
   isOtpRequired: boolean;
   createdAt: string;
   lastLoginAt?: string;
+  updatedAt: string;
 }
 
 /** پاسخ ورود حاوی توکن‌های دسترسی */
@@ -46,6 +47,12 @@ export interface ChangePasswordData {
   confirmNewPassword: string;
 }
 
+/** داده‌ی ثبت‌نام سریع مشتری */
+export interface QuickRegisterCustomerData {
+  identifier: string;
+  password: string;
+}
+
 /** داده‌ی ثبت‌نام مشتری */
 export interface RegisterCustomerData {
   nationalCode: string;
@@ -60,6 +67,18 @@ export interface RegisterSellerData {
   username: string;
   password: string;
   confirmPassword: string;
+}
+
+/** داده‌ی درخواست عضویت پیک شهری */
+export interface AgentRegistrationData {
+  fullName: string;
+  nationalId: string;
+  phone: string;
+  email: string;
+  city: string;
+  province: string;
+  vehicleType?: string;
+  vehiclePlate?: string;
 }
 
 /**
@@ -82,6 +101,13 @@ export class AuthService {
       .pipe(tap((result) => this.storeTokens(result)));
   }
 
+  /** ثبت‌نام سریع مشتری با حداقل اطلاعات */
+  quickRegisterCustomer(data: QuickRegisterCustomerData): Observable<Result<LoginResponse>> {
+    return this.api
+      .post<Result<LoginResponse>>('/Auth/register/quick', data)
+      .pipe(tap((result) => this.storeTokens(result)));
+  }
+
   /** ثبت‌نام مشتری جدید */
   registerCustomer(data: RegisterCustomerData): Observable<Result<LoginResponse>> {
     return this.api
@@ -94,6 +120,11 @@ export class AuthService {
     return this.api
       .post<Result<LoginResponse>>('/Auth/register/seller', data)
       .pipe(tap((result) => this.storeTokens(result)));
+  }
+
+  /** ثبت درخواست عضویت پیک شهری */
+  registerAgent(data: AgentRegistrationData): Observable<Result<string>> {
+    return this.api.post<Result<string>>('/v1/agents/register', data);
   }
 
   /** خروج کاربر و پاک‌کردن توکن‌ها از حافظه‌ی مرورگر */

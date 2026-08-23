@@ -1,0 +1,110 @@
+// ═══════════════════════════════════════════════════════════
+//  Cart Component — استایل‌های سبد خرید بازطراحی‌شده
+// ═══════════════════════════════════════════════════════════
+
+$primary: #FF6B35;
+$primary-dark: #E55A24;
+$secondary: #1A2D52;
+$success: #22C55E;
+
+// ── گروه فروشنده ──
+.seller-group {
+  animation: fadeInUp 0.4s ease-out both;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ── هدر فروشنده ──
+.seller-header {
+  background: linear-gradient(135deg, #FAFBFC 0%, #F8F9FA 100%);
+}
+
+// ── بج تحویل ──
+.delivery-badge {
+  background: linear-gradient(135deg, rgba($success, 0.08), rgba($success, 0.04));
+  border: 1px solid rgba($success, 0.2);
+  border-radius: 10px;
+  padding: 6px 12px;
+  min-width: 90px;
+}
+
+// ── آیتم سبد ──
+.cart-item {
+  transition: background-color 0.2s ease;
+}
+
+// ── شمارنده تعداد (داخل سبد) ──
+.qty-stepper-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: #F8F9FA;
+  border: 1.5px solid #E9ECEF;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+
+  &:focus-within {
+    border-color: $primary;
+  }
+}
+
+.qty-btn-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: $secondary;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: $primary;
+    color: #fff;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.85);
+  }
+
+  &:disabled {
+    color: #D1D5DB;
+    cursor: not-allowed;
+  }
+}
+
+.qty-value-inline {
+  width: 32px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 14px;
+  color: $secondary;
+  border-left: 1px solid #E9ECEF;
+  border-right: 1px solid #E9ECEF;
+  line-height: 28px;
+  user-select: none;
+}
+
+// ── کارت خلاصه ──
+.summary-card {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+// ── انیمیشن fade-in-up ──
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

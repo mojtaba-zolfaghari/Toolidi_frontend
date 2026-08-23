@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.product-card {
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card-image {
+  flex: 0 0 auto;
+}
+
+.product-card-image-source {
+  object-position: center;
+} 
+
+.product-card-body {
+  flex: 1 1 auto;
+}
+
+.product-card-name {
+  min-height: 2.75rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.product-card-prices {
+  min-height: 1.5rem;
+  line-height: 1.5;
+}
+
+.product-discount-badge {
+  border-radius: 999px;
+  padding: 0.28rem 0.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, #dc2626, #f97316);
+  font-size: 0.65rem;
+  font-weight: 900;
+  box-shadow: 0 5px 14px rgba(220, 38, 38, 0.25);
+}
+
+.product-saving-label {
+  display: inline-flex;
+  margin-top: 0.2rem;
+  color: #059669;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.product-delivery-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.delivery-chip {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.22rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid rgba(108, 63, 197, 0.13);
+  border-radius: 0.55rem;
+  color: #64748b;
+  background: #faf8ff;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.delivery-chip svg {
+  width: 0.82rem;
+  height: 0.82rem;
+  flex: 0 0 auto;
+  color: #6c3fc5;
+}
+
+@media (max-width: 640px) {
+  .product-card-name {
+    min-height: 2.45rem;
+    font-size: 0.78rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .product-discount-badge {
+    font-size: 0.58rem;
+    padding: 0.22rem 0.38rem;
+  }
+
+  .product-saving-label {
+    font-size: 0.58rem;
+  }
+
+  .delivery-chip {
+    max-width: 100%;
+    font-size: 0.56rem;
+  }
+
+  .delivery-chip svg {
+    width: 0.72rem;
+    height: 0.72rem;
+  }
+
+  .product-card-prices {
+    line-height: 1.35;
+  }
+}

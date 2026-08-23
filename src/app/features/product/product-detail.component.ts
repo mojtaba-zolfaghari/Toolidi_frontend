@@ -11,6 +11,7 @@ import {
   ProductVariation
 } from '../../core/services/api/product.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
+import { CartButtonState } from '../../shared/components/add-to-cart-button/add-to-cart-button.component';
 
 /** انیمیشن تعویض تصویر اصلی با محو شدن */
 const imageSwap = trigger('imageSwap', [
@@ -36,11 +37,13 @@ interface SpecRow {
 @Component({
   selector: 'app-product-detail',
   templateUrl: './product-detail.component.html',
+  styleUrls: ['./product-detail.component.scss'],
   animations: [fadeIn, slideUp, scaleUp, imageSwap]
 })
 export class ProductDetailComponent implements OnInit, OnDestroy {
   product: Product | null = null;
   relatedProducts: Product[] = [];
+  supplierStats: { totalSuppliers: number; citiesCount: number; cities: { city: string; count: number }[] } | null = null;
   loading = true;
   errorMessage = '';
   quantity = 1;
@@ -48,6 +51,8 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   activeImageIndex = 0;
   selectedVariationId: string | null = null;
   isLoggedIn = false;
+  /** وضعیت دکمه افزودن به سبد */
+  cartState: CartButtonState = 'idle';
 
   private subscription?: Subscription;
 
@@ -83,6 +88,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.autoSelectVariation();
           this.loadRelated();
+          this.loadSupplierStats();
         },
         error: (err: Error) => {
           this.errorMessage = err?.message ?? 'محصول یافت نشد.';
@@ -125,6 +131,33 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   /** قیمت نهایی با احتساب تنوع */
   get effectivePrice(): number {
     return (this.product?.unitPrice ?? 0) + (this.selectedVariation?.priceAdjustment ?? 0);
+  }
+
+  /** درصد تخفیف معتبر محصول */
+  get discountPercent(): number {
+    if (!this.product) return 0;
+    if (this.product.discountPercent && this.product.discountPercent > 0) return this.product.discountPercent;
+    return this.product.comparePrice && this.product.comparePrice > this.product.unitPrice
+      ? Math.round((1 - this.product.unitPrice / this.product.comparePrice) * 100)
+      : 0;
+  }
+
+  /** مبلغ صرفه‌جویی محصول */
+  get discountAmount(): number {
+    if (!this.product) return 0;
+    if (this.product.discountAmount && this.product.discountAmount > 0) return this.product.discountAmount;
+    return this.product.comparePrice && this.product.comparePrice > this.product.unitPrice
+      ? this.product.comparePrice - this.product.unitPrice
+      : 0;
+  }
+
+  /** زمان‌های ارسال عمومی محصول */
+  get deliveryInfo(): { city: string; cityDays: number; nationwideDays: number } {
+    return {
+      city: this.product?.sellerCity || 'شهر مبدا',
+      cityDays: Math.max(1, this.product?.cityDeliveryDays || 1),
+      nationwideDays: Math.max(this.product?.cityDeliveryDays || 1, this.product?.nationwideDeliveryDays || 3)
+    };
   }
 
   /** انتخاب خودکار تنوع پیش‌فرض */
@@ -204,7 +237,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     this.quantity = Math.max(1, this.quantity + delta);
   }
 
-  /** افزودن محصول به سبد خرید */
+  /** افزودن محصول به سبد خرید با انیمیشن */
   addToCart(): void {
     if (!this.product) {
       return;
@@ -213,13 +246,24 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
+    if (this.cartState !== 'idle') {
+      return;
+    }
+
+    this.cartState = 'adding';
 
     this.cartService
       .addItem(this.product.id, this.selectedVariationId ?? undefined, this.quantity)
       .subscribe({
-        next: () => this.router.navigate(['/cart']),
+        next: () => {
+          this.cartState = 'success';
+          // بازگشت به حالت idle پس از ۲ ثانیه
+          setTimeout(() => {
+            this.cartState = 'idle';
+          }, 2000);
+        },
         error: () => {
-          /* اینترسپتور توکن در صورت 401 کاربر را به صفحه ورود می‌برد */
+          this.cartState = 'idle';
         }
       });
   }
@@ -240,6 +284,21 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
           this.relatedProducts = items.slice(0, 4);
         },
         error: () => (this.relatedProducts = [])
+      });
+  }
+
+  /** دریافت آمار تأمین‌کنندگان */
+  private loadSupplierStats(): void {
+    if (!this.product) {
+      return;
+    }
+    this.productService
+      .getSuppliersByCity(this.product.categoryId)
+      .subscribe({
+        next: (result) => {
+          this.supplierStats = result.data ?? null;
+        },
+        error: () => (this.supplierStats = null)
       });
   }
 }

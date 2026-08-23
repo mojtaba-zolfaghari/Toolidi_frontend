@@ -3,33 +3,77 @@ import { Router } from '@angular/router';
 
 import { Product } from '../../../core/services/api/product.service';
 import { CartService } from '../../../core/services/api/cart.service';
+import { CartButtonState } from '../add-to-cart-button/add-to-cart-button.component';
 
 /**
  * کارت محصول؛ نمایش تصویر، نام، قیمت و امتیاز با دکمه افزودن به سبد.
+ * دکمه دارای انیمیشن ripple، spinner و checkmark است.
  */
 @Component({
   selector: 'app-product-card',
-  templateUrl: './product-card.component.html'
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
 })
 export class ProductCardComponent {
   @Input() product!: Product;
+
+  /** وضعیت دکمه افزودن به سبد */
+  cartState: CartButtonState = 'idle';
 
   constructor(
     private readonly router: Router,
     private readonly cartService: CartService
   ) {}
 
+  /** تصویر اصلی محصول با پشتیبانی از هر دو قرارداد قدیمی و جدید API. */
+  get primaryImageUrl(): string {
+    const primary = this.product.images?.find((image) => image.isPrimary) ?? this.product.images?.[0];
+    return primary?.imageUrl ?? this.product.imageUrl ?? '';
+  }
+
+  /** درصد تخفیف معتبر برای نمایش کارت */
+  get discountPercent(): number {
+    if (this.product.discountPercent && this.product.discountPercent > 0) {
+      return this.product.discountPercent;
+    }
+    if (this.product.comparePrice && this.product.comparePrice > this.product.unitPrice) {
+      return Math.round((1 - this.product.unitPrice / this.product.comparePrice) * 100);
+    }
+    return 0;
+  }
+
+  /** مبلغ صرفه‌جویی معتبر برای نمایش کارت */
+  get discountAmount(): number {
+    if (this.product.discountAmount && this.product.discountAmount > 0) {
+      return this.product.discountAmount;
+    }
+    return this.product.comparePrice && this.product.comparePrice > this.product.unitPrice
+      ? this.product.comparePrice - this.product.unitPrice
+      : 0;
+  }
+
   /** هدایت به صفحه جزئیات محصول */
   openDetail(): void {
     this.router.navigate(['/product', this.product.id]);
   }
 
-  /** افزودن محصول به سبد خرید */
+  /** افزودن محصول به سبد خرید با انیمیشن */
   addToCart(): void {
+    if (this.cartState !== 'idle') {
+      return;
+    }
+    this.cartState = 'adding';
+
     this.cartService.addItem(this.product.id, undefined, 1).subscribe({
-      next: () => this.router.navigate(['/cart']),
+      next: () => {
+        this.cartState = 'success';
+        // بازگشت به حالت idle پس از ۱.۵ ثانیه
+        setTimeout(() => {
+          this.cartState = 'idle';
+        }, 1500);
+      },
       error: () => {
-        /* اینترسپتور توکن در صورت 401 کاربر را به صفحه ورود می‌برد */
+        this.cartState = 'idle';
       }
     });
   }

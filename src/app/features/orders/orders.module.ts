@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { OrdersComponent } from './orders.component';
 import { OrderDetailComponent } from './order-detail.component';
+import { SharedModule } from '../../shared/shared.module';
 
 const routes: Routes = [
   { path: '', component: OrdersComponent },
@@ -14,7 +15,8 @@ const routes: Routes = [
   declarations: [OrdersComponent, OrderDetailComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    SharedModule
   ]
 })
 export class OrdersModule { }

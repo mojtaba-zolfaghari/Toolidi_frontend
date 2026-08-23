@@ -1,41 +1,138 @@
-<section class="bg-warm min-h-screen py-10">
-  <div class="container mx-auto px-4 max-w-7xl">
-    <div class="mb-8">
-      <p class="text-sm text-primary font-medium mb-1">وبلاگ</p>
-      <h1 class="text-3xl font-bold text-secondary">آخرین مطالب</h1>
+<!-- ═══════════════════ صفحه وبلاگ ═══════════════════ -->
+<section class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/20">
+
+  <!-- ═══ هدر وبلاگ ═══ -->
+  <div class="blog-hero">
+    <div class="container mx-auto max-w-7xl px-4 py-12 lg:py-16 text-center">
+      <span class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-white/80 mb-4">
+        📝 وبلاگ تولیدی
+      </span>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4">
+        آخرین مقالات و <span class="text-amber-300">آموزش‌ها</span>
+      </h1>
+      <p class="text-white/70 max-w-2xl mx-auto text-base lg:text-lg">
+        راهنمای خرید، اخبار بازار، نکات ترفندها و معرفی محصولات جدید
+      </p>
     </div>
+  </div>
 
-    <app-spinner *ngIf="loading" label="در حال بارگذاری مطالب…"></app-spinner>
-    <p *ngIf="!loading && errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3">{{ errorMessage }}</p>
+  <!-- ═══ فیلتر دسته‌بندی ═══ -->
+  <div class="container mx-auto max-w-7xl px-4 -mt-6 relative z-10">
+    <nav class="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+      <button *ngFor="let cat of categories"
+              type="button"
+              (click)="selectCategory(cat.slug)"
+              [class.category-btn-active]="selectedCategory === cat.slug"
+              [class.category-btn]="selectedCategory !== cat.slug">
+        <span>{{ cat.icon }}</span>
+        <span>{{ cat.name }}</span>
+      </button>
+    </nav>
+  </div>
 
-    <div *ngIf="!loading && posts.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <article
-        *ngFor="let post of posts"
-        (click)="openPost(post.id)"
-        [@slideUp]
-        class="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover">
-        <div class="h-48 overflow-hidden bg-gradient-to-br from-primary-light to-secondary">
-          <img *ngIf="post.featuredImage" [src]="post.featuredImage" [alt]="post.title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          <div *ngIf="!post.featuredImage" class="flex h-full w-full items-center justify-center text-6xl text-white/70">✦</div>
+  <!-- ═══ لودینگ ═══ -->
+  <div *ngIf="loading" class="container mx-auto max-w-7xl px-4 py-20 text-center">
+    <div class="blog-spinner mx-auto mb-4"></div>
+    <p class="text-gray-400">در حال بارگذاری مقالات…</p>
+  </div>
+
+  <!-- ═══ خطا ═══ -->
+  <div *ngIf="!loading && errorMessage" class="container mx-auto max-w-7xl px-4 py-10">
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-6 py-4">
+      ⚠️ {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- ═══ پست ویژه ═══ -->
+  <div *ngIf="!loading && featuredPost && !selectedCategory" class="container mx-auto max-w-7xl px-4 mt-6">
+    <div class="blog-featured-card" (click)="openPost(featuredPost.id)">
+      <div class="relative h-64 md:h-80 overflow-hidden rounded-t-2xl">
+        <img *ngIf="featuredPost.featuredImage"
+             [src]="featuredPost.featuredImage" [alt]="featuredPost.title"
+             class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+        <div *ngIf="!featuredPost.featuredImage" class="w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-6xl">
+          ✦
         </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        <div class="absolute bottom-0 right-0 left-0 p-6 md:p-8">
+          <span class="inline-flex items-center gap-1 bg-amber-500 text-white text-xs font-bold rounded-full px-3 py-1 mb-3">
+            ⭐ ویژه · {{ (featuredPost.viewCount || 0) | number:'1.0-0':'fa-IR' }} بازدید
+          </span>
+          <h2 class="text-xl md:text-2xl lg:text-3xl font-extrabold text-white leading-tight">
+            {{ featuredPost.title }}
+          </h2>
+          <p class="text-white/80 mt-2 text-sm md:text-base max-w-3xl">
+            {{ excerpt(featuredPost.shortDescription || '', 180) }}
+          </p>
+          <div class="flex items-center gap-3 mt-4 text-white/60 text-sm">
+            <span>{{ featuredPost.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
+            <span>·</span>
+            <span>تیم تولیدی</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ لیست پست‌ها ═══ -->
+  <div *ngIf="!loading && !errorMessage" class="container mx-auto max-w-7xl px-4 py-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <article *ngFor="let post of (selectedCategory ? posts : regularPosts); let i = index"
+               (click)="openPost(post.id)"
+               class="blog-card"
+               [style.animation-delay]="i * 80 + 'ms'">
+
+        <!-- تصویر -->
+        <div class="blog-card-image">
+          <img *ngIf="post.featuredImage"
+               [src]="post.featuredImage" [alt]="post.title"
+               class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" />
+          <div *ngIf="!post.featuredImage" class="w-full h-48 bg-gradient-to-br from-primary/20 to-purple-400/20 flex items-center justify-center text-4xl text-primary/30">
+            ✦
+          </div>
+          <!-- بج بازدید -->
+          <div class="absolute top-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs rounded-full px-2.5 py-1 flex items-center gap-1">
+            👁 {{ (post.viewCount || 0) | number:'1.0-0':'fa-IR' }}
+          </div>
+        </div>
+
+        <!-- محتوا -->
         <div class="p-5">
-          <h2 class="text-lg font-bold text-secondary leading-7 line-clamp-2 group-hover:text-primary transition-colors">{{ post.title }}</h2>
-          <p class="mt-2 text-sm text-gray-500 leading-6 line-clamp-3">{{ post.shortDescription || post.content }}</p>
-          <div class="mt-4 flex items-center justify-between text-xs text-gray-400">
-            <span>{{ post.publishedAt | date:'yyyy/MM/dd' }}</span>
-            <span>{{ post.authorId ? 'نویسنده' : 'تیم Toolidi' }}</span>
+          <h3 class="text-base font-bold text-gray-900 leading-6 line-clamp-2 group-hover:text-primary transition-colors">
+            {{ post.title }}
+          </h3>
+          <p class="mt-2 text-sm text-gray-500 leading-6 line-clamp-2">
+            {{ excerpt(post.shortDescription || post.content) }}
+          </p>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-xs text-gray-400">{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
+            <span class="text-xs font-medium text-primary group-hover:translate-x-[-4px] transition-transform inline-flex items-center gap-1">
+              مطالعه
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </span>
           </div>
         </div>
       </article>
     </div>
 
-    <p *ngIf="!loading && !posts.length && !errorMessage" class="text-center text-gray-400 py-16">مطلبی برای نمایش وجود ندارد.</p>
+    <!-- پیام خالی -->
+    <div *ngIf="(!selectedCategory && !regularPosts.length) || (selectedCategory && !posts.length)" class="text-center py-20">
+      <span class="text-5xl block mb-4">📭</span>
+      <h3 class="text-lg font-bold text-gray-700">مطلبی یافت نشد</h3>
+      <p class="text-gray-400 mt-2 text-sm">در این دسته‌بندی هنوز مقاله‌ای منتشر نشده است.</p>
+    </div>
+  </div>
 
-    <app-pagination
-      *ngIf="!loading && posts.length"
-      [page]="page"
-      [totalPages]="totalPages"
-      (pageChange)="onPageChange($event)">
-    </app-pagination>
+  <!-- ═══ صفحه‌بندی ═══ -->
+  <div *ngIf="!loading && posts.length > 0 && totalPages > 1" class="container mx-auto max-w-7xl px-4 pb-12">
+    <div class="flex justify-center gap-2">
+      <button *ngFor="let p of [].constructor(totalPages); let i = index"
+              type="button"
+              (click)="onPageChange(i + 1)"
+              [class.page-btn-active]="page === i + 1"
+              [class.page-btn]="page !== i + 1">
+        {{ i + 1 | number:'1.0-0':'fa-IR' }}
+      </button>
+    </div>
   </div>
 </section>

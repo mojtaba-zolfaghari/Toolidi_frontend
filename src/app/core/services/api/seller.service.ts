@@ -127,4 +127,14 @@ export class SellerService {
   getProducts(params?: { page?: number; pageSize?: number }): Observable<Result<PagedList<Product>>> {
     return this.api.get<Result<PagedList<Product>>>(`/Seller/products${buildQueryString(params)}`);
   }
+
+  /** دریافت سفارشات فروشنده */
+  getOrders(params?: { page?: number; pageSize?: number }): Observable<Result<PagedList<any>>> {
+    return this.api.get<Result<PagedList<any>>>(`/Seller/orders${buildQueryString(params)}`);
+  }
+
+  /** بروزرسانی اطلاعات فروشنده */
+  updateInfo(data: any): Observable<Result<any>> {
+    return this.api.put<Result<any>>('/Seller/info', data);
+  }
 }

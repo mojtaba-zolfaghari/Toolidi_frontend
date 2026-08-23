@@ -1,161 +1,300 @@
-<section class="bg-warm min-h-screen py-10">
-  <div class="container mx-auto px-4 max-w-3xl">
-    <h1 class="text-3xl font-bold text-secondary mb-8">تسویه‌حساب</h1>
+<!-- ═══════════════════ صفحه تسویه‌حساب — بازطراحی ═══════════════════ -->
+<section class="checkout-page bg-warm min-h-screen py-6 sm:py-10">
+  <div class="container mx-auto px-4 max-w-4xl">
 
-    <!-- شاخص مراحل -->
-    <ol class="flex items-center gap-2 mb-8">
+    <!-- هدر -->
+    <div class="mb-8 text-center">
+      <h1 class="text-2xl sm:text-3xl font-bold text-secondary mb-2">تسویه‌حساب</h1>
+      <p class="text-gray-500 text-sm">تکمیل خرید در ۳ مرحله ساده</p>
+    </div>
+
+    <!-- ═══ شاخص مراحل ═══ -->
+    <div class="step-indicator flex items-center justify-center gap-0 mb-10 max-w-lg mx-auto">
       <ng-container *ngFor="let s of [1, 2, 3]; let i = index">
-        <li class="flex items-center gap-2" [@fadeIn]>
-          <span class="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold"
-                [class.bg-primary]="step >= s"
-                [class.text-white]="step >= s"
-                [class.bg-gray-200]="step < s"
-                [class.text-gray-500]="step < s">{{ s }}</span>
-          <span class="text-sm font-medium" [class.text-primary]="step >= s" [class.text-gray-400]="step < s">
+        <div class="flex flex-col items-center relative z-10">
+          <div class="step-circle w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500"
+               [ngClass]="{ 'step-done': step > s, 'step-active': step === s, 'step-pending': step < s }">
+            <svg *ngIf="step > s" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span *ngIf="step <= s">{{ s }}</span>
+          </div>
+          <span class="text-[11px] mt-1.5 font-medium"
+                [ngClass]="{ 'text-primary': step >= s, 'text-gray-400': step < s }">
             {{ s === 1 ? 'آدرس' : s === 2 ? 'ارسال' : 'پرداخت' }}
           </span>
-        </li>
-        <li *ngIf="i < 2" class="h-px flex-1 bg-gray-200"></li>
+        </div>
+        <div *ngIf="i < 2"
+             class="step-line w-16 sm:w-24 h-0.5 mx-1 mt-[-18px] transition-all duration-500"
+             [ngClass]="{ 'bg-primary': step > s, 'bg-gray-200': step <= s }"></div>
       </ng-container>
-    </ol>
+    </div>
 
-    <div *ngIf="loadingOptions" class="bg-white rounded-2xl shadow-card py-10"><app-spinner label="در حال دریافت گزینه‌ها…"></app-spinner></div>
+    <!-- لودینگ -->
+    <div *ngIf="loadingOptions" class="bg-white rounded-2xl shadow-card py-16 text-center">
+      <div class="inline-block w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-400">در حال دریافت اطلاعات…</p>
+    </div>
 
-    <!-- مرحله ۱: آدرس -->
-    <div *ngIf="!loadingOptions && step === 1" [@fadeIn] class="space-y-5">
-      <div *ngIf="!addresses.length" class="bg-orange-50 text-orange-700 rounded-xl px-4 py-3">
-        هنوز آدرسی ثبت نکرده‌اید. لطفاً یک آدرس جدید اضافه کنید.
+    <!-- ═══════════════════ مرحله ۱: آدرس ═══════════════════ -->
+    <div *ngIf="!loadingOptions && step === 1" class="animate-in space-y-5">
+
+      <div *ngIf="!addresses.length" class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-2xl px-5 py-4 flex items-center gap-3">
+        <span class="text-2xl">📍</span>
+        <div>
+          <p class="font-bold text-orange-700 text-sm">هنوز آدرسی ثبت نکرده‌اید</p>
+          <p class="text-orange-600 text-xs mt-0.5">لطفاً یک آدرس اضافه کنید.</p>
+        </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-card p-6">
-        <h2 class="font-bold text-secondary mb-4">آدرس ارسال</h2>
+      <!-- آدرس ارسال -->
+      <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-lg">📍</span>
+          <h2 class="font-bold text-secondary">آدرس ارسال</h2>
+        </div>
         <div class="space-y-3">
-          <label *ngFor="let address of addresses" class="flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
-                 [class.border-primary]="shippingAddressId === address.id"
-                 [class.bg-bg-muted]="shippingAddressId === address.id"
-                 [class.border-gray-200]="shippingAddressId !== address.id">
-            <input type="radio" name="shippingAddress" [checked]="shippingAddressId === address.id" (change)="selectAddress('shipping', address.id)" class="mt-1 accent-primary" />
-            <span>
-              <strong class="block text-secondary">{{ address.city }}، {{ address.addressLine }}</strong>
-              <span class="text-sm text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
-              <span *ngIf="address.isDefault" class="block text-xs text-green-600 mt-1">آدرس پیش‌فرض</span>
-            </span>
+          <label *ngFor="let address of shippingAddresses"
+                 class="address-card flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
+                 [ngClass]="shippingAddressId === address.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
+            <input type="radio" name="shippingAddress"
+                   [checked]="shippingAddressId === address.id"
+                   (change)="selectAddress('shipping', address.id)" class="mt-1 accent-primary" />
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <strong class="text-secondary text-sm">{{ address.city }}، {{ address.addressLine }}</strong>
+                <span *ngIf="address.isDefault" class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">پیش‌فرض</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">{{ address.state }} — کد پستی {{ address.postalCode }}</p>
+            </div>
+            <span *ngIf="shippingAddressId === address.id" class="text-orange-500 text-lg mt-1">✓</span>
           </label>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-card p-6">
-        <h2 class="font-bold text-secondary mb-4">آدرس صورتحساب</h2>
+      <!-- آدرس صورتحساب -->
+      <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">📄</span>
+          <h2 class="font-bold text-secondary">آدرس صورتحساب</h2>
+        </div>
         <div class="space-y-3">
-          <label *ngFor="let address of addresses" class="flex items-start gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
-                 [class.border-primary]="billingAddressId === address.id"
-                 [class.bg-bg-muted]="billingAddressId === address.id"
-                 [class.border-gray-200]="billingAddressId !== address.id">
-            <input type="radio" name="billingAddress" [checked]="billingAddressId === address.id" (change)="selectAddress('billing', address.id)" class="mt-1 accent-primary" />
+          <label *ngFor="let address of billingAddresses"
+                 class="address-card flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
+                 [ngClass]="billingAddressId === address.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
+            <input type="radio" name="billingAddress"
+                   [checked]="billingAddressId === address.id"
+                   (change)="selectAddress('billing', address.id)" class="mt-1 accent-primary" />
             <span>
-              <strong class="block text-secondary">{{ address.city }}، {{ address.addressLine }}</strong>
-              <span class="text-sm text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
+              <strong class="block text-secondary text-sm">{{ address.city }}، {{ address.addressLine }}</strong>
+              <span class="text-xs text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
             </span>
           </label>
         </div>
+        <p *ngIf="!billingAddresses.length" class="rounded-xl bg-blue-50 px-4 py-3 text-xs text-blue-700">برای صورتحساب، یک آدرس با نوع «صورتحساب» یا «ارسال و صورتحساب» اضافه کنید.</p>
       </div>
 
-      <button type="button" (click)="showAddressForm = !showAddressForm" class="text-primary font-medium text-sm hover:underline">
-        {{ showAddressForm ? 'انصراف از افزودن آدرس' : '+ افزودن آدرس جدید' }}
+      <!-- فرم آدرس جدید -->
+      <button type="button" (click)="showAddressForm = !showAddressForm"
+              class="text-primary font-medium text-sm hover:underline flex items-center gap-1">
+        <span class="text-lg">+</span> {{ showAddressForm ? 'انصراف' : 'افزودن آدرس جدید' }}
       </button>
 
-      <form *ngIf="showAddressForm" [formGroup]="addressForm" (ngSubmit)="saveAddress()" [@scaleUp] class="bg-white rounded-2xl shadow-card p-6 space-y-4">
-        <h3 class="font-bold text-secondary">آدرس جدید</h3>
+      <form *ngIf="showAddressForm" [formGroup]="addressForm" (ngSubmit)="saveAddress()"
+            class="bg-white rounded-2xl shadow-card p-5 sm:p-6 space-y-4 animate-in">
+        <h3 class="font-bold text-secondary flex items-center gap-2">📝 آدرس جدید</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label class="block"><span class="block text-secondary font-medium mb-1">نوع آدرس</span><select formControlName="addressType" class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white"><option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option></select></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1">کشور</span><input formControlName="country" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1">استان</span><input formControlName="state" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1">شهر</span><input formControlName="city" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1">کد پستی</span><input formControlName="postalCode" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1">شماره تماس</span><input formControlName="phoneNumber" class="w-full border border-gray-300 rounded-xl px-4 py-2" /></label>
-          <label class="block md:col-span-2"><span class="block text-secondary font-medium mb-1">نشانی کامل</span><textarea rows="2" formControlName="addressLine" class="w-full border border-gray-300 rounded-xl px-4 py-2"></textarea></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">نوع آدرس</span>
+            <select formControlName="addressType" class="input-field">
+              <option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option>
+            </select></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کشور</span><input formControlName="country" class="input-field" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">استان</span><input formControlName="state" class="input-field" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شهر</span><input formControlName="city" class="input-field" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کد پستی</span><input formControlName="postalCode" class="input-field" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شماره تماس</span><input formControlName="phoneNumber" class="input-field" /></label>
+          <label class="block md:col-span-2"><span class="block text-secondary font-medium mb-1 text-sm">نشانی کامل</span><textarea rows="2" formControlName="addressLine" class="input-field"></textarea></label>
         </div>
-        <p *ngIf="addressError" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{{ addressError }}</p>
-        <p *ngIf="addressMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">{{ addressMessage }}</p>
-        <button type="submit" [disabled]="savingAddress" class="bg-primary text-white rounded-xl px-6 py-2.5 font-bold disabled:opacity-50">{{ savingAddress ? 'در حال ذخیره…' : 'ذخیره آدرس' }}</button>
+        <p *ngIf="addressError" class="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2">{{ addressError }}</p>
+        <p *ngIf="addressMessage" class="text-green-600 text-sm bg-green-50 rounded-xl px-4 py-2">{{ addressMessage }}</p>
+        <button type="submit" [disabled]="savingAddress" class="checkout-btn-primary text-sm">{{ savingAddress ? 'در حال ذخیره…' : 'ذخیره آدرس' }}</button>
       </form>
 
       <div class="flex justify-end pt-2">
-        <button type="button" (click)="next()" [disabled]="!canContinueStep1" class="bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">ادامه</button>
+        <button type="button" (click)="next()" [disabled]="!canContinueStep1" class="checkout-btn-primary">
+          ادامه
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
       </div>
     </div>
 
-    <!-- مرحله ۲: ارسال -->
-    <div *ngIf="!loadingOptions && step === 2" [@fadeIn] class="space-y-5">
-      <div class="bg-white rounded-2xl shadow-card p-6">
-        <h2 class="font-bold text-secondary mb-4">روش ارسال</h2>
+    <!-- ═══════════════════ مرحله ۲: ارسال ═══════════════════ -->
+    <div *ngIf="!loadingOptions && step === 2" class="animate-in space-y-5">
+      <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">🚚</span>
+          <h2 class="font-bold text-secondary">روش ارسال</h2>
+        </div>
         <div class="space-y-3">
-          <label *ngFor="let method of shippingMethods" class="flex items-center justify-between gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
-                 [class.border-primary]="shippingMethodId === method.id"
-                 [class.bg-bg-muted]="shippingMethodId === method.id"
-                 [class.border-gray-200]="shippingMethodId !== method.id">
+          <label *ngFor="let method of shippingMethods; let i = index"
+                 class="shipping-option flex items-center justify-between gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
+                 [ngClass]="shippingMethodId === method.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
             <span class="flex items-center gap-3">
               <input type="radio" name="shippingMethod" [checked]="shippingMethodId === method.id" (change)="shippingMethodId = method.id" class="accent-primary" />
-              <span>
-                <strong class="block text-secondary">{{ method.name }}</strong>
-                <span class="text-sm text-gray-500">{{ method.description || '' }}</span>
-              </span>
+              <span><strong class="block text-secondary text-sm">{{ method.name }}</strong><span class="text-xs text-gray-500">{{ method.description || '' }}</span></span>
             </span>
-            <span class="text-left">
-              <strong class="block text-primary">{{ method.baseCost | number }} تومان</strong>
-              <span *ngIf="method.estimatedDeliveryDays" class="text-sm text-gray-500">{{ method.estimatedDeliveryDays }} روز کاری</span>
+            <span class="text-left shrink-0">
+              <strong class="block text-primary text-sm">{{ method.baseCost | number }} تومان</strong>
+              <span *ngIf="method.estimatedDeliveryDays" class="text-xs text-gray-500">{{ method.estimatedDeliveryDays | number:'1.0-0':'fa-IR' }} روز کاری</span>
             </span>
           </label>
         </div>
-        <p *ngIf="!shippingMethods.length" class="text-gray-400 text-center py-4">روش ارسالی موجود نیست.</p>
+        <p *ngIf="!shippingMethods.length" class="text-gray-400 text-center py-6">روش ارسالی موجود نیست.</p>
       </div>
-
       <div class="flex justify-between pt-2">
-        <button type="button" (click)="back()" class="border border-gray-300 rounded-xl px-6 py-3 font-medium hover:bg-gray-50 transition-colors">بازگشت</button>
-        <button type="button" (click)="next()" class="bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors">ادامه</button>
+        <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
+        <button type="button" (click)="next()" class="checkout-btn-primary">
+          ادامه
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
       </div>
     </div>
 
-    <!-- مرحله ۳: پرداخت -->
-    <div *ngIf="!loadingOptions && step === 3" [@fadeIn] class="space-y-5">
-      <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-2xl p-6 text-center">
-        <div class="text-4xl mb-3">✅</div>
-        <p class="font-bold text-lg">{{ successMessage }}</p>
-        <p class="mt-2 text-sm text-green-700">شماره سفارش: <strong>{{ orderNumber }}</strong></p>
-        <button type="button" (click)="goToOrderDetail(orderNumber)" class="mt-4 bg-primary text-white rounded-xl px-6 py-2.5 font-bold hover:bg-primary-dark transition-colors">مشاهده جزئیات سفارش</button>
-        <button type="button" (click)="goToOrders()" class="mt-4 ml-2 bg-green-600 text-white rounded-xl px-6 py-2.5 font-bold hover:bg-green-700 transition-colors">لیست سفارش‌ها</button>
+    <!-- ═══════════════════ مرحله ۳: پرداخت ═══════════════════ -->
+    <div *ngIf="!loadingOptions && step === 3" class="animate-in">
+
+      <!-- پیام موفقیت -->
+      <div *ngIf="successMessage" class="bg-white rounded-2xl shadow-card p-8 text-center success-card">
+        <div class="mb-4" style="font-size:64px">✅</div>
+        <p class="font-bold text-xl text-secondary mb-2">{{ successMessage }}</p>
+        <p class="text-sm text-gray-500 mb-6">شماره سفارش: <strong class="text-primary">{{ orderNumber }}</strong></p>
+        <div class="flex justify-center gap-3">
+          <button type="button" (click)="goToOrderDetail(orderNumber)" class="checkout-btn-primary">مشاهده جزئیات سفارش</button>
+          <button type="button" (click)="goToOrders()" class="checkout-btn-success">لیست سفارش‌ها</button>
+        </div>
       </div>
 
       <ng-container *ngIf="!successMessage">
-        <div class="bg-white rounded-2xl shadow-card p-6">
-          <h2 class="font-bold text-secondary mb-4">درگاه پرداخت</h2>
-          <div class="space-y-3">
-            <label *ngFor="let gateway of gateways" class="flex items-center justify-between gap-3 rounded-xl border p-4 cursor-pointer transition-colors"
-                   [class.border-primary]="paymentGatewayId === gateway.id"
-                   [class.bg-bg-muted]="paymentGatewayId === gateway.id"
-                   [class.border-gray-200]="paymentGatewayId !== gateway.id">
-              <span class="flex items-center gap-3">
-                <input type="radio" name="paymentGateway" [checked]="paymentGatewayId === gateway.id" (change)="paymentGatewayId = gateway.id" class="accent-primary" />
-                <strong class="text-secondary">{{ gateway.displayName || gateway.name }}</strong>
-                <span *ngIf="gateway.isSandbox" class="text-xs bg-orange-50 text-orange-600 rounded px-2 py-1">آزمایشی</span>
-              </span>
-            </label>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+
+          <!-- ستون اصلی -->
+          <div class="lg:col-span-3 space-y-5">
+
+            <!-- درگاه پرداخت -->
+            <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+              <div class="flex items-center gap-2 mb-5">
+                <span class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-lg">💳</span>
+                <h2 class="font-bold text-secondary">انتخاب درگاه پرداخت</h2>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" *ngIf="gateways.length">
+                <div *ngFor="let gw of gateways; let gi = index"
+                     class="gateway-card relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-300"
+                     [ngClass]="paymentGatewayId === gw.id ? 'border-orange-400 shadow-lg' : 'border-gray-100 hover:border-gray-200'"
+                     [style.animation-delay]="gi * 100 + 'ms'"
+                     (click)="paymentGatewayId = gw.id">
+
+                  <div *ngIf="paymentGatewayId === gw.id"
+                       class="absolute top-3 left-3 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+
+                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center text-3xl mb-3">
+                    <span *ngIf="gw.displayName && gw.displayName.includes('Zarin')">💎</span>
+                    <span *ngIf="gw.displayName && gw.displayName.includes('Sep')">🏦</span>
+                    <span *ngIf="!gw.displayName || (!gw.displayName.includes('Zarin') && !gw.displayName.includes('Sep'))">💳</span>
+                  </div>
+
+                  <h3 class="font-bold text-secondary text-base mb-1">{{ gw.displayName || gw.name }}</h3>
+                  <p class="text-xs text-gray-500 mb-3">پرداخت امن و رمزنگاری‌شده</p>
+
+                  <div class="flex flex-wrap gap-2">
+                    <span *ngIf="gw.isSandbox"
+                          class="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium border border-orange-200">
+                      ⚠️ آزمایشی
+                    </span>
+                    <span *ngIf="!gw.isSandbox"
+                          class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium border border-green-200">
+                      ✅ فعال
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!gateways.length" class="text-center py-8">
+                <div class="mb-3" style="font-size:48px">🔒</div>
+                <p class="text-gray-400 text-sm">درگاه فعالی برای انتخاب موجود نیست.</p>
+              </div>
+            </div>
+
+            <!-- تضمین‌های امنیتی -->
+            <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+              <h3 class="font-bold text-secondary mb-3 text-sm">تضمین‌های امنیتی</h3>
+              <div class="grid grid-cols-3 gap-3">
+                <div class="text-center p-3 rounded-xl bg-gray-50">
+                  <div class="mb-1" style="font-size:24px">🔒</div>
+                  <div class="text-[11px] text-gray-600 font-medium">رمزنگاری SSL</div>
+                </div>
+                <div class="text-center p-3 rounded-xl bg-gray-50">
+                  <div class="mb-1" style="font-size:24px">🛡️</div>
+                  <div class="text-[11px] text-gray-600 font-medium">پرداخت امن</div>
+                </div>
+                <div class="text-center p-3 rounded-xl bg-gray-50">
+                  <div class="mb-1" style="font-size:24px">✅</div>
+                  <div class="text-[11px] text-gray-600 font-medium">تأیید بانکی</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- یادداشت -->
+            <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+              <label class="block">
+                <span class="block text-secondary font-medium mb-2 text-sm">یادداشت سفارش (اختیاری)</span>
+                <textarea rows="3" [(ngModel)]="userNotes" placeholder="توضیحات سفارش، زمان تحویل مورد نظر و…"
+                          class="input-field w-full"></textarea>
+              </label>
+            </div>
           </div>
-          <p *ngIf="!gateways.length" class="text-gray-400 text-center py-4">درگاه فعالی برای انتخاب موجود نیست.</p>
+
+          <!-- ستون کناری -->
+          <div class="lg:col-span-2">
+            <div class="lg:sticky lg:top-20">
+              <div class="summary-card bg-white rounded-2xl shadow-card p-5 space-y-4">
+                <h3 class="font-bold text-secondary flex items-center gap-2">
+                  <span>📋</span> خلاصه سفارش
+                </h3>
+                <div *ngIf="selectedShipping" class="flex items-center justify-between text-sm">
+                  <span class="text-gray-500">هزینه ارسال</span>
+                  <span class="font-medium">{{ selectedShipping.baseCost | number }} تومان</span>
+                </div>
+                <div *ngIf="paymentGatewayId" class="flex items-center justify-between text-sm">
+                  <span class="text-gray-500">درگاه پرداخت</span>
+                  <span class="font-medium text-green-600">انتخاب شده ✓</span>
+                </div>
+                <p *ngIf="errorMessage" class="text-red-500 text-sm bg-red-50 rounded-xl px-3 py-2">{{ errorMessage }}</p>
+                <button type="button" (click)="submit()" [disabled]="loading"
+                        class="checkout-btn-primary w-full text-center justify-center">
+                  <span *ngIf="!loading">💳 ثبت سفارش و پرداخت</span>
+                  <span *ngIf="loading" class="inline-flex items-center gap-2">
+                    <span class="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    در حال ثبت…
+                  </span>
+                </button>
+                <div class="flex items-center justify-center gap-1.5 text-xs text-gray-400 pt-1">
+                  <span>🔒</span> پرداخت امن و رمزنگاری‌شده
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-card p-6">
-          <label class="block"><span class="block text-secondary font-medium mb-1">یادداشت سفارش (اختیاری)</span><textarea rows="3" [(ngModel)]="userNotes" placeholder="توضیحات سفارش…" class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea></label>
-          <div *ngIf="selectedShipping" class="mt-4 flex justify-between text-sm text-gray-500"><span>هزینه ارسال</span><strong class="text-secondary">{{ selectedShipping.baseCost | number }} تومان</strong></div>
-        </div>
-
-        <p *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{{ errorMessage }}</p>
-
-        <div class="flex justify-between pt-2">
-          <button type="button" (click)="back()" class="border border-gray-300 rounded-xl px-6 py-3 font-medium hover:bg-gray-50 transition-colors">بازگشت</button>
-          <button type="button" (click)="submit()" [disabled]="loading" class="bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors disabled:opacity-50">{{ loading ? 'در حال ثبت سفارش…' : 'ثبت سفارش' }}</button>
+        <div class="flex justify-start pt-4">
+          <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
         </div>
       </ng-container>
     </div>
+
   </div>
 </section>

@@ -3,5 +3,5 @@
 // (مثلاً /api/Category و /api/Auth)؛ به همین دلیل apiUrl روی /api تنظیم شده است.
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:7182/api'
+  apiUrl: 'http://localhost:5291/api'
 };

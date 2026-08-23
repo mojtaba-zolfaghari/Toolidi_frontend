@@ -1,82 +1,222 @@
-<section class="bg-warm min-h-screen py-10">
-  <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold text-secondary mb-8">سبد خرید</h1>
+<!-- ═══════════════════ صفحه سبد خرید — بازطراحی ═══════════════════ -->
+<section class="bg-warm min-h-screen py-6 sm:py-10">
+  <div class="container mx-auto px-4 max-w-7xl">
 
-    <div *ngIf="loading" class="text-center text-gray-400 py-20">در حال بارگذاری…</div>
+    <!-- هدر صفحه -->
+    <div class="mb-6 sm:mb-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-secondary mb-2">سبد خرید</h1>
+      <p *ngIf="!loading && cart && cart.items.length" class="text-sm text-gray-500">
+        {{ totalItemCount | number:'1.0-0':'fa-IR' }} کالا از {{ sellerCount | number:'1.0-0':'fa-IR' }} فروشنده
+      </p>
+    </div>
+
+    <!-- لودینگ -->
+    <div *ngIf="loading" class="text-center text-gray-400 py-20">
+      <div class="inline-block w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+      <p>در حال بارگذاری سبد خرید…</p>
+    </div>
 
     <!-- سبد خالی -->
-    <div *ngIf="!loading && (!cart || !cart.items.length)" class="text-center py-20">
-      <p class="text-gray-500 text-lg mb-4">سبد خرید شما خالی است.</p>
-      <a routerLink="/shop" class="inline-block bg-primary text-white font-bold rounded-xl px-6 py-2.5 hover:bg-primary-dark transition-colors">
+    <div *ngIf="!loading && (!cart || !cart.items.length)" class="text-center py-16 sm:py-20">
+      <div class="text-7xl mb-6 animate-bounce">🛒</div>
+      <p class="text-gray-500 text-lg mb-2 font-bold">سبد خرید شما خالی است</p>
+      <p class="text-gray-400 text-sm mb-6">محصولات مورد علاقه خود را به سبد اضافه کنید</p>
+      <a routerLink="/shop"
+         class="inline-flex items-center gap-2 bg-primary text-white font-bold rounded-xl px-8 py-3 hover:bg-primary-dark transition-all hover:scale-105">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
         مشاهده محصولات
       </a>
     </div>
 
-    <!-- آیتم‌های سبد -->
+    <!-- محتوای سبد -->
     <div *ngIf="!loading && cart && cart.items.length" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2 space-y-4">
-        <div *ngFor="let item of cart.items" class="bg-white rounded-2xl shadow-card p-4 flex items-center gap-4">
-          <div class="w-20 h-20 bg-gradient-to-br from-primary-light to-primary rounded-xl flex items-center justify-center text-3xl shrink-0">
-            🛍️
+
+      <!-- ═══ ستون اصلی: گروه‌های فروشنده ═══ -->
+      <div class="lg:col-span-2 space-y-5">
+
+        <!-- هر گروه فروشنده -->
+        <div *ngFor="let group of sellerGroups; let gi = index"
+             class="seller-group bg-white rounded-2xl shadow-card overflow-hidden"
+             [style.animation-delay]="gi * 100 + 'ms'">
+
+          <!-- هدر فروشنده -->
+          <div class="seller-header flex items-center gap-3 px-4 sm:px-5 py-3.5 border-b border-gray-100">
+            <!-- آواتار فروشنده -->
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
+              <img *ngIf="group.sellerLogoUrl" [src]="group.sellerLogoUrl" [alt]="group.sellerName"
+                   class="w-full h-full object-cover rounded-xl" />
+              <span *ngIf="!group.sellerLogoUrl">{{ group.sellerName.charAt(0) }}</span>
+            </div>
+
+            <!-- اطلاعات فروشنده -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-secondary text-sm truncate">{{ group.sellerName }}</h3>
+                <span class="flex items-center gap-0.5 text-xs text-yellow-600 bg-yellow-50 rounded-full px-2 py-0.5">
+                  <span *ngFor="let s of getStars(group.sellerRating)" class="text-[10px]"
+                        [class.text-yellow-400]="s <= group.sellerRating"
+                        [class.text-gray-300]="s > group.sellerRating">★</span>
+                </span>
+              </div>
+              <div class="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                <span *ngIf="group.sellerCity">📍 {{ group.sellerCity }}</span>
+                <span *ngIf="group.sellerProvince">· {{ group.sellerProvince }}</span>
+              </div>
+            </div>
+
+            <!-- زمان تحویل -->
+            <div class="delivery-badge shrink-0 text-center">
+              <div class="text-xs font-bold text-accent-success">{{ getDeliveryText(group) }}</div>
+              <div class="text-[10px] text-gray-400 mt-0.5">
+                {{ group.nationwideDeliveryDays | number:'1.0-0':'fa-IR' }} روز سراسری
+              </div>
+            </div>
           </div>
 
-          <div class="flex-1">
-            <h3 class="font-bold text-secondary">{{ item.productName }}</h3>
-            <p *ngIf="item.variationName && item.variationName !== 'Default'" class="text-sm text-gray-500">{{ item.variationName }}</p>
-            <p class="text-primary font-bold mt-1">{{ item.unitPrice | number }} تومان</p>
+          <!-- آیتم‌های این فروشنده -->
+          <div class="divide-y divide-gray-50">
+            <div *ngFor="let item of group.items; let ii = index"
+                 class="cart-item flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-gray-50/50 transition-colors">
+
+              <!-- تصویر محصول -->
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-primary-light/30 to-primary/10 flex items-center justify-center">
+                <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.productName"
+                     class="w-full h-full object-cover" />
+                <span *ngIf="!item.imageUrl" class="text-3xl">🛍️</span>
+              </div>
+
+              <!-- اطلاعات محصول -->
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-secondary text-sm sm:text-base truncate">{{ item.productName }}</h4>
+                <p *ngIf="item.variationName && item.variationName !== 'Default'"
+                   class="text-xs text-gray-400 mt-0.5 truncate">{{ item.variationName }}</p>
+                <p class="text-primary font-bold mt-1.5 text-sm">{{ item.unitPrice | number }} تومان</p>
+              </div>
+
+              <!-- کنترل تعداد -->
+              <div class="flex flex-col items-center gap-1.5 shrink-0">
+                <div class="qty-stepper-inline">
+                  <button type="button" (click)="updateQuantity(item.id, item.quantity + 1)"
+                          class="qty-btn-inline" [disabled]="updating">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M12 4v16m8-8H4"/></svg>
+                  </button>
+                  <span class="qty-value-inline">{{ item.quantity | number:'1.0-0':'fa-IR' }}</span>
+                  <button type="button" (click)="updateQuantity(item.id, item.quantity - 1)"
+                          class="qty-btn-inline" [disabled]="item.quantity <= 1 || updating">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M20 12H4"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- قیمت کل + حذف -->
+              <div class="text-left shrink-0 flex flex-col items-end">
+                <p class="font-bold text-secondary text-sm sm:text-base whitespace-nowrap">{{ item.lineTotal | number }}</p>
+                <button type="button" (click)="removeItem(item.id)"
+                        class="text-red-400 hover:text-red-600 text-xs mt-1 transition-colors flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  حذف
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button type="button" (click)="updateQuantity(item.id, item.quantity + 1)" class="w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-50">+</button>
-            <span class="w-10 text-center font-bold">{{ item.quantity }}</span>
-            <button type="button" (click)="updateQuantity(item.id, item.quantity - 1)" class="w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-50">-</button>
-          </div>
-
-          <div class="text-left">
-            <p class="font-bold text-secondary">{{ item.lineTotal | number }} تومان</p>
-            <button type="button" (click)="removeItem(item.id)" class="text-red-500 text-sm hover:underline mt-1">حذف</button>
+          <!-- فوتر گروه: خلاصه + حذف گروه -->
+          <div class="flex items-center justify-between px-4 sm:px-5 py-3 bg-gray-50/80 border-t border-gray-100">
+            <span class="text-xs text-gray-500">{{ group.itemCount | number:'1.0-0':'fa-IR' }} کالا</span>
+            <div class="flex items-center gap-4">
+              <span class="text-sm font-bold text-secondary">{{ group.subtotal | number }} تومان</span>
+              <button type="button" (click)="removeSellerGroup(group)"
+                      class="text-xs text-red-400 hover:text-red-600 transition-colors">
+                حذف همه
+              </button>
+            </div>
           </div>
         </div>
 
-        <button type="button" (click)="clearCart()" class="text-red-500 text-sm hover:underline">خالی‌کردن سبد</button>
-      </div>
-
-      <!-- خلاصه سفارش -->
-      <div class="bg-white rounded-2xl shadow-card p-5 h-fit">
-        <h3 class="font-bold text-secondary mb-4">خلاصه سفارش</h3>
-
-        <div class="space-y-2 text-sm mb-4">
-          <div class="flex justify-between">
-            <span class="text-gray-500">جمع کل</span>
-            <span>{{ cart.subtotal | number }} تومان</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500">تخفیف</span>
-            <span class="text-green-600">{{ cart.discountAmount | number }} تومان</span>
-          </div>
-          <div class="flex justify-between font-bold text-secondary border-t pt-2">
-            <span>قابل پرداخت</span>
-            <span>{{ cart.totalPrice | number }} تومان</span>
-          </div>
-        </div>
-
-        <!-- کد تخفیف -->
-        <div class="flex gap-2 mb-4">
-          <input
-            #couponInput
-            type="text"
-            placeholder="کد تخفیف"
-            class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-          <button type="button" (click)="applyDiscount(couponInput.value)" class="bg-gray-800 text-white rounded-xl px-4 py-2 text-sm hover:bg-gray-700 transition-colors">
-            اعمال کد تخفیف
+        <!-- عملیات سبد -->
+        <div class="flex items-center justify-between">
+          <a routerLink="/shop" class="text-sm text-primary hover:underline flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+            ادامه خرید
+          </a>
+          <button type="button" (click)="clearCart()"
+                  class="text-sm text-red-500 hover:text-red-600 transition-colors flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            خالی‌کردن سبد
           </button>
         </div>
-        <p *ngIf="cart.discountCode" class="text-sm text-green-600 mb-3">کد تخفیف: {{ cart.discountCode }}</p>
-        <p *ngIf="errorMessage" class="text-sm text-red-500 mb-3">{{ errorMessage }}</p>
+      </div>
 
-        <a routerLink="/checkout" class="block w-full bg-primary text-white font-bold rounded-xl py-2.5 text-center hover:bg-primary-dark transition-colors">
-          پرداخت
-        </a>
+      <!-- ═══ ستون کناری: خلاصه سفارش ═══ -->
+      <div class="lg:col-span-1">
+        <div class="lg:sticky lg:top-20 lg:self-start">
+          <div class="summary-card bg-white rounded-2xl shadow-card p-5 space-y-5">
+
+            <h3 class="font-bold text-secondary text-lg flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              خلاصه سفارش
+            </h3>
+
+            <!-- خلاصه به تفکیک فروشنده -->
+            <div class="space-y-3">
+              <div *ngFor="let group of sellerGroups" class="flex items-center justify-between text-sm">
+                <span class="text-gray-500 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-primary/40"></span>
+                  {{ group.sellerName }}
+                </span>
+                <span class="font-medium">{{ group.subtotal | number }} تومان</span>
+              </div>
+              <div class="border-t border-gray-100 pt-3">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-500">جمع کل</span>
+                  <span class="font-medium">{{ cart.subtotal | number }} تومان</span>
+                </div>
+              </div>
+              <div class="flex justify-between text-sm" *ngIf="cart.discountAmount > 0">
+                <span class="text-gray-500">تخفیف</span>
+                <span class="text-green-600 font-medium">-{{ cart.discountAmount | number }} تومان</span>
+              </div>
+              <div class="flex justify-between font-bold text-secondary border-t border-gray-100 pt-3 text-base">
+                <span>قابل پرداخت</span>
+                <span>{{ cart.totalPrice | number }} تومان</span>
+              </div>
+            </div>
+
+            <!-- کد تخفیف -->
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">کد تخفیف</label>
+              <div class="flex gap-2">
+                <input #couponInput type="text" placeholder="کد خود را وارد کنید"
+                       class="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                <button type="button" (click)="applyDiscount(couponInput.value)"
+                        class="bg-gray-800 text-white rounded-xl px-4 py-2.5 text-sm hover:bg-gray-700 transition-colors shrink-0 font-medium">
+                  اعمال
+                </button>
+              </div>
+              <p *ngIf="cart.discountCode" class="text-xs text-green-600 mt-1.5 flex items-center gap-1">
+                ✅ کد تخفیف «{{ cart.discountCode }}» اعمال شد
+              </p>
+              <p *ngIf="errorMessage" class="text-xs text-red-500 mt-1.5">{{ errorMessage }}</p>
+            </div>
+
+            <!-- دکمه پرداخت -->
+            <a routerLink="/checkout"
+               class="block w-full bg-primary text-white font-bold rounded-xl py-3.5 text-center hover:bg-primary-dark transition-all hover:scale-[1.02] hover:shadow-lg">
+              <span class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                پرداخت و تکمیل سفارش
+              </span>
+            </a>
+
+            <!-- امنیت -->
+            <div class="flex items-center justify-center gap-1.5 text-xs text-gray-400 pt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              پرداخت امن و رمزنگاری‌شده
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

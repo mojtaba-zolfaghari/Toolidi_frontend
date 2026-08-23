@@ -60,12 +60,12 @@
       <div class="bg-white rounded-2xl shadow-card p-6" *ngIf="orderStats as stats">
         <h2 class="text-xl font-bold text-secondary mb-5">آمار سفارش‌ها</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-          <div><span class="text-gray-500">در انتظار</span><strong class="block text-lg text-secondary">{{ stats.pendingOrders }}</strong></div>
-          <div><span class="text-gray-500">در حال پردازش</span><strong class="block text-lg text-secondary">{{ stats.processingOrders }}</strong></div>
-          <div><span class="text-gray-500">ارسال‌شده</span><strong class="block text-lg text-secondary">{{ stats.shippedOrders }}</strong></div>
-          <div><span class="text-gray-500">تحویل‌شده</span><strong class="block text-lg text-accent-success">{{ stats.deliveredOrders }}</strong></div>
-          <div><span class="text-gray-500">لغوشده</span><strong class="block text-lg text-accent-danger">{{ stats.cancelledOrders }}</strong></div>
-          <div><span class="text-gray-500">مرجوعی</span><strong class="block text-lg text-accent-warning">{{ stats.returnedOrders }}</strong></div>
+          <div><span class="text-gray-500">در انتظار</span><strong class="block text-lg text-secondary">{{ stats.pendingOrders | number:'1.0-0':'fa-IR' }}</strong></div>
+          <div><span class="text-gray-500">در حال پردازش</span><strong class="block text-lg text-secondary">{{ stats.processingOrders | number:'1.0-0':'fa-IR' }}</strong></div>
+          <div><span class="text-gray-500">ارسال‌شده</span><strong class="block text-lg text-secondary">{{ stats.shippedOrders | number:'1.0-0':'fa-IR' }}</strong></div>
+          <div><span class="text-gray-500">تحویل‌شده</span><strong class="block text-lg text-accent-success">{{ stats.deliveredOrders | number:'1.0-0':'fa-IR' }}</strong></div>
+          <div><span class="text-gray-500">لغوشده</span><strong class="block text-lg text-accent-danger">{{ stats.cancelledOrders | number:'1.0-0':'fa-IR' }}</strong></div>
+          <div><span class="text-gray-500">مرجوعی</span><strong class="block text-lg text-accent-warning">{{ stats.returnedOrders | number:'1.0-0':'fa-IR' }}</strong></div>
         </div>
         <div class="border-t mt-5 pt-4 flex justify-between text-sm"><span>فروش این دوره</span><strong class="text-primary">{{ stats.totalSales | number }} تومان</strong></div>
       </div>

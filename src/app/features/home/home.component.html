@@ -29,11 +29,11 @@
           <a routerLink="/shop" class="inline-flex items-center justify-center gap-3 rounded-2xl bg-white px-7 py-4 font-bold text-primary shadow-xl shadow-black/20 transition-all hover:-translate-y-1 hover:bg-gold hover:text-secondary">
             خرید عمده <span aria-hidden="true">←</span>
           </a>
-          <a routerLink="/register" class="inline-flex items-center justify-center rounded-2xl border border-white/20 px-7 py-4 font-medium text-white/85 transition-all hover:bg-white/10 hover:-translate-y-0.5">
+          <a routerLink="/auth/seller-register" class="inline-flex items-center justify-center rounded-2xl border border-white/20 px-7 py-4 font-medium text-white/85 transition-all hover:bg-white/10 hover:-translate-y-0.5">
             فروشنده شوید
           </a>
-          <a routerLink="/register" class="inline-flex items-center justify-center rounded-2xl border border-gold/30 px-7 py-4 font-medium text-gold-light transition-all hover:bg-gold/20 hover:-translate-y-0.5">
-            Agent شوید
+          <a routerLink="/auth/supplier-register" class="inline-flex items-center justify-center rounded-2xl border border-green-400/30 px-7 py-4 font-medium text-green-300 transition-all hover:bg-green-500/20 hover:-translate-y-0.5">
+            تأمین‌کننده شوید
           </a>
         </div>
       </div>
@@ -43,7 +43,7 @@
           <div class="rounded-[1.75rem] bg-bg-warm p-5 text-secondary">
             <div class="mb-10 flex items-center justify-between">
               <span class="text-sm font-bold">انتخاب بهتر</span>
-              <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">Toolidi</span>
+              <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">تولیدی</span>
             </div>
             <div class="space-y-3">
               <div class="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
@@ -58,7 +58,7 @@
               </div>
               <div class="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
                 <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-success/10 text-xl">🚚</span>
-                <div><p class="font-bold">تحویل سریع</p><p class="mt-1 text-xs text-gray-500">شبکه Agent در سراسر کشور</p></div>
+                <div><p class="font-bold">تحویل سریع</p><p class="mt-1 text-xs text-gray-500">شبکه پیک‌های شهری در سراسر کشور</p></div>
                 <span class="mr-auto text-primary font-bold">←</span>
               </div>
             </div>
@@ -74,7 +74,7 @@
   <!-- ═══════════════════ FEATURES B2B ═══════════════════ -->
   <section class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20" data-section="features">
     <div class="mb-10 max-w-2xl">
-      <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">چرا Toolidi؟</p>
+      <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">چرا تولیدی؟</p>
       <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">همه‌چیز برای یک خرید و فروش حرفه‌ای</h2>
       <p class="mt-4 leading-8 text-gray-500">از انتخاب محصول تا تحویل، جزئیات مهم را ساده و شفاف در اختیار شما می‌گذاریم.</p>
     </div>
@@ -90,8 +90,8 @@
         <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gold/10 text-gold-dark transition-transform duration-300 group-hover:scale-110 group-hover:bg-gold group-hover:text-white">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
-        <h3 class="text-lg font-bold">شبکه Agent برای تحویل سریع</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">تحویل در کمترین زمان با Agentهای معتبر در سراسر کشور.</p>
+        <h3 class="text-lg font-bold">شبکه پیک شهری برای تحویل سریع</h3>
+        <p class="mt-3 text-sm leading-7 text-gray-500">تحویل در کمترین زمان با پیک‌های معتبر در سراسر کشور.</p>
       </article>
       <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
         <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-success/10 text-accent-success transition-transform duration-300 group-hover:scale-110 group-hover:bg-accent-success group-hover:text-white">
@@ -124,55 +124,48 @@
     </div>
   </section>
 
-  <!-- ═══════════════════ HOW IT WORKS (Animated Timeline) ═══════════════════ -->
-  <section class="border-y border-black/5 bg-white" data-section="workflow">
+  <!-- ═══════════════════ UNIFIED ORDER JOURNEY ═══════════════════ -->
+  <section class="unified-workflow" data-section="workflow">
     <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-      <div class="mb-10 max-w-2xl">
-        <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">نحوه کار</p>
-        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">چطور کار می‌کند؟</h2>
+      <div class="unified-workflow-heading">
+        <div>
+          <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">نحوه کار</p>
+          <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">از ثبت سفارش تا تحویل</h2>
+          <p class="mt-4 max-w-2xl leading-8 text-gray-500">در یک مسیر زنده ببینید سفارش چطور از خریدار به تأمین‌کننده، پیک شهری و در نهایت به مقصد می‌رسد.</p>
+        </div>
+        <div class="workflow-live-pill"><span></span> مسیر سفارش زنده</div>
       </div>
-      <div class="relative">
-        <!-- Vertical line -->
-        <div class="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-gradient-to-b from-primary/20 via-primary/50 to-primary/20 hidden lg:block"></div>
-        <div class="space-y-8 lg:space-y-0">
-          <div *ngFor="let step of workflowSteps; let i = index; trackBy: trackByStepId"
-               class="relative lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center lg:py-8"
-               [class.step-active]="step.status === 'active'"
-               [class.step-completed]="step.status === 'completed'"
-               [style.animation-delay]="(i * 200) + 'ms'">
-            <!-- Center dot -->
-            <div class="absolute left-1/2 top-8 -translate-x-1/2 z-10 hidden lg:block">
-              <div class="h-5 w-5 rounded-full border-4 transition-all duration-500"
-                   [class.border-primary]="step.status === 'active'"
-                   [class.bg-primary]="step.status === 'completed'"
-                   [class.border-gray-200]="step.status === 'pending'"
-                   [class.bg-white]="step.status !== 'completed'"
-                   [class.shadow-lg]="step.status === 'active'"
-                   [class.animate-pulse]="step.status === 'active'">
-              </div>
-            </div>
-            <!-- Content -->
-            <div [class.lg:text-left]="i % 2 === 0" [class.lg:order-2]="i % 2 !== 0" class="flex justify-center">
-              <div class="workflow-card flex items-start gap-4 rounded-3xl border border-black/5 bg-bg-warm p-6 shadow-sm transition-all duration-500 max-w-sm w-full"
-                   [class.hover:shadow-md]="step.status !== 'pending'"
-                   [class.opacity-40]="step.status === 'pending'"
-                   [class.opacity-100]="step.status !== 'pending'">
-                <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl transition-all duration-500"
-                      [ngClass]="{'bg-white/10 text-primary': step.status === 'pending', 'bg-primary text-white shadow-lg': step.status !== 'pending'}">
-                  {{ step.icon }}
-                </span>
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs font-bold text-primary">مرحله {{ step.id }}</span>
-                    <span *ngIf="step.status === 'completed'" class="text-xs text-accent-success font-bold">✓</span>
-                  </div>
-                  <h3 class="text-lg font-bold">{{ step.title }}</h3>
-                  <p class="mt-1 text-sm leading-6 text-gray-500">{{ step.description }}</p>
-                </div>
-              </div>
-            </div>
-            <div [class.lg:text-right]="i % 2 === 0" [class.lg:order-1]="i % 2 !== 0" class="hidden lg:block"></div>
-          </div>
+
+      <div class="workflow-visual-shell">
+        <div class="workflow-grid-glow"></div>
+        <svg viewBox="0 0 900 260" class="workflow-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مسیر سفارش از ثبت تا تحویل">
+          <defs>
+            <linearGradient id="workflowLine" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#8b5cf6"/><stop offset="0.5" stop-color="#f59e0b"/><stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+            <filter id="workflowGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M115 130 C210 55 260 205 340 130 S470 55 560 130 S700 205 785 130" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="8"/>
+          <path d="M115 130 C210 55 260 205 340 130 S470 55 560 130 S700 205 785 130" fill="none" stroke="url(#workflowLine)" stroke-width="2.5" stroke-dasharray="10 8" class="workflow-route-line"/>
+          <circle cx="115" cy="130" r="42" class="workflow-node buyer-node"/><text x="115" y="126" text-anchor="middle" class="workflow-node-icon">👤</text><text x="115" y="155" text-anchor="middle" class="workflow-node-label">خریدار</text>
+          <circle cx="340" cy="130" r="42" class="workflow-node supplier-node"/><text x="340" y="126" text-anchor="middle" class="workflow-node-icon">🏭</text><text x="340" y="155" text-anchor="middle" class="workflow-node-label">تأمین‌کننده</text>
+          <circle cx="560" cy="130" r="42" class="workflow-node courier-node"/><text x="560" y="126" text-anchor="middle" class="workflow-node-icon">🚚</text><text x="560" y="155" text-anchor="middle" class="workflow-node-label">پیک شهری</text>
+          <circle cx="785" cy="130" r="42" class="workflow-node delivery-node"/><text x="785" y="126" text-anchor="middle" class="workflow-node-icon">🏠</text><text x="785" y="155" text-anchor="middle" class="workflow-node-label">دریافت کالا</text>
+          <g class="workflow-package"><rect x="0" y="0" width="18" height="18" rx="4"/><text x="9" y="13" text-anchor="middle">📦</text></g>
+          <text x="115" y="215" text-anchor="middle" class="workflow-node-caption">ثبت سفارش</text><text x="340" y="215" text-anchor="middle" class="workflow-node-caption">تولید و بسته‌بندی</text><text x="560" y="215" text-anchor="middle" class="workflow-node-caption">بازرسی و ارسال</text><text x="785" y="215" text-anchor="middle" class="workflow-node-caption">تحویل امن</text>
+        </svg>
+      </div>
+
+      <div class="workflow-step-grid">
+        <div *ngFor="let step of workflowSteps; let i = index; trackBy: trackByStepId"
+             class="workflow-card workflow-step-card"
+             [class.step-active]="step.status === 'active'"
+             [class.step-completed]="step.status === 'completed'"
+             [style.animation-delay]="(i * 120) + 'ms'">
+          <div class="workflow-step-number">{{ step.id }}</div>
+          <span class="workflow-step-icon">{{ step.icon }}</span>
+          <div class="workflow-step-copy"><h3>{{ step.title }}</h3><p>{{ step.description }}</p></div>
+          <span *ngIf="step.status === 'completed'" class="workflow-step-check">✓</span>
         </div>
       </div>
     </div>
@@ -214,9 +207,9 @@
       <a routerLink="/shop" class="text-sm font-bold text-primary transition-colors hover:text-primary-dark">رفتن به فروشگاه ←</a>
     </div>
     <div *ngIf="loading" class="rounded-3xl bg-white py-16 shadow-sm"><app-spinner label="در حال آماده‌سازی انتخاب‌های شما…"></app-spinner></div>
-    <div *ngIf="!loading && featuredProducts.length" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      <div *ngFor="let product of featuredProducts" class="relative" [@slideUp]>
-        <span class="absolute right-3 top-3 z-10 rounded-full bg-gradient-to-r from-primary to-primary-dark px-3 py-1 text-xs font-bold text-white shadow-lg">منتخب</span>
+    <div *ngIf="!loading && featuredProducts.length" class="featured-products-grid grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-4">
+      <div *ngFor="let product of featuredProducts" class="featured-product-item relative" [@slideUp]>
+        <span class="absolute right-2 top-2 z-10 rounded-full bg-gradient-to-r from-primary to-primary-dark px-2 py-0.5 text-[0.62rem] font-bold text-white shadow-lg sm:right-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">منتخب</span>
         <app-product-card [product]="product"></app-product-card>
       </div>
     </div>
@@ -226,138 +219,68 @@
     </div>
   </section>
 
-  <!-- ═══════════════════ IRAN MAP - AGENT NETWORK ═══════════════════ -->
-  <section class="relative overflow-hidden bg-gradient-to-br from-secondary via-[#1a2d52] to-secondary text-white" data-section="map">
-    <div class="absolute inset-0 opacity-5">
-      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;"></div>
-    </div>
+  <!-- ═══════════════════ LIVE GLOBE — ORDER MAP ═══════════════════ -->
+  <section class="relative overflow-hidden bg-[#0a0e1a]" data-section="map">
     <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-      <div class="mb-10 max-w-2xl">
-        <p class="mb-3 text-sm font-bold uppercase tracking-widest text-gold-light">شبکه تحویل</p>
-        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">شبکه زنده Agent Toolidi</h2>
-        <p class="mt-4 leading-8 text-white/60">با Agentهای معتبر ما، سفارش شما در کمترین زمان و در سراسر کشور تحویل داده می‌شود.</p>
-      </div>
-      <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_350px]">
-        <!-- SVG Iran Map -->
-        <div class="relative rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-          <div class="aspect-[4/3] w-full relative">
-            <svg viewBox="0 0 100 80" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-              <!-- Iran outline -->
-              <path [attr.d]="iranPath"
-                    fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"
-                    class="iran-outline" />
-              <path [attr.d]="iranPath"
-                    fill="rgba(108,63,197,0.08)" stroke="rgba(108,63,197,0.3)" stroke-width="0.3" />
-
-              <!-- Connection lines (animated) -->
-              <line *ngFor="let conn of mapConnections"
-                    [attr.x1]="conn.from.x" [attr.y1]="conn.from.y"
-                    [attr.x2]="conn.to.x" [attr.y2]="conn.to.y"
-                    stroke="rgba(108,63,197,0.2)" stroke-width="0.2"
-                    stroke-dasharray="2,2" class="map-connection" />
-
-              <!-- Agent dots -->
-              <g *ngFor="let agent of agentLocations; let i = index; trackBy: trackByAgentId"
-                 class="agent-dot cursor-pointer"
-                 (click)="selectAgent(agent)">
-                <!-- Pulse ring -->
-                <circle [attr.cx]="agent.coordinates.x" [attr.cy]="agent.coordinates.y"
-                        [attr.r]="getAgentDotRadius(agent.activeOrders) + 3"
-                        [attr.fill]="getAgentColor(agent.activeOrders)"
-                        fill-opacity="0.15"
-                        [class]="getAgentPulseClass(agent.activeOrders)" />
-                <!-- Inner dot -->
-                <circle [attr.cx]="agent.coordinates.x" [attr.cy]="agent.coordinates.y"
-                        [attr.r]="getAgentDotRadius(agent.activeOrders)"
-                        [attr.fill]="getAgentColor(agent.activeOrders)"
-                        class="transition-all duration-300 hover:r-6" />
-                <!-- City label -->
-                <text [attr.x]="agent.coordinates.x" [attr.y]="agent.coordinates.y - getAgentDotRadius(agent.activeOrders) - 2"
-                      fill="white" font-size="2.2" text-anchor="middle" class="pointer-events-none" opacity="0.7">
-                  {{ agent.city }}
-                </text>
-              </g>
-            </svg>
-          </div>
-          <!-- Map Legend -->
-          <div class="mt-4 flex flex-wrap gap-4 text-xs text-white/60">
-            <div class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#059669]"></span> +۲۰۰ سفارش</div>
-            <div class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-primary"></span> ۱۰۰-۲۰۰ سفارش</div>
-            <div class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#D97706]"></span> ۵۰-۱۰۰ سفارش</div>
-            <div class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-[#2563EB]"></span> زیر ۵۰ سفارش</div>
-          </div>
-        </div>
-
-        <!-- Agent Info Panel -->
-        <div class="space-y-4">
-          <!-- Selected Agent Card -->
-          <div *ngIf="selectedAgent" class="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-sm transition-all duration-300">
-            <div class="flex items-center justify-between mb-3">
-              <h4 class="font-bold text-lg">{{ selectedAgent.name }}</h4>
-              <span class="rounded-full px-2 py-0.5 text-xs font-bold" [style.background]="getAgentColor(selectedAgent.activeOrders)" style="color: white">
-                فعال
-              </span>
-            </div>
-            <div class="space-y-2 text-sm text-white/70">
-              <div class="flex justify-between"><span>شهر:</span><span class="font-bold text-white">{{ selectedAgent.city }}</span></div>
-              <div class="flex justify-between"><span>استان:</span><span class="font-bold text-white">{{ selectedAgent.province }}</span></div>
-              <div class="flex justify-between"><span>امتیاز:</span><span class="font-bold text-gold-light">{{ selectedAgent.rating }} ★</span></div>
-              <div class="flex justify-between"><span>سفارشات فعال:</span><span class="font-bold text-white">{{ formatNumber(selectedAgent.activeOrders) }}</span></div>
-            </div>
-          </div>
-
-          <!-- Default Agent List -->
-          <div *ngIf="!selectedAgent" class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-            <h4 class="font-bold mb-3 text-gold-light">Agentهای فعال</h4>
-            <div class="space-y-2">
-              <button *ngFor="let agent of agentLocations; let i = index; trackBy: trackByAgentId"
-                      (click)="selectAgent(agent)"
-                      class="flex w-full items-center justify-between rounded-xl bg-white/5 px-3 py-2.5 text-sm transition-all hover:bg-white/10 hover:-translate-x-1">
-                <div class="flex items-center gap-2">
-                  <span class="h-2 w-2 rounded-full" [style.background]="getAgentColor(agent.activeOrders)"></span>
-                  <span>{{ agent.city }}</span>
-                </div>
-                <span class="text-white/50">{{ agent.activeOrders }}</span>
-              </button>
-            </div>
-          </div>
-
-          <a routerLink="/register" class="block rounded-2xl bg-gradient-to-r from-primary to-primary-dark px-6 py-4 text-center font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl">
-            Agent شوید
-          </a>
-        </div>
-      </div>
+      <app-globe></app-globe>
     </div>
   </section>
 
   <!-- ═══════════════════ SUPPLIERS SHOWCASE ═══════════════════ -->
-  <section class="bg-white" data-section="suppliers">
+  <section class="supplier-network-section bg-white" data-section="suppliers">
     <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-      <div class="mb-10 max-w-2xl">
-        <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">تامین‌کنندگان معتبر</p>
-        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">شبکه تامین Toolidi</h2>
-        <p class="mt-4 leading-8 text-gray-500">تامین‌کنندگان ما از سراسر ایران، با ظرفیت بالا و کیفیت تضمینی.</p>
+      <div class="supplier-network-heading">
+        <div class="max-w-2xl">
+          <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">تامین‌کنندگان معتبر</p>
+          <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">شبکه تامین تولیدی</h2>
+          <p class="mt-4 leading-8 text-gray-500">تامین‌کنندگان ما از سراسر ایران، با ظرفیت بالا و کیفیت تضمینی.</p>
+        </div>
+        <div class="supplier-network-summary">
+          <strong>{{ suppliers.length | number:'1.0-0':'fa-IR' }}</strong>
+          <span>نقطه تأمین فعال</span>
+        </div>
       </div>
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div *ngFor="let supplier of suppliers; let i = index; trackBy: trackBySupplierId"
-             class="supplier-card group rounded-3xl border border-black/5 bg-bg-warm p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary text-xl transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-white">
-              🏭
+
+      <div *ngIf="supplierGroups.length" class="supplier-network-shell">
+        <nav class="supplier-trade-tabs" aria-label="حوزه‌های تامین">
+          <button *ngFor="let group of supplierGroups; trackBy: trackBySupplierTrade"
+                  type="button"
+                  class="supplier-trade-tab"
+                  [class.is-active]="activeSupplierGroup?.trade === group.trade"
+                  (click)="selectSupplierTrade(group.trade)">
+            <span class="supplier-trade-icon">{{ group.icon }}</span>
+            <span class="supplier-trade-copy"><strong>{{ group.trade }}</strong><small>{{ group.suppliers.length | number:'1.0-0':'fa-IR' }} نقطه تأمین</small></span>
+            <span class="supplier-trade-arrow" aria-hidden="true">←</span>
+          </button>
+        </nav>
+
+        <div *ngIf="activeSupplierGroup as group" class="supplier-network-content">
+          <div class="supplier-network-content-head">
+            <div>
+              <span class="supplier-section-kicker">حوزه انتخاب‌شده</span>
+              <h3>{{ group.icon }} {{ group.trade }}</h3>
+              <p>مراکز فعال این حوزه را بر اساس استان و شهر ببینید.</p>
             </div>
-            <span *ngIf="supplier.isVerified" class="rounded-full bg-accent-success/10 px-2 py-0.5 text-xs font-bold text-accent-success">✓ تأیید شده</span>
+            <span class="supplier-network-count">{{ group.locations.length | number:'1.0-0':'fa-IR' }} شهر · {{ group.suppliers.length | number:'1.0-0':'fa-IR' }} تأمین‌کننده</span>
           </div>
-          <h3 class="font-bold text-lg">{{ supplier.companyName }}</h3>
-          <p class="mt-1 text-sm text-gray-500">{{ supplier.city }}، {{ supplier.province }}</p>
-          <div class="mt-3 flex flex-wrap gap-1.5">
-            <span *ngFor="let cat of supplier.productCategories" class="rounded-full bg-primary/5 px-2 py-0.5 text-xs text-primary">{{ cat }}</span>
+
+          <div class="supplier-location-grid">
+            <div *ngFor="let location of group.locations; trackBy: trackBySupplierLocation" class="supplier-location-chip">
+              <span class="supplier-location-pin">⌖</span>
+              <span><strong>{{ location.city }}</strong><small>{{ location.province }}</small></span>
+              <b>{{ location.count | number:'1.0-0':'fa-IR' }}</b>
+            </div>
           </div>
-          <div class="mt-4 space-y-2 text-sm text-gray-500">
-            <div class="flex justify-between"><span>ظرفیت روزانه:</span><span class="font-bold text-secondary">{{ supplier.capacity }} سفارش</span></div>
-            <div class="flex justify-between"><span>زمان آماده‌سازی:</span><span class="font-bold text-secondary">{{ supplier.preparationTime }}</span></div>
-            <div class="flex justify-between"><span>امتیاز:</span><span class="font-bold text-gold-dark">{{ supplier.rating }} ★</span></div>
+
+          <div class="supplier-network-footer">
+            <span><i></i> اطلاعات هویتی نمایش داده نمی‌شود</span>
+            <a routerLink="/shop" [queryParams]="{ city: activeSupplierCity }">مشاهده محصولات این شبکه ←</a>
           </div>
         </div>
+      </div>
+
+      <div *ngIf="!supplierGroups.length" class="supplier-network-empty">
+        <span>🏭</span><p>شبکه تأمین در حال به‌روزرسانی است.</p>
       </div>
     </div>
   </section>
@@ -373,7 +296,7 @@
             <p class="mb-3 text-sm font-bold uppercase tracking-widest text-white/80">برای فروشندگان</p>
             <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">فروشنده شوید و محصولات خود را به سراسر ایران بفروشید</h2>
             <p class="mt-4 leading-8 text-white/75">
-              با ثبت نام در Toolidi به شبکه خریداران و تامین‌کنندگان متصل شوید.
+              با ثبت نام در تولیدی به شبکه خریداران و تامین‌کنندگان متصل شوید.
             </p>
             <ul class="mt-6 space-y-3 text-sm text-white/85">
               <li class="flex items-center gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-white"></span>ثبت نام رایگان و فعال‌سازی سریع</li>
@@ -382,14 +305,14 @@
               <li class="flex items-center gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-white"></span>پرداخت به‌موقع و تسویه شفاف</li>
             </ul>
             <div class="mt-8">
-              <a routerLink="/register" class="inline-flex items-center justify-center rounded-2xl bg-white px-7 py-3 font-bold text-primary shadow-lg transition-all hover:-translate-y-1 hover:bg-gold hover:text-secondary">
+              <a routerLink="/auth/seller-register" class="inline-flex items-center justify-center rounded-2xl bg-white px-7 py-3 font-bold text-primary shadow-lg transition-all hover:-translate-y-1 hover:bg-gold hover:text-secondary">
                 ثبت نام به عنوان فروشنده
               </a>
             </div>
           </div>
           <div class="hidden md:block">
             <div class="rounded-2xl bg-white/10 p-6 text-white/90 shadow-xl backdrop-blur">
-              <p class="text-sm font-medium text-white/70">مزایای فروش در Toolidi</p>
+              <p class="text-sm font-medium text-white/70">مزایای فروش در تولیدی</p>
               <div class="mt-4 space-y-4">
                 <div class="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 transition-all hover:bg-white/15">
                   <span>فروشندگان فعال</span>
@@ -416,54 +339,72 @@
   </section>
 
   <!-- ═══════════════════ TRUST SIGNALS / STATS ═══════════════════ -->
-  <section class="bg-bg-warm" data-section="stats">
+  <section class="platform-overview" data-section="stats">
     <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-      <div class="mb-10 text-center">
-        <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">آمار و اعتماد</p>
-        <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Toolidi در یک نگاه</h2>
-      </div>
-      <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
-        <div class="stats-card rounded-3xl bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
-          <p class="text-4xl font-extrabold text-primary" dir="ltr">{{ formatNumber(animatedProducers) }}+</p>
-          <p class="mt-2 text-sm text-gray-500">فروشنده فعال</p>
+      <div class="platform-overview-heading">
+        <div>
+          <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">آمار و اعتماد</p>
+          <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">تولیدی در یک نگاه</h2>
+          <p class="mt-4 max-w-2xl leading-8 text-gray-500">تصویری زنده از شبکه فروش، پیک‌های فعال و سفارش‌های تکمیل‌شده در پلتفرم تولیدی.</p>
         </div>
-        <div class="stats-card rounded-3xl bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
-          <p class="text-4xl font-extrabold text-gold-dark" dir="ltr">{{ formatNumber(animatedAgents) }}+</p>
-          <p class="mt-2 text-sm text-gray-500">Agent در شبکه</p>
-        </div>
-        <div class="stats-card rounded-3xl bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
-          <p class="text-4xl font-extrabold text-accent-success" dir="ltr">{{ formatNumber(animatedOrders) }}+</p>
-          <p class="mt-2 text-sm text-gray-500">سفارش تکمیل شده</p>
-        </div>
-        <div class="stats-card rounded-3xl bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
-          <p class="text-4xl font-extrabold text-accent-info">{{ animatedRating }}/۵</p>
-          <p class="mt-2 text-sm text-gray-500">رضایت کاربران</p>
+        <div class="live-stats-badge" [class.is-loading]="statsLoading">
+          <span class="live-stats-dot"></span>
+          <span>{{ statsLoading ? 'در حال دریافت آمار' : 'آمار زنده پلتفرم' }}</span>
+          <span *ngIf="!statsLoading" class="live-stats-time">· {{ formatStatsUpdatedAt() }}</span>
         </div>
       </div>
 
-      <!-- Testimonials -->
+      <div *ngIf="statsLoading" class="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div *ngFor="let item of [1, 2, 3, 4]" class="stats-skeleton rounded-3xl bg-white p-6"></div>
+      </div>
+
+      <div *ngIf="!statsLoading" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="stats-card stats-card-sellers">
+          <div class="stats-card-topline">
+            <span class="stats-icon">🏪</span>
+            <span class="stats-trend">فعال</span>
+          </div>
+          <p class="stats-value" dir="ltr">{{ formatNumber(animatedProducers) }}</p>
+          <p class="stats-label">فروشنده فعال</p>
+          <p class="stats-caption">فروشنده‌های آماده عرضه در شبکه</p>
+        </article>
+        <article class="stats-card stats-card-agents">
+          <div class="stats-card-topline">
+            <span class="stats-icon">🚚</span>
+            <span class="stats-trend">شبکه</span>
+          </div>
+          <p class="stats-value" dir="ltr">{{ formatNumber(animatedAgents) }}</p>
+          <p class="stats-label">پیک فعال</p>
+          <p class="stats-caption">پوشش تحویل در شهرهای ایران</p>
+        </article>
+        <article class="stats-card stats-card-orders">
+          <div class="stats-card-topline">
+            <span class="stats-icon">📦</span>
+            <span class="stats-trend">تکمیل‌شده</span>
+          </div>
+          <p class="stats-value" dir="ltr">{{ formatNumber(animatedOrders) }}</p>
+          <p class="stats-label">سفارش تکمیل‌شده</p>
+          <p class="stats-caption">سفارش‌های تحویل‌شده با موفقیت</p>
+        </article>
+        <article class="stats-card stats-card-rating">
+          <div class="stats-card-topline">
+            <span class="stats-icon">★</span>
+            <span class="stats-trend">رضایت</span>
+          </div>
+          <p class="stats-value" dir="ltr">{{ animatedRating }}<span class="stats-denominator">/۵</span></p>
+          <p class="stats-label">میانگین رضایت</p>
+          <p class="stats-caption">بر اساس امتیازهای ثبت‌شده کاربران</p>
+        </article>
+      </div>
+
       <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
         <div class="testimonial-card rounded-3xl bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-card-hover">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">ف</div>
-            <div>
-              <p class="text-sm font-bold text-primary">فروشنده</p>
-              <p class="text-xs text-gray-400">تهران</p>
-            </div>
-          </div>
-          <p class="leading-7 text-gray-600">«پلتفرم بسیار کاربردی و پشتیبانی عالی. فروش‌های من در ۲ ماه ۳ برابر شد.»</p>
-          <div class="mt-3 text-gold-dark text-sm">★★★★★</div>
+          <div class="flex items-center gap-3 mb-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">ف</div><div><p class="text-sm font-bold text-primary">فروشنده</p><p class="text-xs text-gray-400">تهران</p></div></div>
+          <p class="leading-7 text-gray-600">«پلتفرم بسیار کاربردی و پشتیبانی عالی. فروش‌های من در ۲ ماه ۳ برابر شد.»</p><div class="mt-3 text-gold-dark text-sm">★★★★★</div>
         </div>
         <div class="testimonial-card rounded-3xl bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-card-hover">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold-dark font-bold text-sm">خ</div>
-            <div>
-              <p class="text-sm font-bold text-primary">خریدار</p>
-              <p class="text-xs text-gray-400">اصفهان</p>
-            </div>
-          </div>
-          <p class="leading-7 text-gray-600">«خرید عمده با قیمت بهتر و تحویل سریع. تجربه خرید حرفه‌ای داشتم.»</p>
-          <div class="mt-3 text-gold-dark text-sm">★★★★★</div>
+          <div class="flex items-center gap-3 mb-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold-dark font-bold text-sm">خ</div><div><p class="text-sm font-bold text-primary">خریدار</p><p class="text-xs text-gray-400">اصفهان</p></div></div>
+          <p class="leading-7 text-gray-600">«خرید عمده با قیمت بهتر و تحویل سریع. تجربه خرید حرفه‌ای داشتم.»</p><div class="mt-3 text-gold-dark text-sm">★★★★★</div>
         </div>
       </div>
     </div>

@@ -14,10 +14,11 @@ import { AuthStateService, AuthUser } from './core/services/auth-state.service';
   animations: [routeAnimations]
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'toolidi';
+  title = 'تولیدی';
   currentUser: AuthUser | null = null;
   menuOpen = false;
   isAdminArea = false;
+  isStandaloneAuthPage = false;
   searchQuery = '';
   newsletterEmail = '';
 
@@ -41,8 +42,10 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isAdminArea =
           event.urlAfterRedirects.startsWith('/admin') ||
           event.urlAfterRedirects.startsWith('/seller');
+        this.isStandaloneAuthPage = event.urlAfterRedirects === '/auth/agent-register' || event.urlAfterRedirects === '/auth/seller-register' || event.urlAfterRedirects === '/auth/register';
       });
     this.isAdminArea = this.router.url.startsWith('/admin') || this.router.url.startsWith('/seller');
+    this.isStandaloneAuthPage = this.router.url === '/auth/agent-register' || this.router.url === '/auth/seller-register' || this.router.url === '/auth/register';
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

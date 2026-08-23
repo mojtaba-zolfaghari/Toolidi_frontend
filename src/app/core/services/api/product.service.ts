@@ -93,6 +93,12 @@ export interface Product {
   ratingCount: number;
   stockQuantity?: number;
   categoryName?: string;
+  sellerCity?: string;
+  cityDeliveryDays?: number;
+  nationwideDeliveryDays?: number;
+  hasDiscount?: boolean;
+  discountAmount?: number;
+  discountPercent?: number;
   images?: ProductImage[];
   variations?: ProductVariation[];
   attributes?: ProductAttribute[];
@@ -132,6 +138,7 @@ export type UpdateProductData = CreateProductData;
 export interface ProductQueryParams {
   categoryId?: string;
   search?: string;
+  city?: string;
   page?: number;
   pageSize?: number;
   isFeatured?: boolean;
@@ -149,6 +156,11 @@ export class ProductService {
   /** دریافت لیست محصولات با فیلتر و صفحه‌بندی */
   getProducts(params?: ProductQueryParams): Observable<Result<PagedList<Product>>> {
     return this.api.get<Result<PagedList<Product>>>(`/v1/products${buildQueryString(params)}`);
+  }
+
+  /** دریافت شهرهای دارای محصول فعال برای فیلتر فروشگاه */
+  getProductCities(): Observable<Result<{ city: string; productCount: number }[]>> {
+    return this.api.get<Result<{ city: string; productCount: number }[]>>('/v1/products/cities');
   }
 
   /** دریافت یک محصول با شناسه */
@@ -234,5 +246,22 @@ export class ProductService {
   /** حذف تخفیف محصول */
   removeDiscount(productId: string): Observable<Result<boolean>> {
     return this.api.delete<Result<boolean>>(`/v1/products/${productId}/discount`);
+  }
+
+  /** آپلود فایل تصویر برای محصول */
+  uploadImageFile(productId: string, file: File, isPrimary = false): Observable<Result<{ imageUrl: string; imageId: string }>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.api.post<Result<{ imageUrl: string; imageId: string }>>(
+      `/v1/products/${productId}/upload?isPrimary=${isPrimary}`,
+      formData
+    );
+  }
+
+  /** آمار تأمین‌کنندگان بر اساس شهر برای یک دسته‌بندی */
+  getSuppliersByCity(categoryId: string): Observable<Result<{ totalSuppliers: number; citiesCount: number; cities: { city: string; count: number }[] }>> {
+    return this.api.get<Result<{ totalSuppliers: number; citiesCount: number; cities: { city: string; count: number }[] }>>(
+      `/v1/products/suppliers-by-city?categoryId=${categoryId}`
+    );
   }
 }

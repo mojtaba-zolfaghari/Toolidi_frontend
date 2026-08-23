@@ -1,0 +1,234 @@
+<section class="min-h-screen bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-2xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 bg-green-100 rounded-full px-4 py-2 mb-4">
+        <span class="text-2xl">🏭</span>
+        <span class="text-green-700 font-bold text-sm">ثبت‌نام تأمین‌کننده</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-secondary">تأمین‌کننده تولیدی شوید</h1>
+      <p class="text-gray-500 mt-2">محصولات خود را به صورت عمده به فروشندگان سراسر ایران بفروشید</p>
+    </div>
+
+    <!-- Benefits -->
+    <div class="grid grid-cols-3 gap-3 mb-8">
+      <div class="bg-white/80 backdrop-blur rounded-2xl p-4 text-center shadow-sm">
+        <span class="text-2xl block mb-2">🌍</span>
+        <p class="text-xs font-bold text-secondary">فروش سراسری</p>
+        <p class="text-[10px] text-gray-400">به ۳۱ استان</p>
+      </div>
+      <div class="bg-white/80 backdrop-blur rounded-2xl p-4 text-center shadow-sm">
+        <span class="text-2xl block mb-2">📦</span>
+        <p class="text-xs font-bold text-secondary">تحویل سریع</p>
+        <p class="text-[10px] text-gray-400">۱-۵ روز کاری</p>
+      </div>
+      <div class="bg-white/80 backdrop-blur rounded-2xl p-4 text-center shadow-sm">
+        <span class="text-2xl block mb-2">💰</span>
+        <p class="text-xs font-bold text-secondary">قیمت مناسب</p>
+        <p class="text-[10px] text-gray-400">بدون واسطه</p>
+      </div>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="flex items-center justify-center gap-2 mb-8">
+      <div *ngFor="let step of [1, 2, 3]" class="flex items-center">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300"
+             [class.bg-green-600]="currentStep >= step"
+             [class.text-white]="currentStep >= step"
+             [class.bg-gray-200]="currentStep < step"
+             [class.text-gray-500]="currentStep < step">
+          {{ step }}
+        </div>
+        <div *ngIf="step < 3" class="w-16 h-1 mx-1 rounded-full transition-all duration-300"
+             [class.bg-green-600]="currentStep > step"
+             [class.bg-gray-200]="currentStep <= step"></div>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-3xl shadow-xl p-8">
+      <!-- Step 1: اطلاعات حساب -->
+      <div *ngIf="currentStep === 1">
+        <h2 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm">🔐</span>
+          اطلاعات حساب کاربری
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-secondary font-medium mb-1">کد ملی</label>
+            <input type="text" formControlName="nationalCode" placeholder="۱۰ رقم کد ملی"
+                   class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            <p *ngIf="form.get('nationalCode')?.invalid && form.get('nationalCode')?.touched" class="text-red-500 text-xs mt-1">کد ملی معتبر (۱۰ رقم) وارد کنید.</p>
+          </div>
+
+          <div>
+            <label class="block text-secondary font-medium mb-1">نام کاربری</label>
+            <input type="text" formControlName="username" placeholder="نام کاربری دلخواه"
+                   class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            <p *ngIf="form.get('username')?.invalid && form.get('username')?.touched" class="text-red-500 text-xs mt-1">حداقل ۳ کاراکتر.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-secondary font-medium mb-1">رمز عبور</label>
+              <input type="password" formControlName="password" placeholder="حداقل ۶ کاراکتر"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            </div>
+            <div>
+              <label class="block text-secondary font-medium mb-1">تکرار رمز عبور</label>
+              <input type="password" formControlName="confirmPassword" placeholder="تکرار رمز عبور"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: اطلاعات شرکت -->
+      <div *ngIf="currentStep === 2">
+        <h2 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm">🏢</span>
+          اطلاعات شرکت و تماس
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-secondary font-medium mb-1">نام شرکت / کارخانه</label>
+            <input type="text" formControlName="companyName" placeholder="نام شرکت یا کارخانه"
+                   class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-secondary font-medium mb-1">شهر</label>
+              <select formControlName="city"
+                      class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all bg-white">
+                <option value="">انتخاب شهر</option>
+                <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-secondary font-medium mb-1">استان</label>
+              <select formControlName="province"
+                      class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all bg-white">
+                <option value="">انتخاب استان</option>
+                <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-secondary font-medium mb-1">شماره موبایل</label>
+              <input type="tel" formControlName="phone" placeholder="09XXXXXXXXX"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" dir="ltr" />
+            </div>
+            <div>
+              <label class="block text-secondary font-medium mb-1">ایمیل</label>
+              <input type="email" formControlName="email" placeholder="example@email.com"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" dir="ltr" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-secondary font-medium mb-1">آدرس شرکت</label>
+            <input type="text" formControlName="address" placeholder="آدرس کامل شرکت"
+                   class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: اطلاعات تجاری -->
+      <div *ngIf="currentStep === 3">
+        <h2 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-sm">📦</span>
+          اطلاعات تجاری و محصولات
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-secondary font-medium mb-1">درباره شرکت</label>
+            <textarea formControlName="description" rows="3" placeholder="توضیح کوتاه درباره فعالیت شرکت شما"
+                      class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all resize-none"></textarea>
+          </div>
+
+          <!-- Category Selection -->
+          <div>
+            <label class="block text-secondary font-medium mb-2">دسته‌بندی محصولات</label>
+            <div class="flex flex-wrap gap-2">
+              <button *ngFor="let cat of categories" type="button" (click)="toggleCategory(cat)"
+                      class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
+                      [class.bg-green-600]="selectedCategories.includes(cat)"
+                      [class.text-white]="selectedCategories.includes(cat)"
+                      [class.border-green-600]="selectedCategories.includes(cat)"
+                      [class.bg-gray-100]="!selectedCategories.includes(cat)"
+                      [class.text-gray-600]="!selectedCategories.includes(cat)"
+                      [class.border-gray-200]="!selectedCategories.includes(cat)"
+                      [class.hover:border-green-400]="!selectedCategories.includes(cat)">
+                {{ cat }}
+              </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">{{ selectedCategories.length }} دسته‌بندی انتخاب شده</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-secondary font-medium mb-1">ظرفیت تولید روزانه</label>
+              <input type="number" formControlName="capacity" placeholder="تعداد"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            </div>
+            <div>
+              <label class="block text-secondary font-medium mb-1">زمان آماده‌سازی (روز)</label>
+              <input type="number" formControlName="leadTimeDays" placeholder="روز"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-secondary font-medium mb-1">حداقل سفارش (تومان)</label>
+              <input type="number" formControlName="minOrderAmount" placeholder="0"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all" />
+            </div>
+            <div class="flex items-center gap-3 pt-8">
+              <input type="checkbox" formControlName="acceptsReturns" id="supplierAcceptsReturns" class="w-5 h-5 text-green-600 rounded" />
+              <label for="supplierAcceptsReturns" class="text-secondary font-medium">قابلیت مرجوعی</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="errorMessage" class="mt-4 bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
+        <span>⚠️</span> {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="mt-4 bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
+        <span>✅</span> {{ successMessage }}
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex justify-between mt-8">
+        <button *ngIf="currentStep > 1" (click)="prevStep()"
+                class="px-6 py-3 rounded-xl border border-gray-300 font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+          مرحله قبل
+        </button>
+        <div *ngIf="currentStep === 1"></div>
+
+        <button *ngIf="currentStep < totalSteps" (click)="nextStep()" [disabled]="!isStepValid(currentStep)"
+                class="px-6 py-3 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          مرحله بعد →
+        </button>
+        <button *ngIf="currentStep === totalSteps" (click)="submit()" [disabled]="loading || !isStepValid(currentStep)"
+                class="px-8 py-3 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading ? 'در حال ثبت‌نام...' : 'ثبت‌نام تأمین‌کننده 🏭' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-6 text-center text-sm text-gray-500">
+      <p>قبلاً ثبت‌نام کرده‌اید؟ <a routerLink="/login" class="text-green-600 font-medium hover:underline">وارد شوید</a></p>
+      <p class="mt-2">می‌خواهید <a routerLink="/auth/seller-register" class="text-primary font-medium hover:underline">فروشنده</a> شوید؟</p>
+    </div>
+  </div>
+</section>

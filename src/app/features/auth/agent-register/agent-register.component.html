@@ -1,0 +1,144 @@
+<section class="agent-register-shell">
+  <div class="agent-noise"></div>
+  <div class="agent-orbit orbit-one"></div>
+  <div class="agent-orbit orbit-two"></div>
+
+  <div class="agent-register-layout">
+    <aside class="agent-visual-panel">
+      <a routerLink="/" class="agent-brand" aria-label="بازگشت به خانه تولیدی">
+        <span class="agent-brand-mark">ت</span>
+        <span>تولیدی</span>
+      </a>
+
+      <div class="agent-visual-copy">
+        <span class="agent-kicker"><span class="live-dot"></span> شبکه توزیع زنده</span>
+        <h1>شهر را به مقصد وصل کن.</h1>
+        <p>به شبکه پیک‌های شهری تولیدی بپیوندید و سفارش‌ها را سریع، امن و حرفه‌ای به دست مشتری برسانید.</p>
+      </div>
+
+      <div class="agent-route-scene" aria-label="مسیر متحرک تحویل سفارش">
+        <div class="route-grid"></div>
+        <div class="route-glow route-glow-one"></div>
+        <div class="route-glow route-glow-two"></div>
+        <svg class="route-svg" viewBox="0 0 620 300" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="agentRouteGradient" x1="0" x2="1">
+              <stop offset="0" stop-color="#55e6b0" />
+              <stop offset="0.52" stop-color="#63a6ff" />
+              <stop offset="1" stop-color="#f6c85f" />
+            </linearGradient>
+          </defs>
+          <path class="route-path route-path-muted" d="M92 210 C180 80 278 76 350 158 S482 252 548 96" />
+          <path class="route-path route-path-active" d="M92 210 C180 80 278 76 350 158 S482 252 548 96" />
+          <circle class="route-node" cx="92" cy="210" r="13" />
+          <circle class="route-node" cx="350" cy="158" r="13" />
+          <circle class="route-node" cx="548" cy="96" r="13" />
+          <g class="route-package">
+            <rect x="-12" y="-10" width="24" height="20" rx="4"></rect>
+            <path d="M-12 -3 L0 4 L12 -3 M0 4 V10" fill="none"></path>
+          </g>
+        </svg>
+        <div class="route-label route-label-start"><span>🏭</span><small>تأمین‌کننده</small></div>
+        <div class="route-label route-label-mid"><span>🏍</span><small>پیک شهری</small></div>
+        <div class="route-label route-label-end"><span>⌂</span><small>خریدار</small></div>
+        <div class="route-status"><span class="live-dot"></span> مسیر آماده‌ی حرکت</div>
+      </div>
+
+      <div class="agent-benefits">
+        <div><span class="benefit-icon">⚡</span><span><strong>سفارش‌های نزدیک</strong><small>پیشنهاد بر اساس شهر شما</small></span></div>
+        <div><span class="benefit-icon">🛡</span><span><strong>پرداخت امن</strong><small>شفاف و قابل پیگیری</small></span></div>
+        <div><span class="benefit-icon">★</span><span><strong>امتیاز حرفه‌ای</strong><small>با هر تحویل موفق</small></span></div>
+      </div>
+    </aside>
+
+    <section class="agent-form-panel" aria-label="فرم ثبت‌نام پیک شهری">
+      <div class="agent-form-topline">
+        <span class="agent-form-eyebrow">شروع همکاری</span>
+        <a routerLink="/auth/login" class="agent-login-link">قبلاً عضو هستید؟ ورود</a>
+      </div>
+
+      <div *ngIf="!submitted; else successState" class="agent-form-content">
+        <div class="agent-form-heading">
+          <span class="form-icon">🏍</span>
+          <div>
+            <h2>پیک شهری تولیدی شوید</h2>
+            <p>در چند قدم ساده، درخواست عضویت خود را ارسال کنید.</p>
+          </div>
+        </div>
+
+        <div class="agent-progress" aria-label="پیشرفت ثبت‌نام">
+          <div *ngFor="let step of [1, 2, 3, 4]" class="progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step">
+            <span>{{ step }}</span>
+            <small>{{ step === 1 ? 'هویت' : step === 2 ? 'محدوده' : step === 3 ? 'وسیله' : 'تأیید' }}</small>
+          </div>
+        </div>
+        <div class="progress-line"><span [style.width.%]="((currentStep - 1) / 3) * 100"></span></div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div [ngSwitch]="currentStep" class="agent-step-container">
+            <section *ngSwitchCase="1" class="agent-step" aria-labelledby="identity-title">
+              <div class="step-heading"><span>01</span><div><h3 id="identity-title">اول خودت را معرفی کن</h3><p>اطلاعات برای بررسی اولیه و تماس با شما استفاده می‌شود.</p></div></div>
+              <div class="agent-fields-grid">
+                <label class="agent-field field-full"><span>نام و نام خانوادگی</span><input formControlName="fullName" placeholder="مثلاً علی رضایی" autocomplete="name"><em *ngIf="hasError('fullName')">نام کامل را وارد کنید.</em></label>
+                <label class="agent-field"><span>کد ملی</span><input formControlName="nationalId" inputmode="numeric" placeholder="۱۰ رقم" dir="ltr" autocomplete="off"><em *ngIf="hasError('nationalId')">کد ملی باید ۱۰ رقم باشد.</em></label>
+                <label class="agent-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" dir="ltr" autocomplete="tel"><em *ngIf="hasError('phone')">شماره موبایل معتبر وارد کنید.</em></label>
+                <label class="agent-field field-full"><span>ایمیل</span><input formControlName="email" type="email" placeholder="you@example.com" dir="ltr" autocomplete="email"><em *ngIf="hasError('email')">ایمیل معتبر وارد کنید.</em></label>
+              </div>
+            </section>
+
+            <section *ngSwitchCase="2" class="agent-step" aria-labelledby="zone-title">
+              <div class="step-heading"><span>02</span><div><h3 id="zone-title">محدوده حرکتت را مشخص کن</h3><p>سفارش‌های نزدیک‌تر، پیشنهادهای دقیق‌تری می‌سازند.</p></div></div>
+              <div class="agent-zone-card"><span class="zone-pulse">⌖</span><div><strong>پایگاه فعالیت شما</strong><small>شهر و استان اصلی برای تخصیص سفارش</small></div><span class="zone-live">LIVE</span></div>
+              <div class="agent-fields-grid">
+                <label class="agent-field"><span>استان</span><select formControlName="province"><option value="">انتخاب استان</option><option *ngFor="let province of provinces" [value]="province">{{ province }}</option></select><em *ngIf="hasError('province')">استان را انتخاب کنید.</em></label>
+                <label class="agent-field"><span>شهر</span><select formControlName="city"><option value="">انتخاب شهر</option><option *ngFor="let city of cities" [value]="city">{{ city }}</option></select><em *ngIf="hasError('city')">شهر را انتخاب کنید.</em></label>
+              </div>
+            </section>
+
+            <section *ngSwitchCase="3" class="agent-step" aria-labelledby="vehicle-title">
+              <div class="step-heading"><span>03</span><div><h3 id="vehicle-title">ابزار حرکتت چیست؟</h3><p>نوع وسیله و ظرفیت روزانه، پیشنهاد سفارش را هوشمند می‌کند.</p></div></div>
+              <div class="vehicle-options">
+                <button *ngFor="let vehicle of vehicleTypes" type="button" class="vehicle-option" [class.selected]="form.get('vehicleType')?.value === vehicle" (click)="form.get('vehicleType')?.setValue(vehicle)"><span>{{ vehicle === 'موتورسیکلت' ? '🏍' : vehicle === 'خودرو سواری' ? '🚗' : vehicle === 'وانت' ? '🛻' : '🚚' }}</span><small>{{ vehicle }}</small></button>
+              </div>
+              <div class="agent-fields-grid">
+                <label class="agent-field"><span>پلاک وسیله</span><input formControlName="vehiclePlate" placeholder="مثلاً ۱۲۳ الف ۴۵" dir="rtl"><em *ngIf="hasError('vehiclePlate')">پلاک را وارد کنید.</em></label>
+                <label class="agent-field"><span>حداکثر سفارش هم‌زمان</span><input formControlName="maxConcurrentOrders" type="number" min="1" max="100" dir="ltr"><em *ngIf="hasError('maxConcurrentOrders')">ظرفیت باید بین ۱ تا ۱۰۰ باشد.</em></label>
+              </div>
+            </section>
+
+            <section *ngSwitchCase="4" class="agent-step" aria-labelledby="review-title">
+              <div class="step-heading"><span>04</span><div><h3 id="review-title">یک قدم تا شروع</h3><p>درخواست شما پس از بررسی اطلاعات فعال می‌شود.</p></div></div>
+              <div class="review-card">
+                <div><span>نام</span><strong>{{ form.get('fullName')?.value || '—' }}</strong></div>
+                <div><span>محدوده</span><strong>{{ form.get('city')?.value || '—' }}، {{ form.get('province')?.value || '—' }}</strong></div>
+                <div><span>وسیله</span><strong>{{ form.get('vehicleType')?.value || '—' }}</strong></div>
+                <div><span>ظرفیت</span><strong>{{ form.get('maxConcurrentOrders')?.value || 0 }} سفارش</strong></div>
+              </div>
+              <label class="terms-check"><input type="checkbox" formControlName="terms"><span>قوانین همکاری، حریم خصوصی و مسئولیت تحویل امن را مطالعه کرده‌ام و می‌پذیرم.</span></label>
+              <p *ngIf="hasError('terms')" class="form-error">برای ارسال درخواست، پذیرش قوانین الزامی است.</p>
+            </section>
+          </div>
+
+          <div *ngIf="errorMessage" class="agent-alert error">⚠️ {{ errorMessage }}</div>
+          <div class="agent-actions">
+            <button *ngIf="currentStep > 1" type="button" class="secondary-action" (click)="previousStep()">← مرحله قبل</button>
+            <span *ngIf="currentStep === 1"></span>
+            <button *ngIf="currentStep < totalSteps" type="button" class="primary-action" (click)="nextStep()">ادامه <span>←</span></button>
+            <button *ngIf="currentStep === totalSteps" type="submit" class="primary-action submit-action" [disabled]="loading">{{ loading ? 'در حال ارسال...' : 'ارسال درخواست عضویت' }} <span>✦</span></button>
+          </div>
+        </form>
+      </div>
+
+      <ng-template #successState>
+        <div class="agent-success-state">
+          <div class="success-ring"><span>✓</span></div>
+          <span class="agent-form-eyebrow">درخواست دریافت شد</span>
+          <h2>مسیرت آماده‌ی شروع است.</h2>
+          <p>{{ successMessage }}</p>
+          <div class="success-steps"><span>✓ اطلاعات ثبت شد</span><span>◌ بررسی مدارک</span><span>◌ فعال‌سازی حساب</span></div>
+          <div class="agent-actions success-actions"><button type="button" class="secondary-action" (click)="startAgain()">ثبت درخواست جدید</button><button type="button" class="primary-action" (click)="goToLogin()">ورود به تولیدی</button></div>
+        </div>
+      </ng-template>
+    </section>
+  </div>
+</section>

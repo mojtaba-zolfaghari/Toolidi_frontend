@@ -1,0 +1,60 @@
+<section class="min-h-screen bg-bg-warm">
+  <section class="relative overflow-hidden bg-gradient-to-br from-red-600 via-rose-500 to-orange-500 text-white">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <span class="particle-deal" style="--delay:0s;--x:10%;--y:20%"></span>
+      <span class="particle-deal" style="--delay:1s;--x:80%;--y:30%"></span>
+      <span class="particle-deal" style="--delay:2s;--x:30%;--y:70%"></span>
+      <span class="particle-deal" style="--delay:.5s;--x:70%;--y:80%"></span>
+      <span class="particle-deal" style="--delay:1.5s;--x:50%;--y:40%"></span>
+    </div>
+    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-yellow-500/20 blur-3xl"></div>
+
+    <div class="container relative z-10 mx-auto max-w-7xl px-4 py-12 text-center sm:py-16 lg:py-20">
+      <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm backdrop-blur">
+        <span class="h-2 w-2 animate-pulse rounded-full bg-yellow-300"></span>
+        شگفت‌انگیزهای امروز
+      </div>
+      <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">🔥 تخفیف‌های <span class="text-yellow-300">ویژه</span></h1>
+      <p class="mt-4 text-lg text-white/80">قیمت نهایی، میزان صرفه‌جویی و زمان ارسال را قبل از خرید ببینید.</p>
+      <div class="mt-8 inline-flex items-center gap-3 rounded-2xl bg-black/20 px-6 py-4 backdrop-blur-sm">
+        <span class="text-sm text-white/70">پایان تخفیف در:</span>
+        <div class="flex items-center gap-2" dir="ltr">
+          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.hours | number:'2.0-0':'fa-IR' }}</div>
+          <span class="animate-pulse text-xl font-bold">:</span>
+          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.minutes | number:'2.0-0':'fa-IR' }}</div>
+          <span class="animate-pulse text-xl font-bold">:</span>
+          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.seconds | number:'2.0-0':'fa-IR' }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mx-auto max-w-7xl px-4 py-12 lg:px-8">
+    <div class="mb-8 flex items-center justify-between gap-3">
+      <div><p class="text-sm font-bold text-red-500">انتخاب‌های محدود</p><h2 class="text-2xl font-extrabold text-secondary">شگفت‌انگیزهای امروز</h2></div>
+      <span class="rounded-full bg-red-100 px-3 py-1 text-sm font-bold text-red-600">{{ products.length | number:'1.0-0':'fa-IR' }} محصول</span>
+    </div>
+
+    <div *ngIf="loading" class="py-16 text-center"><app-spinner label="در حال بارگذاری..."></app-spinner></div>
+    <div *ngIf="!loading && products.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <app-product-card *ngFor="let deal of products; let i = index" [product]="toProduct(deal)" [@slideUp] class="deal-card"></app-product-card>
+    </div>
+    <div *ngIf="!loading && !products.length" class="rounded-2xl bg-white py-16 text-center shadow-sm"><p class="mb-4 text-5xl">🎉</p><p class="text-gray-500">در حال حاضر تخفیف ویژه‌ای فعال نیست.</p></div>
+  </section>
+
+  <section *ngIf="suppliers.length" class="border-t border-gray-100 bg-white">
+    <div class="container mx-auto max-w-7xl px-4 py-12 lg:px-8">
+      <div class="mb-8"><p class="mb-2 text-sm font-bold uppercase tracking-widest text-red-500">تأمین‌کنندگان شگفت‌انگیز</p><h2 class="text-2xl font-extrabold text-secondary">بیشترین تخفیف‌ها از این فروشندگان</h2></div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div *ngFor="let supplier of suppliers; let i = index" class="supplier-deal-card group flex items-center gap-4 rounded-2xl border border-red-100 bg-gradient-to-r from-white to-red-50/50 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-lg" [style.animation-delay]="(i * 100) + 'ms'">
+          <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-xl text-white shadow-lg shadow-red-200">🏭</div>
+          <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><h3 class="truncate font-bold text-secondary">{{ supplier.companyName }}</h3><span *ngIf="supplier.isVerified" class="shrink-0 rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-bold text-green-600">✓</span></div><p class="text-xs text-gray-500">{{ supplier.city }}، {{ supplier.province }}</p><p class="mt-1 text-xs text-gray-400">{{ supplier.description }}</p></div>
+          <div class="shrink-0 text-center"><div class="animate-bounce text-2xl font-extrabold text-red-600">{{ supplier.maxDiscount | number:'1.0-0':'fa-IR' }}٪</div><p class="text-[10px] text-gray-400">{{ supplier.dealCount | number:'1.0-0':'fa-IR' }} محصول</p><p class="text-[10px] text-gray-400">⭐ {{ supplier.rating }}</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mx-auto max-w-7xl px-4 py-12 lg:px-8"><div class="rounded-3xl bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 p-8 text-center text-white shadow-xl sm:p-12"><h2 class="text-2xl font-extrabold sm:text-3xl">⏰ فرصت محدوده!</h2><p class="mt-3 text-white/80">قیمت‌ها و زمان ارسال هر محصول شفاف نمایش داده می‌شود؛ انتخاب سریع‌تر، خرید مطمئن‌تر.</p><a routerLink="/shop" class="mt-6 inline-flex items-center gap-2 rounded-2xl bg-white px-8 py-3 font-bold text-red-600 shadow-xl transition-all hover:-translate-y-1 hover:bg-yellow-300 hover:text-red-700">مشاهده همه محصولات ←</a></div></section>
+</section>

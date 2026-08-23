@@ -2,50 +2,39 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { AuthService, RegisterCustomerData, RegisterSellerData } from '../../../core/services/api/auth.service';
+import { AuthService } from '../../../core/services/api/auth.service';
+import { AuthStateService } from '../../../core/services/auth-state.service';
 
 /**
- * کامپوننت ثبت‌نام؛ با انتخاب نوع حساب (مشتری/فروشنده)،
- * کاربر را در سرویس AuthService ثبت می‌کند و در موفقیت به صفحه ورود هدایت می‌شود.
+ * صفحه ثبت‌نام سریع خریدار با حداقل اطلاعات موردنیاز.
  */
 @Component({
   selector: 'app-register',
-  templateUrl: './register.component.html'
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
   form: FormGroup;
   loading = false;
   errorMessage = '';
   successMessage = '';
-  isSeller = false;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
+    private readonly authState: AuthStateService,
     private readonly router: Router
   ) {
     this.form = this.fb.group({
-      nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      identifier: ['', [Validators.required, Validators.pattern(/^(?:09\d{9}|[^\s@]+@[^\s@]+\.[^\s@]+)$/)]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  /** تغییر نوع حساب بین مشتری و فروشنده */
-  setRole(isSeller: boolean): void {
-    this.isSeller = isSeller;
-  }
-
-  /** ارسال فرم ثبت‌نام */
+  /** ارسال فرم ثبت‌نام سریع */
   submit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.loading) {
       this.form.markAllAsTouched();
-      return;
-    }
-
-    if (this.form.value.password !== this.form.value.confirmPassword) {
-      this.errorMessage = 'رمز عبور و تکرار آن یکسان نیستند.';
       return;
     }
 
@@ -53,30 +42,23 @@ export class RegisterComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const data: RegisterCustomerData | RegisterSellerData = {
-      nationalCode: this.form.value.nationalCode,
-      username: this.form.value.username,
-      password: this.form.value.password,
-      confirmPassword: this.form.value.confirmPassword
-    };
-
-    const request = this.isSeller
-      ? this.authService.registerSeller(data as RegisterSellerData)
-      : this.authService.registerCustomer(data as RegisterCustomerData);
-
-    request.subscribe({
+    this.authService.quickRegisterCustomer({
+      identifier: this.form.value.identifier.trim(),
+      password: this.form.value.password
+    }).subscribe({
       next: (result) => {
         this.loading = false;
-        if (result.isSuccess) {
-          this.successMessage = 'ثبت‌نام با موفقیت انجام شد. اکنون می‌توانید وارد شوید.';
-          setTimeout(() => this.router.navigate(['/login']), 1200);
+        if (result.isSuccess && result.data) {
+          this.authState.refresh();
+          this.successMessage = 'حساب شما ساخته شد؛ در حال ورود به فروشگاه هستیم.';
+          setTimeout(() => this.router.navigate(['/']), 700);
         } else {
-          this.errorMessage = result.errorMessage ?? 'ثبت‌نام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
+          this.errorMessage = result.errorMessage ?? 'ثبت‌نام ناموفق بود؛ دوباره تلاش کنید.';
         }
       },
-      error: (err: Error) => {
+      error: (err: { error?: { errorMessage?: string }; message?: string }) => {
         this.loading = false;
-        this.errorMessage = err?.message ?? 'خطا در ارتباط با سرور';
+        this.errorMessage = err?.error?.errorMessage ?? err?.message ?? 'خطا در ارتباط با سرور';
       }
     });
   }

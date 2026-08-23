@@ -1,17 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { slideUp } from '../../shared/animations';
 import { BlogPost, BlogService } from '../../core/services/api/blog.service';
 
-/** صفحه فهرست وبلاگ */
+/** دسته‌بندی وبلاگ */
+interface BlogCategory {
+  slug: string;
+  name: string;
+  icon: string;
+}
+
+/** دسته‌بندی‌های وبلاگ */
+const BLOG_CATEGORIES: BlogCategory[] = [
+  { slug: '', name: 'همه', icon: '📰' },
+  { slug: 'buying-guide', name: 'راهنمای خرید', icon: '🛒' },
+  { slug: 'market-news', name: 'اخبار بازار', icon: '📊' },
+  { slug: 'tips-tricks', name: 'نکات و ترفندها', icon: '💡' },
+  { slug: 'product-review', name: 'معرفی محصول', icon: '💎' },
+  { slug: 'tutorial', name: 'آموزش', icon: '🎓' },
+];
+
+/**
+ * صفحه فهرست وبلاگ
+ * شامل: پست ویژه، دسته‌بندی‌ها، کارت‌های زیبا
+ */
 @Component({
   selector: 'app-blog',
   templateUrl: './blog.component.html',
-  animations: [slideUp]
+  styleUrls: ['./blog.component.scss']
 })
 export class BlogComponent implements OnInit {
   posts: BlogPost[] = [];
+  categories = BLOG_CATEGORIES;
+  selectedCategory = '';
   page = 1;
   pageSize = 9;
   totalPages = 1;
@@ -28,15 +49,22 @@ export class BlogComponent implements OnInit {
     this.loadPosts();
   }
 
-  /** بارگذاری پست‌های منتشرشده */
+  /** بارگذاری پست‌ها */
   loadPosts(): void {
     this.loading = true;
     this.blogService.getPosts({ pageNumber: this.page, pageSize: this.pageSize }).subscribe({
       next: (result) => {
         const paged = result.data;
-        this.posts = paged?.items ?? [];
+        let allPosts = paged?.items ?? [];
         this.totalCount = paged?.totalCount ?? 0;
-        this.totalPages = Math.max(1, Math.ceil((paged?.totalCount ?? 0) / this.pageSize));
+
+        // فیلتر بر اساس دسته‌بندی (ساعتی)
+        if (this.selectedCategory) {
+          allPosts = allPosts.filter(p => (p as any).categorySlug === this.selectedCategory || this.matchCategory(p));
+        }
+
+        this.posts = allPosts;
+        this.totalPages = Math.max(1, Math.ceil(this.totalCount / this.pageSize));
         this.loading = false;
       },
       error: (err: Error) => {
@@ -45,6 +73,32 @@ export class BlogComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  /** تطابق پست با دسته‌بندی */
+  private matchCategory(post: BlogPost): boolean {
+    // فعلاً همه پست‌ها نمایش داده می‌شوند چون API category slug برنمی‌گرداند
+    return true;
+  }
+
+  /** پست ویژه (اولین پست با بیشترین بازدید) */
+  get featuredPost(): BlogPost | null {
+    if (!this.posts.length) return null;
+    return [...this.posts].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))[0];
+  }
+
+  /** پست‌های معمولی (به جز ویژه) */
+  get regularPosts(): BlogPost[] {
+    const featured = this.featuredPost;
+    if (!featured) return this.posts;
+    return this.posts.filter(p => p.id !== featured.id);
+  }
+
+  /** انتخاب دسته‌بندی */
+  selectCategory(slug: string): void {
+    this.selectedCategory = slug;
+    this.page = 1;
+    this.loadPosts();
   }
 
   /** رفتن به جزئیات پست */
@@ -57,5 +111,11 @@ export class BlogComponent implements OnInit {
     this.page = page;
     this.loadPosts();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /** خلاصه متن */
+  excerpt(text: string, maxLen = 120): string {
+    if (!text) return '';
+    return text.length > maxLen ? text.substring(0, maxLen) + '…' : text;
   }
 }

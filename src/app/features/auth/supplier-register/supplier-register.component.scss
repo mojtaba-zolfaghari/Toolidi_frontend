@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+::selection {
+  background: rgba(22, 163, 74, 0.2);
+}

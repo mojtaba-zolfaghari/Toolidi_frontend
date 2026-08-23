@@ -1,4 +1,7 @@
 import { NgModule } from '@angular/core';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeFa from '@angular/common/locales/fa';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -19,8 +22,7 @@ import { SharedModule } from './shared/shared.module';
 // Layouts Module (admin/seller layout)
 import { LayoutsModule } from './layouts/layouts.module';
 
-// Feature Modules (built incrementally)
-import { HomeModule } from './features/home/home.module';
+registerLocaleData(localeFa);
 
 @NgModule({
   declarations: [
@@ -35,11 +37,11 @@ import { HomeModule } from './features/home/home.module';
     CoreModule,
     SharedModule,
     LayoutsModule,
-    HomeModule,
   ],
   providers: [
     // ثبت اینترسپتور توکن برای تمام درخواست‌های HTTP
-    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+    { provide: LOCALE_ID, useValue: 'fa-IR' }
   ],
   bootstrap: [AppComponent]
 })

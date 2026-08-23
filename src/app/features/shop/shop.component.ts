@@ -21,7 +21,9 @@ export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'best';
 export class ShopComponent implements OnInit {
   products: Product[] = [];
   categories: CategoryTreeNode[] = [];
+  cities: { city: string; productCount: number }[] = [];
   loading = false;
+  private requestVersion = 0;
 
   page = 1;
   pageSize = 12;
@@ -29,6 +31,7 @@ export class ShopComponent implements OnInit {
   totalCount = 0;
 
   categoryId: string | null = null;
+  city: string | null = null;
   search = '';
   sort: SortOption = 'newest';
   minPrice: number | null = null;
@@ -40,6 +43,9 @@ export class ShopComponent implements OnInit {
 
   /** بیشینه‌ی نوار قیمت (تومان) */
   readonly priceCap = 50_000_000;
+
+  /** وضعیت باز بودن فیلتر موبایل */
+  mobileFilterOpen = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -53,9 +59,14 @@ export class ShopComponent implements OnInit {
       next: (result) => (this.categories = result.data ?? []),
       error: () => (this.categories = [])
     });
+    this.productService.getProductCities().subscribe({
+      next: (result) => (this.cities = result.data ?? []),
+      error: () => (this.cities = [])
+    });
 
     this.route.queryParamMap.subscribe((params) => {
       this.categoryId = params.get('categoryId');
+      this.city = params.get('city');
       this.search = params.get('search') ?? '';
       this.page = Number(params.get('page') ?? 1) || 1;
       this.sort = (params.get('sort') as SortOption) || 'newest';
@@ -71,10 +82,12 @@ export class ShopComponent implements OnInit {
 
   /** بارگذاری محصولات با فیلترهای فعلی */
   loadProducts(): void {
+    const requestVersion = ++this.requestVersion;
     this.loading = true;
     this.productService
       .getProducts({
         categoryId: this.categoryId ?? undefined,
+        city: this.city || undefined,
         search: this.search || undefined,
         isBestSeller: this.sort === 'best' ? true : undefined,
         page: this.page,
@@ -82,6 +95,9 @@ export class ShopComponent implements OnInit {
       })
       .subscribe({
         next: (result) => {
+          if (requestVersion !== this.requestVersion) {
+            return;
+          }
           const paged = result.data;
           this.products = this.applyClientFilters(paged?.items ?? []);
           this.totalCount = paged?.totalCount ?? 0;
@@ -89,7 +105,9 @@ export class ShopComponent implements OnInit {
           this.loading = false;
         },
         error: () => {
-          this.products = [];
+          if (requestVersion !== this.requestVersion) {
+            return;
+          }
           this.loading = false;
         }
       });
@@ -114,6 +132,11 @@ export class ShopComponent implements OnInit {
     }
 
     return result;
+  }
+
+  /** انتخاب شهر فروشنده */
+  selectCity(city: string | null): void {
+    this.navigate({ city: city || null, page: 1 });
   }
 
   /** انتخاب یک دسته‌بندی */
@@ -142,6 +165,7 @@ export class ShopComponent implements OnInit {
   clearFilters(): void {
     this.navigate({
       categoryId: null,
+      city: null,
       search: null,
       sort: null,
       minPrice: null,
@@ -153,6 +177,11 @@ export class ShopComponent implements OnInit {
   /** تغییر صفحه */
   onPageChange(page: number): void {
     this.navigate({ page });
+  }
+
+  /** عنوان شهر انتخاب‌شده */
+  get activeCityName(): string {
+    return this.city || '';
   }
 
   /** نمایش عنوان دسته‌ی انتخاب‌شده */
@@ -180,11 +209,18 @@ export class ShopComponent implements OnInit {
     return null;
   }
 
-  /** ناوبری با ادغام پارامترهای کوئری */
+  /** ناوبری سبک با ادغام پارامترهای کوئری؛ همان صفحه و همان اسکرول حفظ می‌شود. */
   private navigate(params: Record<string, string | number | null>): void {
-    this.router.navigate(['/shop'], {
+    void this.router.navigate(['/shop'], {
       queryParams: params,
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+      state: { filterUpdate: true }
     });
+  }
+
+  /** جلوگیری از ساخت دوباره کارت‌ها هنگام به‌روزرسانی نتیجه. */
+  trackByProductId(_: number, product: Product): string {
+    return product.id;
   }
 }
