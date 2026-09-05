@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
 import { AgentRegistrationData } from '../../../core/services/api/auth.service';
+import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
 
 /** صفحه ثبت‌نام پیک شهری برای پیوستن به شبکه توزیع تولیدی. */
@@ -11,7 +12,7 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
   templateUrl: './agent-register.component.html',
   styleUrls: ['./agent-register.component.scss']
 })
-export class AgentRegisterComponent {
+export class AgentRegisterComponent implements OnInit {
   form: FormGroup;
   currentStep = 1;
   readonly totalSteps = 4;
@@ -20,15 +21,25 @@ export class AgentRegisterComponent {
   errorMessage = '';
   successMessage = '';
 
-  readonly cities = IRAN_CITY_NAMES;
-  readonly provinces = IRAN_PROVINCE_NAMES;
+  // Fallback static data
+  readonly staticCities = IRAN_CITY_NAMES;
+  readonly staticProvinces = IRAN_PROVINCE_NAMES;
+
+  // Dynamic data from API
+  apiProvinces: Province[] = [];
+  apiCities: City[] = [];
+  useApiData = false;
+  loadingCities = false;
+  registrationAllowed = true;
+  registrationCheckMessage = '';
 
   readonly vehicleTypes = ['موتورسیکلت', 'خودرو سواری', 'وانت', 'کامیونت'];
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly locationService: LocationService
   ) {
     this.form = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(120)]],
@@ -37,10 +48,72 @@ export class AgentRegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       city: ['', Validators.required],
       province: ['', Validators.required],
+      provinceId: [''],
+      cityId: [''],
       vehicleType: ['', Validators.required],
       vehiclePlate: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(20)]],
       maxConcurrentOrders: [5, [Validators.required, Validators.min(1), Validators.max(100)]],
       terms: [false, Validators.requiredTrue]
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadProvinces();
+  }
+
+  /** Load provinces from API */
+  loadProvinces(): void {
+    this.locationService.getProvinces().subscribe({
+      next: (result) => {
+        if (result.isSuccess && result.data && result.data.length > 0) {
+          this.apiProvinces = result.data;
+          this.useApiData = true;
+        }
+      },
+      error: () => { /* fallback to static data */ }
+    });
+  }
+
+  /** When province changes, load cities for that province */
+  onProvinceChange(): void {
+    const provinceId = this.form.get('provinceId')?.value;
+    this.apiCities = [];
+    this.form.patchValue({ cityId: '' });
+    this.registrationAllowed = true;
+    this.registrationCheckMessage = '';
+
+    if (!provinceId) return;
+
+    this.loadingCities = true;
+    this.locationService.getCitiesByProvince(provinceId).subscribe({
+      next: (result) => {
+        this.apiCities = result.data ?? [];
+        this.loadingCities = false;
+      },
+      error: () => { this.loadingCities = false; }
+    });
+  }
+
+  /** When city changes, check if agent registration is allowed */
+  onCityChange(): void {
+    const provinceId = this.form.get('provinceId')?.value;
+    const cityId = this.form.get('cityId')?.value;
+
+    this.registrationAllowed = true;
+    this.registrationCheckMessage = '';
+
+    if (!provinceId || !cityId) return;
+
+    this.locationService.isAgentRegistrationAvailable(provinceId, cityId).subscribe({
+      next: (result) => {
+        if (result.isSuccess) {
+          this.registrationAllowed = result.data ?? true;
+          if (!this.registrationAllowed) {
+            this.registrationCheckMessage = 'ثبت‌نام کارپخش در این شهر فعال نیست';
+          }
+        }
+      },
+      error: () => { this.registrationAllowed = true; }
     });
   }
 

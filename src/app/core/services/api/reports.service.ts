@@ -50,18 +50,19 @@ export class ReportsService {
   constructor(private readonly api: ApiService) {}
 
   getDailyReport(date: string): Observable<Result<SalesReport>> {
-    return this.api.get<Result<SalesReport>>(`/admin/reports/daily${buildQueryString({ date })}`);
+    return this.api.get<Result<SalesReport>>(`/v1/admin/reports/daily${buildQueryString({ date })}`);
   }
 
-  getMonthlyReport(month: string): Observable<Result<SalesReport>> {
-    return this.api.get<Result<SalesReport>>(`/admin/reports/monthly${buildQueryString({ month })}`);
+  getMonthlyReport(month: string, year?: number): Observable<Result<SalesReport>> {
+    const q = year ? `?month=${month}&year=${year}` : `?month=${month}`;
+    return this.api.get<Result<SalesReport>>(`/v1/admin/reports/monthly${q}`);
   }
 
   getSellerPerformance(sellerId?: string): Observable<Result<SellerPerformanceReport[]>> {
-    return this.api.get<Result<SellerPerformanceReport[]>>(`/admin/reports/seller-performance${buildQueryString({ sellerId })}`);
+    return this.api.get<Result<SellerPerformanceReport[]>>(`/v1/admin/reports/seller-performance${buildQueryString({ sellerId })}`);
   }
 
   getTopProducts(): Observable<Result<TopProductReport[]>> {
-    return this.api.get<Result<TopProductReport[]>>('/admin/reports/top-products');
+    return this.api.get<Result<TopProductReport[]>>('/v1/admin/reports/top-products');
   }
 }

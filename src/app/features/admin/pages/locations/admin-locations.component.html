@@ -1,0 +1,339 @@
+<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+  <!-- Header -->
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm font-medium text-primary">مدیریت سامانه</p>
+      <h1 class="mt-1 text-3xl font-extrabold text-secondary">مدیریت مکان‌ها</h1>
+      <p class="mt-2 text-sm text-gray-500">استان‌ها، شهرها و محدودیت‌های ثبت‌نام</p>
+    </div>
+    <div class="flex gap-2">
+      <button type="button" (click)="loadAll()" class="rounded-xl border border-primary px-4 py-2 text-sm font-bold text-primary hover:bg-bg-muted">
+        بازخوانی
+      </button>
+    </div>
+  </header>
+
+  <!-- Messages -->
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 rounded-xl bg-gray-100 p-1">
+    <button type="button" (click)="switchTab('provinces')"
+            class="flex-1 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors"
+            [class.bg-white]="activeTab === 'provinces'"
+            [class.text-primary]="activeTab === 'provinces'"
+            [class.shadow-sm]="activeTab === 'provinces'"
+            [class.text-gray-500]="activeTab !== 'provinces'">
+      استان‌ها
+    </button>
+    <button type="button" (click)="switchTab('cities')"
+            class="flex-1 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors"
+            [class.bg-white]="activeTab === 'cities'"
+            [class.text-primary]="activeTab === 'cities'"
+            [class.shadow-sm]="activeTab === 'cities'"
+            [class.text-gray-500]="activeTab !== 'cities'">
+      شهرها
+    </button>
+    <button type="button" (click)="switchTab('supplier-restrictions')"
+            class="flex-1 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors"
+            [class.bg-white]="activeTab === 'supplier-restrictions'"
+            [class.text-primary]="activeTab === 'supplier-restrictions'"
+            [class.shadow-sm]="activeTab === 'supplier-restrictions'"
+            [class.text-gray-500]="activeTab !== 'supplier-restrictions'">
+      محدودیت ثبت‌نام فروشنده
+    </button>
+    <button type="button" (click)="switchTab('agent-restrictions')"
+            class="flex-1 rounded-lg px-4 py-2.5 text-sm font-bold transition-colors"
+            [class.bg-white]="activeTab === 'agent-restrictions'"
+            [class.text-primary]="activeTab === 'agent-restrictions'"
+            [class.shadow-sm]="activeTab === 'agent-restrictions'"
+            [class.text-gray-500]="activeTab !== 'agent-restrictions'">
+      محدودیت ثبت‌نام کارپخش
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: Provinces -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'provinces'">
+    <div class="flex items-center justify-end gap-2">
+      <button type="button" (click)="openProvinceForm()" class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-dark">
+        افزودن استان
+      </button>
+    </div>
+
+    <div class="data-table__container overflow-x-auto">
+      <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری استان‌ها…</div>
+      <table *ngIf="!loading" class="w-full min-w-[600px] text-right text-sm">
+        <thead>
+          <tr class="border-b bg-gray-50 text-gray-500">
+            <th class="p-4">نام</th>
+            <th class="p-4">کد</th>
+            <th class="p-4">وضعیت</th>
+            <th class="p-4">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let province of provinces" class="border-b last:border-0 hover:bg-gray-50/70">
+            <td class="p-4 font-bold text-secondary">{{ province.name }}</td>
+            <td class="p-4">{{ province.code }}</td>
+            <td class="p-4">
+              <span class="rounded-full px-3 py-1 text-xs font-bold"
+                    [class.bg-green-50]="province.isActive"
+                    [class.text-green-700]="province.isActive"
+                    [class.bg-red-50]="!province.isActive"
+                    [class.text-red-700]="!province.isActive">
+                {{ province.isActive ? 'فعال' : 'غیرفعال' }}
+              </span>
+            </td>
+            <td class="p-4">
+              <div class="flex gap-3">
+                <button type="button" (click)="openProvinceForm(province)" class="font-bold text-primary hover:underline">ویرایش</button>
+                <button type="button" (click)="viewCitiesForProvince(province)" class="font-bold text-accent-success hover:underline">شهرها</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!loading && !provinces.length" class="p-10 text-center text-gray-400">استانی برای نمایش وجود ندارد.</p>
+    </div>
+  </ng-container>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: Cities -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'cities'">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <label class="text-sm font-bold text-secondary">فیلتر بر اساس استان:</label>
+        <select (change)="filterCitiesByProvince($any($event.target).value)"
+                class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm">
+          <option value="">همه استان‌ها</option>
+          <option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option>
+        </select>
+      </div>
+      <button type="button" (click)="openCityForm()" class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20">
+        افزودن شهر
+      </button>
+    </div>
+
+    <div class="data-table__container overflow-x-auto">
+      <div *ngIf="loadingCities" class="p-12 text-center text-gray-500">در حال بارگذاری شهرها…</div>
+      <table *ngIf="!loadingCities" class="w-full min-w-[700px] text-right text-sm">
+        <thead>
+          <tr class="border-b bg-gray-50 text-gray-500">
+            <th class="p-4">نام</th>
+            <th class="p-4">کد</th>
+            <th class="p-4">استان</th>
+            <th class="p-4">وضعیت</th>
+            <th class="p-4">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let city of filteredCities" class="border-b last:border-0 hover:bg-gray-50/70">
+            <td class="p-4 font-bold text-secondary">{{ city.name }}</td>
+            <td class="p-4">{{ city.code }}</td>
+            <td class="p-4 text-gray-500">{{ getProvinceName(city.provinceId) }}</td>
+            <td class="p-4">
+              <span class="rounded-full px-3 py-1 text-xs font-bold"
+                    [class.bg-green-50]="city.isActive"
+                    [class.text-green-700]="city.isActive"
+                    [class.bg-red-50]="!city.isActive"
+                    [class.text-red-700]="!city.isActive">
+                {{ city.isActive ? 'فعال' : 'غیرفعال' }}
+              </span>
+            </td>
+            <td class="p-4">
+              <button type="button" (click)="openCityForm(city)" class="font-bold text-primary hover:underline">ویرایش</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!loadingCities && !filteredCities.length" class="p-10 text-center text-gray-400">شهری برای نمایش وجود ندارد.</p>
+    </div>
+  </ng-container>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: Supplier Restrictions -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'supplier-restrictions'">
+    <div class="rounded-2xl bg-white p-6 shadow-card">
+      <h2 class="mb-2 text-lg font-bold text-secondary">محدودیت ثبت‌نام فروشنده</h2>
+      <p class="mb-4 text-sm text-gray-500">اگر محدودیتی ثبت شود، فقط فروشندگان این مکان‌ها می‌توانند ثبت‌نام کنند. اگر هیچ محدودیتی نباشد، ثبت‌نام برای همه باز است.</p>
+
+      <div class="flex flex-wrap items-end gap-3 mb-5">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-secondary">استان</label>
+          <select [(ngModel)]="supplierRestriction.provinceId" (change)="onSupplierProvinceChange()" class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm">
+            <option value="">انتخاب استان</option>
+            <option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option>
+          </select>
+        </div>
+        <div *ngIf="supplierRestriction.provinceId">
+          <label class="mb-1 block text-sm font-medium text-secondary">شهر (اختیاری)</label>
+          <select [(ngModel)]="supplierRestriction.cityId" class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm">
+            <option value="">همه شهرهای استان</option>
+            <option *ngFor="let c of supplierCities" [value]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <button type="button" (click)="addSupplierRestriction()"
+                [disabled]="!supplierRestriction.provinceId"
+                class="rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white disabled:opacity-50">
+          افزودن
+        </button>
+      </div>
+
+      <div *ngIf="loadingSupplierRestrictions" class="py-6 text-center text-gray-500">در حال بارگذاری…</div>
+
+      <table *ngIf="!loadingSupplierRestrictions && supplierRestrictions.length" class="w-full text-right text-sm">
+        <thead>
+          <tr class="border-b bg-gray-50 text-gray-500">
+            <th class="p-3">استان</th>
+            <th class="p-3">شهر</th>
+            <th class="p-3">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of supplierRestrictions" class="border-b last:border-0 hover:bg-gray-50/70">
+            <td class="p-3 font-bold text-secondary">{{ r.provinceName || '—' }}</td>
+            <td class="p-3">{{ r.cityName || 'همه شهرها' }}</td>
+            <td class="p-3">
+              <button type="button" (click)="removeSupplierRestriction(r)" class="font-bold text-red-600 hover:underline">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!loadingSupplierRestrictions && !supplierRestrictions.length" class="py-6 text-center text-gray-400">
+        هیچ محدودیتی ثبت نشده — ثبت‌نام فروشنده برای تمام شهرها فعال است.
+      </p>
+    </div>
+  </ng-container>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TAB: Agent Restrictions -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'agent-restrictions'">
+    <div class="rounded-2xl bg-white p-6 shadow-card">
+      <h2 class="mb-2 text-lg font-bold text-secondary">محدودیت ثبت‌نام کارپخش</h2>
+      <p class="mb-4 text-sm text-gray-500">اگر محدودیتی ثبت شود، فقط کارپخش‌های این مکان‌ها می‌توانند ثبت‌نام کنند.</p>
+
+      <div class="flex flex-wrap items-end gap-3 mb-5">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-secondary">استان</label>
+          <select [(ngModel)]="agentRestriction.provinceId" (change)="onAgentProvinceChange()" class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm">
+            <option value="">انتخاب استان</option>
+            <option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option>
+          </select>
+        </div>
+        <div *ngIf="agentRestriction.provinceId">
+          <label class="mb-1 block text-sm font-medium text-secondary">شهر (اختیاری)</label>
+          <select [(ngModel)]="agentRestriction.cityId" class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm">
+            <option value="">همه شهرهای استان</option>
+            <option *ngFor="let c of agentCities" [value]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <button type="button" (click)="addAgentRestriction()"
+                [disabled]="!agentRestriction.provinceId"
+                class="rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white disabled:opacity-50">
+          افزودن
+        </button>
+      </div>
+
+      <div *ngIf="loadingAgentRestrictions" class="py-6 text-center text-gray-500">در حال بارگذاری…</div>
+
+      <table *ngIf="!loadingAgentRestrictions && agentRestrictions.length" class="w-full text-right text-sm">
+        <thead>
+          <tr class="border-b bg-gray-50 text-gray-500">
+            <th class="p-3">استان</th>
+            <th class="p-3">شهر</th>
+            <th class="p-3">عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of agentRestrictions" class="border-b last:border-0 hover:bg-gray-50/70">
+            <td class="p-3 font-bold text-secondary">{{ r.provinceName || '—' }}</td>
+            <td class="p-3">{{ r.cityName || 'همه شهرها' }}</td>
+            <td class="p-3">
+              <button type="button" (click)="removeAgentRestriction(r)" class="font-bold text-red-600 hover:underline">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="!loadingAgentRestrictions && !agentRestrictions.length" class="py-6 text-center text-gray-400">
+        هیچ محدودیتی ثبت نشده — ثبت‌نام کارپخش برای تمام شهرها فعال است.
+      </p>
+    </div>
+  </ng-container>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- Province Form Modal -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div *ngIf="provinceFormOpen" class="admin-modal" (click)="closeProvinceForm()">
+    <form [formGroup]="provinceForm" (ngSubmit)="saveProvince()" (click)="$event.stopPropagation()" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-secondary">{{ editingProvinceId ? 'ویرایش استان' : 'افزودن استان جدید' }}</h2>
+        <button type="button" (click)="closeProvinceForm()" class="text-2xl text-gray-400">×</button>
+      </div>
+      <div class="mt-5 space-y-4">
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">نام استان *</span>
+          <input formControlName="name" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="مثلاً تهران" />
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">کد استان *</span>
+          <input formControlName="code" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="مثلاً 01" maxlength="10" />
+        </label>
+        <label class="flex items-center gap-2 text-sm font-medium text-secondary">
+          <input formControlName="isActive" type="checkbox" class="h-4 w-4 accent-primary" /> فعال
+        </label>
+      </div>
+      <p *ngIf="formError" class="admin-alert admin-alert--error mt-4">{{ formError }}</p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button type="button" (click)="closeProvinceForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+        <button type="submit" [disabled]="saving" mat-flat-button class="admin-btn-primary">
+          {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- City Form Modal -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div *ngIf="cityFormOpen" class="admin-modal" (click)="closeCityForm()">
+    <form [formGroup]="cityForm" (ngSubmit)="saveCity()" (click)="$event.stopPropagation()" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-secondary">{{ editingCityId ? 'ویرایش شهر' : 'افزودن شهر جدید' }}</h2>
+        <button type="button" (click)="closeCityForm()" class="text-2xl text-gray-400">×</button>
+      </div>
+      <div class="mt-5 space-y-4">
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">استان *</span>
+          <select formControlName="provinceId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+            <option value="">انتخاب استان</option>
+            <option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option>
+          </select>
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">نام شهر *</span>
+          <input formControlName="name" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="مثلاً تهران" />
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">کد شهر *</span>
+          <input formControlName="code" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="مثلاً 01" maxlength="10" />
+        </label>
+        <label class="flex items-center gap-2 text-sm font-medium text-secondary">
+          <input formControlName="isActive" type="checkbox" class="h-4 w-4 accent-primary" /> فعال
+        </label>
+      </div>
+      <p *ngIf="formError" class="admin-alert admin-alert--error mt-4">{{ formError }}</p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button type="button" (click)="closeCityForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+        <button type="submit" [disabled]="saving" mat-flat-button class="admin-btn-primary">
+          {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

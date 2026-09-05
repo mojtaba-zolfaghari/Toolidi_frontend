@@ -16,7 +16,7 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
         <!-- Profile Summary -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
           <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-3xl text-white font-bold mx-auto mb-4">
-            {{ profile.companyName?.charAt(0) || '🏪' }}
+            {{ profile.companyName.charAt(0) || '🏪' }}
           </div>
           <h2 class="font-bold text-secondary text-lg">{{ profile.companyName }}</h2>
           <p class="text-gray-500 text-sm mt-1">{{ profile.city }}، {{ profile.province }}</p>
@@ -86,6 +86,29 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
               <textarea formControlName="description" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"></textarea>
             </div>
 
+            <!-- حداقل سفارش -->
+            <div class="border-t border-gray-100 pt-4 mt-2">
+              <h3 class="font-bold text-secondary text-sm mb-3 flex items-center gap-2">
+                📦 شرایط حداقل سفارش
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-secondary font-medium mb-1 text-sm">حداقل مبلغ سفارش (تومان)</label>
+                  <input type="number" formControlName="minimumOrderAmount" min="0"
+                         class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                         placeholder="مثلاً ۵۰۰,۰۰۰" />
+                  <p class="text-xs text-gray-400 mt-1">اگر ۰ بگذارید محدودیتی نیست</p>
+                </div>
+                <div>
+                  <label class="block text-secondary font-medium mb-1 text-sm">حداقل تعداد سفارش</label>
+                  <input type="number" formControlName="minimumOrderQuantity" min="0"
+                         class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                         placeholder="مثلاً ۱۰" />
+                  <p class="text-xs text-gray-400 mt-1">اگر ۰ بگذارید محدودیتی نیست</p>
+                </div>
+              </div>
+            </div>
+
             <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">✅ {{ successMessage }}</div>
             <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">⚠️ {{ errorMessage }}</div>
 
@@ -129,7 +152,9 @@ export class SellerProfileComponent implements OnInit {
       city: [this.profile.city],
       province: [this.profile.province],
       address: ['تهران، خیابان ولیعصر، پلاک ۱۲۳'],
-      description: ['فروشنده تخصصی طلا و زیورآلات با بیش از ۱۰ سال سابقه']
+      description: ['فروشنده تخصصی طلا و زیورآلات با بیش از ۱۰ سال سابقه'],
+      minimumOrderAmount: [0],
+      minimumOrderQuantity: [0]
     });
   }
 

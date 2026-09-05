@@ -11,6 +11,7 @@ import {
   ProductVariation
 } from '../../core/services/api/product.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
+import { SeoService } from '../../core/services/seo.service';
 import { CartButtonState } from '../../shared/components/add-to-cart-button/add-to-cart-button.component';
 
 /** انیمیشن تعویض تصویر اصلی با محو شدن */
@@ -61,7 +62,8 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly productService: ProductService,
     private readonly cartService: CartService,
-    private readonly authState: AuthStateService
+    private readonly authState: AuthStateService,
+    private readonly seo: SeoService
   ) {}
 
   ngOnInit(): void {
@@ -89,6 +91,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
           this.autoSelectVariation();
           this.loadRelated();
           this.loadSupplierStats();
+          this.applySeo();
         },
         error: (err: Error) => {
           this.errorMessage = err?.message ?? 'محصول یافت نشد.';
@@ -100,6 +103,43 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.seo.removeJsonLd();
+  }
+
+  /** اعمال SEO: title, meta, OG, JSON-LD */
+  private applySeo(): void {
+    const p = this.product;
+    if (!p) return;
+
+    const url = `https://toolidi.ir/product/slug/${p.slug}`;
+    const imageUrl = p.images?.length
+      ? p.images.find(i => i.isPrimary)?.imageUrl || p.images[0].imageUrl
+      : p.imageUrl || '';
+
+    // Page title + meta
+    this.seo.setPage({
+      title: p.name,
+      description: p.shortDescription || p.fullDescription || `${p.name} با قیمت ${new Intl.NumberFormat('fa-IR').format(p.unitPrice)} تومان از ${p.sellerCity || 'تولیدی'}`,
+      image: imageUrl,
+      url,
+      type: 'product',
+    });
+
+    // JSON-LD Product schema
+    this.seo.setJsonLd(this.seo.productJsonLd({
+      name: p.name,
+      description: p.shortDescription || p.fullDescription || p.name,
+      image: imageUrl,
+      price: p.unitPrice,
+      currency: 'IRR',
+      url,
+      rating: p.ratingAverage ?? undefined,
+      reviewCount: p.ratingCount || undefined,
+      sku: p.sku,
+      availability: (p.stockQuantity && p.stockQuantity > 0)
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+    }));
   }
 
   /** تصاویر گالری (در صورت وجود) */
@@ -242,29 +282,28 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     if (!this.product) {
       return;
     }
-    if (!this.isLoggedIn) {
-      this.router.navigate(['/login']);
-      return;
-    }
     if (this.cartState !== 'idle') {
       return;
     }
 
     this.cartState = 'adding';
 
+    if (!this.isLoggedIn) {
+      // کاربر مهمان — ذخیره در localStorage بدون نیاز به ورود
+      this.cartService.addGuestItem(this.product.id, this.selectedVariationId ?? undefined, this.quantity);
+      this.cartState = 'success';
+      setTimeout(() => { this.cartState = 'idle'; }, 2000);
+      return;
+    }
+
     this.cartService
       .addItem(this.product.id, this.selectedVariationId ?? undefined, this.quantity)
       .subscribe({
         next: () => {
           this.cartState = 'success';
-          // بازگشت به حالت idle پس از ۲ ثانیه
-          setTimeout(() => {
-            this.cartState = 'idle';
-          }, 2000);
+          setTimeout(() => { this.cartState = 'idle'; }, 2000);
         },
-        error: () => {
-          this.cartState = 'idle';
-        }
+        error: () => { this.cartState = 'idle'; }
       });
   }
 

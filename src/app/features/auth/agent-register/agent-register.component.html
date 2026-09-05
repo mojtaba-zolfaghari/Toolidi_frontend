@@ -90,8 +90,11 @@
               <div class="step-heading"><span>02</span><div><h3 id="zone-title">محدوده حرکتت را مشخص کن</h3><p>سفارش‌های نزدیک‌تر، پیشنهادهای دقیق‌تری می‌سازند.</p></div></div>
               <div class="agent-zone-card"><span class="zone-pulse">⌖</span><div><strong>پایگاه فعالیت شما</strong><small>شهر و استان اصلی برای تخصیص سفارش</small></div><span class="zone-live">LIVE</span></div>
               <div class="agent-fields-grid">
-                <label class="agent-field"><span>استان</span><select formControlName="province"><option value="">انتخاب استان</option><option *ngFor="let province of provinces" [value]="province">{{ province }}</option></select><em *ngIf="hasError('province')">استان را انتخاب کنید.</em></label>
-                <label class="agent-field"><span>شهر</span><select formControlName="city"><option value="">انتخاب شهر</option><option *ngFor="let city of cities" [value]="city">{{ city }}</option></select><em *ngIf="hasError('city')">شهر را انتخاب کنید.</em></label>
+                <label class="agent-field"><span>استان</span><select formControlName="province" (change)="onProvinceChange()"><option value="">انتخاب استان</option><ng-container *ngIf="!useApiData"><option *ngFor="let p of staticProvinces" [value]="p">{{ p }}</option></ng-container><ng-container *ngIf="useApiData"><option *ngFor="let p of apiProvinces" [value]="p.name">{{ p.name }}</option></ng-container></select><em *ngIf="hasError('province')">استان را انتخاب کنید.</em></label>
+                <label class="agent-field"><span>شهر</span><select formControlName="city" (change)="onCityChange()"><option value="">انتخاب شهر</option><ng-container *ngIf="!useApiData"><option *ngFor="let c of staticCities" [value]="c">{{ c }}</option></ng-container><ng-container *ngIf="useApiData"><option *ngFor="let c of apiCities" [value]="c.name">{{ c.name }}</option></ng-container></select><em *ngIf="hasError('city')">شهر را انتخاب کنید.</em><small *ngIf="loadingCities" class="text-xs text-gray-400">در حال بارگذاری شهرها…</small></label>
+                <div *ngIf="!registrationAllowed && registrationCheckMessage" class="agent-field field-full">
+                  <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">⚠️ {{ registrationCheckMessage }}</div>
+                </div>
               </div>
             </section>
 

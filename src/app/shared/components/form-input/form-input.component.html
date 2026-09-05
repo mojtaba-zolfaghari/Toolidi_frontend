@@ -1,0 +1,50 @@
+<div class="form-input" dir="rtl">
+  <mat-form-field
+    class="form-input__field"
+    [ngClass]="{ 'form-input__field--error': !!error }"
+    appearance="outline"
+    subscriptSizing="dynamic"
+    [style.width.%]="100">
+    <mat-label>{{ label }}<span *ngIf="required" class="form-input__req"> *</span></mat-label>
+
+    <span *ngIf="icon" matTextPrefix class="form-input__icon" aria-hidden="true">{{ icon }}</span>
+
+    <input
+      *ngIf="type !== 'textarea' && type !== 'select'"
+      matInput
+      [type]="type"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()" />
+
+    <textarea
+      *ngIf="type === 'textarea'"
+      matInput
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      [rows]="rows"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"></textarea>
+
+    <select
+      *ngIf="type === 'select'"
+      matNativeControl
+      [value]="value"
+      [disabled]="disabled"
+      (change)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()">
+      <option value="" [disabled]="!!placeholder">{{ placeholder || 'انتخاب کنید' }}</option>
+      <option *ngFor="let opt of options" [value]="opt.value">{{ opt.label }}</option>
+    </select>
+  </mat-form-field>
+
+  <p *ngIf="error" class="form-input__error"><span aria-hidden="true">⚠</span> {{ error }}</p>
+  <p *ngIf="hint && !error" class="form-input__hint">{{ hint }}</p>
+  <div class="form-input__subspace" aria-hidden="true"></div>
+</div>

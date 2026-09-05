@@ -13,6 +13,8 @@ export interface SellerGroup {
   sellerLogoUrl?: string;
   cityDeliveryDays: number;
   nationwideDeliveryDays: number;
+  minimumOrderAmount?: number;
+  minimumOrderQuantity?: number;
   items: CartItem[];
   subtotal: number;
   itemCount: number;
@@ -85,6 +87,8 @@ export class CartComponent implements OnInit {
           sellerLogoUrl: item.sellerLogoUrl,
           cityDeliveryDays: item.cityDeliveryDays || 1,
           nationwideDeliveryDays: item.nationwideDeliveryDays || 3,
+          minimumOrderAmount: item.minimumOrderAmount,
+          minimumOrderQuantity: item.minimumOrderQuantity,
           items: [],
           subtotal: 0,
           itemCount: 0
@@ -199,5 +203,27 @@ export class CartComponent implements OnInit {
   /** ستاره‌های امتیاز */
   getStars(rating: number): number[] {
     return [1, 2, 3, 4, 5];
+  }
+
+  /** بررسی حداقل سفارش برای هر گروه فروشنده */
+  getMinimumWarning(group: SellerGroup): string | null {
+    if (group.minimumOrderAmount && group.minimumOrderAmount > 0 && group.subtotal < group.minimumOrderAmount) {
+      const diff = group.minimumOrderAmount - group.subtotal;
+      return `حداقل سفارش از این فروشنده ${this.formatCurrency(group.minimumOrderAmount)} است. ${this.formatCurrency(diff)} دیگر نیاز است.`;
+    }
+    if (group.minimumOrderQuantity && group.minimumOrderQuantity > 0 && group.itemCount < group.minimumOrderQuantity) {
+      const diff = group.minimumOrderQuantity - group.itemCount;
+      return `حداقل تعداد سفارش از این فروشنده ${group.minimumOrderQuantity} عدد است. ${diff} عدد دیگر نیاز است.`;
+    }
+    return null;
+  }
+
+  /** آیا تمام گروه‌ها شرط حداقل سفارش را رعایت کرده‌اند */
+  get allMinimumsMet(): boolean {
+    return this.sellerGroups.every(g => this.getMinimumWarning(g) === null);
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
   }
 }

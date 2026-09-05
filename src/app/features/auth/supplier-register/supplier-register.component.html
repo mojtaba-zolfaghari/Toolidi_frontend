@@ -100,21 +100,27 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-secondary font-medium mb-1">شهر</label>
-              <select formControlName="city"
+              <label class="block text-secondary font-medium mb-1">استان</label>
+              <select formControlName="province" (change)="onProvinceChange()"
                       class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all bg-white">
-                <option value="">انتخاب شهر</option>
-                <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                <option value="">انتخاب استان</option>
+                <ng-container *ngIf="!useApiData"><option *ngFor="let p of staticProvinces" [value]="p">{{ p }}</option></ng-container>
+                <ng-container *ngIf="useApiData"><option *ngFor="let p of apiProvinces" [value]="p.name">{{ p.name }}</option></ng-container>
               </select>
             </div>
             <div>
-              <label class="block text-secondary font-medium mb-1">استان</label>
-              <select formControlName="province"
+              <label class="block text-secondary font-medium mb-1">شهر</label>
+              <select formControlName="city" (change)="onCityChange()"
                       class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500 transition-all bg-white">
-                <option value="">انتخاب استان</option>
-                <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+                <option value="">انتخاب شهر</option>
+                <ng-container *ngIf="!useApiData"><option *ngFor="let c of staticCities" [value]="c">{{ c }}</option></ng-container>
+                <ng-container *ngIf="useApiData"><option *ngFor="let c of apiCities" [value]="c.name">{{ c.name }}</option></ng-container>
               </select>
+              <small *ngIf="loadingCities" class="text-xs text-gray-400">در حال بارگذاری شهرها…</small>
             </div>
+          </div>
+          <div *ngIf="!registrationAllowed && registrationCheckMessage" class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+            ⚠️ {{ registrationCheckMessage }}
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

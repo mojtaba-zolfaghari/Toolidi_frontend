@@ -109,8 +109,8 @@
               <option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option>
             </select></label>
           <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کشور</span><input formControlName="country" class="input-field" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">استان</span><input formControlName="state" class="input-field" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شهر</span><input formControlName="city" class="input-field" /></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">استان</span><select formControlName="state" (change)="onProvinceChange()" class="input-field"><option value="">انتخاب استان</option><option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option></select></label>
+          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شهر</span><select formControlName="city" class="input-field" [disabled]="!cities.length && !loadingCities"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : (cities.length ? 'انتخاب شهر' : 'ابتدا استان را انتخاب کنید') }}</option><option *ngFor="let c of cities" [value]="c.name">{{ c.name }}</option></select></label>
           <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کد پستی</span><input formControlName="postalCode" class="input-field" /></label>
           <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شماره تماس</span><input formControlName="phoneNumber" class="input-field" /></label>
           <label class="block md:col-span-2"><span class="block text-secondary font-medium mb-1 text-sm">نشانی کامل</span><textarea rows="2" formControlName="addressLine" class="input-field"></textarea></label>
@@ -269,12 +269,36 @@
                   <span class="text-gray-500">هزینه ارسال</span>
                   <span class="font-medium">{{ selectedShipping.baseCost | number }} تومان</span>
                 </div>
+
+                <!-- Estimated Delivery -->
+                <div *ngIf="estimatedDeliveries.length" class="border-t pt-3">
+                  <h4 class="text-xs font-bold text-secondary mb-2">زمان تقریبی تحویل</h4>
+                  <div *ngFor="let ed of estimatedDeliveries" class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="text-gray-500 truncate max-w-[60%]">{{ ed.productName }}</span>
+                    <span *ngIf="ed.capacitySet && ed.estimatedDeliveryDate" class="font-bold text-primary">{{ ed.estimatedDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
+                    <span *ngIf="!ed.capacitySet" class="text-orange-500">در انتظار تأیید</span>
+                  </div>
+                  <div *ngIf="maxEstimatedDelivery" class="mt-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 text-center">
+                    <span class="text-xs text-gray-500">حداکثر زمان تحویل: </span>
+                    <span class="text-sm font-extrabold text-primary">{{ maxEstimatedDelivery | persianDate:'yyyy/MM/dd' }}</span>
+                  </div>
+                </div>
                 <div *ngIf="paymentGatewayId" class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">درگاه پرداخت</span>
                   <span class="font-medium text-green-600">انتخاب شده ✓</span>
                 </div>
+                <!-- هشدار حداقل سفارش -->
+                <div *ngIf="minimumOrderWarnings.length" class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  <p class="text-sm text-amber-700 font-bold flex items-center gap-2 mb-2">
+                    <span>⚠️</span> حداقل سفارش رعایت نشده
+                  </p>
+                  <div *ngFor="let w of minimumOrderWarnings" class="text-xs text-amber-600 mb-1">• {{ w }}</div>
+                  <p class="text-xs text-amber-500 mt-2">لطفاً به سبد خرید بازگردید و مقدار سفارش را افزایش دهید.</p>
+                </div>
+
                 <p *ngIf="errorMessage" class="text-red-500 text-sm bg-red-50 rounded-xl px-3 py-2">{{ errorMessage }}</p>
-                <button type="button" (click)="submit()" [disabled]="loading"
+                <button type="button" (click)="submit()" [disabled]="loading || minimumOrderWarnings.length > 0"
+                        [class.opacity-50]="minimumOrderWarnings.length > 0"
                         class="checkout-btn-primary w-full text-center justify-center">
                   <span *ngIf="!loading">💳 ثبت سفارش و پرداخت</span>
                   <span *ngIf="loading" class="inline-flex items-center gap-2">

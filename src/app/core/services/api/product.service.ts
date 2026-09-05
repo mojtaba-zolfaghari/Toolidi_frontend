@@ -163,6 +163,11 @@ export class ProductService {
     return this.api.get<Result<{ city: string; productCount: number }[]>>('/v1/products/cities');
   }
 
+  /** جستجوی حرفه‌ای با پیشنهادات دسته‌بندی، محصول و تأمین‌کننده */
+  searchSuggestions(query: string): Observable<Result<SearchSuggestions>> {
+    return this.api.get<Result<SearchSuggestions>>(`/v1/search/suggest?q=${encodeURIComponent(query)}`);
+  }
+
   /** دریافت یک محصول با شناسه */
   getProductById(id: string): Observable<Result<Product>> {
     return this.api.get<Result<Product>>(`/v1/products/${id}`);
@@ -264,4 +269,37 @@ export class ProductService {
       `/v1/products/suppliers-by-city?categoryId=${categoryId}`
     );
   }
+}
+
+// ─── Search Suggestion Types ───
+
+export interface SearchSuggestions {
+  products: SearchSuggestionProduct[];
+  categories: SearchSuggestionCategory[];
+  suppliers: SearchSuggestionSupplier[];
+  totalResults: number;
+}
+
+export interface SearchSuggestionProduct {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl?: string;
+  price: number;
+  categoryName: string;
+  supplierName: string;
+}
+
+export interface SearchSuggestionCategory {
+  id: string;
+  name: string;
+  productCount: number;
+}
+
+export interface SearchSuggestionSupplier {
+  id: string;
+  companyName: string;
+  city: string;
+  province: string;
+  productCount: number;
 }

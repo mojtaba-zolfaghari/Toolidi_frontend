@@ -6,6 +6,23 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#6C3FC5">
+
+  <!-- Open Graph / Twitter defaults (runtime paths are kept fresh by SeoService) -->
+  <meta property="og:site_name" content="تولیدی">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fa_IR">
+  <meta property="og:image" content="https://toolidi.ir/assets/og-default.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="تولیدی — پلتفرم خرید و فروش عمده">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://toolidi.ir/assets/og-default.png">
+
+  <!-- hreflang for the homepage (SeoService refreshes it per-route) -->
+  <link rel="alternate" hreflang="fa-IR" href="https://toolidi.ir/">
+  <link rel="alternate" hreflang="x-default" href="https://toolidi.ir/">
+  <link rel="canonical" href="https://toolidi.ir/">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -13,10 +30,20 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
   <link rel="manifest" href="manifest.json">
-  <!-- Vazirmatn Font from Google Fonts CDN -->
+  <!-- Preconnect / DNS-prefetch hints for third-party origins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <!-- Resource hints for the API origin (dev + prod) -->
+  <link rel="preconnect" href="https://api.toolidi.ir">
+  <link rel="dns-prefetch" href="https://api.toolidi.ir">
+  <link rel="dns-prefetch" href="http://localhost:5291">
+
+  <!-- Vazirmatn Font from Google Fonts CDN -->
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Material Icons (ligature font used by admin redesign mat-icons) -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
   <app-root></app-root>

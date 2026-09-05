@@ -1,0 +1,102 @@
+<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm font-medium text-primary">مدیریت مالی</p>
+      <h1 class="mt-1 text-3xl font-extrabold text-secondary">قوانین کمیسیون</h1>
+      <p class="mt-2 text-sm text-gray-500">تعیین نرخ کمیسیون برای فروشنده، دسته‌بندی یا محصول</p>
+    </div>
+    <button mat-flat-button type="button" (click)="openCreate()" class="admin-btn-primary">افزودن قانون کمیسیون</button>
+  </header>
+
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+
+  <div class="data-table__container overflow-x-auto">
+    <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری قوانین…</div>
+    <table *ngIf="!loading" class="w-full min-w-[950px] text-right text-sm admin-table">
+      <thead>
+        <tr class="border-b bg-gray-50 text-gray-500">
+          <th class="p-4">فروشنده</th>
+          <th class="p-4">دسته‌بندی</th>
+          <th class="p-4">محصول</th>
+          <th class="p-4">نرخ (%)</th>
+          <th class="p-4">مبلغ ثابت</th>
+          <th class="p-4">شروع</th>
+          <th class="p-4">پایان</th>
+          <th class="p-4">عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rule of rules" class="border-b last:border-0">
+          <td class="p-4 font-bold text-secondary">{{ sellerName(rule.sellerId) }}</td>
+          <td class="p-4">{{ categoryName(rule.categoryId) }}</td>
+          <td class="p-4">{{ productName(rule.productId) }}</td>
+          <td class="p-4">{{ rule.commissionRate | number:'1.0-2' }}٪</td>
+          <td class="p-4">{{ rule.fixedAmount ?? 0 | number }} تومان</td>
+          <td class="p-4">{{ rule.startDate ? (rule.startDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+          <td class="p-4">{{ rule.endDate ? (rule.endDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+          <td class="p-4">
+            <div class="flex gap-3">
+              <button type="button" (click)="openEdit(rule)" class="font-bold text-primary hover:underline">ویرایش</button>
+              <button type="button" (click)="remove(rule)" class="font-bold text-red-600 hover:underline">حذف</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!loading && !rules.length" class="p-10 text-center text-gray-400">قانونی برای نمایش وجود ندارد.</p>
+  </div>
+
+  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
+    <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card admin-modal__card--wide">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-secondary">{{ editingId ? 'ویرایش قانون کمیسیون' : 'افزودن قانون کمیسیون' }}</h2>
+        <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
+      </div>
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">فروشنده *</span>
+          <select formControlName="sellerId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+            <option value="">انتخاب فروشنده</option>
+            <option *ngFor="let seller of sellers" [value]="seller.id">{{ seller.companyName }}</option>
+          </select>
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">دسته‌بندی</span>
+          <select formControlName="categoryId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+            <option value="">همه دسته‌بندی‌ها</option>
+            <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+          </select>
+        </label>
+        <label class="md:col-span-2">
+          <span class="mb-1 block text-sm font-medium text-secondary">محصول</span>
+          <select formControlName="productId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+            <option value="">همه محصولات</option>
+            <option *ngFor="let product of products" [value]="product.id">{{ product.name }} — {{ product.sku }}</option>
+          </select>
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">نرخ کمیسیون (%) *</span>
+          <input formControlName="commissionRate" type="number" min="0" max="100" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">مبلغ ثابت</span>
+          <input formControlName="fixedAmount" type="number" min="0" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">تاریخ شروع</span>
+          <input formControlName="startDate" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">تاریخ پایان</span>
+          <input formControlName="endDate" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+      </div>
+      <p *ngIf="formError" class="admin-alert admin-alert--error mt-4">{{ formError }}</p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+        <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره' }}</button>
+      </div>
+    </form>
+  </div>
+</section>

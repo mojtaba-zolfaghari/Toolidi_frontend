@@ -1,0 +1,180 @@
+<section dir="rtl" class="mx-auto max-w-5xl space-y-6">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm font-medium text-primary">مدیریت سامانه</p>
+      <h1 class="mt-1 text-3xl font-extrabold text-secondary">تنظیمات</h1>
+      <p class="mt-2 text-sm text-gray-500">پایه، پرداخت، پیامک و حاشیه سود</p>
+    </div>
+    <button type="button" (click)="loadSettings()" class="rounded-xl border border-primary px-4 py-2 text-sm font-bold text-primary hover:bg-bg-muted">بازخوانی</button>
+  </header>
+
+  <!-- تب‌ها -->
+  <nav class="flex flex-wrap gap-2 rounded-2xl bg-white p-2 shadow-card">
+    <button *ngFor="let tab of tabs" type="button" (click)="selectTab(tab.id)"
+      class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition"
+      [class.bg-primary]="activeTab === tab.id" [class.text-white]="activeTab === tab.id"
+      [class.bg-bg-muted]="activeTab !== tab.id" [class.text-secondary]="activeTab !== tab.id">
+      <span class="material-icons text-base">{{ tab.icon }}</span>
+      {{ tab.label }}
+    </button>
+  </nav>
+
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+
+  <div *ngIf="loading" class="rounded-2xl bg-white py-10 text-center text-gray-500 shadow-card">در حال بارگذاری تنظیمات…</div>
+
+  <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+    <!-- ═══ تب پایه ═══ -->
+    <div *ngIf="activeTab === 'basic'" class="space-y-4 rounded-2xl bg-white p-6 shadow-card">
+      <h2 class="text-lg font-bold text-secondary">تنظیمات پایه</h2>
+      <label class="block md:w-1/2">
+        <span class="mb-1 block text-sm font-medium text-secondary">نرخ مالیات (٪)</span>
+        <input formControlName="taxRate" type="number" min="0" max="100" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        <small *ngIf="form.get('taxRate')?.invalid" class="text-red-600">نرخ مالیات باید بین ۰ تا ۱۰۰ باشد.</small>
+      </label>
+    </div>
+
+    <!-- ═══ تب پرداخت ═══ -->
+    <div *ngIf="activeTab === 'payment'" class="space-y-4 rounded-2xl bg-white p-6 shadow-card">
+      <h2 class="text-lg font-bold text-secondary">درگاه‌های پرداخت</h2>
+      <p class="text-sm text-gray-500">این مقادیر مستقیماً توسط درگاه‌های زرین‌پال و سپ در زمان پرداخت خوانده می‌شوند.</p>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-secondary">شناسه مرچنت زرین‌پال</span>
+          <input formControlName="zarinpalMerchantId" type="text" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label class="flex items-center gap-3 self-end rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-secondary">
+          <input formControlName="zarinpalSandbox" type="checkbox" class="h-4 w-4 accent-primary" />زرین‌پال در حالت آزمایشی
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-secondary">شناسه ترمینال سپ</span>
+          <input formControlName="sepTerminalId" type="text" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-secondary">شناسه مرچنت سپ</span>
+          <input formControlName="sepMerchantId" type="text" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label class="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-secondary">
+          <input formControlName="sepSandbox" type="checkbox" class="h-4 w-4 accent-primary" />سپ در حالت آزمایشی
+        </label>
+      </div>
+    </div>
+
+    <!-- ═══ تب پیامک ═══ -->
+    <div *ngIf="activeTab === 'sms'" class="space-y-4 rounded-2xl bg-white p-6 shadow-card">
+      <h2 class="text-lg font-bold text-secondary">پیامک اطلاع‌رسانی (کاوه‌نگار / SMS.ir)</h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-secondary">سرویس‌دهنده</span>
+          <select formControlName="smsProvider" class="w-full rounded-xl border border-gray-300 px-4 py-2.5">
+            <option value="kavenegar">کاوه‌نگار (Kavenegar)</option>
+            <option value="smsir">SMS.ir</option>
+          </select>
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-secondary">شماره فرستنده</span>
+          <input formControlName="smsSenderNumber" type="text" placeholder="مثلاً 10004346" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="mb-1 block text-sm font-medium text-secondary">کلید API</span>
+          <input formControlName="smsApiKey" type="password" autocomplete="off" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 font-mono" />
+        </label>
+        <label class="flex items-center gap-3 md:col-span-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-secondary">
+          <input formControlName="smsOrderStatusEnabled" type="checkbox" class="h-4 w-4 accent-primary" />ارسال پیامک تغییر وضعیت سفارش به مشتری
+        </label>
+      </div>
+      <div class="flex items-center gap-3 border-t border-gray-100 pt-4">
+        <button type="button" (click)="testSms()" [disabled]="testing"
+          class="rounded-xl border border-primary px-5 py-2 text-sm font-bold text-primary hover:bg-bg-muted disabled:opacity-50">
+          {{ testing ? 'در حال ارسال…' : 'ارسال پیامک آزمایشی' }}
+        </button>
+        <p *ngIf="smsTestMessage" class="text-sm" [class.text-green-700]="smsTestSuccess" [class.text-red-600]="!smsTestSuccess">{{ smsTestMessage }}</p>
+      </div>
+    </div>
+
+    <!-- ═══ تب حاشیه سود ═══ -->
+    <div *ngIf="activeTab === 'markup'" class="space-y-5">
+      <div class="space-y-4 rounded-2xl bg-white p-6 shadow-card">
+        <h2 class="text-lg font-bold text-secondary">حاشیه سود جهانی</h2>
+        <p class="text-sm text-gray-500">درصدی که روی قیمت همه محصولات اعمال می‌شود. اولویت: محصول &gt; دسته‌بندی &gt; جهانی.</p>
+        <label class="block md:w-1/2">
+          <span class="mb-1 block text-sm font-medium text-secondary">درصد حاشیه سود جهانی</span>
+          <div class="flex items-center gap-2">
+            <input formControlName="globalMarkup" type="number" min="0" max="200" step="0.5" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+            <span class="text-lg font-bold text-secondary">٪</span>
+          </div>
+          <small *ngIf="form.get('globalMarkup')?.invalid" class="text-red-600">درصد باید بین ۰ تا ۲۰۰ باشد.</small>
+        </label>
+        <p *ngIf="form.get('globalMarkup')?.value > 0" class="rounded-xl bg-bg-muted p-3 text-sm text-gray-600">
+          نمونه: کالای ۱۰۰,۰۰۰ تومانی با این درصد → {{ 100000 * (1 + form.get('globalMarkup')?.value / 100) | number:'1.0-0' }} تومان
+        </p>
+      </div>
+
+      <div class="space-y-4 rounded-2xl bg-white p-6 shadow-card">
+        <h3 class="font-bold text-secondary">حاشیه سود دسته‌بندی</h3>
+        <div class="flex flex-wrap items-end gap-3">
+          <label class="block flex-1 min-w-48">
+            <span class="mb-1 block text-sm font-medium text-secondary">دسته‌بندی</span>
+            <select [(ngModel)]="markupCategory" [ngModelOptions]="{standalone: true}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5">
+              <option value="" disabled selected>انتخاب دسته…</option>
+              <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+            </select>
+          </label>
+          <label class="block w-32">
+            <span class="mb-1 block text-sm font-medium text-secondary">درصد</span>
+            <input [(ngModel)]="markupCategoryPercent" type="number" min="0" max="200" [ngModelOptions]="{standalone: true}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+          </label>
+          <button type="button" (click)="addCategoryMarkup()" [disabled]="!markupCategory" class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white disabled:opacity-40">افزودن</button>
+        </div>
+        <ul *ngIf="categoryMarkups.length" class="divide-y divide-gray-100">
+          <li *ngFor="let cm of categoryMarkups" class="flex items-center justify-between py-2 text-sm">
+            <span class="font-medium text-secondary">{{ cm.categoryName }}</span>
+            <span class="flex items-center gap-3">
+              <span>{{ cm.percent }}٪</span>
+              <button type="button" (click)="removeCategoryMarkup(cm.categoryId)" class="text-red-600 hover:underline">حذف</button>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="space-y-4 rounded-2xl bg-white p-6 shadow-card">
+        <h3 class="font-bold text-secondary">حاشیه سود محصول خاص</h3>
+        <div class="flex flex-wrap items-end gap-3">
+          <label class="block flex-1 min-w-48">
+            <span class="mb-1 block text-sm font-medium text-secondary">جستجوی محصول</span>
+            <input [(ngModel)]="productSearch" (input)="searchProducts()" type="text" placeholder="حداقل ۲ حرف…" [ngModelOptions]="{standalone: true}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+            <ul *ngIf="productResults.length" class="mt-1 max-h-48 overflow-y-auto rounded-xl border border-gray-200 bg-white">
+              <li *ngFor="let p of productResults">
+                <button type="button" (click)="addProductMarkup(p)" class="block w-full px-4 py-2 text-right text-sm hover:bg-bg-muted">
+                  {{ p.name }} <span class="text-gray-400">{{ p.sku }}</span>
+                </button>
+              </li>
+            </ul>
+          </label>
+          <label class="block w-32">
+            <span class="mb-1 block text-sm font-medium text-secondary">درصد</span>
+            <input [(ngModel)]="markupProductPercent" type="number" min="0" max="200" [ngModelOptions]="{standalone: true}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+          </label>
+        </div>
+        <ul *ngIf="productMarkups.length" class="divide-y divide-gray-100">
+          <li *ngFor="let pm of productMarkups" class="flex items-center justify-between py-2 text-sm">
+            <span class="font-medium text-secondary">{{ pm.productName }}</span>
+            <span class="flex items-center gap-3">
+              <span>{{ pm.percent }}٪</span>
+              <button type="button" (click)="removeProductMarkup(pm.productId)" class="text-red-600 hover:underline">حذف</button>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- دکمه ذخیره -->
+    <div class="flex items-center justify-between rounded-2xl bg-white p-4 shadow-card">
+      <p class="text-xs text-gray-400">تغییرات پس از ذخیره بلافاصله روی سایت اعمال می‌شوند (حاشیه سود تا ۳۰ ثانیه کش می‌شود).</p>
+      <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-7 py-2.5 font-bold text-white shadow-lg shadow-primary/20 disabled:opacity-50">
+        {{ saving ? 'در حال ذخیره…' : 'ذخیره تنظیمات' }}
+      </button>
+    </div>
+  </form>
+</section>

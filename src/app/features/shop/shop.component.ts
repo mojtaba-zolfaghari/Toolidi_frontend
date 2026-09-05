@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { slideUp } from '../../shared/animations';
 import { CategoryService, CategoryTreeNode } from '../../core/services/api/category.service';
 import { Product, ProductService } from '../../core/services/api/product.service';
+import { SeoService } from '../../core/services/seo.service';
 
 /** گزینه‌های مرتب‌سازی محصولات */
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'best';
@@ -51,7 +52,8 @@ export class ShopComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly categoryService: CategoryService,
-    private readonly productService: ProductService
+    private readonly productService: ProductService,
+    private readonly seo: SeoService
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +79,7 @@ export class ShopComponent implements OnInit {
       this.priceMin = this.minPrice ?? 0;
       this.priceMax = this.maxPrice ?? this.priceCap;
       this.loadProducts();
+      this.applySeo();
     });
   }
 
@@ -111,6 +114,38 @@ export class ShopComponent implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  /** اعمال SEO بر اساس فیلترهای فعلی */
+  private applySeo(): void {
+    const catName = this.categoryId
+      ? this.categories.find(c => c.id === this.categoryId)?.name ?? ''
+      : '';
+
+    const title = this.search
+      ? `نتایج جستجو «${this.search}»`
+      : catName
+        ? `خرید ${catName}`
+        : 'فروشگاه';
+
+    const description = this.search
+      ? `نتایج جستجو برای «${this.search}» در فروشگاه تولیدی`
+      : catName
+        ? `خرید عمده ${catName} با بهترین قیمت از تأمین‌کنندگان معتبر تولیدی`
+        : 'فروشگاه محصولات عمده با بهترین قیمت از تأمین‌کنندگان معتبر سراسر ایران';
+
+    this.seo.setPage({
+      title,
+      description,
+      url: `https://toolidi.ir/shop` + (this.categoryId ? `?categoryId=${this.categoryId}` : ''),
+      type: 'website',
+    });
+
+    // Breadcrumb JSON-LD
+    const crumbs = [{ name: 'خانه', url: 'https://toolidi.ir' }];
+    crumbs.push({ name: 'فروشگاه', url: 'https://toolidi.ir/shop' });
+    if (catName) crumbs.push({ name: catName, url: `https://toolidi.ir/shop?categoryId=${this.categoryId}` });
+    this.seo.setJsonLd(this.seo.breadcrumbJsonLd(crumbs));
   }
 
   /** اعمال فیلتر قیمت و مرتب‌سازی در سمت کلاینت (روی صفحه‌ی جاری) */

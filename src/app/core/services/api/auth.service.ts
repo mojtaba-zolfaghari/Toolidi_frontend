@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, timeout } from 'rxjs/operators';
 
 import { ApiService } from '../api.service';
 import { Result } from '../../models/api-response.model';
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../../interceptors/token.interceptor';
+import { CartService } from './cart.service';
 
 /** پروفایل کاربر در پاسخ ورود یا دریافت کاربر جاری */
 export interface UserProfile {
@@ -88,9 +89,19 @@ export interface AgentRegistrationData {
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private readonly api: ApiService) {}
+  /** حداکثر زمان انتظار برای پاسخ درخواست ورود (میلی‌ثانیه) */
+  private static readonly LOGIN_TIMEOUT_MS = 15_000;
 
-  /** ورود کاربر با کد ملی (یا نام کاربری) و رمز عبور */
+  constructor(
+    private readonly api: ApiService,
+    private readonly cartService: CartService
+  ) {}
+
+  /**
+   * ورود کاربر با کد ملی (یا نام کاربری) و رمز عبور، و ادغام سبد مهمان.
+   * در صورت کندی بیش از حد سرور، پس از ۱۵ ثانیه درخواست لغو شده
+   * و پیامی برای تلاش مجدد نمایش داده می‌شود.
+   */
   login(nationalCode: string, password: string): Observable<Result<LoginResponse>> {
     return this.api
       .post<Result<LoginResponse>>('/Auth/login', {
@@ -98,7 +109,31 @@ export class AuthService {
         password,
         rememberMe: false
       })
-      .pipe(tap((result) => this.storeTokens(result)));
+      .pipe(
+        timeout({
+          each: AuthService.LOGIN_TIMEOUT_MS,
+          with: () =>
+            throwError(
+              () => new Error('پاسخی از سرور دریافت نشد؛ لطفاً چند لحظه بعد دوباره تلاش کنید.')
+            )
+        }),
+        tap((result) => this.storeTokens(result)),
+        tap((result) => {
+          if (result.isSuccess && result.data) {
+            this.mergeGuestCartOnLogin();
+          }
+        })
+      );
+  }
+
+  /** ادغام سبد مهمان با سبد کاربر پس از ورود */
+  private mergeGuestCartOnLogin(): void {
+    const items = this.cartService.getGuestCart();
+    if (!items.length) return;
+    this.cartService.mergeGuestCart(items).subscribe({
+      next: () => {},
+      error: () => {}
+    });
   }
 
   /** ثبت‌نام سریع مشتری با حداقل اطلاعات */

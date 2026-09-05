@@ -1,74 +1,117 @@
 import { Component, OnInit } from '@angular/core';
 
-import { AdminService, AdminUser } from '../../../../core/services/api/admin.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
+import {
+  AdminService,
+  AdminUser,
+  AdminUserAddress,
+  AdminUserOrder,
+} from '../../../../core/services/api/admin.service';
+import { TableColumn, TableAction } from '../../../../shared/components/data-table/data-table.component';
+
+/** تب‌های مودال جزئیات کاربر */
+type UserDetailTab = 'info' | 'orders' | 'addresses';
 
 @Component({
   selector: 'app-admin-users',
-  template: `
-    <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
-      <header class="flex flex-wrap items-center justify-between gap-4">
-        <div><p class="text-sm font-medium text-primary">مدیریت سامانه</p><h1 class="mt-1 text-3xl font-extrabold text-secondary">کاربران</h1><p class="mt-2 text-sm text-gray-500">مدیریت نقش و وضعیت دسترسی کاربران</p></div>
-        <button type="button" (click)="loadUsers()" class="rounded-xl border border-primary px-4 py-2 text-sm font-bold text-primary hover:bg-bg-muted">بازخوانی</button>
-      </header>
-
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
-
-      <div class="overflow-x-auto rounded-2xl bg-white shadow-card">
-        <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری کاربران…</div>
-        <table *ngIf="!loading" class="w-full min-w-[760px] text-right text-sm">
-          <thead><tr class="border-b bg-gray-50 text-gray-500"><th class="p-4">نام کاربری</th><th class="p-4">کد ملی</th><th class="p-4">نقش</th><th class="p-4">وضعیت</th><th class="p-4">عملیات</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let user of users" class="border-b last:border-0 hover:bg-gray-50/70">
-              <td class="p-4"><strong class="block text-secondary">{{ user.username }}</strong><span class="text-xs text-gray-400">{{ user.email || 'ایمیل ثبت نشده' }}</span></td>
-              <td class="p-4">{{ user.nationalCode || '—' }}</td>
-              <td class="p-4"><div class="flex items-center gap-2"><select [value]="roleSelection[user.id] || user.roleId || normalizedRole(user.roleName)" (change)="roleSelection[user.id] = $any($event.target).value" class="rounded-lg border border-gray-300 bg-white px-3 py-2"><option *ngFor="let role of roleOptionsFor(user)" [value]="role.value">{{ role.label }}</option></select><button type="button" (click)="saveRole(user)" [disabled]="busyId === user.id" class="rounded-lg bg-primary px-3 py-2 text-xs font-bold text-white disabled:opacity-50">ذخیره</button></div></td>
-              <td class="p-4"><span class="rounded-full px-3 py-1 text-xs font-bold" [class.bg-green-50]="user.isActive" [class.text-green-700]="user.isActive" [class.bg-red-50]="!user.isActive" [class.text-red-700]="!user.isActive">{{ user.isActive ? 'فعال' : 'غیرفعال' }}</span></td>
-              <td class="p-4"><div class="flex flex-wrap gap-2"><button type="button" (click)="toggleStatus(user)" [disabled]="busyId === user.id" class="rounded-lg px-3 py-2 text-xs font-bold text-white disabled:opacity-50" [class.bg-accent-danger]="user.isActive" [class.bg-accent-success]="!user.isActive">{{ user.isActive ? 'غیرفعال کردن' : 'فعال کردن' }}</button><button type="button" (click)="remove(user)" [disabled]="busyId === user.id" class="rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-50">حذف</button></div></td>
-            </tr>
-          </tbody>
-        </table>
-        <p *ngIf="!loading && !users.length" class="p-10 text-center text-gray-400">کاربری برای نمایش وجود ندارد.</p>
-      </div>
-
-      <div *ngIf="!loading && totalPages > 1" class="flex items-center justify-center gap-3 text-sm"><button type="button" (click)="goToPage(page - 1)" [disabled]="page === 1" class="rounded-lg border px-4 py-2 disabled:opacity-40">قبلی</button><span class="text-gray-500">صفحه {{ page }} از {{ totalPages }}</span><button type="button" (click)="goToPage(page + 1)" [disabled]="page === totalPages" class="rounded-lg border px-4 py-2 disabled:opacity-40">بعدی</button></div>
-    </section>
-  `
+  templateUrl: './admin-users.component.html'
 })
 export class AdminUsersComponent implements OnInit {
   users: AdminUser[] = [];
   roleSelection: Record<string, string> = {};
+  selectedUser: AdminUser | null = null;
+
   roles = [
     { value: 'Customer', label: 'مشتری' },
     { value: 'Seller', label: 'فروشنده' },
     { value: 'Admin', label: 'مدیر' }
   ];
+
+  roleFilterOptions = [
+    { value: '', label: 'همه نقش‌ها' },
+    { value: 'Customer', label: 'مشتری' },
+    { value: 'Seller', label: 'فروشنده' },
+    { value: 'Admin', label: 'مدیر' }
+  ];
+
+  statusFilterOptions = [
+    { value: '', label: 'همه وضعیت‌ها' },
+    { value: 'Active', label: 'فعال' },
+    { value: 'Inactive', label: 'غیرفعال' }
+  ];
+
+  tableColumns: TableColumn[] = [
+    { key: 'username', label: 'نام کاربری', sortable: true },
+    { key: 'nationalCode', label: 'کد ملی' },
+    { key: 'email', label: 'ایمیل' },
+    { key: 'mobileNumber', label: 'موبایل' },
+    { key: 'roleName', label: 'نقش', type: 'badge', badgeMap: {
+      'Customer': { label: 'مشتری', color: 'bg-blue-100 text-blue-700' },
+      'Seller': { label: 'فروشنده', color: 'bg-amber-100 text-amber-700' },
+      'Admin': { label: 'مدیر', color: 'bg-purple-100 text-purple-700' }
+    }},
+    { key: 'isActive', label: 'وضعیت', type: 'badge', badgeMap: {
+      'true': { label: 'فعال', color: 'bg-green-100 text-green-700' },
+      'false': { label: 'غیرفعال', color: 'bg-red-100 text-red-700' }
+    }},
+    { key: 'createdAt', label: 'تاریخ عضویت', type: 'date' }
+  ];
+
+  tableActions: TableAction[] = [
+    { label: 'جزئیات', icon: '👁️', color: 'primary', click: (row) => this.viewUser(row) },
+    { label: 'فعال/غیرفعال', icon: '🔄', color: 'warning', click: (row) => this.toggleStatus(row) },
+    { label: 'حذف', icon: '🗑️', color: 'danger', click: (row) => this.remove(row) }
+  ];
+
+  searchTerm = '';
+  filterRole = '';
+  filterStatus = '';
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // ── مودال جزئیات کاربر ──
+  detailTab: UserDetailTab = 'info';
+  detailOrders: AdminUserOrder[] = [];
+  detailOrdersTotal = 0;
+  detailOrdersPage = 1;
+  detailOrdersLoading = false;
+  detailOrdersError = '';
+  detailAddresses: AdminUserAddress[] = [];
+  detailAddressesLoading = false;
+  detailAddressesError = '';
+
   page = 1;
   readonly pageSize = 15;
   totalCount = 0;
+  activeCount = 0;
+  sellerCount = 0;
+  adminCount = 0;
   loading = true;
   busyId = '';
   errorMessage = '';
   successMessage = '';
   private readonly roleIds: Record<string, string> = {};
 
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService, private readonly confirm: ConfirmService) {}
 
   ngOnInit(): void {
     this.loadUsers();
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
-
   loadUsers(): void {
     this.loading = true;
     this.errorMessage = '';
-    this.adminService.getUsers({ pageNumber: this.page, pageSize: this.pageSize }).subscribe({
+    // Backend GetUsersQuery binds: page, pageSize, role, status, search.
+    this.adminService.getUsers({
+      page: this.page,
+      pageSize: this.pageSize,
+      search: this.searchTerm || undefined,
+      role: this.filterRole || undefined,
+      status: this.filterStatus === 'Active' ? 'Active' : this.filterStatus === 'Inactive' ? 'Inactive' : undefined
+    }).subscribe({
       next: (result) => {
         this.users = result.data?.items ?? [];
         this.totalCount = result.data?.totalCount ?? this.users.length;
+        this.updateCounts();
         for (const user of this.users) {
           const role = this.normalizedRole(user.roleName);
           if (user.roleId && role) this.roleIds[role] = user.roleId;
@@ -86,15 +129,25 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  private updateCounts(): void {
+    this.activeCount = this.users.filter(u => u.isActive).length;
+    this.sellerCount = this.users.filter(u => this.normalizedRole(u.roleName) === 'Seller').length;
+    this.adminCount = this.users.filter(u => this.normalizedRole(u.roleName) === 'Admin').length;
+  }
+
+  onSearchChange(): void {
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.page = 1;
+      this.loadUsers();
+    }, 400);
+  }
+
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1 && page <= Math.ceil(this.totalCount / this.pageSize)) {
       this.page = page;
       this.loadUsers();
     }
-  }
-
-  roleOptionsFor(_user: AdminUser): Array<{ value: string; label: string }> {
-    return this.roles.map((role) => ({ ...role, value: this.roleIds[role.value] ?? role.value }));
   }
 
   normalizedRole(roleName?: string): string {
@@ -105,12 +158,94 @@ export class AdminUsersComponent implements OnInit {
     return value ? roleName ?? '' : 'Customer';
   }
 
+  getRoleLabel(roleName?: string): string {
+    const normalized = this.normalizedRole(roleName);
+    return this.roles.find(r => r.value === normalized)?.label ?? roleName ?? '—';
+  }
+
+  viewUser(user: AdminUser): void {
+    this.selectedUser = user;
+    this.detailTab = 'info';
+    this.detailOrders = [];
+    this.detailOrdersTotal = 0;
+    this.detailOrdersPage = 1;
+    this.detailOrdersError = '';
+    this.detailAddresses = [];
+    this.detailAddressesError = '';
+    // Orders are the most relevant tab for every role; addresses lazy-load on click.
+    this.selectDetailTab('orders');
+  }
+
+  selectDetailTab(tab: UserDetailTab): void {
+    this.detailTab = tab;
+    if (tab === 'orders' && this.selectedUser && this.detailOrders.length === 0 && !this.detailOrdersLoading) {
+      this.loadUserOrders();
+    }
+    if (tab === 'addresses' && this.selectedUser && this.detailAddresses.length === 0 && !this.detailAddressesLoading) {
+      this.loadUserAddresses();
+    }
+  }
+
+  loadUserOrders(): void {
+    if (!this.selectedUser) return;
+    this.detailOrdersLoading = true;
+    this.detailOrdersError = '';
+    this.adminService.getUserOrders(this.selectedUser.id, this.detailOrdersPage, 5).subscribe({
+      next: (result) => {
+        this.detailOrders = result.data?.items ?? [];
+        this.detailOrdersTotal = result.data?.totalCount ?? 0;
+        this.detailOrdersLoading = false;
+      },
+      error: (error: Error) => { this.detailOrdersLoading = false; this.detailOrdersError = error.message; }
+    });
+  }
+
+  changeDetailOrdersPage(delta: number): void {
+    const maxPage = Math.max(1, Math.ceil(this.detailOrdersTotal / 5));
+    const next = this.detailOrdersPage + delta;
+    if (next < 1 || next > maxPage) return;
+    this.detailOrdersPage = next;
+    this.loadUserOrders();
+  }
+
+  loadUserAddresses(): void {
+    if (!this.selectedUser) return;
+    this.detailAddressesLoading = true;
+    this.detailAddressesError = '';
+    this.adminService.getUserAddresses(this.selectedUser.id).subscribe({
+      next: (result) => {
+        this.detailAddresses = result.data ?? [];
+        this.detailAddressesLoading = false;
+      },
+      error: (error: Error) => { this.detailAddressesLoading = false; this.detailAddressesError = error.message; }
+    });
+  }
+
+  closeUserDetail(): void {
+    this.selectedUser = null;
+  }
+
+  orderStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      Pending: 'در انتظار', Processing: 'در حال پردازش', Shipped: 'ارسال شده',
+      Delivered: 'تحویل شده', Cancelled: 'لغو شده', Returned: 'مرجوع شده'
+    };
+    return map[status] ?? status;
+  }
+
+  paymentStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      Pending: 'در انتظار پرداخت', Paid: 'پرداخت شده', Failed: 'ناموفق',
+      Refunded: 'بازگشت داده شده', Cancelled: 'لغو شده'
+    };
+    return map[status] ?? status;
+  }
+
   saveRole(user: AdminUser): void {
     const roleId = this.roleSelection[user.id] ?? '';
     const currentRoleId = user.roleId ?? this.roleIds[this.normalizedRole(user.roleName)] ?? this.normalizedRole(user.roleName);
-    if (!roleId || roleId === currentRoleId) {
-      return;
-    }
+    if (!roleId || roleId === currentRoleId) return;
+
     this.busyId = user.id;
     this.clearMessages();
     this.adminService.updateUserRole(user.id, roleId).subscribe({
@@ -131,16 +266,18 @@ export class AdminUsersComponent implements OnInit {
   }
 
   remove(user: AdminUser): void {
-    if (!window.confirm(`آیا از حذف کاربر «${user.username}» مطمئن هستید؟`)) return;
-    this.busyId = user.id;
-    this.clearMessages();
-    this.adminService.deleteUser(user.id).subscribe({
-      next: (result) => {
-        this.busyId = '';
-        if (result.isSuccess) { this.successMessage = 'کاربر حذف شد.'; this.loadUsers(); }
-        else this.errorMessage = result.errorMessage ?? 'حذف کاربر انجام نشد.';
-      },
-      error: (error: Error) => { this.busyId = ''; this.errorMessage = error.message; }
+    this.confirm.confirmDanger(`آیا از حذف کاربر «${user.username}» مطمئن هستید؟`).subscribe(ok => {
+      if (!ok) return;
+      this.busyId = user.id;
+      this.clearMessages();
+      this.adminService.deleteUser(user.id).subscribe({
+        next: (result) => {
+          this.busyId = '';
+          if (result.isSuccess) { this.successMessage = 'کاربر حذف شد.'; this.loadUsers(); }
+          else this.errorMessage = result.errorMessage ?? 'حذف کاربر انجام نشد.';
+        },
+        error: (error: Error) => { this.busyId = ''; this.errorMessage = error.message; }
+      });
     });
   }
 

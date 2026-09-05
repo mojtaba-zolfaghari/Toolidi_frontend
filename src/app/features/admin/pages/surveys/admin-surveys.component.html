@@ -1,0 +1,136 @@
+<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm font-medium text-primary">نظرسنجی</p>
+      <h1 class="mt-1 text-3xl font-extrabold text-secondary">مدیریت نظرسنجی‌ها</h1>
+      <p class="mt-2 text-sm text-gray-500">ایجاد نظرسنجی و بررسی پاسخ‌ها</p>
+    </div>
+    <button mat-flat-button type="button" (click)="openCreate()" class="admin-btn-primary">ایجاد نظرسنجی جدید</button>
+  </header>
+
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+
+  <div class="data-table__container overflow-x-auto">
+    <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری نظرسنجی‌ها…</div>
+    <table *ngIf="!loading" class="w-full min-w-[800px] text-right text-sm">
+      <thead>
+        <tr class="border-b bg-gray-50 text-gray-500">
+          <th class="p-4">عنوان</th>
+          <th class="p-4">شروع</th>
+          <th class="p-4">پایان</th>
+          <th class="p-4">وضعیت</th>
+          <th class="p-4">تعداد پاسخ</th>
+          <th class="p-4">عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let survey of surveys" class="border-b last:border-0">
+          <td class="p-4 font-bold text-secondary">{{ survey.title }}</td>
+          <td class="p-4">{{ survey.startDate | persianDate:'yyyy/MM/dd' }}</td>
+          <td class="p-4">{{ survey.endDate | persianDate:'yyyy/MM/dd' }}</td>
+          <td class="p-4">
+            <span [class.text-green-600]="isActive(survey)" [class.text-gray-500]="!isActive(survey)">{{ isActive(survey) ? 'فعال' : 'غیرفعال' }}</span>
+          </td>
+          <td class="p-4">{{ survey.responsesCount ?? 0 | number }}</td>
+          <td class="p-4">
+            <div class="flex gap-3">
+              <button type="button" (click)="showResults(survey)" class="font-bold text-accent-info hover:underline">نتایج</button>
+              <button type="button" (click)="openEdit(survey)" class="font-bold text-primary hover:underline">ویرایش</button>
+              <button type="button" (click)="remove(survey)" class="font-bold text-red-600 hover:underline">حذف</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!loading && !surveys.length" class="p-10 text-center text-gray-400">نظرسنجی‌ای برای نمایش وجود ندارد.</p>
+  </div>
+
+  <!-- Survey form modal -->
+  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
+    <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-secondary">{{ editingId ? 'ویرایش نظرسنجی' : 'ایجاد نظرسنجی جدید' }}</h2>
+        <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
+      </div>
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="md:col-span-2">
+          <span class="mb-1 block text-sm font-medium text-secondary">عنوان *</span>
+          <input formControlName="title" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label class="md:col-span-2">
+          <span class="mb-1 block text-sm font-medium text-secondary">توضیحات</span>
+          <textarea formControlName="description" rows="2" class="w-full rounded-xl border border-gray-300 px-4 py-2.5"></textarea>
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">تاریخ شروع *</span>
+          <input formControlName="startDate" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+        <label>
+          <span class="mb-1 block text-sm font-medium text-secondary">تاریخ پایان *</span>
+          <input formControlName="endDate" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+        </label>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between">
+        <h3 class="font-bold text-secondary">سؤالات</h3>
+        <button type="button" (click)="addQuestion()" class="rounded-lg bg-secondary px-4 py-2 text-sm font-bold text-white">+ افزودن سؤال</button>
+      </div>
+
+      <div *ngFor="let question of questions; let i = index" class="mt-3 rounded-xl border border-gray-200 p-4">
+        <div class="flex items-start gap-3">
+          <input [(ngModel)]="question.text" [ngModelOptions]="{standalone:true}" placeholder="متن سؤال" class="flex-1 rounded-lg border border-gray-300 px-3 py-2" />
+          <select [(ngModel)]="question.type" [ngModelOptions]="{standalone:true}" class="rounded-lg border border-gray-300 bg-white px-3 py-2">
+            <option value="MultipleChoice">چندگزینه‌ای</option>
+            <option value="Text">پاسخ متنی</option>
+            <option value="YesNo">بله/خیر</option>
+          </select>
+          <label class="flex items-center gap-1 whitespace-nowrap pt-2 text-sm">
+            <input [(ngModel)]="question.isRequired" [ngModelOptions]="{standalone:true}" type="checkbox" /> الزامی
+          </label>
+          <button type="button" (click)="removeQuestion(i)" class="text-xl text-red-500">×</button>
+        </div>
+        <div *ngIf="question.type === 'MultipleChoice'" class="mt-3 space-y-2">
+          <div *ngFor="let option of question.options; let oi = index" class="flex gap-2">
+            <input [(ngModel)]="question.options![oi]" [ngModelOptions]="{standalone:true}" placeholder="گزینه" class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+            <button type="button" (click)="removeOption(question, oi)" class="text-red-500">×</button>
+          </div>
+          <button type="button" (click)="addOption(question)" class="text-sm font-bold text-primary">+ افزودن گزینه</button>
+        </div>
+      </div>
+
+      <p *ngIf="formError" class="admin-alert admin-alert--error mt-4">{{ formError }}</p>
+      <div class="mt-6 flex justify-end gap-3">
+        <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+        <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره نظرسنجی' }}</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results modal -->
+  <div *ngIf="resultsSurvey" class="admin-modal" (click)="resultsSurvey = null">
+    <div class="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-secondary">نتایج {{ resultsSurvey.title }}</h2>
+        <button type="button" (click)="resultsSurvey = null" class="text-2xl text-gray-400">×</button>
+      </div>
+      <p *ngIf="resultsLoading" class="py-8 text-center text-gray-500">در حال دریافت نتایج…</p>
+      <div *ngIf="!resultsLoading && results.length" class="mt-5 space-y-5">
+        <div *ngFor="let result of results" class="rounded-xl bg-bg-muted p-4">
+          <h3 class="font-bold text-secondary">{{ result.questionText }}</h3>
+          <div *ngFor="let answer of result.answers" class="mt-3">
+            <div class="flex justify-between text-sm">
+              <span>{{ answer.label }}</span>
+              <strong>{{ answer.count }}</strong>
+            </div>
+            <div class="mt-1 h-2 rounded-full bg-white">
+              <div class="h-2 rounded-full bg-primary" [style.width.%]="resultMax(result) ? answer.count / resultMax(result) * 100 : 0"></div>
+            </div>
+          </div>
+          <p *ngFor="let answer of result.textAnswers" class="mt-2 rounded-lg bg-white p-2 text-sm">{{ answer }}</p>
+        </div>
+      </div>
+      <p *ngIf="!resultsLoading && !results.length" class="py-8 text-center text-gray-400">نتیجه‌ای برای نمایش وجود ندارد.</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,88 @@
+/* ═══ Redesigned filter bar (admin products) ═══ */
+.admin-filters--redesigned {
+  padding: 0.25rem 1rem;
+}
+
+.admin-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-filters__search {
+  flex: 1 1 16rem;
+  min-width: 12.5rem;
+}
+
+.admin-filters__select {
+  width: 11rem;
+  flex: 0 0 auto;
+}
+
+.admin-filters__toggle {
+  flex: 0 0 auto;
+}
+
+.admin-filters__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  margin-inline-start: 0.35rem;
+  border-radius: 999px;
+  background: var(--mat-sys-primary, #6c3fc5);
+  color: var(--mat-sys-on-primary, #fff);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.admin-filters__advanced {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--mat-sys-outline-variant, #e2e8f0);
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .admin-filters__checkbox {
+    align-self: center;
+  }
+}
+
+/* ═══ Quick restock chips ═══ */
+.admin-restock-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  button {
+    min-width: 3.5rem;
+  }
+}
+
+/* ═══ Modal footer (edit + restock) ═══ */
+.admin-modal__footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+/* Modal card taller variant for the edit dialog */
+.admin-modal__card--tall {
+  max-width: 56rem;
+}
+
+.admin-form-grid__toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}

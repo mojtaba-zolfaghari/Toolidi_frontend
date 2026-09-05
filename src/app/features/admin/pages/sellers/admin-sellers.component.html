@@ -1,0 +1,123 @@
+<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+  <app-page-header
+    title="فروشندگان"
+    subtitle="بررسی اطلاعات و تأیید فروشندگان"
+    [actions]="headerActions"
+  ></app-page-header>
+
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+
+  <!-- Summary Cards -->
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <app-stat-card title="کل فروشندگان" [value]="totalCount" icon="🏪" color="primary"></app-stat-card>
+    <app-stat-card title="تأیید شده" [value]="verifiedCount" icon="✅" color="success"></app-stat-card>
+    <app-stat-card title="در انتظار تأیید" [value]="totalCount - verifiedCount" icon="⏳" color="warning"></app-stat-card>
+  </div>
+
+  <!-- Sellers Table -->
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="sellers"
+    [loading]="loading"
+    [actions]="tableActions"
+    searchPlaceholder="جستجوی فروشنده…"
+    emptyMessage="فروشنده‌ای برای نمایش وجود ندارد."
+    emptyIcon="🏪"
+    [pageSize]="pageSize"
+    [totalItems]="totalCount"
+    (pageChange)="goToPage($event)"
+  ></app-data-table>
+
+  <!-- Create Seller Modal -->
+  <div *ngIf="createOpen" class="admin-modal" (click)="closeCreate()">
+    <form [formGroup]="sellerForm" (ngSubmit)="createSeller()" (click)="$event.stopPropagation()"
+      class="admin-modal__card admin-modal__card--wide">
+      <div class="admin-modal__header">
+        <h2 class="admin-modal__title">افزودن فروشنده جدید</h2>
+        <button type="button" mat-icon-button (click)="closeCreate()" aria-label="بستن">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="admin-form-grid">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>نام شرکت *</mat-label>
+          <input matInput formControlName="companyName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>شناسه ملی *</mat-label>
+          <input matInput formControlName="nationalId" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>نام تماس *</mat-label>
+          <input matInput formControlName="contactName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>ایمیل تماس *</mat-label>
+          <input matInput type="email" formControlName="contactEmail" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>شماره تماس *</mat-label>
+          <input matInput formControlName="contactPhone" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>استان *</mat-label>
+          <mat-select formControlName="provinceId" (selectionChange)="onProvinceChange()">
+            <mat-option *ngFor="let province of provinces" [value]="province.id">{{ province.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>شهرستان *</mat-label>
+          <mat-select formControlName="cityId" [disabled]="loadingCities || !sellerForm.get('provinceId')?.value">
+            <mat-option *ngIf="loadingCities" [disabled]="true">در حال بارگذاری…</mat-option>
+            <mat-option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>کد پستی *</mat-label>
+          <input matInput formControlName="postalCode" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>کشور *</mat-label>
+          <input matInput formControlName="country" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>درصد کمیسیون *</mat-label>
+          <input matInput type="number" min="0" max="100" formControlName="commissionRate" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
+          <mat-label>نشانی *</mat-label>
+          <textarea matInput rows="2" formControlName="address"></textarea>
+        </mat-form-field>
+      </div>
+      <p *ngIf="createError" class="admin-form-error">{{ createError }}</p>
+      <div class="admin-form-actions">
+        <button type="button" mat-button (click)="closeCreate()">انصراف</button>
+        <button type="submit" mat-flat-button class="admin-btn-primary" [disabled]="creating">
+          {{ creating ? 'در حال ذخیره…' : 'ثبت فروشنده' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Documents Modal -->
+  <div *ngIf="documentsSeller" class="admin-modal" (click)="closeDocuments()">
+    <mat-card appearance="outlined" class="admin-modal__card" (click)="$event.stopPropagation()">
+      <div class="admin-modal__header">
+        <h2 class="admin-modal__title">مدارک {{ documentsSeller.companyName }}</h2>
+        <button mat-icon-button (click)="closeDocuments()" aria-label="بستن">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <p *ngIf="documentsLoading" class="admin-modal__loading">در حال بارگذاری مدارک…</p>
+      <div *ngIf="!documentsLoading && documents.length" class="admin-modal__list">
+        <a *ngFor="let document of documents" [href]="document.url" target="_blank" rel="noopener"
+          class="admin-modal__list-item">
+          <mat-icon class="admin-modal__list-icon">description</mat-icon>
+          <span>{{ document.name || document.type || 'مشاهده مدرک' }}</span>
+        </a>
+      </div>
+      <p *ngIf="!documentsLoading && !documents.length" class="admin-modal__empty">مدرکی ثبت نشده است.</p>
+    </mat-card>
+  </div>
+</section>

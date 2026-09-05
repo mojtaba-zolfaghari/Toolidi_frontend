@@ -44,7 +44,7 @@ export class ApiService {
 
   /** مدیریت خطاها با پیام‌های فارسی */
   private handleError(error: HttpErrorResponse): Observable<never> {
-    let message = 'خطا در ارتباط با سرور';
+    let message = this.extractServerMessage(error) ?? 'خطا در ارتباط با سرور';
 
     if (error.status === 0) {
       message = 'خطا در ارتباط با سرور؛ لطفاً اتصال اینترنت خود را بررسی کنید.';
@@ -62,5 +62,13 @@ export class ApiService {
 
     console.error('API Error:', error);
     return throwError(() => new Error(message));
+  }
+
+  private extractServerMessage(error: HttpErrorResponse): string | null {
+    const body = error.error;
+    if (!body || typeof body !== 'object') return null;
+    return typeof body.errorMessage === 'string' && body.errorMessage.trim()
+      ? body.errorMessage
+      : typeof body.message === 'string' && body.message.trim() ? body.message : null;
   }
 }

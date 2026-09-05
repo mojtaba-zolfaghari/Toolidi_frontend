@@ -1,0 +1,9 @@
+<button
+  mat-flat-button
+  [class]="classes"
+  [disabled]="disabled || loading"
+  (click)="onClick()">
+  <span *ngIf="loading" class="action-button__spinner" aria-hidden="true"></span>
+  <span *ngIf="!loading && icon" aria-hidden="true">{{ icon }}</span>
+  <span *ngIf="!iconOnly && !loading">{{ label }}</span>
+</button>

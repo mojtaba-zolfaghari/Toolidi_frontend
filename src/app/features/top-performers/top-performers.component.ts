@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
+import { SeoService } from '../../core/services/seo.service';
 
 @Component({
   selector: 'app-top-performers',
@@ -15,12 +16,26 @@ export class TopPerformersComponent implements OnInit {
   stats: any = null;
   loading = true;
 
-  constructor(private readonly api: ApiService) {}
+  constructor(private readonly api: ApiService, private readonly seo: SeoService) {}
 
   ngOnInit(): void {
+    this.seo.setPage({
+      title: 'برترین‌های شبکه تولیدی',
+      description: 'فروشندگان و کالارسانان برتر شبکه تولیدی بر اساس امتیاز، تعداد سفارش و سرعت تحویل',
+      url: 'https://toolidi.ir/top-performers',
+      type: 'website',
+    });
+    this.seo.setJsonLd(this.seo.breadcrumbJsonLd([
+      { name: 'خانه', url: 'https://toolidi.ir' },
+      { name: 'برترین‌ها', url: 'https://toolidi.ir/top-performers' },
+    ]));
     this.loadStats();
     this.loadSellers();
     this.loadCouriers();
+  }
+
+  ngOnDestroy(): void {
+    this.seo.removeJsonLd();
   }
 
   loadStats(): void {

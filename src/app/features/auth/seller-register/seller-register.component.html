@@ -69,8 +69,11 @@
               <div class="seller-step-heading"><span>02</span><div><h3 id="seller-business-title">ویترین کسب‌وکارت را معرفی کن</h3><p>خریدار باید بداند از کجا و با چه مجموعه‌ای خرید می‌کند.</p></div></div>
               <div class="seller-fields-grid">
                 <label class="seller-field seller-field-full"><span>نام فروشگاه یا شرکت</span><input formControlName="companyName" placeholder="مثلاً تولیدی گوهر جنوب"><em *ngIf="hasError('companyName')">نام فروشگاه را وارد کنید.</em></label>
-                <label class="seller-field"><span>استان</span><select formControlName="province"><option value="">انتخاب استان</option><option *ngFor="let province of provinces" [value]="province">{{ province }}</option></select><em *ngIf="hasError('province')">استان را انتخاب کنید.</em></label>
-                <label class="seller-field"><span>شهر</span><select formControlName="city"><option value="">انتخاب شهر</option><option *ngFor="let city of cities" [value]="city">{{ city }}</option></select><em *ngIf="hasError('city')">شهر را انتخاب کنید.</em></label>
+                <label class="seller-field"><span>استان</span><select formControlName="provinceId" (change)="onProvinceChange()"><option value="">انتخاب استان</option><option *ngFor="let p of apiProvinces" [value]="p.id">{{ p.name }}</option></select><em *ngIf="hasError('provinceId')">استان را انتخاب کنید.</em></label>
+                <label class="seller-field"><span>شهرستان</span><select formControlName="cityId" (change)="onCityChange()" [disabled]="loadingCities || !form.get('provinceId')?.value"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : 'انتخاب شهرستان' }}</option><option *ngFor="let c of apiCities" [value]="c.id">{{ c.name }}</option></select><em *ngIf="hasError('cityId')">شهرستان را انتخاب کنید.</em></label>
+                <div *ngIf="!registrationAllowed && registrationCheckMessage" class="seller-field seller-field-full">
+                  <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">⚠️ {{ registrationCheckMessage }}</div>
+                </div>
                 <label class="seller-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" dir="ltr" placeholder="09xxxxxxxxx"><em *ngIf="hasError('phone')">شماره موبایل معتبر وارد کنید.</em></label>
                 <label class="seller-field"><span>ایمیل</span><input formControlName="email" type="email" dir="ltr" placeholder="you@example.com"><em *ngIf="hasError('email')">ایمیل معتبر وارد کنید.</em></label>
               </div>

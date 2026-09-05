@@ -1,0 +1,36 @@
+.confirm-dialog__title {
+  font-weight: 700;
+  color: var(--mat-sys-on-surface, #1B2A4A);
+}
+
+.confirm-dialog__content {
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--mat-sys-on-surface-variant, #475569);
+  }
+}
+
+.confirm-dialog__actions {
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.confirm-dialog__btn--danger {
+  background: #dc2626;
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: #b91c1c;
+  }
+}
+
+.confirm-dialog__btn--primary {
+  background: var(--mat-sys-primary, #6C3FC5);
+  color: var(--mat-sys-on-primary, #fff);
+
+  &:hover:not(:disabled) {
+    background: #5b32a8;
+  }
+}

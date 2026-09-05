@@ -79,6 +79,40 @@ export interface OrderTracking {
   history: OrderTrackingHistory[];
 }
 
+/** یک مرحله از زمان‌بندی سفارش */
+export interface OrderTimelineStage {
+  key: string;
+  label: string;
+  icon: string;
+  completed: boolean;
+  current: boolean;
+  date?: string;
+  note?: string;
+}
+
+/** زمان‌بندی ۶ مرحله‌ای سفارش */
+export interface OrderTimeline {
+  orderId: string;
+  orderNumber: string;
+  currentStatus: string;
+  stages: OrderTimelineStage[];
+}
+
+/** زمان تقریبی تحویل یک آیتم سبد خرید */
+export interface EstimatedDelivery {
+  productId: string;
+  productName: string;
+  quantity: number;
+  supplierName: string;
+  supplierId: string;
+  dailyCapacity: number;
+  unit: string;
+  capacitySet: boolean;
+  productionDays: number;
+  estimatedReadyDate?: string;
+  estimatedDeliveryDate?: string;
+}
+
 /** یک سابقه از پیگیری سفارش */
 export interface OrderTrackingHistory {
   status: string;
@@ -126,5 +160,15 @@ export class OrderService {
   /** دریافت اطلاعات پیگیری سفارش */
   trackOrder(id: string): Observable<Result<OrderTracking>> {
     return this.api.get<Result<OrderTracking>>(`/v1/orders/${id}/track`);
+  }
+
+  /** دریافت زمان تقریبی تحویل بر اساس سبد خرید */
+  getEstimatedDelivery(): Observable<Result<EstimatedDelivery[]>> {
+    return this.api.get<Result<EstimatedDelivery[]>>(`/v1/checkout/estimated-delivery`);
+  }
+
+  /** دریافت زمان‌بندی ۶ مرحله‌ای سفارش */
+  getOrderTimeline(orderId: string): Observable<Result<OrderTimeline>> {
+    return this.api.get<Result<OrderTimeline>>(`/v1/orders/${orderId}/timeline`);
   }
 }

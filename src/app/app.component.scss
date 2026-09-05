@@ -84,8 +84,26 @@ main {
 }
 
 .mobile-mega-menu .mega-menu-group {
-  min-height: 2.85rem;
-  padding: 0.45rem;
+  min-height: 3.2rem;
+  padding: 0.55rem 0.6rem;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mobile-mega-menu .mega-menu-group-active {
+  background: rgb(108 63 197 / 0.28);
+  border-color: rgb(108 63 197 / 0.35);
+  color: white;
+}
+
+.mobile-mega-menu .mega-menu-chevron {
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.mobile-mega-menu .mega-menu-group-active .mega-menu-chevron {
+  transform: rotate(90deg);
+  opacity: 1;
 }
 
 .mobile-mega-menu .mega-menu-group-icon,
@@ -113,9 +131,11 @@ main {
 }
 
 .mobile-mega-menu .mega-menu-child {
-  min-height: 2.2rem;
-  padding: 0.4rem;
-  font-size: 0.68rem;
+  min-height: 2.6rem;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.72rem;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .mobile-mega-menu .mega-menu-footer {

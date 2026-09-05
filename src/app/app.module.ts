@@ -19,9 +19,6 @@ import { CoreModule } from './core/core.module';
 // Shared Module (reusable UI components)
 import { SharedModule } from './shared/shared.module';
 
-// Layouts Module (admin/seller layout)
-import { LayoutsModule } from './layouts/layouts.module';
-
 registerLocaleData(localeFa);
 
 @NgModule({
@@ -36,7 +33,6 @@ registerLocaleData(localeFa);
     AppRoutingModule,
     CoreModule,
     SharedModule,
-    LayoutsModule,
   ],
   providers: [
     // ثبت اینترسپتور توکن برای تمام درخواست‌های HTTP

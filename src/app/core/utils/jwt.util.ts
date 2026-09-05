@@ -48,6 +48,7 @@ export function getUsernameFromToken(token: string): string | null {
 
   return (
     (payload['unique_name'] as string | undefined) ??
+    (payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] as string | undefined) ??
     (payload['name'] as string | undefined) ??
     (payload['sub'] as string | undefined) ??
     null

@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { SellerDashboardComponent } from './dashboard/seller-dashboard.component';
 import { SharedModule } from '../../shared/shared.module';
+import { PanelSharedModule } from '../../shared/panel/panel-shared.module';
 import { ProductManagementModule } from '../product-management/product-management.module';
 import { ProductListComponent } from '../product-management/product-list.component';
 import { ProductFormComponent } from '../product-management/product-form.component';
@@ -13,9 +14,11 @@ import { SellerSurveysComponent } from './pages/surveys/seller-surveys.component
 import { SellerCostsComponent } from './pages/costs/seller-costs.component';
 import { SellerOrdersComponent } from './pages/orders/seller-orders.component';
 import { SellerProfileComponent } from './pages/profile/seller-profile.component';
+import { SellerTaminetoComponent } from './pages/tamineto/seller-tamineto.component';
 
 const routes: Routes = [
   { path: '', component: SellerDashboardComponent },
+  { path: 'tamineto', component: SellerTaminetoComponent },
   { path: 'products', component: ProductListComponent },
   { path: 'products/new', component: ProductFormComponent },
   { path: 'products/edit/:id', component: ProductFormComponent },
@@ -31,6 +34,7 @@ const routes: Routes = [
     SellerDashboardComponent,
     SellerOrdersComponent,
     SellerProfileComponent,
+    SellerTaminetoComponent,
     SellerPayoutsComponent,
     SellerSurveysComponent,
     SellerCostsComponent
@@ -41,6 +45,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     SharedModule,
+    PanelSharedModule,
     ProductManagementModule
   ]
 })

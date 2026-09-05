@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { Order, OrderService, OrderTracking } from '../../core/services/api/order.service';
+import { Order, OrderService, OrderTracking, OrderTimeline, OrderTimelineStage } from '../../core/services/api/order.service';
+import { TimelineStep } from '../../shared/components/tracking-timeline/tracking-timeline.component';
 
 /** صفحه جزئیات و پیگیری سفارش */
 @Component({
@@ -11,6 +12,8 @@ import { Order, OrderService, OrderTracking } from '../../core/services/api/orde
 export class OrderDetailComponent implements OnInit {
   order: Order | null = null;
   tracking: OrderTracking | null = null;
+  timeline: OrderTimeline | null = null;
+  timelineSteps: TimelineStep[] = [];
   loading = true;
   errorMessage = '';
   canceling = false;
@@ -49,6 +52,23 @@ export class OrderDetailComponent implements OnInit {
     this.orderService.trackOrder(id).subscribe({
       next: (result) => (this.tracking = result.data ?? null),
       error: () => (this.tracking = null)
+    });
+
+    this.orderService.getOrderTimeline(id).subscribe({
+      next: (result) => {
+        this.timeline = result.data ?? null;
+        if (this.timeline?.stages) {
+          this.timelineSteps = this.timeline.stages.map((stage: OrderTimelineStage) => ({
+            key: stage.key,
+            label: stage.label,
+            icon: stage.icon,
+            completed: stage.completed,
+            current: stage.current,
+            date: stage.date
+          }));
+        }
+      },
+      error: () => (this.timeline = null)
     });
   }
 

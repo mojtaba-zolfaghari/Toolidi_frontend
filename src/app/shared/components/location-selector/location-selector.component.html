@@ -1,0 +1,16 @@
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" [formGroup]="group">
+  <label class="block">
+    <span class="mb-1 block text-sm font-medium text-secondary">{{ provinceLabel }}{{ required ? ' *' : '' }}</span>
+    <select [formControlName]="provinceControl" (change)="onProvinceChange()" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+      <option value="">{{ loadingProvinces ? 'در حال بارگذاری…' : 'انتخاب استان' }}</option>
+      <option *ngFor="let province of provinces" [value]="province.id">{{ province.name }}</option>
+    </select>
+  </label>
+  <label class="block">
+    <span class="mb-1 block text-sm font-medium text-secondary">{{ cityLabel }}{{ required ? ' *' : '' }}</span>
+    <select [formControlName]="cityControl" (change)="onCityChange()" [disabled]="loadingCities || !group.get(provinceControl)?.value" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 disabled:bg-gray-100">
+      <option value="">{{ loadingCities ? 'در حال بارگذاری…' : 'انتخاب شهرستان' }}</option>
+      <option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</option>
+    </select>
+  </label>
+</div>

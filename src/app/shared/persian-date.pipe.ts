@@ -6,7 +6,8 @@ import { Pipe, PipeTransform } from '@angular/core';
  */
 @Pipe({
   name: 'persianDate',
-  pure: true
+  pure: true,
+  standalone: true
 })
 export class PersianDatePipe implements PipeTransform {
   transform(value: string | Date | number | null | undefined, format = 'yyyy/MM/dd'): string {

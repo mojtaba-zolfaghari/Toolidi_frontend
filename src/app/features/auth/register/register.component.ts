@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../../core/services/api/auth.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
+import { getCurrentRole, navigateAfterLogin } from '../../../core/utils/auth-redirect.util';
 
 /**
  * صفحه ثبت‌نام سریع خریدار با حداقل اطلاعات موردنیاز.
@@ -51,7 +52,7 @@ export class RegisterComponent {
         if (result.isSuccess && result.data) {
           this.authState.refresh();
           this.successMessage = 'حساب شما ساخته شد؛ در حال ورود به فروشگاه هستیم.';
-          setTimeout(() => this.router.navigate(['/']), 700);
+          setTimeout(() => navigateAfterLogin(this.router, getCurrentRole()), 700);
         } else {
           this.errorMessage = result.errorMessage ?? 'ثبت‌نام ناموفق بود؛ دوباره تلاش کنید.';
         }

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { BlogPost, BlogService } from '../../core/services/api/blog.service';
+import { SeoService } from '../../core/services/seo.service';
 
 /** دسته‌بندی وبلاگ */
 interface BlogCategory {
@@ -42,11 +43,26 @@ export class BlogComponent implements OnInit {
 
   constructor(
     private readonly blogService: BlogService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly seo: SeoService
   ) {}
 
   ngOnInit(): void {
+    this.seo.setPage({
+      title: 'وبلاگ تولیدی',
+      description: 'آخرین اخبار بازار، راهنمای خرید عمده، نکات و ترفندهای فروش و معرفی محصولات در وبلاگ تولیدی',
+      url: 'https://toolidi.ir/blog',
+      type: 'website',
+    });
+    this.seo.setJsonLd(this.seo.breadcrumbJsonLd([
+      { name: 'خانه', url: 'https://toolidi.ir' },
+      { name: 'وبلاگ', url: 'https://toolidi.ir/blog' },
+    ]));
     this.loadPosts();
+  }
+
+  ngOnDestroy(): void {
+    this.seo.removeJsonLd();
   }
 
   /** بارگذاری پست‌ها */

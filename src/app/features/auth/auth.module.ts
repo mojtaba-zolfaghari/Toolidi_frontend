@@ -8,6 +8,7 @@ import { RegisterComponent } from './register/register.component';
 import { SellerRegisterComponent } from './seller-register/seller-register.component';
 import { SupplierRegisterComponent } from './supplier-register/supplier-register.component';
 import { AgentRegisterComponent } from './agent-register/agent-register.component';
+import { AuthLandingComponent } from './auth-landing.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -15,7 +16,7 @@ const routes: Routes = [
   { path: 'seller-register', component: SellerRegisterComponent },
   { path: 'supplier-register', component: SupplierRegisterComponent },
   { path: 'agent-register', component: AgentRegisterComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' }
+  { path: '', component: AuthLandingComponent }
 ];
 
 @NgModule({
@@ -24,7 +25,8 @@ const routes: Routes = [
     RegisterComponent,
     SellerRegisterComponent,
     SupplierRegisterComponent,
-    AgentRegisterComponent
+    AgentRegisterComponent,
+    AuthLandingComponent
   ],
   imports: [
     CommonModule,

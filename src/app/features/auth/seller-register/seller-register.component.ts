@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
+import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
 
 /** صفحه ثبت‌نام اختصاصی فروشنده برای شروع فروش در شبکه تولیدی. */
@@ -10,7 +11,7 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
   templateUrl: './seller-register.component.html',
   styleUrls: ['./seller-register.component.scss']
 })
-export class SellerRegisterComponent {
+export class SellerRegisterComponent implements OnInit {
   form: FormGroup;
   currentStep = 1;
   readonly totalSteps = 4;
@@ -19,8 +20,17 @@ export class SellerRegisterComponent {
   errorMessage = '';
   successMessage = '';
 
-  readonly cities = IRAN_CITY_NAMES;
-  readonly provinces = IRAN_PROVINCE_NAMES;
+  // Fallback static data (used if API fails)
+  readonly staticCities = IRAN_CITY_NAMES;
+  readonly staticProvinces = IRAN_PROVINCE_NAMES;
+
+  // Dynamic data from API
+  apiProvinces: Province[] = [];
+  apiCities: City[] = [];
+  useApiData = false;
+  registrationAllowed = true;
+  registrationCheckMessage = '';
+  loadingCities = false;
 
   readonly categories = [
     'زیورآلات و بدلیجات', 'سنگ‌های قیمتی', 'ابزار و تجهیزات معدن',
@@ -30,7 +40,8 @@ export class SellerRegisterComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly locationService: LocationService
   ) {
     this.form = this.fb.group({
       nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -38,14 +49,81 @@ export class SellerRegisterComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
       companyName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(160)]],
-      city: ['', Validators.required],
-      province: ['', Validators.required],
+      city: [''],
+      province: [''],
+      provinceId: ['', Validators.required],
+      cityId: ['', Validators.required],
       phone: ['', [Validators.required, Validators.pattern(/^09\d{9}$/)]],
       email: ['', [Validators.required, Validators.email]],
       category: ['', Validators.required],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       acceptsReturns: [true],
       terms: [false, Validators.requiredTrue]
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadProvinces();
+  }
+
+  /** Load provinces from API */
+  loadProvinces(): void {
+    this.locationService.getProvinces().subscribe({
+      next: (result) => {
+        if (result.isSuccess && result.data && result.data.length > 0) {
+              this.apiProvinces = result.data;
+          this.useApiData = true;
+          this.useApiData = true;
+        }
+      },
+      error: () => { /* fallback to static data */ }
+    });
+  }
+
+  /** When province changes, load cities for that province */
+  onProvinceChange(): void {
+    const provinceId = this.form.get('provinceId')?.value;
+    this.apiCities = [];
+    this.form.patchValue({ cityId: '', city: '' });
+    this.registrationAllowed = true;
+    this.registrationCheckMessage = '';
+
+    if (!provinceId) return;
+
+    this.loadingCities = true;
+    this.locationService.getCitiesByProvince(provinceId).subscribe({
+      next: (result) => {
+        this.apiCities = result.data ?? [];
+        this.form.get('cityId')?.enable({ emitEvent: false });
+        this.loadingCities = false;
+      },
+      error: () => { this.loadingCities = false; }
+    });
+  }
+
+  /** When city changes, check if registration is allowed */
+  onCityChange(): void {
+    const provinceId = this.form.get('provinceId')?.value;
+    const cityId = this.form.get('cityId')?.value;
+    const city = this.apiCities.find(item => String(item.id) === String(cityId));
+    const province = this.apiProvinces.find(item => String(item.id) === String(provinceId));
+    this.form.patchValue({ city: city?.name ?? '', province: province?.name ?? '' }, { emitEvent: false });
+
+    this.registrationAllowed = true;
+    this.registrationCheckMessage = '';
+
+    if (!provinceId || !cityId) return;
+
+    this.locationService.isSupplierRegistrationAvailable(provinceId, cityId).subscribe({
+      next: (result) => {
+        if (result.isSuccess) {
+          this.registrationAllowed = result.data ?? true;
+          if (!this.registrationAllowed) {
+            this.registrationCheckMessage = 'ثبت‌نام فروشنده در این شهر فعال نیست';
+          }
+        }
+      },
+      error: () => { this.registrationAllowed = true; }
     });
   }
 
@@ -137,7 +215,7 @@ export class SellerRegisterComponent {
   private stepFields(step: number): string[] {
     const fields: Record<number, string[]> = {
       1: ['nationalCode', 'username', 'password', 'confirmPassword'],
-      2: ['companyName', 'city', 'province', 'phone', 'email'],
+      2: ['companyName', 'provinceId', 'cityId', 'phone', 'email'],
       3: ['category', 'description'],
       4: ['terms']
     };

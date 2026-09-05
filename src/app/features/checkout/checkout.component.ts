@@ -4,10 +4,21 @@ import { Router } from '@angular/router';
 
 import { fadeIn, scaleUp } from '../../shared/animations';
 import { Address, AddressData, AddressService } from '../../core/services/api/address.service';
-import { OrderService } from '../../core/services/api/order.service';
+import { OrderService, EstimatedDelivery } from '../../core/services/api/order.service';
 import { PaymentGatewayOption, PaymentGatewayService } from '../../core/services/api/payment-gateway.service';
 import { PaymentService } from '../../core/services/api/payment.service';
 import { ShippingMethod, ShippingService } from '../../core/services/api/shipping.service';
+import { LocationService, Province, City } from '../../core/services/api/location.service';
+import { ApiService } from '../../core/services/api.service';
+import { Result } from '../../core/models/api-response.model';
+
+interface MinimumOrderViolationDto {
+  sellerName: string;
+  minimumOrderAmount: number;
+  currentAmount: number;
+  minimumOrderQuantity?: number;
+  currentQuantity?: number;
+}
 
 /** مراحل تسویه‌حساب */
 export type CheckoutStep = 1 | 2 | 3;
@@ -39,10 +50,15 @@ export class CheckoutComponent implements OnInit {
   loadingOptions = true;
   errorMessage = '';
   successMessage = '';
+  minimumOrderWarnings: string[] = [];
   savingAddress = false;
   addressMessage = '';
   addressError = '';
   orderNumber = '';
+  estimatedDeliveries: EstimatedDelivery[] = [];
+  provinces: Province[] = [];
+  cities: City[] = [];
+  loadingCities = false;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -51,7 +67,9 @@ export class CheckoutComponent implements OnInit {
     private readonly shippingService: ShippingService,
     private readonly paymentGatewayService: PaymentGatewayService,
     private readonly paymentService: PaymentService,
-    private readonly orderService: OrderService
+    private readonly orderService: OrderService,
+    private readonly locationService: LocationService,
+    private readonly api: ApiService
   ) {
     this.addressForm = this.fb.group({
       addressType: ['Both', [Validators.required]],
@@ -67,6 +85,7 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingOptions = true;
+    this.loadProvinces();
     let completed = 0;
     const optionLoaded = (): void => {
       completed += 1;
@@ -111,6 +130,37 @@ export class CheckoutComponent implements OnInit {
         this.gateways = [];
         optionLoaded();
       }
+    });
+
+    // Load estimated delivery dates
+    this.orderService.getEstimatedDelivery().subscribe({
+      next: (result) => {
+        this.estimatedDeliveries = result.data ?? [];
+      },
+      error: () => {
+        this.estimatedDeliveries = [];
+      }
+    });
+  }
+
+  /** بارگذاری لیست استان‌ها */
+  private loadProvinces(): void {
+    this.locationService.getProvinces().subscribe({
+      next: (result) => { this.provinces = result.data ?? []; },
+      error: () => { this.provinces = []; }
+    });
+  }
+
+  /** تغییر استان — بارگذاری شهرهای مربوطه */
+  onProvinceChange(): void {
+    const provinceId = this.addressForm.get('state')?.value;
+    this.cities = [];
+    this.addressForm.patchValue({ city: '' });
+    if (!provinceId) return;
+    this.loadingCities = true;
+    this.locationService.getCitiesByProvince(provinceId).subscribe({
+      next: (result) => { this.cities = result.data ?? []; this.loadingCities = false; },
+      error: () => { this.cities = []; this.loadingCities = false; }
     });
   }
 
@@ -225,9 +275,41 @@ export class CheckoutComponent implements OnInit {
       return;
     }
 
+    // Validate minimum order per seller
     this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.minimumOrderWarnings = [];
+
+    this.api.get<Result<MinimumOrderViolationDto[]>>('/v1/checkout/validate-minimum-order').subscribe({
+      next: (result) => {
+        if (result.isSuccess && result.data && result.data.length > 0) {
+          this.minimumOrderWarnings = result.data.map((v: MinimumOrderViolationDto) => {
+            const msgs: string[] = [];
+            if (v.minimumOrderAmount > 0 && v.currentAmount < v.minimumOrderAmount) {
+              msgs.push(`${v.sellerName}: حداقل مبلغ ${new Intl.NumberFormat('fa-IR').format(v.minimumOrderAmount)} تومان (الان: ${new Intl.NumberFormat('fa-IR').format(v.currentAmount)} تومان)`);
+            }
+            if (v.minimumOrderQuantity && v.currentQuantity && v.currentQuantity < v.minimumOrderQuantity) {
+              msgs.push(`${v.sellerName}: حداقل تعداد ${v.minimumOrderQuantity} عدد (الان: ${v.currentQuantity} عدد)`);
+            }
+            return msgs.join('\n');
+          }).filter((w: string) => w);
+          if (this.minimumOrderWarnings.length > 0) {
+            this.loading = false;
+            return;
+          }
+        }
+        this.proceedToOrder();
+      },
+      error: () => {
+        // If validation endpoint fails, proceed anyway
+        this.proceedToOrder();
+      }
+    });
+  }
+
+  /** ثبت سفارش پس از تأیید حداقل سفارش */
+  private proceedToOrder(): void {
 
     this.orderService
       .createOrder({
@@ -276,6 +358,15 @@ export class CheckoutComponent implements OnInit {
           this.errorMessage = err.message;
         }
       });
+  }
+
+  /** حداکثر زمان تحویل تخمینی */
+  get maxEstimatedDelivery(): string | null {
+    const dates = this.estimatedDeliveries
+      .filter(d => d.capacitySet && d.estimatedDeliveryDate)
+      .map(d => d.estimatedDeliveryDate!);
+    if (!dates.length) return null;
+    return dates.sort().reverse()[0];
   }
 
   /** رفتن به جزئیات سفارش */

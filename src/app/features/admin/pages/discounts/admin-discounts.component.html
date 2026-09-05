@@ -1,0 +1,88 @@
+<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+  <app-page-header
+    title="تخفیف‌ها"
+    subtitle="ایجاد، ویرایش و حذف کدهای تخفیف"
+    [actions]="headerActions"
+  ></app-page-header>
+
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+
+  <!-- Summary Cards -->
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <app-stat-card title="کل تخفیف‌ها" [value]="discounts.length" icon="🏷️" color="primary"></app-stat-card>
+    <app-stat-card title="فعال" [value]="activeDiscounts" icon="✅" color="success"></app-stat-card>
+    <app-stat-card title="غیرفعال" [value]="discounts.length - activeDiscounts" icon="⏸️" color="warning"></app-stat-card>
+  </div>
+
+  <!-- Discounts Table -->
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="discounts"
+    [loading]="loading"
+    [actions]="tableActions"
+    searchPlaceholder="جستجوی کد تخفیف…"
+    emptyMessage="تخفیفی برای نمایش وجود ندارد."
+    emptyIcon="🏷️"
+  ></app-data-table>
+
+  <!-- Create/Edit Modal -->
+  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
+    <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card">
+      <div class="admin-modal__header">
+        <h2 class="admin-modal__title">{{ editingId ? 'ویرایش تخفیف' : 'افزودن تخفیف جدید' }}</h2>
+        <button type="button" mat-icon-button (click)="closeForm()" aria-label="بستن">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="admin-form-grid">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>کد تخفیف *</mat-label>
+          <input matInput formControlName="code" placeholder="مثلاً NOWRUZ20" />
+          <mat-error *ngIf="invalid('code')">کد تخفیف الزامی است.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>نوع *</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="percentage">درصدی</mat-option>
+            <mat-option value="fixed">مبلغ ثابت</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>مقدار *</mat-label>
+          <input matInput formControlName="value" type="number" min="0" />
+          <mat-error *ngIf="invalid('value')">مقدار معتبر وارد کنید.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>حداقل مبلغ سفارش</mat-label>
+          <input matInput formControlName="minOrderAmount" type="number" min="0" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>تاریخ شروع *</mat-label>
+          <input matInput formControlName="startDate" type="date" [min]="today" />
+          <mat-error *ngIf="invalid('startDate')">تاریخ شروع الزامی است.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>تاریخ پایان *</mat-label>
+          <input matInput formControlName="endDate" type="date" [min]="minEndDate" />
+          <mat-error *ngIf="invalid('endDate')">تاریخ پایان باید بعد از شروع باشد.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-checkbox formControlName="isActive" class="admin-discount-active">تخفیف فعال است</mat-checkbox>
+
+      <p *ngIf="formError" class="admin-form-error">{{ formError }}</p>
+      <div class="admin-form-actions">
+        <button type="button" mat-button (click)="closeForm()">انصراف</button>
+        <button type="submit" mat-flat-button class="admin-btn-primary" [disabled]="saving">
+          {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

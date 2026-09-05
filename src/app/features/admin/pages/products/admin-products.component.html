@@ -1,0 +1,252 @@
+<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+
+  <!-- Page Header -->
+  <app-page-header
+    title="محصولات"
+    subtitle="مدیریت، ویرایش، تأیید و انتشار محصولات فروشندگان"
+    [actions]="headerActions"
+  ></app-page-header>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-4" *ngIf="!loading">
+    <app-stat-card title="کل محصولات" [value]="totalCount" icon="📦" color="primary"></app-stat-card>
+    <app-stat-card title="در انتظار تأیید" [value]="pendingCount" icon="⏳" color="warning"></app-stat-card>
+    <app-stat-card title="منتشرشده" [value]="publishedCount" icon="✅" color="success"></app-stat-card>
+    <app-stat-card title="پیش‌نویس" [value]="draftCount" icon="📝" color="info"></app-stat-card>
+  </div>
+
+  <!-- ═══ Redesigned Filter Bar ═══ -->
+  <mat-card appearance="outlined" class="admin-filters admin-filters--redesigned">
+    <div class="admin-filters__row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-filters__search">
+        <mat-label>جستجوی نام یا SKU…</mat-label>
+        <input matInput [(ngModel)]="filters.search" (ngModelChange)="onSearchChange()" />
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="filters.search" mat-icon-button matSuffix type="button" (click)="filters.search=''; onFilterChange()" aria-label="پاک کردن جستجو">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-filters__select">
+        <mat-label>وضعیت انتشار</mat-label>
+        <mat-select [(ngModel)]="filters.publishStatus" (ngModelChange)="onFilterChange()">
+          <mat-option *ngFor="let opt of statusFilterOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" class="admin-filters__toggle" (click)="toggleFilters()">
+        <mat-icon>filter_list</mat-icon>
+        فیلترهای بیشتر
+        <span *ngIf="activeFilterCount > 0" class="admin-filters__badge">{{ activeFilterCount }}</span>
+      </button>
+
+      <button *ngIf="activeFilterCount > 0" mat-button type="button" (click)="clearFilters()">
+        <mat-icon>restart_alt</mat-icon>
+        پاک‌سازی
+      </button>
+    </div>
+
+    <!-- Advanced filters (collapsible) -->
+    <div *ngIf="filtersExpanded" class="admin-filters__advanced">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>شناسه فروشنده (SellerId)</mat-label>
+        <input matInput [(ngModel)]="filters.sellerId" (ngModelChange)="onSearchChange()" placeholder="GUID" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>حداقل قیمت</mat-label>
+        <input matInput type="number" [(ngModel)]="filters.minPrice" (ngModelChange)="onFilterChange()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>حداکثر قیمت</mat-label>
+        <input matInput type="number" [(ngModel)]="filters.maxPrice" (ngModelChange)="onFilterChange()" />
+      </mat-form-field>
+
+      <mat-checkbox [(ngModel)]="filters.lowStockOnly" (ngModelChange)="onFilterChange()" class="admin-filters__checkbox">
+        فقط محصولات با موجودی کم (کمتر از ۵)
+      </mat-checkbox>
+    </div>
+  </mat-card>
+
+  <!-- Success / Error messages -->
+  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+
+  <!-- Bulk actions bar -->
+  <mat-card *ngIf="selected.size > 0" appearance="outlined" class="admin-bulkbar">
+    <span class="admin-bulkbar__count">{{ selected.size }} محصول انتخاب شده</span>
+    <span class="admin-bulkbar__spacer"></span>
+    <button mat-flat-button class="admin-btn-success" [disabled]="bulkBusy" (click)="bulkApprove()">تأیید گروهی</button>
+    <button mat-flat-button class="admin-btn-danger" [disabled]="bulkBusy" (click)="bulkReject()">رد گروهی</button>
+    <button mat-stroked-button (click)="clearSelection()">لغو انتخاب</button>
+  </mat-card>
+
+  <!-- Products Table -->
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="products"
+    [loading]="loading"
+    [actions]="tableActions"
+    [selectable]="true"
+    emptyMessage="محصولی برای نمایش وجود ندارد."
+    emptyIcon="📦"
+    searchPlaceholder="جستجوی محصول…"
+    (selectionChange)="onSelectionChange($event)"
+    [pageSize]="pageSize"
+    [totalItems]="totalCount"
+    (pageChange)="goToPage($event)"
+  ></app-data-table>
+</section>
+
+<!-- ═══ Product Edit Modal ═══ -->
+<div *ngIf="editOpen" class="admin-modal" (click)="closeEdit()">
+  <form [formGroup]="editForm" (ngSubmit)="saveEdit()" (click)="$event.stopPropagation()"
+    class="admin-modal__card admin-modal__card--wide admin-modal__card--tall">
+    <div class="admin-modal__header">
+      <h2 class="admin-modal__title">ویرایش محصول — {{ editProductName }}</h2>
+      <button type="button" mat-icon-button (click)="closeEdit()" aria-label="بستن">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <p *ngIf="editError" class="admin-alert admin-alert--error">{{ editError }}</p>
+
+    <div class="admin-form-grid">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>نام محصول</mat-label>
+        <input matInput formControlName="name" required />
+        <mat-error *ngIf="editForm.get('name')?.invalid">نام محصول الزامی است.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>SKU</mat-label>
+        <input matInput formControlName="sku" required />
+        <mat-error *ngIf="editForm.get('sku')?.invalid">SKU الزامی است.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>دسته‌بندی</mat-label>
+        <mat-select formControlName="categoryId" required>
+          <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="editForm.get('categoryId')?.invalid">دسته‌بندی الزامی است.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>قیمت واحد (تومان)</mat-label>
+        <input matInput type="number" formControlName="unitPrice" required min="0" />
+        <mat-error *ngIf="editForm.get('unitPrice')?.invalid">قیمت معتبر وارد کنید.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>قیمت قبل از تخفیف (اختیاری)</mat-label>
+        <input matInput type="number" formControlName="comparePrice" min="0" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>قیمت خرید (اختیاری)</mat-label>
+        <input matInput type="number" formControlName="costPrice" min="0" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
+        <mat-label>توضیح کوتاه</mat-label>
+        <input matInput formControlName="shortDescription" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
+        <mat-label>توضیحات کامل</mat-label>
+        <textarea matInput formControlName="fullDescription" rows="4"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>وزن (گرم)</mat-label>
+        <input matInput type="number" formControlName="weight" min="0" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>نرخ مالیات (٪)</mat-label>
+        <input matInput type="number" formControlName="taxRate" min="0" max="100" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>طول (سانتی‌متر)</mat-label>
+        <input matInput type="number" formControlName="length" min="0" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>عرض (سانتی‌متر)</mat-label>
+        <input matInput type="number" formControlName="width" min="0" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>ارتفاع (سانتی‌متر)</mat-label>
+        <input matInput type="number" formControlName="height" min="0" />
+      </mat-form-field>
+
+      <div class="admin-form-grid__full admin-form-grid__toggles">
+        <mat-checkbox formControlName="isTaxable">مشمول مالیات</mat-checkbox>
+        <mat-checkbox formControlName="isPhysical">کالای فیزیکی</mat-checkbox>
+        <mat-checkbox formControlName="isDigital">کالای دیجیتال</mat-checkbox>
+      </div>
+    </div>
+
+    <div class="admin-modal__footer">
+      <button mat-flat-button color="primary" type="submit" [disabled]="editSaving">
+        {{ editSaving ? 'در حال ذخیره…' : 'ذخیره تغییرات' }}
+      </button>
+      <button mat-stroked-button type="button" (click)="closeEdit()" [disabled]="editSaving">انصراف</button>
+    </div>
+  </form>
+</div>
+
+<!-- ═══ Quick Restock Modal ═══ -->
+<div *ngIf="restockOpen" class="admin-modal" (click)="closeRestock()">
+  <form [formGroup]="restockForm" (ngSubmit)="saveRestock()" (click)="$event.stopPropagation()"
+    class="admin-modal__card">
+    <div class="admin-modal__header">
+      <h2 class="admin-modal__title">افزایش سریع موجودی — {{ restockProductName }}</h2>
+      <button type="button" mat-icon-button (click)="closeRestock()" aria-label="بستن">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <p *ngIf="restockError" class="admin-alert admin-alert--error">{{ restockError }}</p>
+
+    <div *ngIf="restockVariations.length > 0" class="admin-form-grid">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
+        <mat-label>تنوع (اختیاری — خالی = همه تنوع‌ها)</mat-label>
+        <mat-select formControlName="variationId">
+          <mat-option [value]="">همه تنوع‌ها</mat-option>
+          <mat-option *ngFor="let v of restockVariations" [value]="v.id">{{ restockVariationLabel(v) }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <p *ngIf="restockVariations.length === 0" class="admin-modal__empty">
+      این محصول تنوعی ندارد؛ تغییر موجودی فقط به‌عنوان تراکنش انبار ثبت می‌شود.
+    </p>
+
+    <div class="admin-form-grid">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
+        <mat-label>تعداد افزایش</mat-label>
+        <input matInput type="number" formControlName="quantity" min="1" required />
+        <mat-error *ngIf="restockForm.get('quantity')?.invalid">تعداد باید حداقل ۱ باشد.</mat-error>
+        <mat-hint>برای کاهش موجودی عدد منفی وارد کنید.</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Quick quantity chips -->
+    <div class="admin-restock-chips">
+      <button *ngFor="let q of [5, 10, 20, 50, 100]" mat-stroked-button type="button"
+        (click)="restockForm.get('quantity')?.setValue(q)">{{ q }}+</button>
+    </div>
+
+    <div class="admin-modal__footer">
+      <button mat-flat-button color="primary" type="submit" [disabled]="restockSaving">
+        {{ restockSaving ? 'در حال ثبت…' : 'ثبت افزایش موجودی' }}
+      </button>
+      <button mat-stroked-button type="button" (click)="closeRestock()" [disabled]="restockSaving">انصراف</button>
+    </div>
+  </form>
+</div>

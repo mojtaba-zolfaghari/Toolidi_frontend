@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 
 import { routeAnimations } from './shared/animations';
 import { AuthService } from './core/services/api/auth.service';
+import { NewsletterService } from './core/services/api/newsletter.service';
 import { AuthStateService, AuthUser } from './core/services/auth-state.service';
 
 @Component({
@@ -20,13 +21,18 @@ export class AppComponent implements OnInit, OnDestroy {
   isAdminArea = false;
   isStandaloneAuthPage = false;
   searchQuery = '';
+  mobileSearchOpen = false;
+  mobileSearchQuery = '';
   newsletterEmail = '';
+  newsletterSubmitting = false;
+  newsletterMessage: { type: 'success' | 'error'; text: string } | null = null;
 
   private subscription?: Subscription;
 
   constructor(
     private readonly authState: AuthStateService,
     private readonly authService: AuthService,
+    private readonly newsletterService: NewsletterService,
     private readonly router: Router
   ) {}
 
@@ -41,10 +47,12 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe((event) => {
         this.isAdminArea =
           event.urlAfterRedirects.startsWith('/admin') ||
-          event.urlAfterRedirects.startsWith('/seller');
+          event.urlAfterRedirects.startsWith('/seller') ||
+          event.urlAfterRedirects.startsWith('/agent') ||
+          event.urlAfterRedirects.startsWith('/supplier');
         this.isStandaloneAuthPage = event.urlAfterRedirects === '/auth/agent-register' || event.urlAfterRedirects === '/auth/seller-register' || event.urlAfterRedirects === '/auth/register';
       });
-    this.isAdminArea = this.router.url.startsWith('/admin') || this.router.url.startsWith('/seller');
+    this.isAdminArea = this.router.url.startsWith('/admin') || this.router.url.startsWith('/seller') || this.router.url.startsWith('/agent') || this.router.url.startsWith('/supplier');
     this.isStandaloneAuthPage = this.router.url === '/auth/agent-register' || this.router.url === '/auth/seller-register' || this.router.url === '/auth/register';
 
     if ('serviceWorker' in navigator) {
@@ -94,12 +102,69 @@ export class AppComponent implements OnInit, OnDestroy {
     this.searchQuery = '';
   }
 
+  /** باز کردن جستجوی موبایل */
+  onMobileSearch(): void {
+    this.mobileSearchOpen = true;
+  }
+
+  /** بستن جستجوی موبایل */
+  closeMobileSearch(): void {
+    this.mobileSearchOpen = false;
+    this.mobileSearchQuery = '';
+  }
+
+  /** ارسال جستجوی موبایل */
+  onMobileSearchSubmit(): void {
+    const term = this.mobileSearchQuery.trim();
+    if (!term) {
+      return;
+    }
+    this.router.navigate(['/shop'], { queryParams: { search: term } });
+    this.closeMobileSearch();
+  }
+
   /** عضویت در خبرنامه */
   onNewsletterSubmit(): void {
     const email = this.newsletterEmail.trim();
-    if (email) {
-      // TODO: integrate with newsletter API
-      this.newsletterEmail = '';
+    this.newsletterMessage = null;
+
+    if (!email) {
+      this.newsletterMessage = { type: 'error', text: 'لطفاً ایمیل خود را وارد کنید.' };
+      return;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      this.newsletterMessage = { type: 'error', text: 'فرمت ایمیل واردشده صحیح نیست.' };
+      return;
+    }
+
+    if (this.newsletterSubmitting) {
+      return;
+    }
+
+    this.newsletterSubmitting = true;
+    this.newsletterService.subscribe(email).subscribe({
+      next: (result) => {
+        this.newsletterSubmitting = false;
+        if (result.isSuccess) {
+          this.newsletterEmail = '';
+          this.newsletterMessage = { type: 'success', text: 'عضویت شما در خبرنامه با موفقیت ثبت شد.' };
+        } else {
+          this.newsletterMessage = {
+            type: 'error',
+            text: result.errorMessage || 'ثبت عضویت در خبرنامه انجام نشد؛ لطفاً دوباره تلاش کنید.'
+          };
+        }
+      },
+      error: (err: unknown) => {
+        this.newsletterSubmitting = false;
+        const message = err instanceof Error ? err.message : '';
+        this.newsletterMessage = {
+          type: 'error',
+          text: message || 'خطا در ارتباط با سرور؛ لطفاً دوباره تلاش کنید.'
+        };
+      }
+    });
   }
 }

@@ -1,0 +1,47 @@
+.form-input {
+  width: 100%;
+}
+
+.form-input__field {
+  width: 100%;
+}
+
+/* Error state ring on the Material field outline */
+.form-input__field--error {
+  --mdc-outlined-text-field-container-shape: 0.75rem;
+  --mdc-outlined-text-field-outline-color: #dc2626;
+  --mdc-outlined-text-field-hover-outline-color: #dc2626;
+  --mdc-outlined-text-field-focus-outline-color: #b91c1c;
+}
+
+.form-input__req {
+  color: #dc2626;
+}
+
+.form-input__icon {
+  color: var(--mat-sys-outline, #94a3b8);
+  font-size: 0.875rem;
+  margin-inline-end: 0.25rem;
+}
+
+.form-input__error,
+.form-input__hint {
+  margin: 0.25rem 0.25rem 0;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-input__error {
+  color: #dc2626;
+}
+
+.form-input__hint {
+  color: var(--mat-sys-outline, #94a3b8);
+}
+
+/* Reserve space so removing the subscript doesn't collapse layout */
+.form-input__subspace {
+  height: 1.25rem;
+}

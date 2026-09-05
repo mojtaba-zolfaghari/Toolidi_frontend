@@ -8,6 +8,7 @@ import { ProductService, Product } from '../../core/services/api/product.service
 import { SellerService, DashboardSummary, SellerStatistics } from '../../core/services/api/seller.service';
 import { AuthStateService, AuthUser } from '../../core/services/auth-state.service';
 import { PlatformStats as ApiPlatformStats, PublicService, PublicSeller } from '../../core/services/api/public.service';
+import { SeoService } from '../../core/services/seo.service';
 
 /* ─────────────────── Data Interfaces ─────────────────── */
 
@@ -77,6 +78,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   agentLocations: AgentLocation[] = [];
   workflowSteps: WorkflowStep[] = [];
   suppliers: SupplierInfo[] = [];
+  sellerStats = { activeSellers: 0, monthlyOrders: 0, totalProducts: 0 };
   selectedSupplierTrade = '';
 
   /* ── Animated Counters ── */
@@ -149,7 +151,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly sellerService: SellerService,
     private readonly authState: AuthStateService,
     private readonly publicService: PublicService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly seo: SeoService
   ) {}
 
   /* ─────────── Lifecycle ─────────── */
@@ -161,6 +164,13 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         this.cdr.detectChanges();
       })
     );
+    this.seo.setPage({
+      title: 'تولیدی — خرید عمده از تأمین‌کنندگان معتبر ایران',
+      description: 'پلتفرم B2B خرید و فروش عمده محصولات از تأمین‌کنندگان و تولیدکنندگان سراسر ایران. قیمت کارخانه، تحویل سریع و مدیریت کامل فروش.',
+      url: 'https://toolidi.ir',
+      type: 'website',
+    });
+    this.seo.setJsonLd(this.seo.organizationJsonLd());
     this.initializePage();
     this.buildMapConnections();
   }
@@ -171,6 +181,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+    this.seo.removeJsonLd();
     this.counterIntervals.forEach(id => clearInterval(id));
     if (this.observer) {
       this.observer.disconnect();
@@ -182,6 +193,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private initializePage(): void {
     this.loadCategories();
     this.loadPlatformStats();
+    this.loadSellerStats();
     this.loadAgentLocations();
     this.initializeWorkflowSteps();
     this.initializeSuppliers();
@@ -327,6 +339,22 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       this.cdr.detectChanges();
       if (this.sectionVisibility['stats']) {
         this.startCounters();
+      }
+    });
+  }
+
+  loadSellerStats(): void {
+    this.publicService.getSellerStats().pipe(
+      catchError(() => { return []; })
+    ).subscribe((result: any) => {
+      const data = result?.data;
+      if (data) {
+        this.sellerStats = {
+          activeSellers: data.activeSellers ?? 0,
+          monthlyOrders: data.monthlyOrders ?? 0,
+          totalProducts: data.totalProducts ?? 0
+        };
+        this.cdr.detectChanges();
       }
     });
   }
@@ -506,6 +534,30 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getCategoryColor(index: number): string {
     return this.categoryColors[index % this.categoryColors.length];
+  }
+
+  /** Gradient background for each category card */
+  private readonly categoryGradients = [
+    'linear-gradient(135deg, #7c3aed, #a78bfa)',
+    'linear-gradient(135deg, #f59e0b, #fbbf24)',
+    'linear-gradient(135deg, #ec4899, #f472b6)',
+    'linear-gradient(135deg, #10b981, #34d399)',
+    'linear-gradient(135deg, #3b82f6, #60a5fa)',
+    'linear-gradient(135deg, #06b6d4, #22d3ee)',
+    'linear-gradient(135deg, #f97316, #fb923c)',
+    'linear-gradient(135deg, #6366f1, #818cf8)',
+    'linear-gradient(135deg, #8b5cf6, #c084fc)',
+    'linear-gradient(135deg, #14b8a6, #5eead4)',
+    'linear-gradient(135deg, #e11d48, #fb7185)',
+    'linear-gradient(135deg, #7c3aed, #c084fc)',
+    'linear-gradient(135deg, #2563eb, #93c5fd)',
+    'linear-gradient(135deg, #0891b2, #67e8f9)',
+    'linear-gradient(135deg, #d946ef, #f0abfc)',
+    'linear-gradient(135deg, #84cc16, #bef264)',
+  ];
+
+  getCategoryGradient(index: number): string {
+    return this.categoryGradients[index % this.categoryGradients.length];
   }
 
   formatNumber(num: number): string {

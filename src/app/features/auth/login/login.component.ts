@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthService } from '../../../core/services/api/auth.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
+import { extractReturnUrl, getCurrentRole, navigateAfterLogin } from '../../../core/utils/auth-redirect.util';
 
 /**
  * کامپوننت ورود کاربر؛ با دریافت کد ملی و رمز عبور،
- * از سرویس AuthService استفاده می‌کند و در صورت موفقیت به صفحه اصلی می‌رود.
+ * از سرویس AuthService استفاده می‌کند و در صورت موفقیت کاربر را بر اساس
+ * نقش او (یا مسیر بازگشت ذخیره‌شده) به مسیر مناسب هدایت می‌کند.
  */
 @Component({
   selector: 'app-login',
@@ -22,6 +24,7 @@ export class LoginComponent {
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly authState: AuthStateService,
+    private readonly route: ActivatedRoute,
     private readonly router: Router
   ) {
     this.form = this.fb.group({
@@ -45,7 +48,11 @@ export class LoginComponent {
         this.loading = false;
         if (result.isSuccess && result.data) {
           this.authState.refresh();
-          this.router.navigate(['/']);
+          const role = getCurrentRole();
+          const returnUrl = extractReturnUrl(this.route.snapshot.queryParams);
+
+          // نقش Buyer/Customer → صفحه اصلی؛ بقیه نقش‌ها → پنل خودشان (یا returnUrl)
+          navigateAfterLogin(this.router, role, returnUrl);
         } else {
           this.errorMessage = result.errorMessage ?? 'ورود ناموفق بود؛ لطفاً دوباره تلاش کنید.';
         }

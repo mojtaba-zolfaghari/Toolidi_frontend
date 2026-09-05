@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { ApiService } from '../api.service';
 import { Result } from '../../models/api-response.model';
+
+/** کلید ذخیره‌سازی سبد مهمان در localStorage */
+export const GUEST_CART_KEY = 'guest_cart_items';
+
+/** آیتم سبد مهمان (قبل از ورود) */
+export interface GuestCartItem {
+  productVariationId: string;
+  quantity: number;
+}
 
 /** آیتم سبد خرید */
 export interface CartItem {
@@ -32,6 +41,10 @@ export interface CartItem {
   cityDeliveryDays: number;
   /** زمان تحویل سراسری */
   nationwideDeliveryDays: number;
+  /** حداقل مبلغ سفارش از این فروشنده (تومان) */
+  minimumOrderAmount?: number;
+  /** حداقل تعداد سفارش از این فروشنده */
+  minimumOrderQuantity?: number;
 }
 
 /** سبد خرید کاربر جاری */
@@ -54,6 +67,34 @@ export class CartService {
 
   /** تعداد کالاهای فعلی سبد، برای نشان‌دادن در هدر و دکمه شناور. */
   readonly itemCount$ = this.countSubject.asObservable();
+
+  /** ذخیره‌ی آیتم‌های سبد مهمان در localStorage */
+  saveGuestCart(items: GuestCartItem[]): void {
+    localStorage.setItem(GUEST_CART_KEY, JSON.stringify(items));
+  }
+
+  /** خواندن آیتم‌های سبد مهمان از localStorage */
+  getGuestCart(): GuestCartItem[] {
+    const raw = localStorage.getItem(GUEST_CART_KEY);
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw) as GuestCartItem[];
+    } catch {
+      return [];
+    }
+  }
+
+  /** ادغام سبد مهمان با سبد کاربر — درخواست POST به /v1/cart/merge-guest */
+  mergeGuestCart(items: GuestCartItem[]): Observable<Result<boolean>> {
+    if (!items.length) {
+      return of({ isSuccess: true } as Result<boolean>);
+    }
+    return this.api.post<Result<boolean>>('/v1/cart/merge-guest', { items }).pipe(
+      tap(() => {
+        localStorage.removeItem(GUEST_CART_KEY);
+      })
+    );
+  }
 
   constructor(private readonly api: ApiService) {}
 
@@ -86,6 +127,22 @@ export class CartService {
       productVariationId: variationId ?? productId,
       quantity
     }).pipe(tap(() => this.refreshCount()));
+  }
+
+  /** افزودن آیتم به سبد مهمان (بدون احراز هویت) — در صورت عدم احراز، به localStorage ذخیره می‌شود */
+  addGuestItem(productId: string, variationId?: string, quantity = 1): void {
+    const items = this.getGuestCart();
+    const id = variationId ?? productId;
+    const index = items.findIndex((item) => item.productVariationId === id);
+    if (index >= 0) {
+      items[index].quantity += quantity;
+    } else {
+      items.push({
+        productVariationId: id,
+        quantity
+      });
+    }
+    this.saveGuestCart(items);
   }
 
   /** به‌روزرسانی تعداد یک آیتم سبد */

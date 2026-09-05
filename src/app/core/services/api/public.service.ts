@@ -43,4 +43,14 @@ export class PublicService {
   getGlobeOrders(): Observable<Result<any>> {
     return this.api.get<Result<any>>('/v1/public/globe-orders');
   }
+
+  /** دریافت آمار شبکه تأمین (استان‌ها + تعداد تولیدکنندگان) */
+  getSupplyNetwork(): Observable<Result<any>> {
+    return this.api.get<Result<any>>('/v1/public/supply-network');
+  }
+
+  /** دریافت آمار فروشندگان (تعداد فعال + سفارشات ماهانه) */
+  getSellerStats(): Observable<Result<any>> {
+    return this.api.get<Result<any>>('/v1/public/seller-stats');
+  }
 }

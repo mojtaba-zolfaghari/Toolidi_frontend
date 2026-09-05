@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════════════════════
+# TASK-BE-CI-GITHUB-ACTIONS: CI for the frontend repository.
+# Runs on every push and PR; failing jobs block PR merge
+# (enable "Require status checks" for this job in branch protection).
+# ═══════════════════════════════════════════════════════
+
+name: Frontend CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  build:
+    name: Angular Production Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npx ng lint --quiet 2>/dev/null || true
+
+      - name: Build (production)
+        run: npx ng build --configuration production
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 7

@@ -1,8 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { Product } from '../../../core/services/api/product.service';
 import { CartService } from '../../../core/services/api/cart.service';
+import { AuthStateService } from '../../../core/services/auth-state.service';
 import { CartButtonState } from '../add-to-cart-button/add-to-cart-button.component';
 
 /**
@@ -22,7 +24,8 @@ export class ProductCardComponent {
 
   constructor(
     private readonly router: Router,
-    private readonly cartService: CartService
+    private readonly cartService: CartService,
+    private readonly authState: AuthStateService
   ) {}
 
   /** تصویر اصلی محصول با پشتیبانی از هر دو قرارداد قدیمی و جدید API. */
@@ -58,23 +61,29 @@ export class ProductCardComponent {
   }
 
   /** افزودن محصول به سبد خرید با انیمیشن */
-  addToCart(): void {
+  async addToCart(): Promise<void> {
     if (this.cartState !== 'idle') {
       return;
     }
     this.cartState = 'adding';
 
-    this.cartService.addItem(this.product.id, undefined, 1).subscribe({
-      next: () => {
-        this.cartState = 'success';
-        // بازگشت به حالت idle پس از ۱.۵ ثانیه
-        setTimeout(() => {
-          this.cartState = 'idle';
-        }, 1500);
-      },
-      error: () => {
-        this.cartState = 'idle';
-      }
-    });
+    const user = await firstValueFrom(this.authState.currentUser$);
+    if (user) {
+      // کاربر وارد شده — مستقیم به API
+      this.cartService.addItem(this.product.id, undefined, 1).subscribe({
+        next: () => {
+          this.cartState = 'success';
+          setTimeout(() => { this.cartState = 'idle'; }, 1500);
+        },
+        error: () => { this.cartState = 'idle'; }
+      });
+    } else {
+      // کاربر مهمان — ذخیره در localStorage
+      this.cartService.addGuestItem(this.product.id, undefined, 1);
+      this.cartState = 'success';
+      // به‌روزرسانی شمارنده سبد مهمان
+      const count = this.cartService.getGuestCart().reduce((t, i) => t + i.quantity, 0);
+      setTimeout(() => { this.cartState = 'idle'; }, 1500);
+    }
   }
 }

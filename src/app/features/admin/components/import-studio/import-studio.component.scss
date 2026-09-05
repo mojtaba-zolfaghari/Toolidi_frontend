@@ -1,0 +1,84 @@
+// استودیو ایمپورت — TASK-BE-STUDIO-001
+// استایل‌ها با Tailwind درون قالب اعمال شده‌اند؛ این فایل فقط تنظیمات جزئی را نگه می‌دارد.
+
+:host {
+  display: block;
+  background: #f7f6fb;
+}
+
+.import-studio-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem clamp(1rem, 3vw, 2.5rem) 4rem;
+}
+
+.import-studio-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-link {
+  border: 0;
+  background: transparent;
+  color: #6c3fc5;
+  cursor: pointer;
+  font-size: .85rem;
+  padding: 0;
+  margin-bottom: .75rem;
+}
+
+.import-studio-title { margin: 0; color: #17233f; font-size: 1.75rem; font-weight: 800; }
+.import-studio-subtitle { margin: .4rem 0 0; color: #73809a; font-size: .9rem; }
+.flow-context { min-width: 190px; border: 1px solid #e9e5f2; border-radius: 1rem; background: #fff; padding: .8rem 1rem; }
+.flow-context span { display: block; color: #8993a8; font-size: .7rem; }
+.flow-context strong { display: block; margin-top: .2rem; color: #33205f; }
+.studio-steps { display: flex; gap: .5rem; overflow-x: auto; margin-bottom: 1.5rem; padding: .3rem; }
+.studio-step { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; border: 1px solid #e9e5f2; border-radius: 999px; background: #fff; color: #69758b; padding: .55rem .8rem; font-size: .76rem; }
+.studio-step span { display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: #f0edf8; color: #6c3fc5; font-weight: 800; }
+.studio-step.is-active { border-color: #6c3fc5; background: #6c3fc5; color: #fff; box-shadow: 0 5px 14px #6c3fc533; }
+.studio-step.is-active span, .studio-step.is-done span { background: #fff; }
+
+:host ::ng-deep .dashboard-card { border: 1px solid #ece9f2 !important; border-radius: 1.25rem !important; background: #fff !important; box-shadow: 0 8px 28px rgba(44, 31, 79, .06) !important; padding: 1.5rem !important; }
+
+@media (max-width: 700px) {
+  .import-studio-header { align-items: flex-start; flex-direction: column; }
+  .flow-context { width: 100%; }
+}
+
+input[type='checkbox'] {
+  accent-color: #6C3FC5;
+}
+
+.source-html-canvas {
+  direction: ltr;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.source-html-canvas ::ng-deep * {
+  cursor: inherit;
+}
+
+.source-html-canvas ::ng-deep img {
+  max-width: 100%;
+}
+
+// ── Visual tag picker (sandboxed iframe) — TASK-BE-STUDIO-001
+.import-studio-picker-frame {
+  border: 1px solid #e9e5f2;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #fff;
+  min-height: 620px;
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 620px;
+    border: 0;
+    background: #fff;
+  }
+}

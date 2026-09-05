@@ -1,4 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription, catchError, of } from 'rxjs';
 import { CategoryService, CategoryTreeNode } from '../../core/services/api/category.service';
 
@@ -41,7 +42,6 @@ export interface MegaMenuGroup {
         </div>
 
         <div class="mega-menu-content" *ngIf="menuGroups.length; else emptyMenu">
-          <!-- در RTL، ستون حوزه‌های اصلی در سمت راست قرار می‌گیرد. -->
           <nav class="mega-menu-groups" aria-label="دسته‌های اصلی">
             <a
               *ngFor="let group of menuGroups; let i = index"
@@ -52,7 +52,7 @@ export interface MegaMenuGroup {
               [style.--group-color]="group.color"
               (mouseenter)="setActiveGroup(i)"
               (focus)="setActiveGroup(i)"
-              (click)="closeMenu()">
+              (click)="onGroupTap(i, $event)">
               <span class="mega-menu-group-icon">{{ group.icon }}</span>
               <span class="mega-menu-group-copy">
                 <strong>{{ group.title }}</strong>
@@ -64,7 +64,6 @@ export interface MegaMenuGroup {
             </a>
           </nav>
 
-          <!-- پنل جزئیات با هاور یا فوکوس دسته‌ی اصلی عوض می‌شود. -->
           <div class="mega-menu-submenu" *ngIf="activeGroup as group">
             <div class="mega-menu-submenu-header" [style.--group-color]="group.color">
               <span class="mega-menu-submenu-icon">{{ group.icon }}</span>
@@ -157,12 +156,15 @@ export interface MegaMenuGroup {
     :host-context(.mobile-mega-menu) .mega-menu-heading h3 { font-size: .85rem; }
     :host-context(.mobile-mega-menu) .mega-menu-content { gap: .65rem; padding-top: .65rem; }
     :host-context(.mobile-mega-menu) .mega-menu-groups { grid-template-columns: 1fr; gap: .3rem; padding: 0 0 .65rem; }
-    :host-context(.mobile-mega-menu) .mega-menu-group { min-height: 2.85rem; padding: .45rem; }
+    :host-context(.mobile-mega-menu) .mega-menu-group { min-height: 3.2rem; padding: .55rem .6rem; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    :host-context(.mobile-mega-menu) .mega-menu-group-active { background: rgba(108,63,197,.28); border-color: rgba(108,63,197,.35); color: #fff; }
+    :host-context(.mobile-mega-menu) .mega-menu-chevron { opacity: .5; transition: transform .2s ease; }
+    :host-context(.mobile-mega-menu) .mega-menu-group-active .mega-menu-chevron { transform: rotate(90deg); opacity: 1; }
     :host-context(.mobile-mega-menu) .mega-menu-group-copy strong { font-size: .7rem; }
     :host-context(.mobile-mega-menu) .mega-menu-submenu-header { padding: .2rem .35rem .65rem; }
     :host-context(.mobile-mega-menu) .mega-menu-submenu h4 { font-size: .85rem; }
     :host-context(.mobile-mega-menu) .mega-menu-children { gap: .25rem; padding: .55rem .15rem; }
-    :host-context(.mobile-mega-menu) .mega-menu-child { min-height: 2.2rem; padding: .4rem; font-size: .68rem; }
+    :host-context(.mobile-mega-menu) .mega-menu-child { min-height: 2.6rem; padding: .5rem .6rem; font-size: .72rem; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     :host-context(.mobile-mega-menu) .mega-menu-footer { gap: .5rem; margin-top: .65rem; padding-top: .65rem; }
 
     @keyframes megaMenuIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
@@ -183,6 +185,7 @@ export class MegaMenuComponent implements OnInit, OnDestroy {
   activeGroupIndex = 0;
   totalProducts = 0;
   totalSellers = 0;
+  isMobile = false;
 
   private hoverTimeout: ReturnType<typeof setTimeout> | undefined;
   private subscription?: Subscription;
@@ -196,9 +199,13 @@ export class MegaMenuComponent implements OnInit, OnDestroy {
     { icon: '🎨', title: 'دست‌ساز و عتیقه', color: '#a78bfa', keywords: ['دست‌ساز', 'عتیقه', 'کلکسیونی'] }
   ];
 
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService, private readonly router: Router) {}
 
   ngOnInit(): void {
+    this.checkMobile();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', this._resizeHandler);
+    }
     this.subscription = this.categoryService.getCategoryTree().pipe(
       catchError(() => {
         this.buildFallbackGroups();
@@ -217,6 +224,17 @@ export class MegaMenuComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     if (this.hoverTimeout) clearTimeout(this.hoverTimeout);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this._resizeHandler);
+    }
+  }
+
+  private _resizeHandler = (): void => this.checkMobile();
+
+  private checkMobile(): void {
+    if (typeof window === 'undefined') { this.isMobile = false; return; }
+    // Touch device OR narrow viewport = mobile behavior
+    this.isMobile = window.innerWidth < 900 || ('ontouchstart' in window);
   }
 
   get activeGroup(): MegaMenuGroup | null {
@@ -240,12 +258,35 @@ export class MegaMenuComponent implements OnInit, OnDestroy {
     this.activeGroupIndex = index;
   }
 
+  /**
+   * روی موبایل: اولین تاپ زیرمجموعه را نشان بده، تاپ دوم ناوبری کند.
+   * روی دسکتاپ: همان رفتار قبلی (کلیک = ناوبری).
+   */
+  onGroupTap(index: number, event: Event): void {
+    if (!this.isMobile) { return; }
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.activeGroupIndex === index) {
+      // تاپ دوم → ناوبری
+      const group = this.menuGroups[index];
+      if (group) {
+        this.closeMenu();
+        this.router.navigate(['/shop'], { queryParams: { categoryId: group.id } });
+      }
+    } else {
+      // اولین تاپ → نمایش زیرمجموعه
+      this.setActiveGroup(index);
+    }
+  }
+
   closeMenu(): void {
     this.isOpen = false;
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    // On mobile, the toggle button handles open/close — don't interfere
+    if (this.isMobile) { return; }
     const target = event.target as HTMLElement | null;
     if (target?.closest('app-mega-menu')) {
       return;

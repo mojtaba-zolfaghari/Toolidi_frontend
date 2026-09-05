@@ -1,0 +1,59 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/schema/ngsw-config.schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-static",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "app-images",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "urls": [
+          "**/*.jpg",
+          "**/*.png",
+          "**/*.webp",
+          "**/*.svg"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-cache",
+      "urls": [
+        "/api/v1/products*",
+        "/api/v1/categories*",
+        "/api/v1/blogs*"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "1h",
+        "timeout": "10s"
+      }
+    },
+    {
+      "name": "api-network-first",
+      "urls": [
+        "/api/v1/cart*",
+        "/api/v1/orders*",
+        "/api/v1/checkout*"
+      ],
+      "cacheConfig": {
+        "strategy": "network-first",
+        "timeout": "5s"
+      }
+    }
+  ]
+}

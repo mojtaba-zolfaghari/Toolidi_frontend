@@ -1,0 +1,14 @@
+<h2 mat-dialog-title class="confirm-dialog__title">{{ data.title }}</h2>
+<mat-dialog-content class="confirm-dialog__content">
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="confirm-dialog__actions">
+  <button mat-button (click)="cancel()">{{ data.cancelLabel || 'انصراف' }}</button>
+  <button
+    mat-flat-button
+    [ngClass]="data.danger ? 'confirm-dialog__btn--danger' : 'confirm-dialog__btn--primary'"
+    (click)="confirm()"
+  >
+    {{ data.confirmLabel || 'تأیید' }}
+  </button>
+</mat-dialog-actions>
