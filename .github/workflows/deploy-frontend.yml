@@ -117,12 +117,12 @@ jobs:
           echo "Backup created at: $BACKUP_DIR$TIMESTAMP"
 
       - name: Deploy to FTP Server
-        uses: SamKirkland/FTP-Deploy-Action@4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/toolidi/
+          local-dir: ./dist/
           remote-dir: ${{ env.FTP_REMOTE_DIR }}
           exclude: |
             **/.git
@@ -130,7 +130,7 @@ jobs:
             **/node_modules/**
             **/src/**
             **/dist/**
-            **/test*/**
+            **/test*/
 
       - name: Verify deployment
         run: |
