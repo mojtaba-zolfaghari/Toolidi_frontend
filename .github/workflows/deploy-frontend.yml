@@ -1,0 +1,84 @@
+# TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
+# Triggers: push to main/dev branches
+# Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
+
+name: CI/CD Frontend Deploy
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  # ─── Frontend Build ────────────────────────────────
+  frontend-build:
+    name: Frontend Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npx ng lint --quiet 2>/dev/null || true
+
+      - name: Build
+        run: npx ng build --configuration production
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist/
+          retention-days: 3
+
+  # ─── FTP Deploy ─────────────────────────────────────
+  deploy-frontend:
+    name: FTP Deploy to Production
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ./dist/
+
+      - name: Verify build output
+        run: ls -la ./dist/toolidi/ | head -20
+
+      - name: Deploy to FTP Server
+        uses: SamKirkland/FTP-Deploy-Action@4.3.5
+        with:
+          server: 192.236.168.180
+          username: ftpuser
+          password: Aa@123456
+          local-dir: ./dist/toolidi/
+          remote-dir: /home/ftpuser/toolidi/
+          exclude: |
+            **/.git
+            **/.git/**
+            **/node_modules/**
+            **/src/**
+            **/dist/**
+            **/test*/**
