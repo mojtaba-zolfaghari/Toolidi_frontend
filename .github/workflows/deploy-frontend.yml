@@ -1,7 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.7 - Using ncftp like before
+# Version: 2.8 - Using ncftp with forced passive mode
 name: CI/CD Frontend Deploy
 
 on:
@@ -75,7 +75,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
-      - name: 📂 Sync files with FTP using ncftp
+      - name: 📂 Sync files with FTP using ncftp (Passive Mode)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -93,21 +93,18 @@ jobs:
           echo "user $FTP_USERNAME" >> ~/.ncftp/ncftpput.cfg
           echo "pass $FTP_PASSWORD" >> ~/.ncftp/ncftpput.cfg
           
-          echo "📂 Current directory contents:"
+          echo "📁 Current directory contents:"
           ls -la ./dist/toolidi/
           
-          echo "🚀 Uploading files to FTP server..."
-          # Upload files using ncftpput with retry and timeout
-          ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 30 -T 30 "$REMOTE_DIR" "$LOCAL_DIR"/* || {
-            echo "First attempt failed, retrying in 10 seconds..."
-            sleep 10
-            ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 30 -T 30 "$REMOTE_DIR" "$LOCAL_DIR"/* || {
-              echo "Second attempt failed, trying with passive mode..."
-              # Try with passive mode
-              ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 30 -T 30 -o usePASV=true "$REMOTE_DIR" "$LOCAL_DIR"/* || {
-                echo "All FTP attempts failed"
-                exit 1
-              }
+          echo "🚀 Uploading files to FTP server using PASSIVE MODE..."
+          # Upload files using ncftpput with forced passive mode (-o usePASV=true)
+          # This is crucial for GitHub Actions runners which are behind NAT
+          ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 60 -T 60 -o usePASV=true "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+            echo "First attempt failed, retrying in 15 seconds..."
+            sleep 15
+            ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 60 -T 60 -o usePASV=true "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+              echo "Second attempt failed"
+              exit 1
             }
           }
           
