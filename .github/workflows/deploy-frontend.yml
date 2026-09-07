@@ -20,7 +20,7 @@ on:
 # TELEGRAM_CHAT_ID: <your-chat-id>
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '22'
   FTP_REMOTE_DIR: /home/ftpuser/toolidi/
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
