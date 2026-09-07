@@ -8,8 +8,6 @@ name: CI/CD Frontend Deploy
 on:
   push:
     branches: [main, dev]
-    paths:
-      - 'frontend/**'
   workflow_dispatch:
 
 # Environment variables (store in GitHub repo secrets)
