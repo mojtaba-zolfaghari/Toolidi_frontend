@@ -1,130 +1,104 @@
-<header *ngIf="!isAdminArea && !isStandaloneAuthPage" class="sticky top-0 z-50">
-  <nav class="border-b border-white/10 bg-secondary/95 text-white shadow-lg backdrop-blur-xl">
-    <div class="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
-      <a routerLink="/" (click)="closeMenu()"
-        class="flex items-center gap-2 text-xl font-extrabold tracking-tight text-white" aria-label="خانه تولیدی">
-        <span
-          class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-lg text-white shadow-lg shadow-primary/30">T</span>
+<header *ngIf="!isAdminArea && !isStandaloneAuthPage" class="site-header">
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a routerLink="/" (click)="closeMenu()" class="site-brand" aria-label="خانه تولیدی">
+        <span class="site-brand__logo" aria-hidden="true">T</span>
         <span>تولیدی</span>
       </a>
 
-
-
-      <div class="hidden items-center gap-5 text-sm font-medium md:flex">
-        <a routerLink="/" routerLinkActive="text-primary-light" [routerLinkActiveOptions]="{ exact: true }"
-          class="transition-colors hover:text-primary-light">خانه</a>
+      <div class="site-nav__links">
+        <a routerLink="/" routerLinkActive="site-nav__link--active" [routerLinkActiveOptions]="{ exact: true }"
+          class="site-nav__link">خانه</a>
         <app-mega-menu></app-mega-menu>
-        <a routerLink="/shop" routerLinkActive="text-primary-light"
-          class="transition-colors hover:text-primary-light">فروشگاه</a>
+        <a routerLink="/shop" routerLinkActive="site-nav__link--active" class="site-nav__link">فروشگاه</a>
         <!-- Dropdown: deals + top + shipping -->
-        <div class="relative group">
-          <button type="button" class="inline-flex items-center gap-1 transition-colors hover:text-primary-light">
-            بیشتر <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <div class="site-nav__dropdown">
+          <button type="button" class="site-nav__link site-nav__dropdown-toggle">
+            بیشتر
+            <svg class="site-nav__chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div
-            class="invisible absolute right-0 top-full z-50 mt-2 w-52 rounded-2xl border border-gray-100 bg-white py-2 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-            <a routerLink="/deals"
-              class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-red-500">
-              <span>🔥</span> شگفت‌انگیزها
+          <div class="site-nav__dropdown-panel">
+            <a routerLink="/deals" class="site-nav__dropdown-item site-nav__dropdown-item--deals">
+              <span aria-hidden="true">🔥</span> شگفت‌انگیزها
             </a>
-            <a routerLink="/top-performers"
-              class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-amber-500">
-              <span>🏆</span> برترین‌ها
+            <a routerLink="/top-performers" class="site-nav__dropdown-item site-nav__dropdown-item--top">
+              <span aria-hidden="true">🏆</span> برترین‌ها
             </a>
-            <a routerLink="/shipping"
-              class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-blue-500">
-              <span>📦</span> روش‌های ارسال
+            <a routerLink="/shipping" class="site-nav__dropdown-item site-nav__dropdown-item--shipping">
+              <span aria-hidden="true">📦</span> روش‌های ارسال
             </a>
-            <a routerLink="/contact"
-              class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-primary">
-              <span>✉️</span> تماس با ما
+            <a routerLink="/contact" class="site-nav__dropdown-item site-nav__dropdown-item--contact">
+              <span aria-hidden="true">✉️</span> تماس با ما
             </a>
           </div>
         </div>
       </div>
+
       <app-search-autocomplete></app-search-autocomplete>
-      <div class="hidden items-center gap-3 md:flex">
+
+      <div class="site-nav__actions">
         <ng-container *ngIf="!currentUser">
-          <a routerLink="/auth/login"
-            class="rounded-xl border border-white/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">ورود</a>
-          <a routerLink="/auth/seller-register"
-            class="rounded-xl bg-primary px-4 py-2 text-sm font-bold shadow-lg shadow-primary/20 transition-colors hover:bg-primary-light">ثبت‌نام</a>
+          <a routerLink="/auth" class="site-nav__btn site-nav__btn--ghost">ورود</a>
+          <a routerLink="/auth" class="site-nav__btn site-nav__btn--primary">ثبت‌نام</a>
         </ng-container>
         <ng-container *ngIf="currentUser">
-          <a routerLink="/cart" class="rounded-xl px-3 py-2 text-sm font-medium transition-colors hover:bg-white/10"
-            aria-label="سبد خرید">🛒</a>
-          <a routerLink="/profile"
-            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">پروفایل</a>
-          <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller"
-            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">داشبورد فروشنده</a>
-          <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin"
-            class="rounded-xl px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10">پنل مدیریت</a>
-          <button type="button" (click)="logout()"
-            class="rounded-xl border border-white/15 px-4 py-2 text-sm font-medium transition-colors hover:border-red-300/50 hover:text-red-200">خروج</button>
+          <a routerLink="/cart" class="site-nav__btn site-nav__btn--ghost site-nav__btn--icon" aria-label="سبد خرید">🛒</a>
+          <a routerLink="/profile" class="site-nav__btn site-nav__btn--ghost">پروفایل</a>
+          <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller" class="site-nav__btn site-nav__btn--ghost">داشبورد فروشنده</a>
+          <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin" class="site-nav__btn site-nav__btn--ghost">پنل مدیریت</a>
+          <button type="button" (click)="logout()" class="site-nav__btn site-nav__btn--ghost site-nav__btn--logout">خروج</button>
         </ng-container>
       </div>
 
-
-      <button type="button" (click)="toggleMenu()"
-        class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 text-white transition-colors hover:bg-white/10 md:hidden"
+      <button type="button" (click)="toggleMenu()" class="site-nav__burger"
         [attr.aria-expanded]="menuOpen" aria-controls="mobile-menu" aria-label="باز کردن منو">
-        <svg *ngIf="!menuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor" stroke-width="1.8">
+        <svg *ngIf="!menuOpen" xmlns="http://www.w3.org/2000/svg" class="site-nav__burger-icon" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-        <svg *ngIf="menuOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor" stroke-width="1.8">
+        <svg *ngIf="menuOpen" xmlns="http://www.w3.org/2000/svg" class="site-nav__burger-icon" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
   </nav>
 
-
   <!-- منوی موبایل: کشوی لغزنده از راست -->
-  <div class="fixed inset-0 z-40 bg-secondary/40 backdrop-blur-sm transition-opacity duration-300 md:hidden"
-    [class.opacity-0]="!menuOpen" [class.pointer-events-none]="!menuOpen" (click)="closeMenu()">
-    <aside id="mobile-menu"
-      class="absolute right-0 top-0 h-full w-[min(88vw,22rem)] border-l border-white/20 bg-secondary/95 px-5 pb-8 pt-24 text-white shadow-2xl backdrop-blur-2xl transition-transform duration-300 ease-in-out"
-      [class.translate-x-full]="!menuOpen" (click)="$event.stopPropagation()">
-      <div class="mb-8 flex items-center gap-3 border-b border-white/10 pb-5">
-        <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-xl font-bold">T</span>
+  <div class="mobile-menu" [class.is-open]="menuOpen" (click)="closeMenu()">
+    <aside id="mobile-menu" class="mobile-menu__drawer" [class.is-open]="menuOpen" (click)="$event.stopPropagation()">
+      <div class="mobile-menu__head">
+        <span class="mobile-menu__logo" aria-hidden="true">T</span>
         <div>
-          <p class="font-bold">تولیدی</p>
-          <p class="text-xs text-white/55">فروشگاهی برای حرفه‌ای‌ها</p>
+          <p class="mobile-menu__title">تولیدی</p>
+          <p class="mobile-menu__subtitle">فروشگاهی برای حرفه‌ای‌ها</p>
         </div>
       </div>
       <div class="mobile-mega-menu">
         <app-mega-menu></app-mega-menu>
       </div>
 
-      <div class="space-y-2 text-base font-medium">
-        <a routerLink="/" (click)="closeMenu()" class="mobile-nav-link">خانه <span>⌂</span></a>
-        <a routerLink="/shop" (click)="closeMenu()" class="mobile-nav-link">فروشگاه <span>◈</span></a>
-        <a routerLink="/deals" (click)="closeMenu()" class="mobile-nav-link text-red-400 font-bold">🔥 شگفت‌انگیزها</a>
-        <a routerLink="/top-performers" (click)="closeMenu()" class="mobile-nav-link text-yellow-400 font-bold">🏆
-          برترین‌ها</a>
-        <a routerLink="/shipping" (click)="closeMenu()" class="mobile-nav-link text-blue-400 font-bold">📦 ارسال</a>
-        <a routerLink="/contact" (click)="closeMenu()" class="mobile-nav-link">تماس با ما <span>✉</span></a>
+      <div class="mobile-menu__links">
+        <a routerLink="/" (click)="closeMenu()" class="mobile-nav-link">خانه <span aria-hidden="true">⌂</span></a>
+        <a routerLink="/shop" (click)="closeMenu()" class="mobile-nav-link">فروشگاه <span aria-hidden="true">◈</span></a>
+        <a routerLink="/deals" (click)="closeMenu()" class="mobile-nav-link mobile-nav-link--deals">🔥 شگفت‌انگیزها</a>
+        <a routerLink="/top-performers" (click)="closeMenu()" class="mobile-nav-link mobile-nav-link--top">🏆 برترین‌ها</a>
+        <a routerLink="/shipping" (click)="closeMenu()" class="mobile-nav-link mobile-nav-link--shipping">📦 ارسال</a>
+        <a routerLink="/contact" (click)="closeMenu()" class="mobile-nav-link">تماس با ما <span aria-hidden="true">✉</span></a>
       </div>
 
-      <div class="my-7 border-t border-white/10 pt-6">
+      <div class="mobile-menu__footer">
         <ng-container *ngIf="!currentUser">
-          <a routerLink="/auth/login" (click)="closeMenu()"
-            class="mb-3 block rounded-2xl bg-primary px-4 py-3 text-center font-bold shadow-lg shadow-primary/25">ورود /
-            ثبت‌نام</a>
+          <a routerLink="/auth" (click)="closeMenu()" class="mobile-menu__cta">ورود / ثبت‌نام</a>
         </ng-container>
         <ng-container *ngIf="currentUser">
-          <a routerLink="/profile" (click)="closeMenu()" class="mobile-nav-link">پروفایل <span>◎</span></a>
-          <a routerLink="/orders" (click)="closeMenu()" class="mobile-nav-link">سفارش‌ها <span>☰</span></a>
-          <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller" (click)="closeMenu()"
-            class="mobile-nav-link">داشبورد فروشنده <span>↗</span></a>
-          <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin" (click)="closeMenu()" class="mobile-nav-link">پنل
-            مدیریت <span>⚙</span></a>
-          <button type="button" (click)="logout()"
-            class="mt-3 w-full rounded-2xl border border-red-300/30 px-4 py-3 text-red-200">خروج از حساب</button>
+          <a routerLink="/profile" (click)="closeMenu()" class="mobile-nav-link">پروفایل <span aria-hidden="true">◎</span></a>
+          <a routerLink="/orders" (click)="closeMenu()" class="mobile-nav-link">سفارش‌ها <span aria-hidden="true">☰</span></a>
+          <a *ngIf="currentUser.role === 'Seller'" routerLink="/seller" (click)="closeMenu()" class="mobile-nav-link">داشبورد فروشنده <span aria-hidden="true">↗</span></a>
+          <a *ngIf="currentUser.role === 'Admin'" routerLink="/admin" (click)="closeMenu()" class="mobile-nav-link">پنل مدیریت <span aria-hidden="true">⚙</span></a>
+          <button type="button" (click)="logout()" class="mobile-menu__logout">خروج از حساب</button>
         </ng-container>
       </div>
     </aside>
@@ -139,46 +113,45 @@
   <app-bottom-nav *ngIf="!isAdminArea && !isStandaloneAuthPage"></app-bottom-nav>
 </main>
 
-<footer *ngIf="!isAdminArea && !isStandaloneAuthPage" class="mt-12 bg-secondary text-white">
-  <div class="container mx-auto px-4 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 py-12 md:grid-cols-4">
+<footer *ngIf="!isAdminArea && !isStandaloneAuthPage" class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__grid">
       <div>
-        <p class="font-bold">تولیدی</p>
-        <p class="mt-2 text-sm text-white/70">پلتفرم B2B برای خرید و فروش عمده.</p>
+        <p class="site-footer__brand">تولیدی</p>
+        <p class="site-footer__tagline">پلتفرم B2B برای خرید و فروش عمده.</p>
       </div>
       <div>
-        <p class="mb-3 text-sm font-bold text-white/90">برای خریداران</p>
-        <ul class="space-y-2 text-sm text-white/70">
-          <li><a routerLink="/shop" class="hover:text-white">فروشگاه</a></li>
-          <li><a routerLink="/contact" class="hover:text-white">تماس با ما</a></li>
-          <li><a routerLink="/cart" class="hover:text-white">سبد خرید</a></li>
+        <p class="site-footer__title">برای خریداران</p>
+        <ul class="site-footer__list">
+          <li><a routerLink="/shop" class="site-footer__link">فروشگاه</a></li>
+          <li><a routerLink="/contact" class="site-footer__link">تماس با ما</a></li>
+          <li><a routerLink="/cart" class="site-footer__link">سبد خرید</a></li>
         </ul>
       </div>
       <div>
-        <p class="mb-3 text-sm font-bold text-white/90">برای فروشندگان</p>
-        <ul class="space-y-2 text-sm text-white/70">
-          <li><a routerLink="/register" class="hover:text-white">ثبت نام فروشنده</a></li>
-          <li><a routerLink="/seller" class="hover:text-white">داشبورد فروشنده</a></li>
-          <li><a routerLink="/admin" class="hover:text-white">پنل مدیریت</a></li>
+        <p class="site-footer__title">برای فروشندگان</p>
+        <ul class="site-footer__list">
+          <li><a routerLink="/register" class="site-footer__link">ثبت نام فروشنده</a></li>
+          <li><a routerLink="/seller" class="site-footer__link">داشبورد فروشنده</a></li>
+          <li><a routerLink="/admin" class="site-footer__link">پنل مدیریت</a></li>
         </ul>
       </div>
       <div>
-        <p class="mb-3 text-sm font-bold text-white/90">خبرنامه</p>
-        <form (ngSubmit)="onNewsletterSubmit()" class="space-y-2">
+        <p class="site-footer__title">خبرنامه</p>
+        <form (ngSubmit)="onNewsletterSubmit()" class="site-footer__form">
           <input type="email" name="newsletterEmail" [(ngModel)]="newsletterEmail" placeholder="ایمیل شما"
-            class="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-primary" />
-          <button type="submit" [disabled]="newsletterSubmitting"
-            class="w-full rounded-xl bg-primary px-4 py-2 text-sm font-bold shadow-lg shadow-primary/20 transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-60">
+            class="site-footer__input" />
+          <button type="submit" [disabled]="newsletterSubmitting" class="site-footer__submit">
             {{ newsletterSubmitting ? 'در حال ثبت…' : 'عضویت' }}
           </button>
         </form>
-        <div *ngIf="newsletterMessage" class="text-xs font-bold"
-          [ngClass]="newsletterMessage.type === 'success' ? 'text-emerald-400' : 'text-red-400'">
+        <div *ngIf="newsletterMessage" class="site-footer__msg"
+          [ngClass]="newsletterMessage.type === 'success' ? 'site-footer__msg--success' : 'site-footer__msg--error'">
           {{ newsletterMessage.text }}
         </div>
       </div>
     </div>
-    <div class="border-t border-white/10 py-6 text-center text-xs text-white/60">
+    <div class="site-footer__bottom">
       © ۲۰۲۴ تولیدی — تمامی حقوق محفوظ است.
     </div>
   </div>

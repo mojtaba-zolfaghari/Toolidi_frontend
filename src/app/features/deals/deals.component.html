@@ -20,11 +20,11 @@
       <div class="mt-8 inline-flex items-center gap-3 rounded-2xl bg-black/20 px-6 py-4 backdrop-blur-sm">
         <span class="text-sm text-white/70">پایان تخفیف در:</span>
         <div class="flex items-center gap-2" dir="ltr">
-          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.hours | number:'2.0-0':'fa-IR' }}</div>
+          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.hours | persianNumber }}</div>
           <span class="animate-pulse text-xl font-bold">:</span>
-          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.minutes | number:'2.0-0':'fa-IR' }}</div>
+          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.minutes | persianNumber }}</div>
           <span class="animate-pulse text-xl font-bold">:</span>
-          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.seconds | number:'2.0-0':'fa-IR' }}</div>
+          <div class="countdown-box flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl font-extrabold text-red-600">{{ countdown.seconds | persianNumber }}</div>
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@
   <section class="container mx-auto max-w-7xl px-4 py-12 lg:px-8">
     <div class="mb-8 flex items-center justify-between gap-3">
       <div><p class="text-sm font-bold text-red-500">انتخاب‌های محدود</p><h2 class="text-2xl font-extrabold text-secondary">شگفت‌انگیزهای امروز</h2></div>
-      <span class="rounded-full bg-red-100 px-3 py-1 text-sm font-bold text-red-600">{{ products.length | number:'1.0-0':'fa-IR' }} محصول</span>
+      <span class="rounded-full bg-red-100 px-3 py-1 text-sm font-bold text-red-600">{{ products.length | persianNumber }} محصول</span>
     </div>
 
     <div *ngIf="loading" class="py-16 text-center"><app-spinner label="در حال بارگذاری..."></app-spinner></div>
@@ -50,7 +50,7 @@
         <div *ngFor="let supplier of suppliers; let i = index" class="supplier-deal-card group flex items-center gap-4 rounded-2xl border border-red-100 bg-gradient-to-r from-white to-red-50/50 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-lg" [style.animation-delay]="(i * 100) + 'ms'">
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-xl text-white shadow-lg shadow-red-200">🏭</div>
           <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><h3 class="truncate font-bold text-secondary">{{ supplier.companyName }}</h3><span *ngIf="supplier.isVerified" class="shrink-0 rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-bold text-green-600">✓</span></div><p class="text-xs text-gray-500">{{ supplier.city }}، {{ supplier.province }}</p><p class="mt-1 text-xs text-gray-400">{{ supplier.description }}</p></div>
-          <div class="shrink-0 text-center"><div class="animate-bounce text-2xl font-extrabold text-red-600">{{ supplier.maxDiscount | number:'1.0-0':'fa-IR' }}٪</div><p class="text-[10px] text-gray-400">{{ supplier.dealCount | number:'1.0-0':'fa-IR' }} محصول</p><p class="text-[10px] text-gray-400">⭐ {{ supplier.rating }}</p></div>
+          <div class="shrink-0 text-center"><div class="animate-bounce text-2xl font-extrabold text-red-600">{{ supplier.maxDiscount | persianNumber }}٪</div><p class="text-[10px] text-gray-400">{{ supplier.dealCount | persianNumber }} محصول</p><p class="text-[10px] text-gray-400">⭐ {{ supplier.rating }}</p></div>
         </div>
       </div>
     </div>

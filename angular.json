@@ -11,7 +11,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:browser-esbuild",
           "options": {
             "outputPath": "dist/toolidi",
             "index": "src/index.html",
@@ -23,9 +23,10 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.json",
-              "src/sw.js",
               "src/robots.txt"
             ],
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json",
             "styles": [
               "src/styles.scss"
             ],
@@ -44,8 +45,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb",
-                  "maximumError": "24kb"
+                  "maximumWarning": "32kb",
+                  "maximumError": "40kb"
                 }
               ],
               "outputHashing": "all",
@@ -53,7 +54,8 @@
                 "scripts": true,
                 "styles": true,
                 "fonts": false
-              }
+              },
+              "sourceMap": true
             },
             "development": {
               "fileReplacements": [

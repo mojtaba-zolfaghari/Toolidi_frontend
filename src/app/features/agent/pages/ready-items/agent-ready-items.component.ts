@@ -41,7 +41,7 @@ import { AgentPickupService, ReadyItem } from '../../../../core/services/api/age
                 <div class="text-xs text-gray-500">{{ item.supplierLocation }}</div>
               </td>
               <td class="p-4 text-secondary">{{ item.productName }}</td>
-              <td class="p-4">{{ item.quantity | number:'1.0-0':'fa-IR' }}</td>
+              <td class="p-4">{{ item.quantity | persianNumber }}</td>
               <td class="p-4">{{ item.estimatedReadyDate ? (item.estimatedReadyDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
               <td class="p-4">
                 <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">آماده تحویل</span>

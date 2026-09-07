@@ -1,4 +1,4 @@
-<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+<section dir="rtl" class="admin-page">
   <app-page-header
     title="کاربران"
     subtitle="مدیریت نقش و وضعیت دسترسی کاربران"
@@ -139,14 +139,14 @@
                   <span class="admin-modal__pill" [class.admin-modal__pill--ok]="order.isPaid">{{ paymentStatusLabel(order.paymentStatus) }}</span>
                 </td>
                 <td>{{ order.itemCount }}</td>
-                <td>{{ order.grandTotal | number:'1.0-0' }} تومان</td>
+                <td>{{ order.grandTotal | persianNumber }} تومان</td>
                 <td>{{ order.createdAt | persianDate:'yyyy/MM/dd' }}</td>
               </tr>
             </tbody>
           </table>
           <div class="admin-modal__pager" *ngIf="detailOrdersTotal > 5">
             <button mat-button [disabled]="detailOrdersPage <= 1" (click)="changeDetailOrdersPage(-1)">قبلی</button>
-            <span>صفحه {{ detailOrdersPage }} از {{ ((detailOrdersTotal + 4) / 5) | number:'1.0-0' }}</span>
+            <span>صفحه {{ detailOrdersPage }} از {{ ((detailOrdersTotal + 4) / 5) | persianNumber }}</span>
             <button mat-button [disabled]="detailOrdersPage >= ((detailOrdersTotal + 4) / 5)" (click)="changeDetailOrdersPage(1)">بعدی</button>
           </div>
           <p class="admin-modal__note">نقش کاربر: {{ getRoleLabel(selectedUser.roleName) }} — گزارش‌های اختصاصی نقش در نسخه‌های بعد تکمیل می‌شود.</p>

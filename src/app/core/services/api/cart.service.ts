@@ -4,6 +4,7 @@ import { tap } from 'rxjs/operators';
 
 import { ApiService } from '../api.service';
 import { Result } from '../../models/api-response.model';
+import { ACCESS_TOKEN_KEY } from '../../interceptors/token.interceptor';
 
 /** کلید ذخیره‌سازی سبد مهمان در localStorage */
 export const GUEST_CART_KEY = 'guest_cart_items';
@@ -12,6 +13,16 @@ export const GUEST_CART_KEY = 'guest_cart_items';
 export interface GuestCartItem {
   productVariationId: string;
   quantity: number;
+  /** اسنپ‌شات نمایشی محصول (برای نمایش سبد مهمان بدون فراخوانی API) */
+  name?: string;
+  imageUrl?: string;
+  unitPrice?: number;
+  categoryName?: string;
+  sellerCity?: string;
+  cityDeliveryDays?: number;
+  nationwideDeliveryDays?: number;
+  hasDiscount?: boolean;
+  discountPercent?: number;
 }
 
 /** آیتم سبد خرید */
@@ -84,12 +95,16 @@ export class CartService {
     }
   }
 
-  /** ادغام سبد مهمان با سبد کاربر — درخواست POST به /v1/cart/merge-guest */
+  /** ادغام سبد مهمان با سبد کاربر — درخواست POST به /v1/cart/merge */
   mergeGuestCart(items: GuestCartItem[]): Observable<Result<boolean>> {
     if (!items.length) {
       return of({ isSuccess: true } as Result<boolean>);
     }
-    return this.api.post<Result<boolean>>('/v1/cart/merge-guest', { items }).pipe(
+    const guestCartItems = items.map((item) => ({
+      productVariationId: item.productVariationId,
+      quantity: item.quantity
+    }));
+    return this.api.post<Result<boolean>>('/v1/cart/merge', { guestCartItems }).pipe(
       tap(() => {
         localStorage.removeItem(GUEST_CART_KEY);
       })
@@ -98,8 +113,13 @@ export class CartService {
 
   constructor(private readonly api: ApiService) {}
 
-  /** تازه‌سازی شمارنده سبد از backend. */
+  /** تازه‌سازی شمارنده سبد از backend — برای مهمان از localStorage */
   refreshCount(): void {
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY) ?? sessionStorage.getItem(ACCESS_TOKEN_KEY) ?? null;
+    if (!token) {
+      this.countSubject.next(this.getGuestCart().reduce((total, item) => total + (item.quantity || 0), 0));
+      return;
+    }
     this.getCart().subscribe({
       next: (result) => this.setCount(result.data?.items ?? []),
       error: () => this.countSubject.next(0)
@@ -119,18 +139,27 @@ export class CartService {
 
   /**
    * افزودن آیتم به سبد خرید.
-   * بک‌اند شناسه‌ی «تنوع محصول» (productVariationId) دریافت می‌کند؛
-   * در صورت نبود تنوع، شناسه‌ی محصول به عنوان تنوع در نظر گرفته می‌شود.
+   * بک‌اند دو فیلد جدا می‌گیرد: productVariationId (محصول تنوع‌دار) یا
+   * productId (محصول ساده — بک‌اند خودش تنوع پیش‌فرض را می‌سازد/پیدا می‌کند).
+   * ارسال شناسه‌ی محصول در فیلد productVariationId باعث خطای VariationNotFound می‌شود.
    */
   addItem(productId: string, variationId?: string, quantity = 1): Observable<Result<string>> {
-    return this.api.post<Result<string>>('/v1/cart/items', {
-      productVariationId: variationId ?? productId,
-      quantity
-    }).pipe(tap(() => this.refreshCount()));
+    const payload: Record<string, unknown> = { quantity };
+    if (variationId) {
+      payload['productVariationId'] = variationId;
+    } else {
+      payload['productId'] = productId;
+    }
+    return this.api.post<Result<string>>('/v1/cart/items', payload).pipe(tap(() => this.refreshCount()));
   }
 
-  /** افزودن آیتم به سبد مهمان (بدون احراز هویت) — در صورت عدم احراز، به localStorage ذخیره می‌شود */
-  addGuestItem(productId: string, variationId?: string, quantity = 1): void {
+  /** افزودن آیتم به سبد مهمان (بدون احراز هویت) — با اسنپ‌شات نمایشی محصول */
+  addGuestItem(
+    productId: string,
+    variationId?: string,
+    quantity = 1,
+    snapshot?: Omit<GuestCartItem, 'productVariationId' | 'quantity'>
+  ): void {
     const items = this.getGuestCart();
     const id = variationId ?? productId;
     const index = items.findIndex((item) => item.productVariationId === id);
@@ -139,10 +168,30 @@ export class CartService {
     } else {
       items.push({
         productVariationId: id,
-        quantity
+        quantity,
+        ...snapshot
       });
     }
     this.saveGuestCart(items);
+  }
+
+  /** تغییر تعداد یک آیتم سبد مهمان */
+  updateGuestItem(productVariationId: string, quantity: number): void {
+    const items = this.getGuestCart();
+    const index = items.findIndex((item) => item.productVariationId === productVariationId);
+    if (index >= 0) {
+      if (quantity < 1) {
+        items.splice(index, 1);
+      } else {
+        items[index].quantity = quantity;
+      }
+      this.saveGuestCart(items);
+    }
+  }
+
+  /** حذف یک آیتم از سبد مهمان */
+  removeGuestItem(productVariationId: string): void {
+    this.updateGuestItem(productVariationId, 0);
   }
 
   /** به‌روزرسانی تعداد یک آیتم سبد */

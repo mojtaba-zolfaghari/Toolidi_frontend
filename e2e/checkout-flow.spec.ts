@@ -106,10 +106,34 @@ const MOCK_CART = {
 
 // ── Helpers ────────────────────────────────────────────
 
+/** Standard API success envelope used by every mock in this suite. */
+function success<T>(data: T) {
+  return { status: 200, contentType: 'application/json', body: JSON.stringify({ isSuccess: true, data }) };
+}
+
+/** Unsigned HS256-shaped JWT — the app only decodes the payload client-side. */
+function makeJwt(role: string, username: string): string {
+  const b64url = (obj: unknown) =>
+    btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const header = b64url({ alg: 'HS256', typ: 'JWT' });
+  const payload = b64url({
+    sub: `user-${role.toLowerCase()}`,
+    unique_name: username,
+    role,
+    exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1h
+  });
+  return `${header}.${payload}.fake-signature`;
+}
+
 /** Intercept and mock all checkout-related APIs */
 async function mockAllApis(page: Page) {
+  // Backstop for every other API call — registered FIRST so the specific
+  // routes below (registered later) take precedence (reverse registration order).
+  await page.route('**/api/**', (route) => route.fulfill(success({})));
+
+  // NB: real service endpoints (ApiService base url already ends in /api).
   // Addresses
-  await page.route('**/api/v1/addresses**', (route) =>
+  await page.route('**/api/Profile/addresses**', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -118,7 +142,7 @@ async function mockAllApis(page: Page) {
   );
 
   // Shipping methods
-  await page.route('**/api/v1/shipping/methods**', (route) =>
+  await page.route('**/api/shipping/methods**', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -127,7 +151,7 @@ async function mockAllApis(page: Page) {
   );
 
   // Payment gateways
-  await page.route('**/api/v1/payment-gateways**', (route) =>
+  await page.route('**/api/payment/gateways**', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -135,16 +159,7 @@ async function mockAllApis(page: Page) {
     }),
   );
 
-  // Cart (for estimated delivery + cart summary)
-  await page.route('**/api/v1/cart**', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ isSuccess: true, data: MOCK_CART }),
-    }),
-  );
-
-  // Estimated delivery
+  // Estimated delivery (OrderService.getEstimatedDelivery → /v1/checkout/estimated-delivery)
   await page.route('**/api/v1/checkout/estimated-delivery**', (route) =>
     route.fulfill({
       status: 200,
@@ -159,6 +174,19 @@ async function mockAllApis(page: Page) {
     }),
   );
 
+  // Cart for the cart page (items grouped by seller; no minimum-order warnings,
+  // so the checkout link in test 19 is active)
+  await page.route('**/api/v1/cart**', (route) => {
+    if (route.request().method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ isSuccess: true, data: MOCK_CART }),
+      });
+    }
+    return route.fulfill(success(true));
+  });
+
   // Create order
   await page.route('**/api/v1/orders', (route) => {
     if (route.request().method() === 'POST') {
@@ -172,8 +200,20 @@ async function mockAllApis(page: Page) {
   });
 }
 
+/**
+ * Seed an access token so the AuthGuard lets /checkout render (the app only
+ * base64-decodes the JWT payload client-side, same convention as auth-redirect.spec.ts).
+ */
+async function seedAuth(page: Page) {
+  await page.addInitScript(
+    ([tokenKey, token]) => localStorage.setItem(tokenKey, token),
+    ['access_token', makeJwt('Buyer', 'checkout-flow-e2e')],
+  );
+}
+
 /** Navigate to checkout with mocks active */
 async function goToCheckout(page: Page) {
+  await seedAuth(page);
   await mockAllApis(page);
   await page.goto(`${BASE}/checkout`);
   await page.waitForLoadState('networkidle');
@@ -209,7 +249,7 @@ test.describe('Checkout Flow E2E', () => {
   test('03 - addresses are loaded from API', async ({ page }) => {
     const apiCalls: string[] = [];
     page.on('request', (req) => {
-      if (req.url().includes('/api/v1/address')) apiCalls.push(req.url());
+      if (req.url().includes('/Profile/addresses')) apiCalls.push(req.url());
     });
 
     await goToCheckout(page);
@@ -228,9 +268,10 @@ test.describe('Checkout Flow E2E', () => {
   test('05 - default address is pre-selected', async ({ page }) => {
     await goToCheckout(page);
 
-    // First address should be checked (isDefault: true)
-    const checkedRadio = page.locator('input[type="radio"]:checked');
-    await expect(checkedRadio).toHaveCount(1, { timeout: 10000 });
+    // The page has two address radio groups (shipping + billing) and each
+    // pre-selects the default address — exactly one checked radio per group.
+    await expect(page.locator('input[name="shippingAddress"]:checked')).toHaveCount(1, { timeout: 10000 });
+    await expect(page.locator('input[name="billingAddress"]:checked')).toHaveCount(1, { timeout: 10000 });
   });
 
   test('06 - can switch between addresses', async ({ page }) => {
@@ -253,8 +294,10 @@ test.describe('Checkout Flow E2E', () => {
     await expect(nextBtn).toBeVisible({ timeout: 10000 });
     await nextBtn.click();
 
-    // Step 2 (shipping) should now be visible
-    const shippingSection = page.locator('text=روش ارسال, text=ارسال').first();
+    // Step 2 (shipping) should now be visible — NB: a comma inside a single
+    // text= selector is NOT a union in Playwright (it becomes one literal
+    // string); use precise markers or .or() to combine selectors.
+    const shippingSection = page.getByRole('heading', { name: 'روش ارسال' });
     await expect(shippingSection).toBeVisible({ timeout: 10000 });
   });
 
@@ -268,7 +311,7 @@ test.describe('Checkout Flow E2E', () => {
     await nextBtn.click();
 
     // Shipping method options should appear
-    const shippingOptions = page.locator('text=پست پیشتاز, text=اسنپ باکس');
+    const shippingOptions = page.locator('text=پست پیشتاز').or(page.locator('text=اسنپ باکس'));
     await expect(shippingOptions.first()).toBeVisible({ timeout: 10000 });
   });
 
@@ -278,7 +321,7 @@ test.describe('Checkout Flow E2E', () => {
     const nextBtn = page.locator('button:has-text("ادامه"), button:has-text("مرحله بعد")').first();
     await nextBtn.click();
 
-    const paymentOptions = page.locator('text=زرین‌پال, text=سداد');
+    const paymentOptions = page.locator('text=زرین‌پال').or(page.locator('text=سداد'));
     await expect(paymentOptions.first()).toBeVisible({ timeout: 10000 });
   });
 
@@ -323,7 +366,11 @@ test.describe('Checkout Flow E2E', () => {
       await submitBtn.click();
 
       // Order confirmation should appear
-      const confirmation = page.locator(`text=${MOCK_ORDER_NUMBER}, text=تایید, text=تائید, text=تکمیل`).first();
+      const confirmation = page.locator(`text=${MOCK_ORDER_NUMBER}`)
+        .or(page.locator('text=تایید'))
+        .or(page.locator('text=تائید'))
+        .or(page.locator('text=تکمیل'))
+        .first();
       await expect(confirmation).toBeVisible({ timeout: 15000 });
     }
   });
@@ -386,7 +433,9 @@ test.describe('Checkout Flow E2E', () => {
     await goToCheckout(page);
 
     // Delivery estimates should be visible somewhere on the page
-    const deliveryText = page.locator('text=تحویل, text=تاریخ تحویل, text=تحویل تخمینی');
+    const deliveryText = page.locator('text=تحویل تخمینی')
+      .or(page.locator('text=تاریخ تحویل'))
+      .or(page.locator('text=تحویل'));
     // This may not be visible in step 1, check step 2
     const nextBtn = page.locator('button:has-text("ادامه"), button:has-text("مرحله بعد")').first();
     if (await nextBtn.isVisible().catch(() => false)) {
@@ -443,6 +492,7 @@ test.describe('Checkout Flow E2E', () => {
 
 test.describe('Cart → Checkout Integration', () => {
   test('19 - navigating to checkout from cart works', async ({ page }) => {
+    await seedAuth(page);
     await mockAllApis(page);
 
     await page.goto(`${BASE}/cart`);
@@ -452,7 +502,10 @@ test.describe('Cart → Checkout Integration', () => {
     const checkoutBtn = page.locator('a[href*="checkout"], button:has-text("تکمیل خرید")').first();
     if (await checkoutBtn.isVisible().catch(() => false)) {
       await checkoutBtn.click();
-      await page.waitForLoadState('networkidle');
+
+      // /checkout is lazy-loaded — wait for the router to finish the client-side
+      // navigation (networkidle resolves instantly here and races the router).
+      await page.waitForURL('**/checkout', { timeout: 15_000 });
 
       // Should be on checkout page
       expect(page.url()).toContain('checkout');
@@ -466,6 +519,8 @@ test.describe('Cart → Checkout Integration', () => {
 
 test.describe('Post-Checkout: Order Detail', () => {
   test('20 - order detail page shows tracking timeline', async ({ page }) => {
+    await seedAuth(page);
+
     // Mock order detail API
     await page.route('**/api/v1/orders/*', (route) =>
       route.fulfill({

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -14,13 +14,23 @@ import { CartButtonState } from '../add-to-cart-button/add-to-cart-button.compon
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
-  styleUrls: ['./product-card.component.scss']
+  styleUrls: ['./product-card.component.scss'],
+  // OnPush: کارت‌ها فقط با تغییر ورودی ورِندر می‌شوند؛ مهم برای گرید‌های فروشگاه/صفحه اصلی.
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCardComponent {
   @Input() product!: Product;
 
   /** وضعیت دکمه افزودن به سبد */
   cartState: CartButtonState = 'idle';
+
+  /** srcset با پشتیبانی WebP */
+  get imageSrcset(): string {
+    const base = this.primaryImageUrl;
+    if (!base) return '';
+    const webp = base.replace(/\.(jpg|jpeg|png|webp)$/i, '.webp');
+    return `${base} 1x, ${webp} 1x`;
+  }
 
   constructor(
     private readonly router: Router,
@@ -55,6 +65,15 @@ export class ProductCardComponent {
       : 0;
   }
 
+  /** شهر مبدا برای نمایش؛ مقدارهای خالی یا خراب (فقط علامت سؤال) به «نامشخص» تبدیل می‌شوند */
+  get sellerCityDisplay(): string {
+    const city = this.product.sellerCity?.trim() ?? '';
+    if (!city || /^[?؟]+$/.test(city)) {
+      return 'نامشخص';
+    }
+    return city;
+  }
+
   /** هدایت به صفحه جزئیات محصول */
   openDetail(): void {
     this.router.navigate(['/product', this.product.id]);
@@ -78,8 +97,18 @@ export class ProductCardComponent {
         error: () => { this.cartState = 'idle'; }
       });
     } else {
-      // کاربر مهمان — ذخیره در localStorage
-      this.cartService.addGuestItem(this.product.id, undefined, 1);
+      // کاربر مهمان — ذخیره در localStorage با اسنپ‌شات نمایشی
+      this.cartService.addGuestItem(this.product.id, undefined, 1, {
+        name: this.product.name,
+        imageUrl: this.product.imageUrl ?? this.product.images?.find((image) => image.isPrimary)?.imageUrl,
+        unitPrice: this.product.unitPrice,
+        categoryName: this.product.categoryName,
+        sellerCity: this.product.sellerCity,
+        cityDeliveryDays: this.product.cityDeliveryDays,
+        nationwideDeliveryDays: this.product.nationwideDeliveryDays,
+        hasDiscount: this.product.hasDiscount,
+        discountPercent: this.product.discountPercent
+      });
       this.cartState = 'success';
       // به‌روزرسانی شمارنده سبد مهمان
       const count = this.cartService.getGuestCart().reduce((t, i) => t + i.quantity, 0);

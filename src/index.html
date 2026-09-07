@@ -40,10 +40,12 @@
   <link rel="dns-prefetch" href="https://api.toolidi.ir">
   <link rel="dns-prefetch" href="http://localhost:5291">
 
-  <!-- Vazirmatn Font from Google Fonts CDN -->
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Vazirmatn Font from Google Fonts CDN (async load to avoid render blocking) -->
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
   <!-- Material Icons (ligature font used by admin redesign mat-icons) -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></noscript>
 </head>
 <body>
   <app-root></app-root>

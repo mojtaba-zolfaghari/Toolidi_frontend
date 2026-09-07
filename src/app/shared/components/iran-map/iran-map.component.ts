@@ -21,7 +21,7 @@ interface ProvinceData {
           </div>
           <h2 class="pn-title">تولیدکنندگان در سراسر ایران</h2>
           <p class="pn-subtitle">
-            از <strong>{{ totalSellers | number:'1.0-0':'fa-IR' }}</strong>
+            از <strong>{{ totalSellers | persianNumber }}</strong>
             تأمین‌کننده فعال در
             <strong>{{ provinces.length }}</strong>
             استان کشور
@@ -31,21 +31,21 @@ interface ProvinceData {
           <div class="pn-summary-card">
             <span class="pn-summary-icon">🏭</span>
             <div>
-              <span class="pn-summary-value">{{ provinces.length | number:'1.0-0':'fa-IR' }}</span>
+              <span class="pn-summary-value">{{ provinces.length | persianNumber }}</span>
               <span class="pn-summary-label">استان فعال</span>
             </div>
           </div>
           <div class="pn-summary-card">
             <span class="pn-summary-icon">📦</span>
             <div>
-              <span class="pn-summary-value">{{ totalSellers | number:'1.0-0':'fa-IR' }}</span>
+              <span class="pn-summary-value">{{ totalSellers | persianNumber }}</span>
               <span class="pn-summary-label">تأمین‌کننده</span>
             </div>
           </div>
           <div class="pn-summary-card">
             <span class="pn-summary-icon">🏷️</span>
             <div>
-              <span class="pn-summary-value">{{ totalTrades | number:'1.0-0':'fa-IR' }}</span>
+              <span class="pn-summary-value">{{ totalTrades | persianNumber }}</span>
               <span class="pn-summary-label">حوزه تولیدی</span>
             </div>
           </div>
@@ -77,7 +77,7 @@ interface ProvinceData {
           <!-- Stats -->
           <div class="pn-card-stats">
             <span class="pn-card-count">
-              <strong>{{ p.sellerCount | number:'1.0-0':'fa-IR' }}</strong>
+              <strong>{{ p.sellerCount | persianNumber }}</strong>
               تولیدکننده
             </span>
           </div>

@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 
 import { ShippingComponent } from './shipping.component';
+import { PersianNumberPipe } from '../../shared/persian-number.pipe';
 
 const routes: Routes = [
   { path: '', component: ShippingComponent }
@@ -15,6 +16,7 @@ const routes: Routes = [
   ],
   imports: [
     CommonModule,
+    PersianNumberPipe,
     HttpClientModule,
     RouterModule.forChild(routes)
   ]

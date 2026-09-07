@@ -46,13 +46,13 @@ export class AdminUsersComponent implements OnInit {
     { key: 'email', label: 'ایمیل' },
     { key: 'mobileNumber', label: 'موبایل' },
     { key: 'roleName', label: 'نقش', type: 'badge', badgeMap: {
-      'Customer': { label: 'مشتری', color: 'bg-blue-100 text-blue-700' },
-      'Seller': { label: 'فروشنده', color: 'bg-amber-100 text-amber-700' },
-      'Admin': { label: 'مدیر', color: 'bg-purple-100 text-purple-700' }
+      'Customer': { label: 'مشتری', color: 'data-table__badge--info' },
+      'Seller': { label: 'فروشنده', color: 'data-table__badge--warning' },
+      'Admin': { label: 'مدیر', color: 'data-table__badge--success' }
     }},
     { key: 'isActive', label: 'وضعیت', type: 'badge', badgeMap: {
-      'true': { label: 'فعال', color: 'bg-green-100 text-green-700' },
-      'false': { label: 'غیرفعال', color: 'bg-red-100 text-red-700' }
+      'true': { label: 'فعال', color: 'data-table__badge--success' },
+      'false': { label: 'غیرفعال', color: 'data-table__badge--danger' }
     }},
     { key: 'createdAt', label: 'تاریخ عضویت', type: 'date' }
   ];

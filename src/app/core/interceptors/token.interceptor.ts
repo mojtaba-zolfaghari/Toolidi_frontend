@@ -42,8 +42,11 @@ export class TokenInterceptor implements HttpInterceptor {
           const protectedPaths = ['/profile', '/orders', '/cart', '/checkout', '/seller', '/supplier', '/agent', '/admin'];
           const isProtected = protectedPaths.some(p => window.location.pathname.startsWith(p));
           if (isProtected) {
+            // پاک‌سازی توکن‌ها از هر دو localStorage و sessionStorage
             localStorage.removeItem(ACCESS_TOKEN_KEY);
             localStorage.removeItem(REFRESH_TOKEN_KEY);
+            sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+            sessionStorage.removeItem(REFRESH_TOKEN_KEY);
             // حفظ مسیر فعلی برای بازگشت پس از ورود مجدد
             this.router.navigate(['/auth/login'], { queryParams: { returnUrl: this.router.url } });
           }

@@ -1,92 +1,99 @@
-<!-- ═══════════════════ جزئیات مطلب وبلاگ ═══════════════════ -->
-<section class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/20">
+<!-- ═══════════════════ جزئیات مطلب وبلاگ (Angular Material) ═══════════════════ -->
+<section class="bd-page">
 
   <!-- ═══ لودینگ ═══ -->
-  <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
-    <div class="text-center space-y-4">
-      <div class="blog-detail-spinner mx-auto"></div>
-      <p class="text-gray-400">در حال بارگذاری مطلب…</p>
-    </div>
+  <div *ngIf="loading" class="bd-state">
+    <mat-progress-spinner mode="indeterminate" [diameter]="44" />
+    <p class="bd-state__text">در حال بارگذاری مطلب…</p>
   </div>
 
   <!-- ═══ خطا ═══ -->
-  <div *ngIf="!loading && errorMessage" class="max-w-4xl mx-auto px-4 pt-16 text-center">
-    <span class="text-5xl block mb-4">😔</span>
-    <h2 class="text-xl font-bold text-gray-700">مشکلی پیش آمد</h2>
-    <p class="text-gray-400 mt-2">{{ errorMessage }}</p>
-    <a routerLink="/blog" class="inline-flex items-center gap-2 mt-6 text-primary font-medium hover:underline">← بازگشت به وبلاگ</a>
+  <div *ngIf="!loading && errorMessage" class="bd-state">
+    <span class="bd-state__emoji">😔</span>
+    <h2 class="bd-state__title">مشکلی پیش آمد</h2>
+    <p class="bd-state__text">{{ errorMessage }}</p>
+    <a mat-button color="primary" routerLink="/blog">
+      <mat-icon [inline]="true">arrow_forward</mat-icon>
+      بازگشت به وبلاگ
+    </a>
   </div>
 
   <!-- ═══ محتوا ═══ -->
   <article *ngIf="!loading && post">
 
     <!-- هدر تصویر -->
-    <div class="relative h-64 md:h-96 overflow-hidden">
+    <div class="bd-hero">
       <img *ngIf="post.featuredImage"
            [src]="post.featuredImage" [alt]="post.title"
-           class="w-full h-full object-cover" />
-      <div *ngIf="!post.featuredImage" class="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-7xl text-white/20">
-        ✦
-      </div>
-      <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent"></div>
+           loading="lazy"
+           width="800" height="450" />
+      <div *ngIf="!post.featuredImage" class="bd-hero__placeholder">✦</div>
+      <div class="bd-hero__shade"></div>
 
       <!-- دکمه بازگشت روی تصویر -->
-      <a routerLink="/blog" class="absolute top-6 right-6 flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white rounded-xl px-4 py-2 text-sm hover:bg-white/25 transition-all">
-        <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      <a mat-stroked-button class="bd-hero__back" routerLink="/blog">
+        <mat-icon [inline]="true">arrow_forward</mat-icon>
         بازگشت
       </a>
     </div>
 
     <!-- محتوای مقاله -->
-    <div class="max-w-3xl mx-auto px-4 -mt-16 relative z-10">
-      <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10 lg:p-12">
+    <div class="bd-body-wrap">
+      <mat-card class="bd-card">
+        <mat-card-content class="bd-card__content">
 
-        <!-- عنوان -->
-        <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
-          {{ post.title }}
-        </h1>
+          <!-- عنوان -->
+          <h1 class="bd-title">{{ post.title }}</h1>
 
-        <!-- متا -->
-        <div class="flex flex-wrap items-center gap-3 mt-5 pb-6 border-b border-gray-100 text-sm text-gray-500">
-          <div class="flex items-center gap-2">
-            <span class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">T</span>
-            <span class="font-medium text-gray-700">تیم تولیدی</span>
+          <!-- متا -->
+          <div class="bd-meta">
+            <div class="bd-meta__author">
+              <span class="bd-meta__avatar">T</span>
+              <span class="bd-meta__name">تیم تولیدی</span>
+            </div>
+            <span class="bd-meta__sep">·</span>
+            <span>{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
+            <span class="bd-meta__sep">·</span>
+            <span class="bd-meta__views">
+              <mat-icon [inline]="true">visibility</mat-icon>
+              {{ (post.viewCount || 0) | persianNumber }} بازدید
+            </span>
           </div>
-          <span class="text-gray-300">·</span>
-          <span>{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
-          <span class="text-gray-300">·</span>
-          <span>👁 {{ (post.viewCount || 0) | number:'1.0-0':'fa-IR' }} بازدید</span>
-        </div>
 
-        <!-- خلاصه -->
-        <div *ngIf="post.shortDescription" class="mt-6 bg-purple-50 rounded-xl px-5 py-4 text-sm text-purple-800 leading-7 font-medium">
-          💡 {{ post.shortDescription }}
-        </div>
+          <mat-divider class="bd-divider" />
 
-        <!-- بدنه مقاله -->
-        <div class="mt-8 blog-content text-gray-700 leading-[2] text-[15px]" [innerHTML]="post.content"></div>
-
-        <!-- اشتراک‌گذاری -->
-        <div class="mt-10 pt-6 border-t border-gray-100">
-          <p class="text-sm font-medium text-gray-500 mb-3">اشتراک‌گذاری این مطلب</p>
-          <div class="flex gap-3">
-            <button type="button" class="share-btn bg-blue-500 hover:bg-blue-600" title="تلگرام">
-              📱 تلگرام
-            </button>
-            <button type="button" class="share-btn bg-green-500 hover:bg-green-600" title="واتساپ">
-              💬 واتساپ
-            </button>
-            <button type="button" class="share-btn bg-gray-500 hover:bg-gray-600" title="کپی لینک">
-              🔗 کپی لینک
-            </button>
+          <!-- خلاصه -->
+          <div *ngIf="post.shortDescription" class="bd-summary">
+            💡 {{ post.shortDescription }}
           </div>
-        </div>
-      </div>
+
+          <!-- بدنه مقاله -->
+          <div class="blog-content" [innerHTML]="post.content"></div>
+
+          <mat-divider class="bd-divider" />
+
+          <!-- اشتراک‌گذاری -->
+          <div class="bd-share">
+            <p class="bd-share__label">اشتراک‌گذاری این مطلب</p>
+            <div class="bd-share__row">
+              <button type="button" class="share-btn share-btn--telegram" title="تلگرام">
+                📱 تلگرام
+              </button>
+              <button type="button" class="share-btn share-btn--whatsapp" title="واتساپ">
+                💬 واتساپ
+              </button>
+              <button type="button" class="share-btn share-btn--copy" title="کپی لینک">
+                🔗 کپی لینک
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
       <!-- لینک بازگشت -->
-      <div class="text-center py-10">
-        <a routerLink="/blog" class="inline-flex items-center gap-2 bg-primary text-white rounded-xl px-6 py-3 font-bold hover:bg-primary-dark transition-colors">
-          <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      <div class="bd-back-row">
+        <a mat-raised-button color="primary" routerLink="/blog">
+          <mat-icon [inline]="true">arrow_forward</mat-icon>
           مشاهده سایر مقالات
         </a>
       </div>

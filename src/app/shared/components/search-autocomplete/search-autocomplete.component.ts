@@ -8,7 +8,7 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
   template: `
     <div class="search-autocomplete" [class.search-open]="isOpen">
       <!-- Desktop -->
-      <div class="hidden lg:block">
+      <div class="search-desktop">
         <form (ngSubmit)="onSubmit()" class="relative">
           <div class="search-input-wrap">
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -57,7 +57,7 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
                   <span class="search-item-name">{{ p.name }}</span>
                   <span class="search-item-meta">{{ p.categoryName }} · {{ p.supplierName }}</span>
                 </div>
-                <span class="search-item-price">{{ p.price | number:'1.0-0':'fa-IR' }} تومان</span>
+                <span class="search-item-price">{{ p.price | persianNumber }} تومان</span>
               </a>
             </div>
 
@@ -76,7 +76,7 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
                 <div class="search-item-img-placeholder">📂</div>
                 <div class="search-item-info">
                   <span class="search-item-name">{{ c.name }}</span>
-                  <span class="search-item-meta">{{ c.productCount | number:'1.0-0':'fa-IR' }} محصول</span>
+                  <span class="search-item-meta">{{ c.productCount | persianNumber }} محصول</span>
                 </div>
                 <span class="search-item-arrow">←</span>
               </a>
@@ -97,7 +97,7 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
                 <div class="search-item-img-placeholder">🏭</div>
                 <div class="search-item-info">
                   <span class="search-item-name">{{ s.companyName }}</span>
-                  <span class="search-item-meta">{{ s.city }}، {{ s.province }} · {{ s.productCount | number:'1.0-0':'fa-IR' }} محصول</span>
+                  <span class="search-item-meta">{{ s.city }}، {{ s.province }} · {{ s.productCount | persianNumber }} محصول</span>
                 </div>
                 <span class="search-item-arrow">←</span>
               </a>
@@ -120,9 +120,9 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
       </div>
 
       <!-- Mobile -->
-      <div class="lg:hidden">
+      <div class="search-mobile">
         <button type="button" (click)="openMobile()" class="search-mobile-trigger" aria-label="جستجو">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="search-mobile-trigger-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
           </svg>
         </button>
@@ -175,7 +175,7 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
                       <span class="search-item-name">{{ p.name }}</span>
                       <span class="search-item-meta">{{ p.categoryName }} · {{ p.supplierName }}</span>
                     </div>
-                    <span class="search-item-price">{{ p.price | number:'1.0-0':'fa-IR' }} ت</span>
+                    <span class="search-item-price">{{ p.price | persianNumber }} ت</span>
                   </a>
                 </div>
 
@@ -193,7 +193,7 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
                     <div class="search-item-img-placeholder">📂</div>
                     <div class="search-item-info">
                       <span class="search-item-name">{{ c.name }}</span>
-                      <span class="search-item-meta">{{ c.productCount | number:'1.0-0':'fa-IR' }} محصول</span>
+                      <span class="search-item-meta">{{ c.productCount | persianNumber }} محصول</span>
                     </div>
                     <span class="search-item-arrow">←</span>
                   </a>
@@ -238,6 +238,16 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
   `,
   styles: [`
     :host { display: inline-block; }
+
+    .search-desktop { display: none; }
+    .search-mobile { display: block; }
+
+    @media (min-width: 1024px) {
+      .search-desktop { display: block; }
+      .search-mobile { display: none; }
+    }
+
+    .search-mobile-trigger-icon { width: 1.25rem; height: 1.25rem; }
 
     /* ─── Desktop ─── */
     .search-input-wrap {

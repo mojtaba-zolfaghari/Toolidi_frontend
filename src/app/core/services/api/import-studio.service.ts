@@ -12,6 +12,8 @@ export interface ImportFieldConfig {
   replacements: { [find: string]: string };
   expectedType: 'Text' | 'Number' | 'Url' | 'Html' | 'Date';
   required: boolean;
+  /** Which page(s) this selector applies to: Both | Listing | Detail. */
+  scope?: 'Both' | 'Listing' | 'Detail';
 }
 
 export interface ImportValidationRules {
@@ -29,6 +31,7 @@ export interface ImportFlowConfig {
   productItemSelector: string;
   productLinkSelector: string;
   nextPageSelector?: string;
+  prevPageSelector?: string;
   maxPages: number;
   maxProducts: number;
   fields: ImportFieldConfig[];

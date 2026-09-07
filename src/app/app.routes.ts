@@ -101,8 +101,7 @@ export const routes: Routes = [
   },
   {
     path: 'cart',
-    loadChildren: loadCartChildren,
-    canActivate: [AuthGuard]
+    loadChildren: loadCartChildren
   },
   {
     path: 'checkout',

@@ -1,11 +1,11 @@
-<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
-  <header class="flex flex-wrap items-center justify-between gap-4">
+<section dir="rtl" class="admin-page">
+  <header class="admin-page__header">
     <div>
-      <p class="text-sm font-medium text-primary">مدیریت مالی</p>
-      <h1 class="mt-1 text-3xl font-extrabold text-secondary">هزینه‌های جاری</h1>
-      <p class="mt-2 text-sm text-gray-500">ثبت هزینه و توزیع خودکار سهم بین فروشندگان</p>
+      <p class="admin-page__eyebrow">مدیریت مالی</p>
+      <h1 class="admin-page__title">هزینه‌های جاری</h1>
+      <p class="admin-page__subtitle">ثبت هزینه و توزیع خودکار سهم بین فروشندگان</p>
     </div>
-    <div class="flex gap-2">
+    <div class="admin-page__header-actions">
       <button mat-flat-button type="button" (click)="openCreate()" class="admin-btn-primary">ثبت هزینه جدید</button>
       <button type="button" (click)="loadCosts()" mat-stroked-button class="admin-btn-outline">بازخوانی</button>
     </div>
@@ -14,56 +14,56 @@
   <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
   <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
 
-  <div class="data-table__container overflow-x-auto">
-    <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری هزینه‌ها…</div>
-    <table *ngIf="!loading" class="w-full min-w-[850px] text-right text-sm admin-table">
+  <div class="admin-page__tablewrap">
+    <div *ngIf="loading" class="admin-page__loading">در حال بارگذاری هزینه‌ها…</div>
+    <table *ngIf="!loading" class="admin-page__table">
       <thead>
-        <tr class="border-b bg-gray-50 text-gray-500">
-          <th class="p-4">عنوان</th>
-          <th class="p-4">مبلغ</th>
-          <th class="p-4">نوع</th>
-          <th class="p-4">ماه</th>
-          <th class="p-4">وضعیت</th>
-          <th class="p-4">عملیات</th>
+        <tr>
+          <th>عنوان</th>
+          <th>مبلغ</th>
+          <th>نوع</th>
+          <th>ماه</th>
+          <th>وضعیت</th>
+          <th>عملیات</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let cost of costs" class="border-b last:border-0">
-          <td class="p-4 font-bold text-secondary">{{ cost.name }}</td>
-          <td class="p-4">{{ cost.amount | number }} تومان</td>
-          <td class="p-4">{{ costTypeLabel(cost.costType) }}</td>
-          <td class="p-4">{{ cost.month || (cost.createdAt | persianDate:'yyyy/MM') }}</td>
-          <td class="p-4">
-            <span class="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">توزیع‌شده</span>
+        <tr *ngFor="let cost of costs">
+          <td class="admin-page__cell-strong">{{ cost.name }}</td>
+          <td>{{ cost.amount | persianNumber }} تومان</td>
+          <td>{{ costTypeLabel(cost.costType) }}</td>
+          <td>{{ cost.month || (cost.createdAt | persianDate:'yyyy/MM') }}</td>
+          <td>
+            <span class="admin-badge admin-badge--success">توزیع‌شده</span>
           </td>
-          <td class="p-4">
-            <button type="button" (click)="distribute(cost)" class="font-bold text-primary hover:underline">توزیع مجدد</button>
+          <td>
+            <button type="button" (click)="distribute(cost)" class="admin-page__link admin-page__link--primary">توزیع مجدد</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <p *ngIf="!loading && !costs.length" class="p-10 text-center text-gray-400">هزینه‌ای برای نمایش وجود ندارد.</p>
+    <p *ngIf="!loading && !costs.length" class="admin-page__empty">هزینه‌ای برای نمایش وجود ندارد.</p>
   </div>
 
   <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
     <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card admin-modal__card--wide">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-bold text-secondary">ثبت هزینه جدید</h2>
-        <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
+      <div class="admin-modal__header">
+        <h2 class="admin-modal__title">ثبت هزینه جدید</h2>
+        <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
       </div>
-      <p class="mt-3 rounded-xl bg-bg-muted px-4 py-3 text-sm text-gray-600">پس از ثبت، هزینه به‌صورت خودکار بین فروشندگان فعال توزیع می‌شود.</p>
-      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <p class="admin-modal__note">پس از ثبت، هزینه به‌صورت خودکار بین فروشندگان فعال توزیع می‌شود.</p>
+      <div class="admin-form-grid">
         <label>
-          <span class="mb-1 block text-sm font-medium text-secondary">عنوان *</span>
-          <input formControlName="name" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+          <span class="admin-form-grid__label">عنوان *</span>
+          <input formControlName="name" class="admin-form-grid__input" />
         </label>
         <label>
-          <span class="mb-1 block text-sm font-medium text-secondary">مبلغ *</span>
-          <input formControlName="amount" type="number" min="1" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+          <span class="admin-form-grid__label">مبلغ *</span>
+          <input formControlName="amount" type="number" min="1" class="admin-form-grid__input" />
         </label>
         <label>
-          <span class="mb-1 block text-sm font-medium text-secondary">نوع هزینه *</span>
-          <select formControlName="costType" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+          <span class="admin-form-grid__label">نوع هزینه *</span>
+          <select formControlName="costType" class="admin-form-grid__input">
             <option value="Server">سرور</option>
             <option value="SMS">پیامک</option>
             <option value="Advertising">تبلیغات</option>
@@ -71,17 +71,17 @@
           </select>
         </label>
         <label>
-          <span class="mb-1 block text-sm font-medium text-secondary">تاریخ هزینه *</span>
-          <input formControlName="costDate" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+          <span class="admin-form-grid__label">تاریخ هزینه *</span>
+          <input formControlName="costDate" type="date" class="admin-form-grid__input" />
         </label>
-        <label class="md:col-span-2">
-          <span class="mb-1 block text-sm font-medium text-secondary">توضیحات</span>
-          <textarea formControlName="description" rows="3" class="w-full rounded-xl border border-gray-300 px-4 py-2.5"></textarea>
-        </label>
+        <div class="admin-form-grid__full">
+          <label class="admin-form-grid__label">توضیحات</label>
+          <textarea formControlName="description" rows="3" class="admin-form-grid__input"></textarea>
+        </div>
       </div>
-      <p *ngIf="formError" class="admin-alert admin-alert--error mt-4">{{ formError }}</p>
-      <div class="mt-5 flex justify-end gap-3">
-        <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+      <p *ngIf="formError" class="admin-alert admin-alert--error">{{ formError }}</p>
+      <div class="admin-form-actions">
+        <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
         <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ثبت…' : 'ثبت هزینه' }}</button>
       </div>
     </form>

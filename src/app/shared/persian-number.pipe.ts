@@ -1,37 +1,26 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Converts Western Arabic numerals (0-9) to Persian/Farsi numerals (۰-۹).
- * Usage: {{ 12345 | persianNumber }} → ۱۲۳۴۵
- * Usage: {{ 12345.67 | persianNumber:'2' }} → ۱۲٬۳۴۵٫۶۷
+ * اعداد را با ارقام فارسی (۰-۹) و جداکننده‌ی هزارگان فارسی نمایش می‌دهد.
+ * لوله‌ی number خود انگولار با locale فارسی فقط جداکننده را محلی می‌کند و
+ * شکل ارقام لاتین می‌ماند؛ این لوله مستقیماً از Intl با locale fa-IR
+ * استفاده می‌کند تا خروجی همیشه ارقام فارسی باشد.
  */
-@Pipe({ name: 'persianNumber', standalone: true })
+@Pipe({
+  name: 'persianNumber',
+  pure: true,
+  standalone: true
+})
 export class PersianNumberPipe implements PipeTransform {
-  private static readonly persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-
-  transform(value: unknown, decimalPlaces?: number): string {
+  transform(value: number | string | null | undefined, minFractionDigits = 0, maxFractionDigits = minFractionDigits): string {
     if (value === null || value === undefined || value === '') return '';
 
-    let numStr: string;
-    if (typeof value === 'number') {
-      numStr = decimalPlaces !== undefined
-        ? value.toFixed(decimalPlaces)
-        : value.toString();
-    } else {
-      numStr = String(value);
-    }
+    const numeric = typeof value === 'number' ? value : Number(value);
+    if (Number.isNaN(numeric)) return String(value);
 
-    // Convert digits
-    let result = numStr.replace(/[0-9]/g, (d) => PersianNumberPipe.persianDigits[parseInt(d)]);
-
-    // Format with Persian thousand separator (٬) and decimal (٫)
-    if (decimalPlaces !== undefined || numStr.includes('.')) {
-      const parts = result.split('.');
-      // Add thousand separators to integer part
-      parts[0] = parts[0].replace(/\B(?=(\D{3})+(?!\D))/g, '٬');
-      result = parts.join('٫');
-    }
-
-    return result;
+    return new Intl.NumberFormat('fa-IR', {
+      minimumFractionDigits: minFractionDigits,
+      maximumFractionDigits: maxFractionDigits
+    }).format(numeric);
   }
 }

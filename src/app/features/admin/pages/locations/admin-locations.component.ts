@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfirmService } from '../../../../shared/services/confirm.service';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 
 import { Result } from '../../../../core/models/api-response.model';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import {
   LocationService,
   Province,
@@ -15,12 +18,23 @@ import {
 
 type Tab = 'provinces' | 'cities' | 'supplier-restrictions' | 'agent-restrictions';
 
+const TAB_ORDER: Tab[] = ['provinces', 'cities', 'supplier-restrictions', 'agent-restrictions'];
+
+/**
+ * مدیریت مکان‌ها (استان/شهر/محدودیت ثبت‌نام) — TASK-FE-REDESIGN-LOCATIONS.
+ * کاملاً Angular Material: mat-tab-group برای ناوبری، mat-table با mat-sort و
+ * mat-paginator برای هر جدول، mat-form-field/mat-select برای فیلترها و فرم‌ها.
+ * هیچ کلاس کمکی Tailwind در قالب استفاده نشده است.
+ */
 @Component({
   selector: 'app-admin-locations',
-  templateUrl: './admin-locations.component.html'
+  templateUrl: './admin-locations.component.html',
+  styleUrls: ['./admin-locations.component.scss']
 })
-export class AdminLocationsComponent implements OnInit {
+export class AdminLocationsComponent implements OnInit, AfterViewInit {
   // ─── Tab ──────────────────────────────────────────────────────
+  readonly tabOrder = TAB_ORDER;
+  activeTabIndex = 0;
   activeTab: Tab = 'provinces';
 
   // ─── Data ─────────────────────────────────────────────────────
@@ -29,6 +43,26 @@ export class AdminLocationsComponent implements OnInit {
   filteredCities: City[] = [];
   supplierRestrictions: RegistrationRestriction[] = [];
   agentRestrictions: RegistrationRestriction[] = [];
+
+  // ─── Material tables ──────────────────────────────────────────
+  readonly provinceColumns = ['name', 'code', 'isActive', 'actions'];
+  readonly cityColumns = ['name', 'code', 'province', 'isActive', 'actions'];
+  readonly restrictionColumns = ['provinceName', 'cityName', 'actions'];
+  readonly provincesDataSource = new MatTableDataSource<Province>([]);
+  readonly citiesDataSource = new MatTableDataSource<City>([]);
+
+  @ViewChild('provincePaginator') provincePaginator?: MatPaginator;
+  @ViewChild('cityPaginator') cityPaginator?: MatPaginator;
+  @ViewChild('provinceSort') provinceSort?: MatSort;
+  @ViewChild('citySort') citySort?: MatSort;
+
+  provincePageSize = 10;
+  cityPageSize = 10;
+
+  // ─── Header actions ───────────────────────────────────────────
+  readonly headerActions: Array<{ label: string; icon?: string; click: () => void }> = [
+    { label: 'بازخوانی', click: () => this.loadAll() },
+  ];
 
   // ─── Loading States ───────────────────────────────────────────
   loading = true;
@@ -84,6 +118,39 @@ export class AdminLocationsComponent implements OnInit {
     this.loadAll();
   }
 
+  ngAfterViewInit(): void {
+    // mat-tab bodies render lazily — the paginators/sorts inside the active tab
+    // are only available after the tab group's own change detection, so attach
+    // deferred here and again whenever data lands (see attachTableControls).
+    setTimeout(() => this.attachTableControls());
+  }
+
+  /** (Re)attach paginator/sort to the data sources once tab content exists. */
+  private attachTableControls(): void {
+    this.provincesDataSource.paginator = this.provincePaginator ?? null;
+    this.provincesDataSource.sort = this.provinceSort ?? null;
+    this.citiesDataSource.paginator = this.cityPaginator ?? null;
+    this.citiesDataSource.sort = this.citySort ?? null;
+  }
+
+  // ─── Tab Switching (mat-tab-group ↔ state) ────────────────────
+
+  onTabIndexChange(index: number): void {
+    this.activeTabIndex = index;
+    this.activeTab = TAB_ORDER[index] ?? 'provinces';
+    this.clearMessages();
+
+    if (this.activeTab === 'supplier-restrictions' && !this.supplierRestrictions.length && this.loadingSupplierRestrictions) {
+      this.loadSupplierRestrictions();
+    }
+    if (this.activeTab === 'agent-restrictions' && !this.agentRestrictions.length && this.loadingAgentRestrictions) {
+      this.loadAgentRestrictions();
+    }
+    if (this.activeTab === 'cities' && !this.allCities.length && !this.loadingCities) {
+      this.loadAllCities();
+    }
+  }
+
   // ─── Load All Data ────────────────────────────────────────────
 
   loadAll(): void {
@@ -96,11 +163,13 @@ export class AdminLocationsComponent implements OnInit {
     this.locationService.getProvinces().subscribe({
       next: (result) => {
         this.provinces = result.data ?? [];
+        this.provincesDataSource.data = this.provinces;
         this.provinceNameMap.clear();
         for (const p of this.provinces) {
           this.provinceNameMap.set(p.id, p.name);
         }
         this.loading = false;
+        setTimeout(() => this.attachTableControls());
         this.loadAllCities();
       },
       error: (error: Error) => {
@@ -116,24 +185,28 @@ export class AdminLocationsComponent implements OnInit {
     const requests = this.provinces.map(p => this.locationService.getCitiesByProvince(p.id));
     if (requests.length === 0) {
       this.allCities = [];
-      this.filteredCities = [];
+      this.applyCityFilter();
       this.loadingCities = false;
       return;
     }
 
-    // Use sequential loading since we need all cities
+    // Use sequential loading since we need all cities.
+    // NB: the cities endpoint does not return provinceId on each city — but we
+    // requested per-province, so tag them here (also makes the استان column work).
     let loaded = 0;
     const allCities: City[] = [];
-    for (const req of requests) {
-      req.subscribe({
+    for (let i = 0; i < requests.length; i++) {
+      const provinceId = this.provinces[i].id;
+      requests[i].subscribe({
         next: (result) => {
-          const cities = result.data ?? [];
+          const cities = (result.data ?? []).map(c => ({ ...c, provinceId }));
           allCities.push(...cities);
           loaded++;
           if (loaded === requests.length) {
             this.allCities = allCities;
             this.applyCityFilter();
             this.loadingCities = false;
+            setTimeout(() => this.attachTableControls());
           }
         },
         error: () => {
@@ -142,6 +215,7 @@ export class AdminLocationsComponent implements OnInit {
             this.allCities = allCities;
             this.applyCityFilter();
             this.loadingCities = false;
+            setTimeout(() => this.attachTableControls());
           }
         }
       });
@@ -168,23 +242,6 @@ export class AdminLocationsComponent implements OnInit {
       },
       error: () => { this.loadingAgentRestrictions = false; }
     });
-  }
-
-  // ─── Tab Switching ────────────────────────────────────────────
-
-  switchTab(tab: Tab): void {
-    this.activeTab = tab;
-    this.clearMessages();
-
-    if (tab === 'supplier-restrictions' && !this.supplierRestrictions.length && this.loadingSupplierRestrictions) {
-      this.loadSupplierRestrictions();
-    }
-    if (tab === 'agent-restrictions' && !this.agentRestrictions.length && this.loadingAgentRestrictions) {
-      this.loadAgentRestrictions();
-    }
-    if (tab === 'cities' && !this.allCities.length && !this.loadingCities) {
-      this.loadAllCities();
-    }
   }
 
   // ─── Province CRUD ────────────────────────────────────────────
@@ -242,6 +299,7 @@ export class AdminLocationsComponent implements OnInit {
 
   viewCitiesForProvince(province: Province): void {
     this.cityFilterProvinceId = province.id;
+    this.activeTabIndex = TAB_ORDER.indexOf('cities');
     this.activeTab = 'cities';
     this.applyCityFilter();
   }
@@ -259,6 +317,7 @@ export class AdminLocationsComponent implements OnInit {
     } else {
       this.filteredCities = this.allCities.filter(c => c.provinceId === this.cityFilterProvinceId);
     }
+    this.citiesDataSource.data = this.filteredCities;
   }
 
   openCityForm(city?: City): void {
@@ -315,6 +374,16 @@ export class AdminLocationsComponent implements OnInit {
 
   getProvinceName(provinceId: string): string {
     return this.provinceNameMap.get(provinceId) ?? '—';
+  }
+
+  // ─── Paginator/sort refresh helpers ───────────────────────────
+
+  onProvincePage(): void {
+    // paginator state is kept by MatPaginator itself; hook kept for analytics
+  }
+
+  onCityPage(): void {
+    // paginator state is kept by MatPaginator itself; hook kept for analytics
   }
 
   // ─── Supplier Restrictions ────────────────────────────────────

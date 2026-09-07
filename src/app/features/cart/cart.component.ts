@@ -1,7 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { SeoService } from '../../core/services/seo.service';
 import { Router } from '@angular/router';
 
-import { Cart, CartItem, CartService } from '../../core/services/api/cart.service';
+import {
+  Cart,
+  CartItem,
+  CartService,
+  GuestCartItem
+} from '../../core/services/api/cart.service';
+import { AuthStateService } from '../../core/services/auth-state.service';
 
 /** گروه آیتم‌های سبد بر اساس فروشنده */
 export interface SellerGroup {
@@ -20,9 +27,29 @@ export interface SellerGroup {
   itemCount: number;
 }
 
+/** آیتم سبد مهمان — هم شکل CartItem برای استفاده‌ی مشترک در قالب */
+export interface GuestCartDisplayItem {
+  id: string;
+  productVariationId: string;
+  productName: string;
+  variationName: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  imageUrl?: string;
+  sellerId: string;
+  sellerName: string;
+  sellerCity: string;
+  sellerProvince: string;
+  sellerRating: number;
+  cityDeliveryDays: number;
+  nationwideDeliveryDays: number;
+  categoryName?: string;
+}
+
 /**
- * صفحه سبد خرید بازطراحی‌شده؛ گروه‌بندی آیتم‌ها بر اساس فروشنده
- * با نمایش زمان تحویل، امتیاز فروشنده و خلاصه سفارش به تفکیک.
+ * صفحه سبد خرید؛ از سبد کاربر لاگین‌شده (API) یا سبد مهمان (localStorage)
+ * تغذیه می‌شود و آیتم‌ها را بر اساس فروشنده گروه می‌کند.
  */
 @Component({
   selector: 'app-cart',
@@ -30,9 +57,23 @@ export interface SellerGroup {
   styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
+  constructor(
+    private readonly cartService: CartService,
+    private readonly authState: AuthStateService,
+    private readonly router: Router,
+    private readonly seo: SeoService
+  ) {}
+
   cart: Cart | null = null;
   loading = true;
   errorMessage = '';
+
+  /** کاربر لاگین‌شده؟ */
+  isLoggedIn = false;
+
+  /** حالت مهمان — سبد از localStorage می‌آید */
+  isGuest = false;
+  guestItems: GuestCartDisplayItem[] = [];
 
   /** گروه‌های فروشنده */
   sellerGroups: SellerGroup[] = [];
@@ -40,21 +81,38 @@ export class CartComponent implements OnInit {
   /** آیا سبد در حال به‌روزرسانی است */
   updating = false;
 
-  constructor(
-    private readonly cartService: CartService,
-    private readonly router: Router
-  ) {}
-
   ngOnInit(): void {
+    this.seo.setPage({
+      title: 'سبد خرید — تولیدی',
+      description: 'سبد خرید شما. محصولات را بررسی کنید و سفارش خود را نهایی کنید.',
+      url: 'https://toolidi.ir/cart',
+      type: 'website',
+    });
+    this.authState.currentUser$.subscribe((user) => {
+      this.isLoggedIn = !!user;
+    });
     this.load();
   }
 
-  /** بارگذاری سبد خرید و گروه‌بندی آیتم‌ها */
+  /** بارگذاری سبد (کاربر یا مهمان) و گروه‌بندی آیتم‌ها */
   load(): void {
     this.loading = true;
+    this.errorMessage = '';
+    this.isGuest = !this.isLoggedIn;
+
+    if (this.isGuest) {
+      const raw = this.cartService.getGuestCart();
+      this.guestItems = raw.map((item, index) => this.toDisplayItem(item, index));
+      this.cart = null;
+      this.groupBySeller();
+      this.loading = false;
+      return;
+    }
+
     this.cartService.getCart().subscribe({
       next: (result) => {
         this.cart = result.data ?? null;
+        this.guestItems = [];
         this.groupBySeller();
         this.loading = false;
       },
@@ -66,36 +124,61 @@ export class CartComponent implements OnInit {
     });
   }
 
-  /** گروه‌بندی آیتم‌ها بر اساس فروشنده */
+  /** تبدیل آیتم مهمان به شکل نمایشی با مقادیر پیش‌فرض */
+  private toDisplayItem(item: GuestCartItem, index: number): GuestCartDisplayItem {
+    return {
+      id: `guest-${index}`,
+      productVariationId: item.productVariationId,
+      productName: item.name ?? 'محصول',
+      variationName: '',
+      quantity: item.quantity,
+      unitPrice: item.unitPrice ?? 0,
+      lineTotal: (item.unitPrice ?? 0) * item.quantity,
+      imageUrl: item.imageUrl,
+      sellerId: 'guest-seller',
+      sellerName: 'سبد شما',
+      sellerCity: item.sellerCity ?? '',
+      sellerProvince: '',
+      sellerRating: 0,
+      cityDeliveryDays: item.cityDeliveryDays ?? 0,
+      nationwideDeliveryDays: item.nationwideDeliveryDays ?? 0
+    };
+  }
+
+  /** گروه‌بندی آیتم‌ها بر اساس فروشنده (بر اساس شناسه، نه هویت شیء) */
   private groupBySeller(): void {
-    if (!this.cart?.items?.length) {
+    const items: (CartItem | GuestCartDisplayItem)[] = this.isGuest
+      ? this.guestItems
+      : (this.cart?.items ?? []);
+
+    if (!items.length) {
       this.sellerGroups = [];
       return;
     }
 
     const groupMap = new Map<string, SellerGroup>();
 
-    for (const item of this.cart.items) {
+    for (const item of items) {
       const key = item.sellerId || 'unknown';
       if (!groupMap.has(key)) {
         groupMap.set(key, {
           sellerId: item.sellerId,
           sellerName: item.sellerName || 'فروشنده ناشناخته',
           sellerCity: item.sellerCity || '',
-          sellerProvince: item.sellerProvince || '',
+          sellerProvince: (item as CartItem).sellerProvince ?? '',
           sellerRating: item.sellerRating || 0,
-          sellerLogoUrl: item.sellerLogoUrl,
+          sellerLogoUrl: (item as CartItem).sellerLogoUrl,
           cityDeliveryDays: item.cityDeliveryDays || 1,
           nationwideDeliveryDays: item.nationwideDeliveryDays || 3,
-          minimumOrderAmount: item.minimumOrderAmount,
-          minimumOrderQuantity: item.minimumOrderQuantity,
+          minimumOrderAmount: (item as CartItem).minimumOrderAmount,
+          minimumOrderQuantity: (item as CartItem).minimumOrderQuantity,
           items: [],
           subtotal: 0,
           itemCount: 0
         });
       }
       const group = groupMap.get(key)!;
-      group.items.push(item);
+      group.items.push(item as CartItem);
       group.subtotal += item.lineTotal;
       group.itemCount += item.quantity;
     }
@@ -115,15 +198,32 @@ export class CartComponent implements OnInit {
 
   /** تعداد کل آیتم‌ها (برای نمایش) */
   get totalItemCount(): number {
-    return this.cart?.items?.length ?? 0;
+    return this.isGuest ? this.guestItems.length : (this.cart?.items?.length ?? 0);
   }
 
-  /** تغییر تعداد آیتم */
+  /** مبلغ قابل پرداخت */
+  get payableTotal(): number {
+    if (this.isGuest) {
+      return this.guestItems.reduce((sum, item) => sum + item.lineTotal, 0);
+    }
+    return this.cart?.totalPrice ?? 0;
+  }
+
+  /** تغییر تعداد آیتم (کاربر یا مهمان) */
   updateQuantity(itemId: string, quantity: number): void {
     if (quantity < 1 || this.updating) {
       return;
     }
     this.updating = true;
+    if (this.isGuest) {
+      const item = this.guestItems.find((i) => i.id === itemId);
+      if (item) {
+        this.cartService.updateGuestItem(item.productVariationId, quantity);
+      }
+      this.load();
+      this.updating = false;
+      return;
+    }
     this.cartService.updateItem(itemId, quantity).subscribe({
       next: () => {
         this.load();
@@ -135,10 +235,19 @@ export class CartComponent implements OnInit {
     });
   }
 
-  /** حذف آیتم از سبد */
+  /** حذف آیتم از سبد (کاربر یا مهمان) */
   removeItem(itemId: string): void {
     if (this.updating) return;
     this.updating = true;
+    if (this.isGuest) {
+      const item = this.guestItems.find((i) => i.id === itemId);
+      if (item) {
+        this.cartService.removeGuestItem(item.productVariationId);
+      }
+      this.load();
+      this.updating = false;
+      return;
+    }
     this.cartService.removeItem(itemId).subscribe({
       next: () => {
         this.load();
@@ -153,6 +262,15 @@ export class CartComponent implements OnInit {
   /** حذف تمام آیتم‌های یک فروشنده */
   removeSellerGroup(group: SellerGroup): void {
     if (this.updating) return;
+    if (this.isGuest) {
+      this.updating = true;
+      for (const item of group.items) {
+        this.cartService.removeGuestItem((item as GuestCartDisplayItem).productVariationId);
+      }
+      this.load();
+      this.updating = false;
+      return;
+    }
     this.updating = true;
     const ids = group.items.map(i => i.id);
     let completed = 0;
@@ -178,7 +296,21 @@ export class CartComponent implements OnInit {
 
   /** خالی‌کردن سبد */
   clearCart(): void {
+    if (this.isGuest) {
+      this.cartService.saveGuestCart([]);
+      this.load();
+      return;
+    }
     this.cartService.clearCart().subscribe(() => this.load());
+  }
+
+  /** ادامه خرید — به تسویه‌حساب یا ورود */
+  proceedToCheckout(): void {
+    if (this.isGuest) {
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/checkout' } });
+      return;
+    }
+    this.router.navigate(['/checkout']);
   }
 
   /** اعمال کد تخفیف */

@@ -23,11 +23,11 @@ export interface MegaMenuGroup {
         [class.mega-menu-trigger-active]="isOpen"
         [attr.aria-expanded]="isOpen"
         aria-haspopup="true">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mega-menu-burger" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
         <span>دسته‌بندی‌ها</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform duration-200" [class.rotate-180]="isOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mega-menu-caret" [class.mega-menu-caret--open]="isOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
         </svg>
       </button>
@@ -38,7 +38,7 @@ export interface MegaMenuGroup {
             <span class="mega-menu-eyebrow">انتخاب حوزه</span>
             <h3>از دسته‌های اصلی شروع کنید</h3>
           </div>
-          <span class="mega-menu-count">{{ menuGroups.length | number:'1.0-0':'fa-IR' }} حوزه فعال</span>
+          <span class="mega-menu-count">{{ menuGroups.length | persianNumber }} حوزه فعال</span>
         </div>
 
         <div class="mega-menu-content" *ngIf="menuGroups.length; else emptyMenu">
@@ -104,7 +104,7 @@ export interface MegaMenuGroup {
 
         <div class="mega-menu-footer">
           <a routerLink="/shop" (click)="closeMenu()">مشاهده همه محصولات ←</a>
-          <div><span>💎 {{ totalProducts | number:'1.0-0':'fa-IR' }}+ محصول</span><span>🏭 {{ totalSellers | number:'1.0-0':'fa-IR' }}+ تأمین‌کننده</span></div>
+          <div><span>💎 {{ totalProducts | persianNumber }}+ محصول</span><span>🏭 {{ totalSellers | persianNumber }}+ تأمین‌کننده</span></div>
         </div>
       </section>
     </div>
@@ -113,6 +113,9 @@ export interface MegaMenuGroup {
     :host { display: inline-block; }
 
     .mega-menu-root { position: relative; }
+    .mega-menu-burger { width: 1.25rem; height: 1.25rem; }
+    .mega-menu-caret { width: 0.875rem; height: 0.875rem; transition: transform 0.2s ease; }
+    .mega-menu-caret--open { transform: rotate(180deg); }
     .mega-menu-trigger { display: inline-flex; align-items: center; gap: .4rem; color: inherit; background: transparent; border: 0; cursor: pointer; font: inherit; transition: color .2s ease; }
     .mega-menu-trigger:hover, .mega-menu-trigger-active { color: #8eb9ff; }
     .mega-menu-panel { position: absolute; top: calc(100% + 14px); right: -24px; z-index: 100; width: min(92vw, 920px); padding: 22px; border: 1px solid #e7edf6; border-radius: 20px; color: #1d2b49; background: rgba(255,255,255,.98); box-shadow: 0 24px 60px rgba(17, 35, 70, .2); animation: megaMenuIn .18s ease-out; }

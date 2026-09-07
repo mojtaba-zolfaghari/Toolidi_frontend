@@ -18,6 +18,7 @@ import { AdminLocationsComponent } from './pages/locations/admin-locations.compo
 import { AdminDiscountsComponent } from './pages/discounts/admin-discounts.component';
 import { AdminSurveysComponent } from './pages/surveys/admin-surveys.component';
 import { AdminCommissionRulesComponent } from './pages/commission/admin-commission-rules.component';
+import { AdminSupplierPricingComponent } from './pages/supplier-pricing/admin-supplier-pricing.component';
 import { ImportStudioComponent } from './components/import-studio/import-studio.component';
 
 const routes: Routes = [
@@ -36,6 +37,7 @@ const routes: Routes = [
   { path: 'discounts', component: AdminDiscountsComponent },
   { path: 'surveys', component: AdminSurveysComponent },
   { path: 'commission', component: AdminCommissionRulesComponent },
+  { path: 'supplier-pricing', component: AdminSupplierPricingComponent },
   { path: 'settings', component: AdminSettingsComponent }
 ];
 

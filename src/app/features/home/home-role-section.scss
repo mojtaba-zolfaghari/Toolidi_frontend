@@ -1,0 +1,141 @@
+
+/* ═══════════════════════════════════════════════════════════════
+   Role Selection Section
+   ═══════════════════════════════════════════════════════════════ */
+
+.role-selection {
+  background: var(--mat-sys-surface);
+  padding-block: 5rem;
+}
+
+.role-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .role-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .role-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.role-card {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  }
+
+  &__header {
+    padding: 1.5rem 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    font-size: 3rem;
+    width: 4rem;
+    height: 4rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    backdrop-filter: blur(8px);
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+  }
+
+  &__content {
+    padding: 1rem 1.5rem;
+  }
+
+  &__actions {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.role-benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.role-benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.5;
+}
+
+.benefit-check {
+  font-size: 1.25rem;
+  color: #D4AF37;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.role-card__cta {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: var(--mat-sys-primary) !important;
+  font-weight: 700;
+  padding-inline: 1.5rem;
+  padding-block: 0.625rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #fff !important;
+    transform: scale(1.05);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Section Header Centered
+   ═══════════════════════════════════════════════════════════════ */
+
+.section-head--center {
+  text-align: center;
+  max-width: 48rem;
+  margin-inline: auto;
+  margin-bottom: 3rem;
+}

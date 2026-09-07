@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -193,11 +194,109 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
 
   /** زمان‌های ارسال عمومی محصول */
   get deliveryInfo(): { city: string; cityDays: number; nationwideDays: number } {
+    const city = this.product?.sellerCity?.trim() ?? '';
     return {
-      city: this.product?.sellerCity || 'شهر مبدا',
+      city: !city || /^[?؟]+$/.test(city) ? 'نامشخص' : city,
       cityDays: Math.max(1, this.product?.cityDeliveryDays || 1),
       nationwideDays: Math.max(this.product?.cityDeliveryDays || 1, this.product?.nationwideDeliveryDays || 3)
     };
+  }
+
+  /** روزهای تولید (طولانی‌ترین زمان تأمین‌کننده) — ۰ یعنی آماده ارسال */
+  get productionLeadDays(): number {
+    return this.product?.productionLeadDays ?? 0;
+  }
+
+  /** تبدیل عدد روز به متن فارسی */
+  daysText(days: number): string {
+    if (days <= 0) return 'امروز';
+    if (days === 1) return 'فردا';
+    return `${days.toLocaleString('fa-IR', { maximumFractionDigits: 0 })} روز کاری`;
+  }
+
+  // ─── مقایسه محصولات ───
+
+  /** حداکثر تعداد محصولات قابل مقایسه */
+  readonly compareLimit = 4;
+
+  /** حالت انتخاب برای مقایسه */
+  compareMode = false;
+
+  /** شناسه‌های انتخاب‌شده برای مقایسه (محصول جاری همیشه اول است) */
+  compareIds: string[] = [];
+
+  /** آیا محصول جاری در فهرست مقایسه است */
+  get isComparing(): boolean {
+    return !!this.product && this.compareIds.includes(this.product.id);
+  }
+
+  /** ستون‌های جدول مقایسه — محصول جاری + انتخاب‌شده‌ها به ترتیب */
+  get compareColumns(): Product[] {
+    const columns: Product[] = [];
+    if (this.product) columns.push(this.product);
+    for (const id of this.compareIds) {
+      const related = this.relatedProducts.find((item) => item.id === id);
+      if (related && related.id !== this.product?.id) columns.push(related);
+    }
+    return columns.slice(0, this.compareLimit);
+  }
+
+  /** ردیف‌های جدول مقایسه */
+  get compareRows(): { label: string; values: string[] }[] {
+    const columns = this.compareColumns;
+    if (columns.length < 2) return [];
+
+    const row = (label: string, extract: (p: Product) => string): { label: string; values: string[] } => ({
+      label,
+      values: columns.map(extract)
+    });
+
+    return [
+      row('قیمت', (p) => `${p.unitPrice.toLocaleString('fa-IR')} تومان`),
+      row('قیمت قبل', (p) =>
+        p.comparePrice && p.comparePrice > p.unitPrice
+          ? `${p.comparePrice.toLocaleString('fa-IR')} تومان`
+          : '—'),
+      row('امتیاز', (p) => (p.ratingCount > 0 ? `${(p.ratingAverage ?? 0).toLocaleString('fa-IR')} از ۵ (${p.ratingCount.toLocaleString('fa-IR')} نظر)` : 'بدون نظر')),
+      row('موجودی', (p) => (p.stockQuantity === undefined || p.stockQuantity === null ? 'نامشخص' : p.stockQuantity > 0 ? 'موجود' : 'ناموجود')),
+      row('شهر فروشنده', (p) => {
+        const city = p.sellerCity?.trim() ?? '';
+        return !city || /^[?؟]+$/.test(city) ? 'نامشخص' : city;
+      }),
+      row('ارسال محلی', (p) => this.daysText((p.productionLeadDays ?? 0) + Math.max(1, p.cityDeliveryDays ?? 1))),
+      row('ارسال سراسری', (p) => this.daysText((p.productionLeadDays ?? 0) + Math.max(p.cityDeliveryDays ?? 1, p.nationwideDeliveryDays ?? 3))),
+      row('دسته‌بندی', (p) => p.categoryName ?? '—'),
+      row('کد کالا', (p) => p.sku || '—')
+    ];
+  }
+
+  /** بازکردن حالت مقایسه — محصول جاری به‌صورت خودکار انتخاب می‌شود */
+  openCompare(): void {
+    this.compareMode = true;
+    if (this.product && !this.compareIds.includes(this.product.id)) {
+      this.compareIds = [this.product.id, ...this.compareIds];
+    }
+    setTimeout(() => {
+      document.querySelector('.product-detail__related')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  /** افزودن/حذف یک محصول از مقایسه */
+  toggleCompare(id: string): void {
+    if (this.compareIds.includes(id)) {
+      this.compareIds = this.compareIds.filter((item) => item !== id);
+      return;
+    }
+    if (this.compareColumns.length >= this.compareLimit) {
+      return;
+    }
+    this.compareIds = [...this.compareIds, id];
+  }
+
+  /** بستن حالت مقایسه */
+  closeCompare(): void {
+    this.compareMode = false;
+    this.compareIds = [];
   }
 
   /** انتخاب خودکار تنوع پیش‌فرض */
@@ -225,6 +324,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  /** نظرات محصول (در حال حاضر خالی) */
+  reviews: any[] = [];
 
   /** وضعیت موجودی کالا */
   get stockStatus(): { text: string; cssClass: string; inStock: boolean } {
@@ -289,8 +391,17 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     this.cartState = 'adding';
 
     if (!this.isLoggedIn) {
-      // کاربر مهمان — ذخیره در localStorage بدون نیاز به ورود
-      this.cartService.addGuestItem(this.product.id, this.selectedVariationId ?? undefined, this.quantity);
+      // کاربر مهمان — ذخیره در localStorage با اسنپ‌شات نمایشی
+      const primaryImage = this.product.images?.find((image) => image.isPrimary)?.imageUrl;
+      this.cartService.addGuestItem(this.product.id, this.selectedVariationId ?? undefined, this.quantity, {
+        name: this.product.name,
+        imageUrl: this.product.imageUrl ?? primaryImage,
+        unitPrice: this.product.unitPrice,
+        categoryName: this.product.categoryName,
+        sellerCity: this.product.sellerCity,
+        cityDeliveryDays: this.product.cityDeliveryDays,
+        nationwideDeliveryDays: this.product.nationwideDeliveryDays
+      });
       this.cartState = 'success';
       setTimeout(() => { this.cartState = 'idle'; }, 2000);
       return;

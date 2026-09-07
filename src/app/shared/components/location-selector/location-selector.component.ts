@@ -4,7 +4,55 @@ import { LocationService, Province, City } from '../../../core/services/api/loca
 
 @Component({
   selector: 'app-location-selector',
-  templateUrl: './location-selector.component.html'
+  templateUrl: './location-selector.component.html',
+  styles: [`
+    :host { display: block; }
+
+    .location-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+
+      @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .location-field {
+      display: block;
+    }
+
+    .location-field__label {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: #1B2A4A;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .location-field__select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      background: #fff;
+      padding: 0.625rem 1rem;
+      color: #1B2A4A;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+      &:focus {
+        border-color: var(--mat-sys-primary, #6C3FC5);
+        box-shadow: 0 0 0 3px rgba(108, 63, 197, 0.15);
+      }
+
+      &:disabled {
+        background: #f3f4f6;
+        color: #9ca3af;
+        cursor: not-allowed;
+      }
+    }
+  `]
 })
 export class LocationSelectorComponent implements OnInit {
   @Input() formGroup?: FormGroup;

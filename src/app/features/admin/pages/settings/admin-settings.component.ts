@@ -46,15 +46,21 @@ const SMS_FIELDS: SettingField[] = [
  */
 @Component({
   selector: 'app-admin-settings',
-  templateUrl: './admin-settings.component.html'
+  templateUrl: './admin-settings.component.html',
+  styleUrls: ['./admin-settings.component.scss']
 })
 export class AdminSettingsComponent implements OnInit {
   activeTab: SettingsTab = 'basic';
+  activeTabIndex = 0;
   readonly tabs: { id: SettingsTab; label: string; icon: string }[] = [
     { id: 'basic', label: 'پایه', icon: 'settings' },
     { id: 'payment', label: 'پرداخت', icon: 'payments' },
     { id: 'sms', label: 'پیامک', icon: 'sms' },
     { id: 'markup', label: 'حاشیه سود', icon: 'trending_up' }
+  ];
+
+  readonly headerActions: Array<{ label: string; click: () => void }> = [
+    { label: 'بازخوانی', click: () => this.loadSettings() },
   ];
 
   loading = true;
@@ -109,6 +115,23 @@ export class AdminSettingsComponent implements OnInit {
 
   selectTab(tab: SettingsTab): void {
     this.activeTab = tab;
+    this.activeTabIndex = this.tabs.findIndex((t) => t.id === tab);
+    this.clearMessages();
+  }
+
+  /** mat-tab-group ↔ state sync */
+  onTabIndexChange(index: number): void {
+    this.activeTabIndex = index;
+    this.activeTab = this.tabs[index]?.id ?? 'basic';
+    this.clearMessages();
+  }
+
+  /** نمایش نام محصول در فیلد autocomplete پس از انتخاب */
+  displayProduct(product: AdminProduct): string {
+    return product ? product.name : '';
+  }
+
+  private clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
     this.smsTestMessage = '';
@@ -222,7 +245,7 @@ export class AdminSettingsComponent implements OnInit {
   }
 
   addProductMarkup(product: AdminProduct): void {
-    if (this.productMarkups.some((p) => p.productId === product.id)) return;
+    if (!product || this.productMarkups.some((p) => p.productId === product.id)) return;
     this.productMarkups.push({ productId: product.id, productName: product.name, percent: this.markupProductPercent });
     this.productResults = this.productResults.filter((p) => p.id !== product.id);
     this.productSearch = '';

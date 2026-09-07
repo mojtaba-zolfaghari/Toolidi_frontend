@@ -61,7 +61,7 @@ interface BlogResult {
             class="search-tab">
             <span class="search-tab-icon">{{ tab.icon }}</span>
             <span>{{ tab.label }}</span>
-            <span *ngIf="getTabCount(tab.id) > 0" class="search-tab-count">{{ getTabCount(tab.id) | number:'1.0-0':'fa-IR' }}</span>
+            <span *ngIf="getTabCount(tab.id) > 0" class="search-tab-count">{{ getTabCount(tab.id) | persianNumber }}</span>
           </button>
         </div>
       </div>
@@ -92,7 +92,7 @@ interface BlogResult {
                     <span class="search-result-badge">📂 {{ p.categoryName }}</span>
                     <span class="search-result-badge">🏭 {{ p.supplierName }}</span>
                   </div>
-                  <div class="search-result-price">{{ p.price | number:'1.0-0':'fa-IR' }} تومان</div>
+                  <div class="search-result-price">{{ p.price | persianNumber }} تومان</div>
                 </div>
               </a>
             </div>
@@ -145,7 +145,7 @@ interface BlogResult {
                   <h3 class="search-supplier-name">{{ s.companyName }}</h3>
                   <div class="search-supplier-meta">
                     <span>📍 {{ s.city }}، {{ s.province }}</span>
-                    <span>📦 {{ s.productCount | number:'1.0-0':'fa-IR' }} محصول</span>
+                    <span>📦 {{ s.productCount | persianNumber }} محصول</span>
                   </div>
                 </div>
                 <span class="search-supplier-arrow">←</span>
@@ -168,7 +168,7 @@ interface BlogResult {
                  [queryParams]="{ categoryId: c.id }"
                  class="search-category-chip">
                 <span>{{ c.name }}</span>
-                <small>{{ c.productCount | number:'1.0-0':'fa-IR' }} محصول</small>
+                <small>{{ c.productCount | persianNumber }} محصول</small>
               </a>
             </div>
           </div>

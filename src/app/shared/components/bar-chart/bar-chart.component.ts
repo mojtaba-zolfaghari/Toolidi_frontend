@@ -17,12 +17,12 @@ export interface BarChartDatum {
         <div
           *ngFor="let item of normalized"
           class="flex flex-1 flex-col items-center justify-end h-full min-w-0">
-          <span class="mb-1 text-xs font-bold text-secondary">{{ item.value | number }}</span>
+          <span class="mb-1 text-xs font-bold text-secondary">{{ item.value | persianNumber }}</span>
           <div
             class="w-full rounded-t-lg transition-all"
             [style.height.%]="item.percent"
             [style.background-color]="color"
-            [title]="item.label + ': ' + (item.value | number)">
+            [title]="item.label + ': ' + (item.value | persianNumber)">
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 import { ApiService } from '../api.service';
 import { PagedList, Result } from '../../models/api-response.model';
@@ -96,6 +97,8 @@ export interface Product {
   sellerCity?: string;
   cityDeliveryDays?: number;
   nationwideDeliveryDays?: number;
+  /** طولانی‌ترین زمان تولید تأمین‌کنندگان (روز) — ۰ یعنی موجود در انبار */
+  productionLeadDays?: number;
   hasDiscount?: boolean;
   discountAmount?: number;
   discountPercent?: number;
@@ -144,6 +147,12 @@ export interface ProductQueryParams {
   isFeatured?: boolean;
   isNewArrival?: boolean;
   isBestSeller?: boolean;
+  /** مرتب‌سازی سمت سرور: newest | priceasc | pricedesc | bestselling | rating | nameasc | namedesc */
+  sortBy?: string;
+  /** حداقل قیمت نهایی (پس از حاشیه سود) */
+  minPrice?: number;
+  /** حداکثر قیمت نهایی (پس از حاشیه سود) */
+  maxPrice?: number;
 }
 
 /**
@@ -158,9 +167,14 @@ export class ProductService {
     return this.api.get<Result<PagedList<Product>>>(`/v1/products${buildQueryString(params)}`);
   }
 
-  /** دریافت شهرهای دارای محصول فعال برای فیلتر فروشگاه */
+  /** شهرهای دارای محصول فعال برای فیلتر فروشگاه — کش ۵ دقیقه‌ای (shareReplay). */
+  private readonly productCities$ = this.api
+    .get<Result<{ city: string; productCount: number }[]>>('/v1/products/cities')
+    .pipe(shareReplay({ bufferSize: 1, refCount: false, windowTime: 5 * 60 * 1000 }));
+
+  /** دریافت شهرهای دارای محصول فعال برای فیلتر فروشگاه (کش ۵ دقیقه‌ای) */
   getProductCities(): Observable<Result<{ city: string; productCount: number }[]>> {
-    return this.api.get<Result<{ city: string; productCount: number }[]>>('/v1/products/cities');
+    return this.productCities$;
   }
 
   /** جستجوی حرفه‌ای با پیشنهادات دسته‌بندی، محصول و تأمین‌کننده */

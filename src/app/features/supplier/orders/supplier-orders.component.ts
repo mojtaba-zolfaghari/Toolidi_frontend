@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SupplierService, SupplierOrder } from '../../../core/services/api/supplier.service';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-supplier-orders',
@@ -46,6 +47,10 @@ import { SupplierService, SupplierOrder } from '../../../core/services/api/suppl
               </div>
             </div>
             <div class="flex gap-2 shrink-0">
+              <button (click)="openChat(order.id)"
+                      class="rounded-lg bg-teal-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-teal-700">
+                💬 چت با فروشنده
+              </button>
               <button *ngIf="order.status === 'Pending'" (click)="updateStatus(order, 'Processing')"
                       class="rounded-lg bg-blue-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-blue-700">
                 شروع پردازش
@@ -64,11 +69,20 @@ import { SupplierService, SupplierOrder } from '../../../core/services/api/suppl
       </div>
       <p *ngIf="!filteredOrders.length" class="text-gray-400 text-center py-12">سفارشی در این وضعیت وجود ندارد</p>
     </section>
+
+    <!-- Chat Modal -->
+    <div *ngIf="chatOrderId" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40" (click)="closeChat()"></div>
+      <div class="relative bg-gray-50 rounded-2xl shadow-2xl w-full max-w-lg h-[70vh] p-5 flex flex-col">
+        <app-order-chat [orderId]="chatOrderId" (closed)="closeChat()"></app-order-chat>
+      </div>
+    </div>
   `
 })
 export class SupplierOrdersComponent implements OnInit {
   orders: SupplierOrder[] = [];
   activeStatus = 'all';
+  chatOrderId = '';
 
   statusTabs = [
     { value: 'all', label: 'همه' },
@@ -113,6 +127,14 @@ export class SupplierOrdersComponent implements OnInit {
 
   updateStatus(order: SupplierOrder, newStatus: string): void {
     order.status = newStatus;
+  }
+
+  openChat(orderId: string): void {
+    this.chatOrderId = orderId;
+  }
+
+  closeChat(): void {
+    this.chatOrderId = '';
   }
 
   getStatusLabel(status: string): string {

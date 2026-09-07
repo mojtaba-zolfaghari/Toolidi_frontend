@@ -105,6 +105,8 @@ export interface AdminSeller {
   postalCode?: string;
   country?: string;
   commissionRate?: number;
+  minimumOrderAmount?: number | null;
+  minimumOrderQuantity?: number | null;
   isVerified: boolean;
   isActive: boolean;
   createdAt: string;
@@ -125,6 +127,9 @@ export interface CreateSellerData {
   postalCode: string;
   country: string;
   commissionRate: number;
+  minimumOrderAmount?: number | null;
+  minimumOrderQuantity?: number | null;
+  isActive?: boolean;
 }
 
 /** مدرک ثبت‌شده برای فروشنده */
@@ -260,6 +265,63 @@ export interface AdminProductQueryParams {
   search?: string;
   page?: number;
   pageSize?: number;
+}
+
+/** رکورد قیمت تأمین‌کننده برای یک محصول (نمای مدیر) */
+export interface AdminSupplierPricingEntry {
+  id: string;
+  supplierId: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  supplierName: string;
+  /** قیمت تأمین‌کننده (تومان) */
+  supplyPrice: number;
+  /** حاشیه سود اختصاصی این رکورد (۰ = پیش‌فرض سایت) */
+  profitMarginPercent: number;
+  /** حاشیه سود مؤثر پس از اولویت‌بندی تنظیمات */
+  effectiveMarginPercent: number;
+  /** قیمت پیشنهادی سایت پس از حاشیه و تعدیل مالیات */
+  suggestedSitePrice: number;
+  availableQuantity: number;
+  leadTimeHours: number;
+  minOrderQuantity: number;
+  supplierSku?: string;
+  isAvailable: boolean;
+}
+
+/** تنظیمات قیمت‌گذاری پلتفرم */
+export interface PricingSettings {
+  globalMarginPercent: number;
+  corporateTaxPercent: number;
+  vatPercent: number;
+  categoryOverrides: CategoryMarginOverride[];
+  productOverrides: ProductMarginOverride[];
+}
+
+/** override حاشیه سود برای یک دسته‌بندی */
+export interface CategoryMarginOverride {
+  categoryId: string;
+  categoryName: string;
+  marginPercent: number;
+}
+
+/** override حاشیه سود برای یک محصول */
+export interface ProductMarginOverride {
+  productId: string;
+  productName: string;
+  marginPercent: number;
+}
+
+/** نتیجه پیش‌نمایش قیمت سایت */
+export interface SitePricePreview {
+  supplyPrice: number;
+  effectiveMarginPercent: number;
+  corporateTaxPercent: number;
+  vatPercent: number;
+  sitePrice: number;
+  grossProfit: number;
+  netMarginPercent: number;
 }
 
 /** داشبورد مدیریت */
@@ -465,6 +527,47 @@ export class AdminService {
     return this.api.post<Result<Array<{ productId: string; success: boolean; error?: string }>>>(
       `/admin/products/bulk`,
       { productIds, status }
+    );
+  }
+
+  // ─── Supplier Pricing (قیمت‌گذاری تأمین‌کنندگان) ──────────────
+
+  /** فهرست همه رکوردهای قیمت تأمین‌کنندگان با قیمت سایت محاسبه‌شده */
+  getAllSupplierPricing(params?: {
+    supplierId?: string;
+    productId?: string;
+    search?: string;
+  }): Observable<Result<AdminSupplierPricingEntry[]>> {
+    return this.api.get<Result<AdminSupplierPricingEntry[]>>(
+      `/v1/supplier-products/all${buildQueryString(params)}`
+    );
+  }
+
+  /** دریافت تنظیمات حاشیه سود و مالیات */
+  getPricingSettings(): Observable<Result<PricingSettings>> {
+    return this.api.get<Result<PricingSettings>>('/v1/supplier-products/pricing-settings');
+  }
+
+  /** ذخیره تنظیمات حاشیه سود و مالیات */
+  updatePricingSettings(data: {
+    globalMarginPercent?: number;
+    corporateTaxPercent?: number;
+    vatPercent?: number;
+    categoryOverrides?: CategoryMarginOverride[] | null;
+    productOverrides?: ProductMarginOverride[] | null;
+  }): Observable<Result<PricingSettings>> {
+    return this.api.put<Result<PricingSettings>>('/v1/supplier-products/pricing-settings', data);
+  }
+
+  /** پیش‌نمایش زنده‌ی قیمت سایت از روی قیمت تأمین‌کننده */
+  previewSitePrice(params: {
+    supplyPrice: number;
+    marginPercent?: number;
+    categoryId?: string;
+    productId?: string;
+  }): Observable<Result<SitePricePreview>> {
+    return this.api.get<Result<SitePricePreview>>(
+      `/v1/supplier-products/pricing-preview${buildQueryString(params)}`
     );
   }
 }

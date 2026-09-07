@@ -149,12 +149,20 @@ export class DataTableComponent implements OnChanges {
     return value;
   }
 
+  /** For text/name cells: never render a bare '?' (missing-data placeholder from backend). */
+  sanitizeDisplay(value: any): string {
+    if (value === null || value === undefined) return '';
+    const s = String(value).trim();
+    if (s === '?' || s === '؟' || s === '') return '';
+    return s;
+  }
+
   getBadgeClass(row: any, column: TableColumn): string {
     const value = this.getCellValue(row, column);
     if (column.badgeMap && value !== undefined && value !== null) {
-      return column.badgeMap[String(value)]?.color || 'bg-gray-100 text-gray-600';
+      return column.badgeMap[String(value)]?.color || '';
     }
-    return 'bg-gray-100 text-gray-600';
+    return '';
   }
 
   getBadgeLabel(row: any, column: TableColumn): string {

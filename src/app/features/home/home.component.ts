@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild,
 import { Subscription, forkJoin, timer } from 'rxjs';
 import { take, finalize, catchError } from 'rxjs/operators';
 
-import { fadeIn, slideUp, staggerList, zoomIn, fadeSlideUp, slideFromRight, slideFromLeft } from '../../shared/animations';
+import { fadeIn, slideUp, staggerList, zoomIn, fadeSlideUp, slideFromRight, slideFromLeft, slideInFromBottom } from '../../shared/animations';
 import { CategoryService, CategoryTreeNode } from '../../core/services/api/category.service';
 import { ProductService, Product } from '../../core/services/api/product.service';
 import { SellerService, DashboardSummary, SellerStatistics } from '../../core/services/api/seller.service';
@@ -47,6 +47,17 @@ export interface WorkflowStep {
   status: 'pending' | 'active' | 'completed';
 }
 
+export interface RoleCard {
+  id: 'supplier' | 'seller' | 'buyer';
+  title: string;
+  subtitle: string;
+  icon: string;
+  benefits: string[];
+  ctaText: string;
+  ctaLink: string;
+  gradient: string;
+}
+
 export interface SupplierInfo {
   id: string;
   trade: string;
@@ -68,7 +79,7 @@ import { IRAN_LOCATIONS, IRAN_MAP_CONNECTIONS } from '../../shared/iran-location
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  animations: [fadeIn, slideUp, staggerList, zoomIn, fadeSlideUp, slideFromRight, slideFromLeft]
+  animations: [fadeIn, slideUp, staggerList, zoomIn, fadeSlideUp, slideFromRight, slideFromLeft, slideInFromBottom]
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   /* ── Data State ── */
@@ -80,6 +91,55 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   suppliers: SupplierInfo[] = [];
   sellerStats = { activeSellers: 0, monthlyOrders: 0, totalProducts: 0 };
   selectedSupplierTrade = '';
+
+  /* ── Role Cards ── */
+  roleCards: RoleCard[] = [
+    {
+      id: 'supplier',
+      title: 'تولیدکننده شوید',
+      subtitle: 'محصولات خود را مستقیماً به هزاران فروشنده عرضه کنید',
+      icon: 'factory',
+      benefits: [
+        'دسترسی به شبکه بزرگ فروشندگان عمده',
+        'مدیریت سفارشات و موجودی از داشبورد یکپارچه',
+        'پرداخت سریع و تضمین‌شده',
+        'پشتیبانی لجستیک و ارسال'
+      ],
+      ctaText: 'ثبت‌نام تولیدکننده',
+      ctaLink: '/supplier/benefits',
+      gradient: 'linear-gradient(135deg, #6C3FC5 0%, #4A2E9E 100%)'
+    },
+    {
+      id: 'seller',
+      title: 'فروشنده شوید',
+      subtitle: 'به شبکه تامین‌کنندگان معتبر متصل شوید',
+      icon: 'store',
+      benefits: [
+        'دسترسی به صدها تامین‌کننده معتبر',
+        'مدیریت چند فروشنده در یک پنل',
+        'ابزارهای تحلیل فروش و گزارش‌گیری',
+        'پشتیبانی ۲۴ ساعته'
+      ],
+      ctaText: 'ثبت‌نام فروشنده',
+      ctaLink: '/seller/benefits',
+      gradient: 'linear-gradient(135deg, #1B2A4A 0%, #2A3F6B 100%)'
+    },
+    {
+      id: 'buyer',
+      title: 'خریدار عمده',
+      subtitle: 'محصولات را با قیمت کارخانه خریداری کنید',
+      icon: 'shopping_cart',
+      benefits: [
+        'قیمت‌های عمده و رقابتی',
+        'ضمانت اصالت کالا',
+        'بازگشت وجه در صورت مشکل',
+        'ارسال سریع به سراسر کشور'
+      ],
+      ctaText: 'شروع خرید',
+      ctaLink: '/buyer/benefits',
+      gradient: 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
+    }
+  ];
 
   /* ── Animated Counters ── */
   animatedProducers = 0;
@@ -100,6 +160,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   /* ── Scroll Visibility ── */
   sectionVisibility: Record<string, boolean> = {
     hero: false,
+    roles: false,
     features: false,
     workflow: false,
     categories: false,
@@ -133,17 +194,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     'سنگ‌های قیمتی و نیمه‌قیمتی': '💠', 'ابزار و تجهیزات معدن': '⛏️',
     'زیورآلات دست‌ساز': '🎨', 'جواهرات عتیقه و کلکسیونی': '🏺'
   };
-
-  private categoryColors = [
-    'from-purple-500 to-purple-700',
-    'from-amber-500 to-amber-700',
-    'from-rose-500 to-rose-700',
-    'from-emerald-500 to-emerald-700',
-    'from-blue-500 to-blue-700',
-    'from-cyan-500 to-cyan-700',
-    'from-orange-500 to-orange-700',
-    'from-indigo-500 to-indigo-700',
-  ];
 
   constructor(
     private readonly categoryService: CategoryService,
@@ -530,10 +580,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getCategoryIcon(name: string): string {
     return this.categoryIcons[name] || '✦';
-  }
-
-  getCategoryColor(index: number): string {
-    return this.categoryColors[index % this.categoryColors.length];
   }
 
   /** Gradient background for each category card */

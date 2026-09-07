@@ -1,52 +1,45 @@
-<section class="bg-warm min-h-screen flex items-center justify-center px-4">
-  <div class="bg-white rounded-2xl shadow-card w-full max-w-md p-8">
-    <h1 class="text-2xl font-bold text-secondary text-center mb-6">ورود به حساب کاربری</h1>
+<section class="login-shell" dir="rtl">
+  <div class="login-shell__bg"></div>
+  <div class="login-card">
+    <div class="login-card__header">
+      <a routerLink="/" class="login-brand" aria-label="بازگشت به خانه">
+        <span class="login-brand__mark">ت</span>
+        <span class="login-brand__name">تولیدی</span>
+      </a>
+      <h1 class="login-card__title">ورود به حساب کاربری</h1>
+      <p class="login-card__subtitle">با کد ملی و رمز عبور وارد شوید</p>
+    </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="nationalCode">کد ملی</label>
-        <input
-          id="nationalCode"
-          type="text"
-          formControlName="nationalCode"
-          placeholder="کد ملی خود را وارد کنید"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <p *ngIf="form.get('nationalCode')?.invalid && form.get('nationalCode')?.touched" class="text-red-500 text-sm mt-1">
-          کد ملی الزامی است.
-        </p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="login-field">
+        <mat-label>کد ملی</mat-label>
+        <input matInput type="text" id="nationalCode" formControlName="nationalCode" placeholder="کد ملی خود را وارد کنید" autocomplete="off" />
+        <mat-error>کد ملی الزامی است.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="login-field">
+        <mat-label>رمز عبور</mat-label>
+        <input matInput type="password" id="password" formControlName="password" placeholder="رمز عبور خود را وارد کنید" autocomplete="current-password" />
+        <mat-error>رمز عبور باید حداقل ۶ کاراکتر باشد.</mat-error>
+      </mat-form-field>
+
+      <div *ngIf="errorMessage" class="login-alert login-alert--error">{{ errorMessage }}</div>
+
+      <div class="login-options">
+        <mat-checkbox formControlName="rememberMe">مرا به خاطر بسپار</mat-checkbox>
       </div>
 
-      <div>
-        <label class="block text-secondary font-medium mb-1" for="password">رمز عبور</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="رمز عبور خود را وارد کنید"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        <p *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="text-red-500 text-sm mt-1">
-          رمز عبور باید حداقل ۶ کاراکتر باشد.
-        </p>
-      </div>
-
-      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-2 text-sm">
-        {{ errorMessage }}
-      </div>
-
-      <button
-        type="submit"
-        [disabled]="form.invalid || loading"
-        class="w-full bg-primary text-white font-bold rounded-xl py-2.5 hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+      <button type="submit" mat-flat-button class="login-submit" [disabled]="form.invalid || loading">
         {{ loading ? 'در حال ورود…' : 'ورود' }}
       </button>
     </form>
 
-    <div class="mt-5 text-center text-sm space-y-2">
-      <p class="text-gray-500">
+    <div class="login-footer">
+      <p class="login-footer__text">
         حساب کاربری ندارید؟
-        <a routerLink="/register" class="text-primary font-medium hover:underline">ثبت‌نام کنید</a>
+        <a routerLink="/register" class="login-footer__link">ثبت‌نام کنید</a>
       </p>
-      <p class="text-gray-400">فراموشی رمز عبور (به‌زودی)</p>
+      <p class="login-footer__text login-footer__text--muted">فراموشی رمز عبور (به‌زودی)</p>
     </div>
   </div>
 </section>

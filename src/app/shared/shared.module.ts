@@ -30,6 +30,7 @@ import { SearchAutocompleteComponent } from './components/search-autocomplete/se
 import { IranMapComponent } from './components/iran-map/iran-map.component';
 import { LocationSelectorComponent } from './components/location-selector/location-selector.component';
 import { StatusBadgeComponent } from './components/status-badge/status-badge.component';
+import { OrderChatComponent } from './components/order-chat/order-chat.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +71,8 @@ import { StatusBadgeComponent } from './components/status-badge/status-badge.com
     ReactiveFormsModule,
     PersianDatePipe,
     PersianNumberPipe,
-    RouterModule
+    RouterModule,
+    OrderChatComponent
   ],
   exports: [
     CommonModule,
@@ -105,7 +107,8 @@ import { StatusBadgeComponent } from './components/status-badge/status-badge.com
     ProductGalleryComponent,
     LoadingSpinnerComponent,
     LocationSelectorComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    OrderChatComponent
   ]
 })
 export class SharedModule { }

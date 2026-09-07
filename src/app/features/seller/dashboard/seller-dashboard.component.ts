@@ -6,6 +6,7 @@ import {
   DashboardSummary,
   OrderStats,
   ProductStats,
+  SellerReport,
   SellerService,
   SellerStatistics
 } from '../../../core/services/api/seller.service';
@@ -21,6 +22,9 @@ export class SellerDashboardComponent implements OnInit {
   productStats: ProductStats[] = [];
   orderStats: OrderStats | null = null;
   commissions: CommissionBreakdown[] = [];
+  report: SellerReport | null = null;
+  reportLoading = false;
+  reportError = '';
   loading = true;
   errorMessage = '';
 
@@ -59,6 +63,23 @@ export class SellerDashboardComponent implements OnInit {
       error: () => {
         this.commissions = [];
         this.loading = false;
+      }
+    });
+    this.loadReport();
+  }
+
+  /** دریافت گزارش عملکرد (سفارش‌ها، درآمد، کمیسیون قابل پرداخت) */
+  loadReport(): void {
+    this.reportLoading = true;
+    this.reportError = '';
+    this.sellerService.getReport().subscribe({
+      next: (result) => {
+        this.report = result.data ?? null;
+        this.reportLoading = false;
+      },
+      error: (err: Error) => {
+        this.reportError = err.message;
+        this.reportLoading = false;
       }
     });
   }

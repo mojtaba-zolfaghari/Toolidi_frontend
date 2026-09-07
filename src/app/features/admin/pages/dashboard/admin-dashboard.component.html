@@ -1,4 +1,4 @@
-<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+<section dir="rtl" class="admin-page">
 
   <!-- Page Header -->
   <app-page-header
@@ -11,14 +11,14 @@
   <p *ngIf="error" class="dashboard-error">{{ error }}</p>
 
   <!-- Loading -->
-  <div *ngIf="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+  <div *ngIf="loading" class="dashboard-stat-grid">
     <div *ngFor="let i of [1,2,3,4,5]" class="dashboard-skeleton"></div>
   </div>
 
   <ng-container *ngIf="!loading">
 
     <!-- Stat Cards -->
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="dashboard-stat-grid">
       <app-stat-card
         *ngFor="let card of statCards"
         [title]="card.label"
@@ -42,7 +42,7 @@
     </mat-card>
 
     <!-- Sales Charts -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="dashboard-charts-grid">
       <mat-card appearance="outlined" class="dashboard-card">
         <h3 class="dashboard-card__title">فروش روزانه</h3>
         <p class="dashboard-card__caption">۷ روز اخیر</p>
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Recent Orders + Low Stock -->
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="dashboard-charts-grid">
 
       <!-- Recent Orders -->
       <mat-card appearance="outlined" class="dashboard-card lg:col-span-2">
@@ -87,7 +87,7 @@
               <p class="dashboard-orders__date">{{ order.createdAt | persianDate }}</p>
             </div>
             <span class="dashboard-orders__amount">
-              {{ order.totalAmount | number:'1.0-0' }}
+              {{ order.totalAmount | persianNumber }}
               <span class="dashboard-orders__unit">تومان</span>
             </span>
             <app-status-badge [status]="order.status"></app-status-badge>

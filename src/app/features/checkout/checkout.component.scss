@@ -199,3 +199,236 @@ $success: #22C55E;
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+// ═══════════════ مرحله ۲: ارسال هوشمند تجمیعی ═══════════════
+.checkout-ship {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  &__card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 1.25rem;
+
+    @media (min-width: 640px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-block-end: 1.25rem;
+  }
+
+  &__head-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background: #eff6ff;
+    font-size: 1.125rem;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--mat-sys-on-surface, #1B2A4A);
+  }
+
+  &__subtitle {
+    margin: 0.125rem 0 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    justify-content: center;
+  }
+
+  &__loading-spinner {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    border: 3px solid rgba(108, 63, 197, 0.15);
+    border-top-color: var(--mat-sys-primary, #6C3FC5);
+    animation: shipSpin 0.9s linear infinite;
+  }
+
+  &__error {
+    padding: 1rem;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+@keyframes shipSpin {
+  to { transform: rotate(360deg); }
+}
+
+// ── گزینه ارسال ──
+.ship-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 2px solid #f3f4f6;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+
+  input[type='radio'] {
+    accent-color: var(--mat-sys-primary, #6C3FC5);
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    border-color: #e5e7eb;
+  }
+
+  &--selected,
+  &--selected:hover {
+    border-color: #fb923c;
+    background: #fff7ed;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    color: var(--mat-sys-on-surface, #1B2A4A);
+  }
+
+  &__desc {
+    display: block;
+    margin-block-start: 0.25rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  &__tag {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+
+    &--recommended {
+      background: rgba(108, 63, 197, 0.1);
+      color: var(--mat-sys-primary, #6C3FC5);
+    }
+
+    &--fastest {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    &--free {
+      background: #dcfce7;
+      color: #15803d;
+    }
+  }
+
+  &__cost {
+    flex-shrink: 0;
+    text-align: left;
+
+    strong {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--mat-sys-primary, #6C3FC5);
+    }
+  }
+
+  &__eta {
+    display: block;
+    margin-block-start: 0.125rem;
+    font-size: 0.6875rem;
+    color: #6b7280;
+  }
+}
+
+// ── زمان‌بندی هر انبار ──
+.ship-legs {
+  margin-block-start: 1.25rem;
+  border-block-start: 1px solid #f3f4f6;
+  padding-block-start: 1rem;
+
+  &__summary {
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--mat-sys-primary, #6C3FC5);
+    user-select: none;
+  }
+
+  &__body {
+    margin-block-start: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__note {
+    margin: 0.5rem 0 0;
+    font-size: 0.6875rem;
+    color: #9ca3af;
+  }
+}
+
+.ship-leg {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #f9fafb;
+  font-size: 0.75rem;
+
+  &__seller {
+    font-weight: 700;
+    color: var(--mat-sys-on-surface, #1B2A4A);
+  }
+
+  &__meta {
+    color: #6b7280;
+  }
+
+  &__eta {
+    margin-inline-start: auto;
+    color: #059669;
+    white-space: nowrap;
+  }
+}

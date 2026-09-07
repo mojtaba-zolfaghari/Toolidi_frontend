@@ -11,25 +11,76 @@ interface NavItem {
 @Component({
   selector: 'app-bottom-nav',
   template: `
-    <nav class="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/95 backdrop-blur-md safe-bottom md:hidden">
-      <div class="flex items-center justify-around px-2 py-1">
+    <nav class="bottom-nav">
+      <div class="bottom-nav__inner">
         <a *ngFor="let item of items"
            [routerLink]="item.route"
            routerLinkActive="active"
-           class="flex flex-1 flex-col items-center gap-0.5 py-2 text-center transition-colors"
-           [class.text-primary]="isActive(item.route)"
-           [class.text-gray-400]="!isActive(item.route)">
-          <span class="text-xl leading-none">{{ isActive(item.route) && item.activeIcon ? item.activeIcon : item.icon }}</span>
-          <span class="text-[10px] font-medium leading-none">{{ item.label }}</span>
+           class="bottom-nav__item"
+           [class.bottom-nav__item--active]="isActive(item.route)">
+          <span class="bottom-nav__icon">{{ isActive(item.route) && item.activeIcon ? item.activeIcon : item.icon }}</span>
+          <span class="bottom-nav__label">{{ item.label }}</span>
         </a>
       </div>
     </nav>
   `,
   styles: [`
     :host { display: block; }
-    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0); }
-    .active { color: var(--color-primary, #f97316); }
-    .active span:first-child { transform: scale(1.15); }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      border-top: 1px solid #f1f5f9;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .bottom-nav__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .bottom-nav__item {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.125rem;
+      padding: 0.5rem 0;
+      color: #9ca3af;
+      text-align: center;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .bottom-nav__item--active {
+      color: var(--mat-sys-primary, #6C3FC5);
+    }
+
+    .bottom-nav__icon {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .bottom-nav__item--active .bottom-nav__icon {
+      transform: scale(1.15);
+    }
+
+    .bottom-nav__label {
+      font-size: 0.625rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    @media (min-width: 768px) {
+      .bottom-nav { display: none; }
+    }
   `]
 })
 export class BottomNavComponent {

@@ -1,0 +1,36 @@
+<section dir="rtl" class="al-page">
+  <div class="al-head">
+    <p class="al-head__kicker">به تولیدی خوش آمدید</p>
+    <h1 class="al-head__title">برای شروع، مسیر خود را انتخاب کنید</h1>
+    <p class="al-head__sub">
+      هر نقش مسیر و پنل مخصوص خود را دارد؛ وارد شوید یا ثبت‌نام کنید.
+    </p>
+  </div>
+
+  <div class="al-grid">
+    <mat-card
+      *ngFor="let role of roles"
+      class="role-card"
+      [routerLink]="role.route"
+      matRipple>
+      <mat-card-content class="role-card__body">
+        <div class="role-icon" [style.background]="role.tint">
+          <mat-icon aria-hidden="true">{{ role.matIcon }}</mat-icon>
+        </div>
+        <h2 class="role-card__title">{{ role.title }}</h2>
+        <p class="role-card__desc">{{ role.description }}</p>
+        <button mat-flat-button color="primary" class="role-card__cta" [attr.aria-label]="role.ariaLabel">
+          {{ role.cta }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="al-login-hint">
+    <p class="al-login-hint__text">
+      حساب کاربری دارید؟
+      <a routerLink="/auth/login" class="al-login-hint__link">ورود به حساب</a>
+      — ورود برای همه نقش‌ها یکسان است و پس از ورود به پنل همان نقش هدایت می‌شوید.
+    </p>
+  </div>
+</section>

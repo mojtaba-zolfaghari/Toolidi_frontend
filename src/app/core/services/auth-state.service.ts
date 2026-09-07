@@ -27,7 +27,7 @@ export class AuthStateService {
 
   /** بازخوانی وضعیت کاربر از توکن ذخیره‌شده */
   refresh(): void {
-    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY) ?? sessionStorage.getItem(ACCESS_TOKEN_KEY) ?? null;
     if (!token) {
       this.userSubject.next(null);
       return;

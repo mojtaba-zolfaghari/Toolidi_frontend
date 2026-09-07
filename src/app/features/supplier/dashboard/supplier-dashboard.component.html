@@ -23,9 +23,9 @@
       <div class="relative">
         <div class="flex items-center justify-between mb-3">
           <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">📦</span>
-          <span class="text-xs text-white/70 bg-white/10 px-2 py-0.5 rounded-full">{{ (dashboard?.activeProducts || 0) | number:'1.0-0':'fa-IR' }} فعال</span>
+          <span class="text-xs text-white/70 bg-white/10 px-2 py-0.5 rounded-full">{{ (dashboard?.activeProducts || 0) | persianNumber }} فعال</span>
         </div>
-        <p class="text-3xl font-extrabold">{{ (dashboard?.totalProducts || 0) | number:'1.0-0':'fa-IR' }}</p>
+        <p class="text-3xl font-extrabold">{{ (dashboard?.totalProducts || 0) | persianNumber }}</p>
         <p class="text-sm text-white/70 mt-1">کل محصولات</p>
       </div>
     </div>
@@ -35,9 +35,9 @@
       <div class="relative">
         <div class="flex items-center justify-between mb-3">
           <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">🛒</span>
-          <span class="text-xs text-white/70 bg-white/10 px-2 py-0.5 rounded-full">{{ (dashboard?.pendingOrders || 0) | number:'1.0-0':'fa-IR' }} در انتظار</span>
+          <span class="text-xs text-white/70 bg-white/10 px-2 py-0.5 rounded-full">{{ (dashboard?.pendingOrders || 0) | persianNumber }} در انتظار</span>
         </div>
-        <p class="text-3xl font-extrabold">{{ (dashboard?.totalOrders || 0) | number:'1.0-0':'fa-IR' }}</p>
+        <p class="text-3xl font-extrabold">{{ (dashboard?.totalOrders || 0) | persianNumber }}</p>
         <p class="text-sm text-white/70 mt-1">کل سفارشات</p>
       </div>
     </div>
@@ -59,7 +59,7 @@
         <div class="flex items-center justify-between mb-3">
           <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg">🌍</span>
         </div>
-        <p class="text-3xl font-extrabold">{{ (dashboard?.citiesServed || 0) | number:'1.0-0':'fa-IR' }}</p>
+        <p class="text-3xl font-extrabold">{{ (dashboard?.citiesServed || 0) | persianNumber }}</p>
         <p class="text-sm text-white/70 mt-1">شهر تحت پوشش</p>
       </div>
     </div>
@@ -71,7 +71,7 @@
       <div class="flex items-center gap-3">
         <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-lg">⭐</span>
         <div>
-          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.averageRating || 0) | number:'1.1-1':'fa-IR' }}</p>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.averageRating || 0) | persianNumber:1:1 }}</p>
           <p class="text-xs text-gray-500">امتیاز میانگین</p>
         </div>
       </div>
@@ -80,7 +80,7 @@
       <div class="flex items-center gap-3">
         <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-lg">✅</span>
         <div>
-          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.deliverySuccessRate || 0) | number:'1.1-1':'fa-IR' }}٪</p>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.deliverySuccessRate || 0) | persianNumber:1:1 }}٪</p>
           <p class="text-xs text-gray-500">نرخ تحویل موفق</p>
         </div>
       </div>
@@ -89,7 +89,7 @@
       <div class="flex items-center gap-3">
         <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-100 text-lg">⏳</span>
         <div>
-          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.pendingOrders || 0) | number:'1.0-0':'fa-IR' }}</p>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.pendingOrders || 0) | persianNumber }}</p>
           <p class="text-xs text-gray-500">سفارش در انتظار</p>
         </div>
       </div>
@@ -98,7 +98,7 @@
       <div class="flex items-center gap-3">
         <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-lg">📦</span>
         <div>
-          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.activeProducts || 0) | number:'1.0-0':'fa-IR' }}</p>
+          <p class="text-2xl font-bold text-secondary">{{ (dashboard?.activeProducts || 0) | persianNumber }}</p>
           <p class="text-xs text-gray-500">محصول فعال</p>
         </div>
       </div>
@@ -129,7 +129,7 @@
             <td class="p-3 font-mono text-xs">{{ order.orderNumber }}</td>
             <td class="p-3 font-medium text-secondary">{{ order.customerName }}</td>
             <td class="p-3">{{ order.productName }}</td>
-            <td class="p-3 text-center">{{ order.quantity | number:'1.0-0':'fa-IR' }}</td>
+            <td class="p-3 text-center">{{ order.quantity | persianNumber }}</td>
             <td class="p-3 text-green-600 font-bold">{{ formatCurrency(order.totalAmount) }}</td>
             <td class="p-3">
               <span class="inline-flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 text-xs">

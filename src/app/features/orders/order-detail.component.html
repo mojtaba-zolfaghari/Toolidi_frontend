@@ -28,8 +28,8 @@
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-card p-6">
           <h2 class="text-xl font-bold text-secondary mb-5">اقلام سفارش</h2>
           <div *ngFor="let item of order.items" class="flex items-center justify-between gap-4 border-b last:border-0 py-4">
-            <div><p class="font-bold text-secondary">{{ item.productName }}</p><p class="text-sm text-gray-500 mt-1">تعداد: {{ item.quantity | number:'1.0-0':'fa-IR' }} × {{ item.unitPrice | number }} تومان</p></div>
-            <strong class="text-primary">{{ item.totalPrice | number }} تومان</strong>
+            <div><p class="font-bold text-secondary">{{ item.productName }}</p><p class="text-sm text-gray-500 mt-1">تعداد: {{ item.quantity | persianNumber }} × {{ item.unitPrice | persianNumber }} تومان</p></div>
+            <strong class="text-primary">{{ item.totalPrice | persianNumber }} تومان</strong>
           </div>
           <p *ngIf="!order.items.length" class="text-gray-400 py-6 text-center">جزئیات اقلام موجود نیست.</p>
         </div>
@@ -38,10 +38,10 @@
           <div class="bg-white rounded-2xl shadow-card p-6">
             <h2 class="text-xl font-bold text-secondary mb-4">خلاصه پرداخت</h2>
             <div class="space-y-3 text-sm">
-              <div class="flex justify-between"><span class="text-gray-500">مبلغ سفارش</span><span>{{ order.totalAmount | number }} تومان</span></div>
-              <div class="flex justify-between"><span class="text-gray-500">تخفیف</span><span>{{ order.discountAmount | number }} تومان</span></div>
-              <div class="flex justify-between"><span class="text-gray-500">هزینه ارسال</span><span>{{ order.shippingAmount | number }} تومان</span></div>
-              <div class="flex justify-between border-t pt-3 font-bold text-secondary"><span>مبلغ نهایی</span><span class="text-primary">{{ order.grandTotal | number }} تومان</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">مبلغ سفارش</span><span>{{ order.totalAmount | persianNumber }} تومان</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">تخفیف</span><span>{{ order.discountAmount | persianNumber }} تومان</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">هزینه ارسال</span><span>{{ order.shippingAmount | persianNumber }} تومان</span></div>
+              <div class="flex justify-between border-t pt-3 font-bold text-secondary"><span>مبلغ نهایی</span><span class="text-primary">{{ order.grandTotal | persianNumber }} تومان</span></div>
             </div>
           </div>
 

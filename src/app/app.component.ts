@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, isDevMode, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -55,7 +55,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isAdminArea = this.router.url.startsWith('/admin') || this.router.url.startsWith('/seller') || this.router.url.startsWith('/agent') || this.router.url.startsWith('/supplier');
     this.isStandaloneAuthPage = this.router.url === '/auth/agent-register' || this.router.url === '/auth/seller-register' || this.router.url === '/auth/register';
 
-    if ('serviceWorker' in navigator) {
+    // Only register the service worker in production builds — /sw.js does not
+    // exist on the dev server, so registering it there logs a 404 console error
+    // on every page load (and fails the e2e console-error checks).
+    if (!isDevMode() && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
       });

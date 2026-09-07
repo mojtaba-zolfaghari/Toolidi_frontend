@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SupplierService, SupplierProduct } from '../../../core/services/api/supplier.service';
+import { SupplierService, SupplierProduct, SupplierProductPricing } from '../../../core/services/api/supplier.service';
 
 @Component({
   selector: 'app-supplier-products',
@@ -57,10 +57,15 @@ import { SupplierService, SupplierProduct } from '../../../core/services/api/sup
                 <td class="p-4">
                   <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{{ product.categoryName }}</span>
                 </td>
-                <td class="p-4 font-bold text-green-600">{{ product.price | number }} تومان</td>
                 <td class="p-4">
-                  <span [class]="product.stockQuantity > 10 ? 'text-green-600' : product.stockQuantity > 0 ? 'text-yellow-600' : 'text-red-600'">
-                    {{ product.stockQuantity }}
+                  <div class="font-bold text-green-600">{{ getPricing(product.id)?.supplyPrice ?? product.price | persianNumber }} تومان</div>
+                  <div *ngIf="getPricing(product.id)" class="text-[11px] text-gray-400 mt-0.5">
+                    قیمت سایت: {{ getPricing(product.id)!.suggestedSitePrice | persianNumber }} تومان
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span [class]="(getPricing(product.id)?.availableQuantity ?? product.stockQuantity) > 10 ? 'text-green-600' : (getPricing(product.id)?.availableQuantity ?? product.stockQuantity) > 0 ? 'text-yellow-600' : 'text-red-600'">
+                    {{ getPricing(product.id)?.availableQuantity ?? product.stockQuantity }}
                   </span>
                 </td>
                 <td class="p-4">
@@ -70,8 +75,7 @@ import { SupplierService, SupplierProduct } from '../../../core/services/api/sup
                 </td>
                 <td class="p-4">
                   <div class="flex gap-2">
-                    <button class="text-blue-600 hover:underline text-xs">ویرایش</button>
-                    <button class="text-red-600 hover:underline text-xs">غیرفعال</button>
+                    <button (click)="startEdit(product)" class="text-blue-600 hover:underline text-xs">ثبت قیمت</button>
                   </div>
                 </td>
               </tr>
@@ -81,19 +85,63 @@ import { SupplierService, SupplierProduct } from '../../../core/services/api/sup
         <p *ngIf="!filteredProducts.length" class="text-gray-400 text-center py-12">محصولی یافت نشد</p>
       </div>
     </section>
+
+    <!-- Pricing Modal -->
+    <div *ngIf="editing" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40" (click)="cancelEdit()"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+        <h3 class="font-bold text-secondary">ثبت قیمت تأمین — {{ editing.name }}</h3>
+        <label class="block">
+          <span class="text-xs text-gray-500">قیمت شما (تومان)</span>
+          <input type="number" [(ngModel)]="editSupplyPrice"
+                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+        </label>
+        <label class="block">
+          <span class="text-xs text-gray-500">موجودی قابل تأمین</span>
+          <input type="number" [(ngModel)]="editQuantity"
+                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+        </label>
+        <label class="block">
+          <span class="text-xs text-gray-500">زمان آماده‌سازی (ساعت)</span>
+          <input type="number" [(ngModel)]="editLeadTime"
+                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+        </label>
+        <p *ngIf="suggestedPrice" class="text-xs bg-blue-50 text-blue-700 rounded-xl p-3">
+          قیمت پیشنهادی سایت با حاشیه سود و تعدیل مالیات: {{ suggestedPrice | persianNumber }} تومان
+        </p>
+        <p *ngIf="editError" class="text-xs text-red-500">{{ editError }}</p>
+        <div class="flex gap-2 justify-end">
+          <button (click)="cancelEdit()" class="px-4 py-2 text-sm rounded-xl border border-gray-200 text-gray-600">انصراف</button>
+          <button (click)="savePricing()" [disabled]="saving"
+                  class="px-5 py-2 text-sm rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 disabled:opacity-40">
+            {{ saving ? 'در حال ذخیره…' : 'ذخیره قیمت' }}
+          </button>
+        </div>
+      </div>
+    </div>
   `
 })
 export class SupplierProductsComponent implements OnInit {
   products: SupplierProduct[] = [];
+  pricing: SupplierProductPricing[] = [];
   searchTerm = '';
   filterCategory = '';
   filterStatus = '';
   categories: string[] = [];
 
+  editing: SupplierProduct | null = null;
+  editSupplyPrice = 0;
+  editQuantity = 0;
+  editLeadTime = 0;
+  suggestedPrice = 0;
+  saving = false;
+  editError: string | null = null;
+
   constructor(private readonly supplierService: SupplierService) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadPricing();
   }
 
   loadProducts(): void {
@@ -112,6 +160,64 @@ export class SupplierProductsComponent implements OnInit {
           { id: '5', name: 'سنگ فیروزه نیشابور', sku: 'GEM-002', price: 500000, stockQuantity: 100, categoryName: 'سنگ‌های قیمتی', imageUrl: '', isActive: true },
         ];
         this.categories = [...new Set(this.products.map(p => p.categoryName))];
+      }
+    });
+  }
+
+  private loadPricing(): void {
+    this.supplierService.getMyPricing().subscribe({
+      next: (result) => { this.pricing = result.data ?? []; },
+      error: () => { this.pricing = []; }
+    });
+  }
+
+  getPricing(productId: string): SupplierProductPricing | undefined {
+    return this.pricing.find(p => p.productId === productId);
+  }
+
+  startEdit(product: SupplierProduct): void {
+    const existing = this.getPricing(product.id);
+    this.editing = product;
+    this.editSupplyPrice = existing?.supplyPrice ?? product.price;
+    this.editQuantity = existing?.availableQuantity ?? product.stockQuantity;
+    this.editLeadTime = existing?.leadTimeHours ?? 0;
+    this.suggestedPrice = existing?.suggestedSitePrice ?? 0;
+    this.editError = null;
+  }
+
+  cancelEdit(): void {
+    this.editing = null;
+  }
+
+  savePricing(): void {
+    if (!this.editing) return;
+    if (this.editSupplyPrice <= 0) {
+      this.editError = 'قیمت باید بزرگ‌تر از صفر باشد.';
+      return;
+    }
+
+    this.saving = true;
+    this.editError = null;
+    this.supplierService.upsertPricing({
+      productId: this.editing.id,
+      supplyPrice: this.editSupplyPrice,
+      availableQuantity: this.editQuantity,
+      leadTimeHours: this.editLeadTime
+    }).subscribe({
+      next: (result) => {
+        if (result.isSuccess && result.data) {
+          const idx = this.pricing.findIndex(p => p.productId === result.data!.productId);
+          if (idx >= 0) this.pricing[idx] = result.data;
+          else this.pricing = [...this.pricing, result.data];
+          this.editing = null;
+        } else {
+          this.editError = result.errorMessage ?? 'خطا در ذخیره قیمت';
+        }
+        this.saving = false;
+      },
+      error: (err: Error) => {
+        this.editError = err.message;
+        this.saving = false;
       }
     });
   }

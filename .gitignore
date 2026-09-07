@@ -23,3 +23,11 @@ out-tsc/
 # OS files
 .DS_Store
 Thumbs.db
+# lighthouse / e2e test artifacts
+lighthouse-results*.json
+lighthouse-results*.trace.json
+lighthouse-summary.txt
+test-results/
+playwright-report/
+.e2e-render/
+test-lh.json

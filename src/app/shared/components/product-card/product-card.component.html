@@ -1,59 +1,59 @@
-<div class="product-card group bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover sm:hover:scale-[1.02] transition-all duration-200 cursor-pointer" (click)="openDetail()">
+<a class="product-card" [routerLink]="['/product', 'slug', product.slug || product.id]">
   <!-- تصویر محصول -->
-  <div class="product-card-image relative w-full aspect-[4/3] sm:aspect-[4/3] bg-gradient-to-br from-primary-light/25 to-primary/10 flex items-center justify-center text-4xl sm:text-5xl overflow-hidden">
-    <img *ngIf="primaryImageUrl" [src]="primaryImageUrl" [alt]="product.name" class="product-card-image-source h-full w-full object-contain p-2 sm:p-3 transition-transform duration-500 group-hover:scale-[1.04]" />
-    <span *ngIf="!primaryImageUrl" class="select-none">🛍️</span>
+  <div class="product-card-image">
+    <img *ngIf="primaryImageUrl" [src]="primaryImageUrl" [attr.srcset]="imageSrcset" [alt]="product.name" loading="lazy" width="400" height="300" class="product-card-image-source" />
+    <span *ngIf="!primaryImageUrl" class="product-card-image-fallback" aria-hidden="true">🛍️</span>
 
-    <span *ngIf="discountPercent > 0" class="product-discount-badge absolute right-2 top-2 z-10">
-      {{ discountPercent | number:'1.0-0':'fa-IR' }}٪ تخفیف
+    <span *ngIf="discountPercent > 0" class="product-discount-badge">
+      {{ discountPercent | persianNumber }}٪ تخفیف
     </span>
 
     <app-add-to-cart-button
-      (click)="$event.stopPropagation()"
+      (click)="$event.preventDefault(); $event.stopPropagation()"
       (addToCart)="addToCart()"
       [state]="cartState"
       [disabled]="cartState === 'adding' || cartState === 'success'"
       size="sm"
       [showIcon]="cartState === 'idle'"
-      class="absolute bottom-3 left-3">
+      class="product-card__cart-btn">
     </app-add-to-cart-button>
   </div>
 
-  <div class="product-card-body p-2.5 sm:p-4">
-    <h3 class="product-card-name font-bold text-secondary mb-1">{{ product.name }}</h3>
+  <div class="product-card-body">
+    <h3 class="product-card-name">{{ product.name }}</h3>
 
-    <div class="flex items-center gap-1 mb-2">
+    <div class="product-card-rating">
       <span
         *ngFor="let star of [1, 2, 3, 4, 5]"
-        class="text-[0.65rem] sm:text-sm"
-        [class.text-yellow-400]="star <= (product.ratingAverage ?? 0)"
-        [class.text-gray-300]="star > (product.ratingAverage ?? 0)">★</span>
-      <span class="text-[0.65rem] sm:text-xs text-gray-400 mr-1">({{ product.ratingCount | number:'1.0-0':'fa-IR' }})</span>
+        class="product-card-star"
+        [class.product-card-star--on]="star <= (product.ratingAverage ?? 0)"
+        [class.product-card-star--off]="star > (product.ratingAverage ?? 0)">★</span>
+      <span class="product-card-rating-count">({{ product.ratingCount | persianNumber }})</span>
     </div>
 
     <!-- قیمت و میزان صرفه‌جویی -->
     <div class="product-card-prices">
-      <div class="flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
-        <span class="text-primary font-bold text-sm sm:text-lg">{{ product.unitPrice | number:'1.0-0':'fa-IR' }} تومان</span>
-        <span *ngIf="discountPercent > 0" class="text-gray-400 line-through text-[0.65rem] sm:text-sm">
-          {{ product.comparePrice | number:'1.0-0':'fa-IR' }} تومان
+      <div class="product-card-price-row">
+        <span class="product-card-price">{{ product.unitPrice | persianNumber }} تومان</span>
+        <span *ngIf="discountPercent > 0" class="product-card-compare">
+          {{ product.comparePrice | persianNumber }} تومان
         </span>
       </div>
       <span *ngIf="discountAmount > 0" class="product-saving-label">
-        صرفه‌جویی {{ discountAmount | number:'1.0-0':'fa-IR' }} تومان
+        صرفه‌جویی {{ discountAmount | persianNumber }} تومان
       </span>
     </div>
 
     <!-- زمان ارسال با tooltip -->
     <div class="product-delivery-row" *ngIf="product.sellerCity || product.cityDeliveryDays || product.nationwideDeliveryDays">
-      <span class="delivery-chip" [attr.title]="'تحویل در شهر ' + (product.sellerCity || 'مبدا') + ': ' + (product.cityDeliveryDays || 1) + ' روز کاری'" [attr.aria-label]="'تحویل در شهر ' + (product.sellerCity || 'مبدا') + ': ' + (product.cityDeliveryDays || 1) + ' روز کاری'">
+      <span class="delivery-chip" [attr.title]="'تحویل در شهر ' + sellerCityDisplay + ': ' + ((product.cityDeliveryDays || 1) | persianNumber) + ' روز کاری'" [attr.aria-label]="'تحویل در شهر ' + sellerCityDisplay + ': ' + ((product.cityDeliveryDays || 1) | persianNumber) + ' روز کاری'">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-5.2 7-11A7 7 0 1 0 5 10c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.2"/></svg>
-        <span>{{ product.sellerCity || 'مبدا' }} · {{ (product.cityDeliveryDays || 1) | number:'1.0-0':'fa-IR' }} روز</span>
+        <span>{{ sellerCityDisplay }} · {{ (product.cityDeliveryDays || 1) | persianNumber }} روز</span>
       </span>
       <span class="delivery-chip" [attr.title]="'تحویل به سراسر کشور: ' + (product.nationwideDeliveryDays || 3) + ' روز کاری'" [attr.aria-label]="'تحویل به سراسر کشور: ' + (product.nationwideDeliveryDays || 3) + ' روز کاری'">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v10H3zM14 10h3l4 4v3h-7z"/><circle cx="7" cy="19" r="1.7"/><circle cx="18" cy="19" r="1.7"/></svg>
-        <span>ایران · {{ (product.nationwideDeliveryDays || 3) | number:'1.0-0':'fa-IR' }} روز</span>
+        <span>ایران · {{ (product.nationwideDeliveryDays || 3) | persianNumber }} روز</span>
       </span>
     </div>
   </div>
-</div>
+</a>

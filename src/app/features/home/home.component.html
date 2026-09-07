@@ -1,9 +1,9 @@
-<section class="min-h-screen bg-bg-warm text-secondary">
+<section class="home">
 
   <!-- ═══════════════════ HERO SECTION ═══════════════════ -->
-  <section class="relative isolate overflow-hidden bg-gradient-to-br from-primary via-[#4A2E9E] to-secondary text-white" data-section="hero">
+  <section class="hero" data-section="hero">
     <!-- Floating particles -->
-    <div class="hero-particles absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="hero-particles" aria-hidden="true">
       <span class="particle" style="--delay:0s;--x:10%;--y:20%"></span>
       <span class="particle" style="--delay:2s;--x:80%;--y:30%"></span>
       <span class="particle" style="--delay:4s;--x:30%;--y:70%"></span>
@@ -11,188 +11,249 @@
       <span class="particle" style="--delay:3s;--x:50%;--y:40%"></span>
       <span class="particle" style="--delay:5s;--x:90%;--y:60%"></span>
     </div>
-    <div class="absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
-    <div class="absolute -bottom-40 -left-20 -z-10 h-96 w-96 rounded-full bg-primary-light/30 blur-3xl"></div>
-    <div class="container mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:py-28 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-32">
-      <div class="max-w-2xl" [class.animate-in]="heroLoaded">
-        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/80 backdrop-blur">
-          <span class="h-2 w-2 rounded-full bg-primary-light animate-pulse"></span>
+
+    <div class="hero__inner">
+      <div class="hero__copy" [class.animate-in]="heroLoaded">
+        <p class="hero__badge">
+          <span class="hero__badge-dot" aria-hidden="true"></span>
           پلتفرم B2B برای خرید و فروش عمده
-        </div>
-        <h1 class="hero-title text-4xl font-extrabold leading-[1.25] tracking-tight sm:text-5xl lg:text-6xl">
-          خرید عمده از <span class="text-gold-light">تامین‌کنندگان</span> معتبر
-        </h1>
-        <p class="mt-6 max-w-xl text-lg leading-9 text-white/75 sm:text-xl">
-          قیمت کارخانه، تحویل سریع و مدیریت کامل فروش در یک پلتفرم.
         </p>
-        <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-          <a routerLink="/shop" class="inline-flex items-center justify-center gap-3 rounded-2xl bg-white px-7 py-4 font-bold text-primary shadow-xl shadow-black/20 transition-all hover:-translate-y-1 hover:bg-gold hover:text-secondary">
-            خرید عمده <span aria-hidden="true">←</span>
+        <h1 class="hero-title">خرید عمده از <span class="hero__title-accent">تامین‌کنندگان</span> معتبر</h1>
+        <p class="hero__subtitle">قیمت کارخانه، تحویل سریع و مدیریت کامل فروش در یک پلتفرم.</p>
+
+        <div class="hero__actions">
+          <a mat-flat-button routerLink="/shop" class="hero__cta hero__cta--primary">
+            خرید عمده
+            <mat-icon aria-hidden="true">arrow_back</mat-icon>
           </a>
-          <a routerLink="/auth/seller-register" class="inline-flex items-center justify-center rounded-2xl border border-white/20 px-7 py-4 font-medium text-white/85 transition-all hover:bg-white/10 hover:-translate-y-0.5">
+          <a mat-stroked-button routerLink="/auth/seller-register" class="hero__cta hero__cta--ghost">
             فروشنده شوید
           </a>
-          <a routerLink="/auth/supplier-register" class="inline-flex items-center justify-center rounded-2xl border border-green-400/30 px-7 py-4 font-medium text-green-300 transition-all hover:bg-green-500/20 hover:-translate-y-0.5">
+          <a mat-stroked-button routerLink="/auth/supplier-register" class="hero__cta hero__cta--supplier">
             تأمین‌کننده شوید
           </a>
         </div>
       </div>
-      <div class="relative mx-auto w-full max-w-md lg:justify-self-end">
-        <div class="absolute -inset-5 rounded-[2.5rem] bg-white/10 blur-2xl"></div>
-        <div class="hero-card relative rounded-[2.25rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl">
-          <div class="rounded-[1.75rem] bg-bg-warm p-5 text-secondary">
-            <div class="mb-10 flex items-center justify-between">
-              <span class="text-sm font-bold">انتخاب بهتر</span>
-              <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">تولیدی</span>
+
+      <div class="hero__aside">
+        <div class="hero-card">
+          <div class="hero-card__panel">
+            <div class="hero-card__head">
+              <span class="hero-card__head-title">انتخاب بهتر</span>
+              <span class="hero-card__head-tag">تولیدی</span>
             </div>
-            <div class="space-y-3">
-              <div class="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-xl">💎</span>
-                <div><p class="font-bold">محصولات منتخب</p><p class="mt-1 text-xs text-gray-500">با دقت انتخاب شده برای شما</p></div>
-                <span class="mr-auto text-primary font-bold">←</span>
-              </div>
-              <div class="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-gold/10 text-xl">🛡️</span>
-                <div><p class="font-bold">خرید مطمئن</p><p class="mt-1 text-xs text-gray-500">پرداخت و ارسال قابل اعتماد</p></div>
-                <span class="mr-auto text-primary font-bold">←</span>
-              </div>
-              <div class="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-success/10 text-xl">🚚</span>
-                <div><p class="font-bold">تحویل سریع</p><p class="mt-1 text-xs text-gray-500">شبکه پیک‌های شهری در سراسر کشور</p></div>
-                <span class="mr-auto text-primary font-bold">←</span>
-              </div>
+            <div class="hero-card__items">
+              <a routerLink="/shop" class="hero-card__item">
+                <span class="hero-card__item-icon hero-card__item-icon--primary" aria-hidden="true">💎</span>
+                <span class="hero-card__item-copy">
+                  <strong>محصولات منتخب</strong>
+                  <small>با دقت انتخاب شده برای شما</small>
+                </span>
+                <mat-icon class="hero-card__item-arrow" aria-hidden="true">arrow_back</mat-icon>
+              </a>
+              <a routerLink="/shop" class="hero-card__item">
+                <span class="hero-card__item-icon hero-card__item-icon--gold" aria-hidden="true">🛡️</span>
+                <span class="hero-card__item-copy">
+                  <strong>خرید مطمئن</strong>
+                  <small>پرداخت و ارسال قابل اعتماد</small>
+                </span>
+                <mat-icon class="hero-card__item-arrow" aria-hidden="true">arrow_back</mat-icon>
+              </a>
+              <a routerLink="/shop" class="hero-card__item">
+                <span class="hero-card__item-icon hero-card__item-icon--success" aria-hidden="true">🚚</span>
+                <span class="hero-card__item-copy">
+                  <strong>تحویل سریع</strong>
+                  <small>شبکه پیک‌های شهری در سراسر کشور</small>
+                </span>
+                <mat-icon class="hero-card__item-arrow" aria-hidden="true">arrow_back</mat-icon>
+              </a>
             </div>
-            <div class="mt-5 h-2 overflow-hidden rounded-full bg-secondary/10">
-              <div class="progress-bar h-full rounded-full bg-gradient-to-r from-primary to-gold"></div>
+            <div class="hero-card__progress" role="presentation">
+              <div class="progress-bar"></div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ROLE SELECTION ═══════════════════ -->
+  <section class="role-selection" data-section="roles">
+    <div class="home-container">
+      <header class="section-head section-head--center">
+        <p class="section-kicker">نقش خود را انتخاب کنید</p>
+        <h2 class="section-title">هر کسب‌وکاری جایگاهی دارد</h2>
+        <p class="section-sub">در تولیدی می‌توانید به عنوان تولیدکننده، فروشنده یا خریدار فعال باشید. هر نقش مزایای خاص خود را دارد.</p>
+      </header>
+
+      <div class="role-cards-grid" [class.animate-in]="sectionVisibility['roles']">
+        <mat-card *ngFor="let role of roleCards; let i = index" class="role-card"
+                  [style.background]="role.gradient"
+                  [@slideInFromBottom]="{value: 1, params: { delay: i * 100 }}">
+          <mat-card-header class="role-card__header">
+            <mat-icon matCardAvatar class="role-card__icon">{{ role.icon }}</mat-icon>
+            <mat-card-title class="role-card__title">{{ role.title }}</mat-card-title>
+            <mat-card-subtitle class="role-card__subtitle">{{ role.subtitle }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content class="role-card__content">
+            <ul class="role-benefits-list">
+              <li *ngFor="let benefit of role.benefits" class="role-benefit-item">
+                <mat-icon class="benefit-check" aria-hidden="true">check_circle</mat-icon>
+                <span>{{ benefit }}</span>
+              </li>
+            </ul>
+          </mat-card-content>
+
+          <mat-card-actions class="role-card__actions">
+            <a mat-raised-button color="accent" [routerLink]="role.ctaLink" class="role-card__cta">
+              {{ role.ctaText }}
+              <mat-icon aria-hidden="true">arrow_back</mat-icon>
+            </a>
+          </mat-card-actions>
+        </mat-card>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════ FEATURES B2B ═══════════════════ -->
-  <section class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20" data-section="features">
-    <div class="mb-10 max-w-2xl">
-      <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">چرا تولیدی؟</p>
-      <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">همه‌چیز برای یک خرید و فروش حرفه‌ای</h2>
-      <p class="mt-4 leading-8 text-gray-500">از انتخاب محصول تا تحویل، جزئیات مهم را ساده و شفاف در اختیار شما می‌گذاریم.</p>
-    </div>
-    <div class="grid grid-cols-1 gap-5 md:grid-cols-3" [class.animate-in]="sectionVisibility['features']">
-      <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-        <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        </div>
-        <h3 class="text-lg font-bold">خرید عمده با قیمت کارخانه</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">قیمت‌های ویژه برای سفارشات عمده و رویدادهای تصفیه‌حساب.</p>
-      </article>
-      <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-        <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gold/10 text-gold-dark transition-transform duration-300 group-hover:scale-110 group-hover:bg-gold group-hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <h3 class="text-lg font-bold">شبکه پیک شهری برای تحویل سریع</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">تحویل در کمترین زمان با پیک‌های معتبر در سراسر کشور.</p>
-      </article>
-      <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-        <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-success/10 text-accent-success transition-transform duration-300 group-hover:scale-110 group-hover:bg-accent-success group-hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <h3 class="text-lg font-bold">ضمانت اصالت کالا</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">کالاهای اصلی با گارانتی و تضمین کیفیت از تامین‌کنندگان معتبر.</p>
-      </article>
-      <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-        <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-info/10 text-accent-info transition-transform duration-300 group-hover:scale-110 group-hover:bg-accent-info group-hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-        </div>
-        <h3 class="text-lg font-bold">پنل مدیریت فروشندگان</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">مدیریت موجودی، قیمت‌گذاری و سفارشات از یک داشبورد یکپارچه.</p>
-      </article>
-      <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-        <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-warning/10 text-accent-warning transition-transform duration-300 group-hover:scale-110 group-hover:bg-accent-warning group-hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        </div>
-        <h3 class="text-lg font-bold">پرداخت امن</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">درگاه‌های پرداخت معتبر با تسویه حساب شفاف و سریع.</p>
-      </article>
-      <article class="feature-card group rounded-3xl border border-black/5 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-card-hover hover:border-primary/20">
-        <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-danger/10 text-accent-danger transition-transform duration-300 group-hover:scale-110 group-hover:bg-accent-danger group-hover:text-white">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        </div>
-        <h3 class="text-lg font-bold">گزارش‌گیری تحلیلی</h3>
-        <p class="mt-3 text-sm leading-7 text-gray-500">گزارش‌های دقیق از فروش، موجودی و عملکرد فروشندگان.</p>
-      </article>
+  <section class="features" data-section="features">
+    <div class="home-container">
+      <header class="section-head">
+        <p class="section-kicker">چرا تولیدی؟</p>
+        <h2 class="section-title">همه‌چیز برای یک خرید و فروش حرفه‌ای</h2>
+        <p class="section-sub">از انتخاب محصول تا تحویل، جزئیات مهم را ساده و شفاف در اختیار شما می‌گذاریم.</p>
+      </header>
+
+      <div class="features__grid" [class.animate-in]="sectionVisibility['features']">
+        <article class="feature-card">
+          <span class="feature-card__icon feature-card__icon--primary" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </span>
+          <h3>خرید عمده با قیمت کارخانه</h3>
+          <p>قیمت‌های ویژه برای سفارشات عمده و رویدادهای تصفیه‌حساب.</p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-card__icon feature-card__icon--gold" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </span>
+          <h3>شبکه پیک شهری برای تحویل سریع</h3>
+          <p>تحویل در کمترین زمان با پیک‌های معتبر در سراسر کشور.</p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-card__icon feature-card__icon--success" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
+          <h3>ضمانت اصالت کالا</h3>
+          <p>کالاهای اصلی با گارانتی و تضمین کیفیت از تامین‌کنندگان معتبر.</p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-card__icon feature-card__icon--info" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+          </span>
+          <h3>پنل مدیریت فروشندگان</h3>
+          <p>مدیریت موجودی، قیمت‌گذاری و سفارشات از یک داشبورد یکپارچه.</p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-card__icon feature-card__icon--warning" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </span>
+          <h3>پرداخت امن</h3>
+          <p>درگاه‌های پرداخت معتبر با تسویه حساب شفاف و سریع.</p>
+        </article>
+
+        <article class="feature-card">
+          <span class="feature-card__icon feature-card__icon--danger" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </span>
+          <h3>گزارش‌گیری تحلیلی</h3>
+          <p>گزارش‌های دقیق از فروش، موجودی و عملکرد فروشندگان.</p>
+        </article>
+      </div>
     </div>
   </section>
 
   <!-- ═══════════════════ CATEGORIES ═══════════════════ -->
-  <section class="bg-white" data-section="categories">
-    <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-      <div class="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+  <section class="categories" data-section="categories">
+    <div class="home-container">
+      <header class="section-head section-head--row">
         <div>
-          <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">کاوش کنید</p>
-          <h2 class="text-3xl font-extrabold tracking-tight">دسته‌بندی محصولات</h2>
+          <p class="section-kicker">کاوش کنید</p>
+          <h2 class="section-title">دسته‌بندی محصولات</h2>
         </div>
-        <a routerLink="/shop" class="text-sm font-bold text-primary transition-colors hover:text-primary-dark">مشاهده همه محصولات ←</a>
+        <a routerLink="/shop" class="section-link">مشاهده همه محصولات ←</a>
+      </header>
+
+      <div *ngIf="categoriesLoading" class="home-loading">
+        <app-spinner label="در حال بارگذاری دسته‌بندی‌ها…"></app-spinner>
       </div>
-      <div *ngIf="categoriesLoading" class="py-10"><app-spinner label="در حال بارگذاری دسته‌بندی‌ها…"></app-spinner></div>
-      <div *ngIf="!categoriesLoading && categories.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+
+      <div *ngIf="!categoriesLoading && categories.length" class="categories__grid">
         <a *ngFor="let cat of categories; let i = index; trackBy: trackByCategoryId"
            [routerLink]="['/shop']" [queryParams]="{ categoryId: cat.id }"
-           class="category-card group relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+           class="category-card"
            [style.background]="getCategoryGradient(i)">
-          <div class="relative z-10 flex flex-col items-start gap-3">
-            <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/25 text-3xl backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">{{ getCategoryIcon(cat.name) }}</span>
-            <div>
-              <h3 class="text-base font-extrabold text-white drop-shadow-sm">{{ cat.name }}</h3>
-              <p class="mt-1 text-xs text-white/70">مشاهده محصولات ←</p>
-            </div>
-          </div>
-          <div class="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-150"></div>
+          <span class="category-card__icon" aria-hidden="true">{{ getCategoryIcon(cat.name) }}</span>
+          <span class="category-card__copy">
+            <h3>{{ cat.name }}</h3>
+            <p>مشاهده محصولات ←</p>
+          </span>
         </a>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════ FEATURED PRODUCTS ═══════════════════ -->
-  <section class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20" data-section="products">
-    <div class="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div>
-        <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">پرطرفدارها</p>
-        <h2 class="text-3xl font-extrabold tracking-tight">مردم همین الان دارن این محصولات رو می‌خرن 🔥</h2>
-        <p class="mt-3 text-gray-500">محصولاتی که بیشترین سفارش و رضایت رو دارن.</p>
+  <section class="featured" data-section="products">
+    <div class="home-container">
+      <header class="section-head section-head--row">
+        <div>
+          <p class="section-kicker">پرطرفدارها</p>
+          <h2 class="section-title">مردم همین الان دارن این محصولات رو می‌خرن 🔥</h2>
+          <p class="section-sub">محصولاتی که بیشترین سفارش و رضایت رو دارن.</p>
+        </div>
+        <a routerLink="/shop" class="section-link">رفتن به فروشگاه ←</a>
+      </header>
+
+      <div *ngIf="loading" class="home-loading">
+        <app-spinner label="در حال آماده‌سازی انتخاب‌های شما…"></app-spinner>
       </div>
-      <a routerLink="/shop" class="text-sm font-bold text-primary transition-colors hover:text-primary-dark">رفتن به فروشگاه ←</a>
-    </div>
-    <div *ngIf="loading" class="rounded-3xl bg-white py-16 shadow-sm"><app-spinner label="در حال آماده‌سازی انتخاب‌های شما…"></app-spinner></div>
-    <div *ngIf="!loading && featuredProducts.length" class="featured-products-grid grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-4">
-      <div *ngFor="let product of featuredProducts" class="featured-product-item relative" [@slideUp]>
-        <span class="absolute right-2 top-2 z-10 rounded-full bg-gradient-to-r from-red-500 to-orange-500 px-2 py-0.5 text-[0.62rem] font-bold text-white shadow-lg sm:right-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">پرفروش</span>
-        <app-product-card [product]="product"></app-product-card>
+
+      <div *ngIf="!loading && featuredProducts.length" class="featured-products-grid">
+        <div *ngFor="let product of featuredProducts" class="featured-product-item" [@slideUp]>
+          <span class="featured-product-badge">پرفروش</span>
+          <app-product-card [product]="product"></app-product-card>
+        </div>
       </div>
-    </div>
-    <div *ngIf="!loading && !featuredProducts.length" class="rounded-3xl bg-white py-16 text-center shadow-sm">
-      <p class="text-gray-500">به‌زودی محصولات منتخب جدیدی اینجا قرار می‌گیرد.</p>
-      <a routerLink="/shop" class="mt-5 inline-block font-bold text-primary hover:underline">مشاهده فروشگاه</a>
+
+      <div *ngIf="!loading && !featuredProducts.length" class="home-empty">
+        <p>به‌زودی محصولات منتخب جدیدی اینجا قرار می‌گیرد.</p>
+        <a routerLink="/shop" class="section-link">مشاهده فروشگاه</a>
+      </div>
     </div>
   </section>
 
   <!-- ═══════════════════ SUPPLY NETWORK (merged) ═══════════════════ -->
-  <section class="bg-white" data-section="suppliers">
-    <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
+  <section class="categories" data-section="suppliers">
+    <div class="home-container">
       <div class="supplier-network-heading">
-        <div class="max-w-2xl">
-          <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">شبکه تأمین سراسری</p>
-          <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">تولیدکنندگان در سراسر ایران</h2>
-          <p class="mt-4 leading-8 text-gray-500">تأمین‌کنندگان ما از ۳۱ استان کشور، با ظرفیت بالا و کیفیت تضمینی.</p>
+        <div>
+          <p class="section-kicker">شبکه تأمین سراسری</p>
+          <h2 class="section-title">تولیدکنندگان در سراسر ایران</h2>
+          <p class="section-sub">تأمین‌کنندگان ما از ۳۱ استان کشور، با ظرفیت بالا و کیفیت تضمینی.</p>
         </div>
         <div class="supplier-network-summary">
-          <strong>{{ suppliers.length | number:'1.0-0':'fa-IR' }}</strong>
+          <strong>{{ suppliers.length | persianNumber }}</strong>
           <span>نقطه تأمین فعال</span>
         </div>
       </div>
 
       <!-- Province Grid -->
-      <div class="mb-10">
+      <div class="home-supplier-map">
         <app-iran-map></app-iran-map>
       </div>
 
@@ -204,7 +265,7 @@
                   [class.is-active]="activeSupplierGroup?.trade === group.trade"
                   (click)="selectSupplierTrade(group.trade)">
             <span class="supplier-trade-icon">{{ group.icon }}</span>
-            <span class="supplier-trade-copy"><strong>{{ group.trade }}</strong><small>{{ group.suppliers.length | number:'1.0-0':'fa-IR' }} نقطه تأمین</small></span>
+            <span class="supplier-trade-copy"><strong>{{ group.trade }}</strong><small>{{ group.suppliers.length | persianNumber }} نقطه تأمین</small></span>
             <span class="supplier-trade-arrow" aria-hidden="true">←</span>
           </button>
         </nav>
@@ -216,14 +277,14 @@
               <h3>{{ group.icon }} {{ group.trade }}</h3>
               <p>مراکز فعال این حوزه را بر اساس استان و شهر ببینید.</p>
             </div>
-            <span class="supplier-network-count">{{ group.locations.length | number:'1.0-0':'fa-IR' }} شهر · {{ group.suppliers.length | number:'1.0-0':'fa-IR' }} تأمین‌کننده</span>
+            <span class="supplier-network-count">{{ group.locations.length | persianNumber }} شهر · {{ group.suppliers.length | persianNumber }} تأمین‌کننده</span>
           </div>
 
           <div class="supplier-location-grid">
             <div *ngFor="let location of group.locations; trackBy: trackBySupplierLocation" class="supplier-location-chip">
               <span class="supplier-location-pin">⌖</span>
               <span><strong>{{ location.city }}</strong><small>{{ location.province }}</small></span>
-              <b>{{ location.count | number:'1.0-0':'fa-IR' }}</b>
+              <b>{{ location.count | persianNumber }}</b>
             </div>
           </div>
 
@@ -241,49 +302,48 @@
   </section>
 
   <!-- ═══════════════════ SELLER CTA ═══════════════════ -->
-  <section class="bg-white" data-section="sellerCta">
-    <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
-      <div class="rounded-3xl bg-gradient-to-br from-primary to-secondary p-8 text-white md:p-12 overflow-hidden relative">
-        <div class="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-white/5 blur-3xl"></div>
-        <div class="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-gold/10 blur-2xl"></div>
-        <div class="relative grid items-center gap-8 md:grid-cols-2">
-          <div>
-            <p class="mb-3 text-sm font-bold uppercase tracking-widest text-white/80">برای فروشندگان</p>
-            <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">فروشنده شوید و محصولات خود را به سراسر ایران بفروشید</h2>
-            <p class="mt-4 leading-8 text-white/75">
-              با ثبت نام در تولیدی به شبکه خریداران و تامین‌کنندگان متصل شوید.
-            </p>
-            <ul class="mt-6 space-y-3 text-sm text-white/85">
-              <li class="flex items-center gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-white"></span>ثبت نام رایگان و فعال‌سازی سریع</li>
-              <li class="flex items-center gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-white"></span>پنل مدیریت کامل محصولات و موجودی</li>
-              <li class="flex items-center gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-white"></span>گزارش‌گیری تحلیلی از فروش</li>
-              <li class="flex items-center gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-white"></span>پرداخت به‌موقع و تسویه شفاف</li>
+  <section class="seller-cta" data-section="sellerCta">
+    <div class="home-container">
+      <div class="seller-cta__panel">
+        <div class="seller-cta__grid">
+          <div class="seller-cta__copy">
+            <p class="seller-cta__kicker">برای فروشندگان</p>
+            <h2 class="section-title section-title--light">فروشنده شوید و محصولات خود را به سراسر ایران بفروشید</h2>
+            <p class="seller-cta__sub">با ثبت نام در تولیدی به شبکه خریداران و تامین‌کنندگان متصل شوید.</p>
+
+            <ul class="seller-cta__list">
+              <li><span class="seller-cta__dot" aria-hidden="true"></span>ثبت نام رایگان و فعال‌سازی سریع</li>
+              <li><span class="seller-cta__dot" aria-hidden="true"></span>پنل مدیریت کامل محصولات و موجودی</li>
+              <li><span class="seller-cta__dot" aria-hidden="true"></span>گزارش‌گیری تحلیلی از فروش</li>
+              <li><span class="seller-cta__dot" aria-hidden="true"></span>پرداخت به‌موقع و تسویه شفاف</li>
             </ul>
-            <div class="mt-8">
-              <a routerLink="/auth/seller-register" class="inline-flex items-center justify-center rounded-2xl bg-white px-7 py-3 font-bold text-primary shadow-lg transition-all hover:-translate-y-1 hover:bg-gold hover:text-secondary">
+
+            <div class="seller-cta__action">
+              <a mat-flat-button routerLink="/auth/seller-register" class="seller-cta__btn">
                 ثبت نام به عنوان فروشنده
               </a>
             </div>
           </div>
-          <div class="hidden md:block">
-            <div class="rounded-2xl bg-white/10 p-6 text-white/90 shadow-xl backdrop-blur">
-              <p class="text-sm font-medium text-white/70">مزایای فروش در تولیدی</p>
-              <div class="mt-4 space-y-4">
-                <div class="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 transition-all hover:bg-white/15">
+
+          <div class="seller-cta__aside">
+            <div class="seller-cta__stats">
+              <p class="seller-cta__stats-title">مزایای فروش در تولیدی</p>
+              <div class="seller-cta__stats-list">
+                <div class="seller-cta__stat-row">
                   <span>فروشندگان فعال</span>
-                  <span class="font-bold text-gold-light">+{{ sellerStats.activeSellers | number:'1.0-0':'fa-IR' }}</span>
+                  <span class="seller-cta__stat-value">+{{ sellerStats.activeSellers | persianNumber }}</span>
                 </div>
-                <div class="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 transition-all hover:bg-white/15">
+                <div class="seller-cta__stat-row">
                   <span>سفارشات ماهیانه</span>
-                  <span class="font-bold text-gold-light">+{{ sellerStats.monthlyOrders | number:'1.0-0':'fa-IR' }}</span>
+                  <span class="seller-cta__stat-value">+{{ sellerStats.monthlyOrders | persianNumber }}</span>
                 </div>
-                <div class="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 transition-all hover:bg-white/15">
+                <div class="seller-cta__stat-row">
                   <span>محصولات فعال</span>
-                  <span class="font-bold text-gold-light">{{ sellerStats.totalProducts | number:'1.0-0':'fa-IR' }}</span>
+                  <span class="seller-cta__stat-value">{{ sellerStats.totalProducts | persianNumber }}</span>
                 </div>
-                <div class="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3 transition-all hover:bg-white/15">
+                <div class="seller-cta__stat-row">
                   <span>پشتیبانی</span>
-                  <span class="font-bold text-gold-light">۲۴/۷</span>
+                  <span class="seller-cta__stat-value">۲۴/۷</span>
                 </div>
               </div>
             </div>
@@ -295,12 +355,12 @@
 
   <!-- ═══════════════════ TRUST SIGNALS / STATS ═══════════════════ -->
   <section class="platform-overview" data-section="stats">
-    <div class="container mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-20">
+    <div class="home-container">
       <div class="platform-overview-heading">
         <div>
-          <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">آمار و اعتماد</p>
-          <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl">تولیدی در یک نگاه</h2>
-          <p class="mt-4 max-w-2xl leading-8 text-gray-500">تصویری زنده از شبکه فروش، پیک‌های فعال و سفارش‌های تکمیل‌شده در پلتفرم تولیدی.</p>
+          <p class="section-kicker">آمار و اعتماد</p>
+          <h2 class="section-title">تولیدی در یک نگاه</h2>
+          <p class="section-sub">تصویری زنده از شبکه فروش، پیک‌های فعال و سفارش‌های تکمیل‌شده در پلتفرم تولیدی.</p>
         </div>
         <div class="live-stats-badge" [class.is-loading]="statsLoading">
           <span class="live-stats-dot"></span>
@@ -309,11 +369,11 @@
         </div>
       </div>
 
-      <div *ngIf="statsLoading" class="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div *ngFor="let item of [1, 2, 3, 4]" class="stats-skeleton rounded-3xl bg-white p-6"></div>
+      <div *ngIf="statsLoading" class="stats-grid stats-grid--four">
+        <div *ngFor="let item of [1, 2, 3, 4]" class="stats-skeleton"></div>
       </div>
 
-      <div *ngIf="!statsLoading" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div *ngIf="!statsLoading" class="stats-grid stats-grid--four">
         <article class="stats-card stats-card-sellers">
           <div class="stats-card-topline">
             <span class="stats-icon">🏪</span>
@@ -352,15 +412,29 @@
         </article>
       </div>
 
-      <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div class="testimonial-card rounded-3xl bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-card-hover">
-          <div class="flex items-center gap-3 mb-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm">ف</div><div><p class="text-sm font-bold text-primary">فروشنده</p><p class="text-xs text-gray-400">تهران</p></div></div>
-          <p class="leading-7 text-gray-600">«پلتفرم بسیار کاربردی و پشتیبانی عالی. فروش‌های من در ۲ ماه ۳ برابر شد.»</p><div class="mt-3 text-gold-dark text-sm">★★★★★</div>
-        </div>
-        <div class="testimonial-card rounded-3xl bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-card-hover">
-          <div class="flex items-center gap-3 mb-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold-dark font-bold text-sm">خ</div><div><p class="text-sm font-bold text-primary">خریدار</p><p class="text-xs text-gray-400">اصفهان</p></div></div>
-          <p class="leading-7 text-gray-600">«خرید عمده با قیمت بهتر و تحویل سریع. تجربه خرید حرفه‌ای داشتم.»</p><div class="mt-3 text-gold-dark text-sm">★★★★★</div>
-        </div>
+      <div class="testimonial-grid">
+        <figure class="testimonial-card">
+          <figcaption class="testimonial-card__head">
+            <span class="testimonial-card__avatar testimonial-card__avatar--primary" aria-hidden="true">ف</span>
+            <span class="testimonial-card__who">
+              <strong>فروشنده</strong>
+              <small>تهران</small>
+            </span>
+          </figcaption>
+          <blockquote>«پلتفرم بسیار کاربردی و پشتیبانی عالی. فروش‌های من در ۲ ماه ۳ برابر شد.»</blockquote>
+          <p class="testimonial-card__stars" aria-label="امتیاز ۵ از ۵">★★★★★</p>
+        </figure>
+        <figure class="testimonial-card">
+          <figcaption class="testimonial-card__head">
+            <span class="testimonial-card__avatar testimonial-card__avatar--gold" aria-hidden="true">خ</span>
+            <span class="testimonial-card__who">
+              <strong>خریدار</strong>
+              <small>اصفهان</small>
+            </span>
+          </figcaption>
+          <blockquote>«خرید عمده با قیمت بهتر و تحویل سریع. تجربه خرید حرفه‌ای داشتم.»</blockquote>
+          <p class="testimonial-card__stars" aria-label="امتیاز ۵ از ۵">★★★★★</p>
+        </figure>
       </div>
     </div>
   </section>

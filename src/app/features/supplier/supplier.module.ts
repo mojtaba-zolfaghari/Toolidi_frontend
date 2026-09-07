@@ -11,7 +11,6 @@ import { SupplierCapacityComponent } from './pages/production-capacity/supplier-
 import { SupplierScheduleComponent } from './pages/production-schedule/supplier-schedule.component';
 import { SupplierProductionScheduleComponent } from './pages/production-schedule/supplier-production-schedule.component';
 import { SharedModule } from '../../shared/shared.module';
-
 const routes: Routes = [
   { path: '', component: SupplierDashboardComponent },
   { path: 'products', component: SupplierProductsComponent },
@@ -37,6 +36,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     SharedModule
+    // OrderChatComponent (standalone) is imported via SharedModule exports
   ]
 })
 export class SupplierModule {}

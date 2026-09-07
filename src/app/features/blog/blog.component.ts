@@ -1,5 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { BlogPost, BlogService } from '../../core/services/api/blog.service';
 import { SeoService } from '../../core/services/seo.service';
@@ -21,16 +24,23 @@ const BLOG_CATEGORIES: BlogCategory[] = [
   { slug: 'tutorial', name: 'آموزش', icon: '🎓' },
 ];
 
+/** نقاط شکست شبکه ریسپانسیو */
+const GRID_COLS_BY_MEDIA: Record<'mobile' | 'tablet' | 'desktop', number> = {
+  mobile: 1,
+  tablet: 2,
+  desktop: 3,
+};
+
 /**
  * صفحه فهرست وبلاگ
- * شامل: پست ویژه، دسته‌بندی‌ها، کارت‌های زیبا
+ * شامل: پست ویژه، دسته‌بندی‌ها، شبکه ریسپانسیو کارت‌های Material، صفحه‌بندی MatPaginator
  */
 @Component({
   selector: 'app-blog',
   templateUrl: './blog.component.html',
   styleUrls: ['./blog.component.scss']
 })
-export class BlogComponent implements OnInit {
+export class BlogComponent implements OnInit, OnDestroy {
   posts: BlogPost[] = [];
   categories = BLOG_CATEGORIES;
   selectedCategory = '';
@@ -41,10 +51,16 @@ export class BlogComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
+  /** تعداد ستون‌های شبکه بر اساس عرض صفحه */
+  gridCols = GRID_COLS_BY_MEDIA.desktop;
+
+  private readonly destroy$ = new Subject<void>();
+
   constructor(
     private readonly blogService: BlogService,
     private readonly router: Router,
-    private readonly seo: SeoService
+    private readonly seo: SeoService,
+    private readonly breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit(): void {
@@ -58,11 +74,28 @@ export class BlogComponent implements OnInit {
       { name: 'خانه', url: 'https://toolidi.ir' },
       { name: 'وبلاگ', url: 'https://toolidi.ir/blog' },
     ]));
+
+    // شبکه ریسپانسیو: 1 / 2 / 3 ستون
+    this.breakpointObserver
+      .observe(['(max-width: 599px)', '(min-width: 600px) and (max-width: 959px)', '(min-width: 960px)'])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(state => {
+        if (state.breakpoints['(max-width: 599px)']) {
+          this.gridCols = GRID_COLS_BY_MEDIA.mobile;
+        } else if (state.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.gridCols = GRID_COLS_BY_MEDIA.tablet;
+        } else {
+          this.gridCols = GRID_COLS_BY_MEDIA.desktop;
+        }
+      });
+
     this.loadPosts();
   }
 
   ngOnDestroy(): void {
     this.seo.removeJsonLd();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /** بارگذاری پست‌ها */
@@ -97,9 +130,9 @@ export class BlogComponent implements OnInit {
     return true;
   }
 
-  /** پست ویژه (اولین پست با بیشترین بازدید) */
+  /** پست ویژه (فقط در صفحه اول؛ بیشترین بازدید) */
   get featuredPost(): BlogPost | null {
-    if (!this.posts.length) return null;
+    if (!this.posts.length || this.page !== 1) return null;
     return [...this.posts].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))[0];
   }
 
@@ -122,9 +155,10 @@ export class BlogComponent implements OnInit {
     this.router.navigate(['/blog', id]);
   }
 
-  /** تغییر صفحه */
-  onPageChange(page: number): void {
-    this.page = page;
+  /** رویداد صفحه‌بندی MatPaginator */
+  onPageEvent(event: PageEventLike): void {
+    this.pageSize = event.pageSize;
+    this.page = event.pageIndex + 1;
     this.loadPosts();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -134,4 +168,11 @@ export class BlogComponent implements OnInit {
     if (!text) return '';
     return text.length > maxLen ? text.substring(0, maxLen) + '…' : text;
   }
+}
+
+/** حداقل شکل رویداد MatPageEvent (بدون وابستگی به import نوع در قالب) */
+interface PageEventLike {
+  pageIndex: number;
+  pageSize: number;
+  length: number;
 }

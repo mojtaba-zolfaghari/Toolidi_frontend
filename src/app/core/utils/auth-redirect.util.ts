@@ -60,6 +60,6 @@ export function extractReturnUrl(queryParams: Record<string, unknown> | null): s
  * نقش کاربر وارد‌شده را از توکن ذخیره‌شده می‌خواند.
  */
 export function getCurrentRole(): string | null {
-  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY) ?? sessionStorage.getItem(ACCESS_TOKEN_KEY) ?? null;
   return token ? getRoleFromToken(token) : null;
 }

@@ -1,205 +1,182 @@
-<section class="bg-warm min-h-screen py-6 sm:py-8">
-  <div class="container mx-auto px-4">
+<section class="shop">
+  <div class="shop-container">
     <!-- Mobile header bar -->
-    <div class="flex items-center justify-between gap-3 mb-4 md:hidden">
-      <h1 class="text-lg font-bold text-secondary truncate">{{ activeCategoryName || (activeCityName ? 'محصولات ' + activeCityName : 'فروشگاه') }}</h1>
-      <div class="flex items-center gap-2">
-        <button type="button" (click)="mobileFilterOpen = !mobileFilterOpen"
-                class="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+    <div class="shop-mobile-bar">
+      <h1 class="shop-mobile-bar__title">{{ pageTitle }}</h1>
+      <div class="shop-mobile-bar__actions">
+        <button type="button" (click)="mobileFilterOpen = !mobileFilterOpen" class="shop-filter-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" class="shop-filter-toggle__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
           فیلتر
+          <span *ngIf="activeFilterChips.length" class="shop-filter-toggle__count">{{ activeFilterChips.length | persianNumber }}</span>
         </button>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="shop-layout">
       <!-- Mobile filter overlay -->
-      <div *ngIf="mobileFilterOpen" class="fixed inset-0 z-50 md:hidden">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="mobileFilterOpen = false"></div>
-        <aside class="absolute right-0 top-0 h-full w-[85vw] max-w-sm bg-white shadow-2xl overflow-y-auto animate-slide-in-right">
-          <div class="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-            <h3 class="font-bold text-secondary">فیلترها</h3>
-            <button type="button" (click)="mobileFilterOpen = false" class="text-gray-400 hover:text-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      <div *ngIf="mobileFilterOpen" class="shop-filter-overlay">
+        <div class="shop-filter-overlay__backdrop" (click)="mobileFilterOpen = false"></div>
+        <aside class="shop-filter-drawer animate-slide-in-right">
+          <div class="shop-filter-drawer__head">
+            <h3 class="shop-filter-drawer__title">فیلترها</h3>
+            <button type="button" (click)="mobileFilterOpen = false" class="shop-filter-drawer__close" aria-label="بستن فیلترها">
+              <svg xmlns="http://www.w3.org/2000/svg" class="shop-filter-drawer__close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
-          <div class="p-4 space-y-5">
-            <!-- Search -->
-            <div>
-              <h3 class="font-bold text-secondary mb-2 text-sm">جستجو</h3>
-              <div class="flex gap-2">
-                <input #mobileSearchInput type="text" [value]="search" placeholder="جستجوی محصول…"
-                       class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                <button type="button" (click)="submitSearch(mobileSearchInput.value); mobileFilterOpen = false"
-                        class="shrink-0 bg-primary text-white rounded-xl px-4 py-2.5 text-sm font-bold">جستجو</button>
-              </div>
-            </div>
-            <!-- Categories -->
-            <div>
-              <h3 class="font-bold text-secondary mb-2 text-sm">دسته‌بندی‌ها</h3>
-              <ul class="space-y-0.5 max-h-48 overflow-y-auto">
-                <li>
-                  <button type="button" (click)="selectCategory(null); mobileFilterOpen = false"
-                          class="w-full text-right text-sm rounded-lg px-3 py-2 transition-colors"
-                          [class]="!categoryId ? 'bg-bg-muted text-primary font-bold' : 'text-gray-600 hover:bg-gray-50'">
-                    همه محصولات
-                  </button>
-                </li>
-                <ng-container *ngTemplateOutlet="tree; context: { nodes: categories, level: 0 }"></ng-container>
-              </ul>
-            </div>
-            <!-- City -->
-            <div>
-              <h3 class="font-bold text-secondary mb-2 text-sm">شهر تأمین</h3>
-              <select [value]="city || ''" (change)="selectCity($any($event.target).value || null); mobileFilterOpen = false"
-                      class="w-full border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="">همه شهرها</option>
-                <option *ngFor="let item of cities" [value]="item.city">{{ item.city }} ({{ item.productCount | number:'1.0-0':'fa-IR' }})</option>
-              </select>
-            </div>
-            <!-- Price -->
-            <div>
-              <h3 class="font-bold text-secondary mb-2 text-sm">محدوده قیمت</h3>
-              <div class="space-y-3">
-                <div>
-                  <label class="flex justify-between text-xs text-gray-500 mb-1"><span>حداقل</span><span class="font-bold text-secondary">{{ priceMin | number:'1.0-0':'fa-IR' }} تومان</span></label>
-                  <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMin" class="w-full accent-primary" />
-                </div>
-                <div>
-                  <label class="flex justify-between text-xs text-gray-500 mb-1"><span>حداکثر</span><span class="font-bold text-secondary">{{ priceMax | number:'1.0-0':'fa-IR' }} تومان</span></label>
-                  <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMax" class="w-full accent-primary" />
-                </div>
-                <button type="button" (click)="applyPrice(); mobileFilterOpen = false"
-                        class="w-full bg-secondary text-white rounded-xl px-4 py-2.5 text-sm font-bold">اعمال فیلتر قیمت</button>
-              </div>
-            </div>
-            <button type="button" (click)="clearFilters(); mobileFilterOpen = false"
-                    class="w-full border border-gray-300 text-gray-600 rounded-xl px-4 py-2.5 text-sm font-medium">
-              پاک‌کردن فیلترها
-            </button>
+          <div class="shop-filter-drawer__body">
+            <ng-container *ngTemplateOutlet="filterPanel"></ng-container>
           </div>
         </aside>
       </div>
 
       <!-- Desktop sidebar -->
-      <aside class="hidden md:block md:col-span-1">
-        <div class="bg-white rounded-2xl shadow-card p-4 space-y-6 sticky top-20">
-          <!-- Search -->
-          <div>
-            <h3 class="font-bold text-secondary mb-3">جستجو</h3>
-            <div class="flex gap-2">
-              <input #searchInput type="text" [value]="search" placeholder="جستجوی محصول…"
-                     class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-              <button type="button" (click)="submitSearch(searchInput.value)" class="shrink-0 bg-primary text-white rounded-xl px-4 py-2 text-sm font-bold hover:bg-primary-dark transition-colors">جستجو</button>
-            </div>
-          </div>
-          <!-- Categories -->
-          <div>
-            <h3 class="font-bold text-secondary mb-3">دسته‌بندی‌ها</h3>
-            <ul class="space-y-1">
-              <li>
-                <button type="button" (click)="selectCategory(null)"
-                        class="w-full text-right text-sm rounded-lg px-2 py-1.5 transition-colors"
-                        [class]="!categoryId ? 'bg-bg-muted text-primary font-bold' : 'text-gray-600 hover:bg-gray-50'">
-                  همه محصولات
-                </button>
-              </li>
-              <ng-container *ngTemplateOutlet="tree; context: { nodes: categories, level: 0 }"></ng-container>
-            </ul>
-            <p *ngIf="!categories.length" class="text-sm text-gray-400">دسته‌بندی‌ای موجود نیست.</p>
-          </div>
-          <!-- City -->
-          <div>
-            <h3 class="font-bold text-secondary mb-3">شهر تأمین</h3>
-            <select [value]="city || ''" (change)="selectCity($any($event.target).value || null)"
-                    class="w-full border border-gray-200 rounded-xl bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="">همه شهرها</option>
-              <option *ngFor="let item of cities" [value]="item.city">{{ item.city }} ({{ item.productCount | number:'1.0-0':'fa-IR' }})</option>
-            </select>
-          </div>
-          <!-- Price -->
-          <div>
-            <h3 class="font-bold text-secondary mb-3">محدوده قیمت</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="flex justify-between text-xs text-gray-500 mb-1"><span>حداقل</span><span class="font-bold text-secondary">{{ priceMin | number:'1.0-0':'fa-IR' }} تومان</span></label>
-                <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMin" class="w-full accent-primary" />
-              </div>
-              <div>
-                <label class="flex justify-between text-xs text-gray-500 mb-1"><span>حداکثر</span><span class="font-bold text-secondary">{{ priceMax | number:'1.0-0':'fa-IR' }} تومان</span></label>
-                <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMax" class="w-full accent-primary" />
-              </div>
-              <button type="button" (click)="applyPrice()" class="w-full bg-secondary text-white rounded-xl px-4 py-2 text-sm font-bold hover:bg-secondary-light transition-colors">اعمال فیلتر قیمت</button>
-            </div>
-          </div>
-          <button type="button" (click)="clearFilters()"
-                  class="w-full border border-gray-300 text-gray-600 rounded-xl px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors">
-            پاک‌کردن فیلترها
-          </button>
+      <aside class="shop-sidebar">
+        <div class="shop-sidebar__card">
+          <ng-container *ngTemplateOutlet="filterPanel"></ng-container>
         </div>
       </aside>
 
       <!-- Products list -->
-      <div class="md:col-span-3">
+      <div class="shop-content">
         <!-- Sort bar -->
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div class="shop-sortbar">
           <div>
-            <h1 class="hidden md:block text-xl font-bold text-secondary">{{ activeCategoryName || (activeCityName ? 'محصولات ' + activeCityName : 'فروشگاه') }}</h1>
-            <p class="text-sm text-gray-500">{{ totalCount | number:'1.0-0':'fa-IR' }} محصول</p>
+            <h1 class="shop-sortbar__title">{{ pageTitle }}</h1>
+            <p class="shop-sortbar__count">{{ totalCount | persianNumber }} محصول</p>
           </div>
-          <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-500" for="sortSelect">مرتب‌سازی:</label>
-            <select id="sortSelect" [value]="sort" (change)="changeSort($any($event.target).value)"
-                    class="border border-gray-200 rounded-xl px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="newest">جدیدترین</option>
-              <option value="price-asc">قیمت (صعودی)</option>
-              <option value="price-desc">قیمت (نزولی)</option>
-              <option value="best">پرفروش‌ترین</option>
+          <div class="shop-sortbar__controls">
+            <label class="shop-sortbar__label" for="sortSelect">مرتب‌سازی:</label>
+            <select id="sortSelect" [value]="filters.sort" (change)="changeSort($any($event.target).value)" class="shop-select shop-select--compact">
+              <option *ngFor="let option of sortOptions" [value]="option[0]">{{ option[1] }}</option>
             </select>
           </div>
         </div>
 
-        <div class="relative min-h-[18rem]">
-          <div class="shop-product-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5"
-               [class.is-refreshing]="loading">
-            <app-product-card *ngFor="let product of products; trackBy: trackByProductId"
-                              [product]="product" [@slideUp]></app-product-card>
-          </div>
+        <!-- Active filter chips -->
+        <div *ngIf="activeFilterChips.length" class="shop-chips">
+          <button type="button" *ngFor="let chip of activeFilterChips"
+                  class="shop-chip" (click)="chip.clear()"
+                  [attr.aria-label]="'حذف فیلتر ' + chip.label">
+            {{ chip.label }}
+            <svg xmlns="http://www.w3.org/2000/svg" class="shop-chip__x" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+          <button type="button" (click)="clearFilters()" class="shop-chip shop-chip--clear">پاک‌کردن همه</button>
+        </div>
 
-          <div *ngIf="loading" class="shop-loading-overlay" aria-live="polite" aria-label="در حال به‌روزرسانی محصولات">
-            <div class="shop-loading-pill">
-              <span class="shop-loading-dot"></span>
-              <span>در حال به‌روزرسانی محصولات</span>
+        <!-- Skeleton (initial load) -->
+        <app-skeleton-product-grid *ngIf="initialLoading" [count]="8"></app-skeleton-product-grid>
+
+        <!-- Error state -->
+        <app-empty-state *ngIf="!initialLoading && loadError"
+                         icon="📡"
+                         title="خطا در بارگذاری محصولات"
+                         message="ارتباط با سرور برقرار نشد. دوباره تلاش کنید."
+                         actionLabel="تلاش مجدد"
+                         (action)="retry()">
+        </app-empty-state>
+
+        <!-- Empty state -->
+        <app-empty-state *ngIf="!initialLoading && !loadError && !loading && !products.length"
+                         icon="🔍"
+                         title="محصولی یافت نشد"
+                         message="با تغییر فیلترها یا عبارت جستجو دوباره امتحان کنید."
+                         actionLabel="پاک‌کردن فیلترها"
+                         (action)="clearFilters()">
+        </app-empty-state>
+
+        <!-- Results grid -->
+        <ng-container *ngIf="!initialLoading && !loadError">
+          <div class="shop-results">
+            <div class="shop-product-grid" [class.is-refreshing]="loading">
+              <app-product-card *ngFor="let product of products; trackBy: trackByProductId"
+                                [product]="product" [@slideUp]></app-product-card>
+            </div>
+
+            <div *ngIf="loading" class="shop-loading-overlay" aria-live="polite" aria-label="در حال به‌روزرسانی محصولات">
+              <div class="shop-loading-pill">
+                <span class="shop-loading-dot"></span>
+                <span>در حال به‌روزرسانی محصولات</span>
+              </div>
             </div>
           </div>
 
-          <p *ngIf="!loading && !products.length" class="text-center text-gray-400 py-16">
-            محصولی مطابق فیلترها یافت نشد.
-          </p>
-        </div>
-
-        <app-pagination
-          *ngIf="!loading && products.length"
-          [page]="page"
-          [totalPages]="totalPages"
-          (pageChange)="onPageChange($event)">
-        </app-pagination>
+          <app-pagination
+            *ngIf="!loading && products.length"
+            [page]="filters.page"
+            [totalPages]="totalPages"
+            (pageChange)="onPageChange($event)">
+          </app-pagination>
+        </ng-container>
       </div>
     </div>
   </div>
 </section>
+
+<!-- Shared filters template (sidebar + drawer) -->
+<ng-template #filterPanel>
+  <!-- Search -->
+  <div class="shop-filter">
+    <h3 class="shop-filter__title">جستجو</h3>
+    <div class="shop-filter__row">
+      <input #searchInput type="text" [value]="filters.search"
+             (input)="onSearchInput(searchInput.value)"
+             (keyup.enter)="submitSearch(searchInput.value)"
+             placeholder="جستجوی محصول…" class="shop-input" />
+      <button type="button" (click)="submitSearch(searchInput.value)" class="shop-btn shop-btn--primary shop-btn--shrink">جستجو</button>
+    </div>
+  </div>
+  <!-- Categories -->
+  <div class="shop-filter">
+    <h3 class="shop-filter__title">دسته‌بندی‌ها</h3>
+    <ul class="shop-cat-list">
+      <li>
+        <button type="button" (click)="selectCategory(null); mobileFilterOpen = false"
+                class="shop-cat-btn"
+                [class.is-active]="!filters.categoryId">
+          همه محصولات
+        </button>
+      </li>
+      <ng-container *ngTemplateOutlet="tree; context: { nodes: categories, level: 0 }"></ng-container>
+    </ul>
+    <p *ngIf="!categories.length" class="shop-filter__hint">دسته‌بندی‌ای موجود نیست.</p>
+  </div>
+  <!-- City -->
+  <div class="shop-filter">
+    <h3 class="shop-filter__title">شهر تأمین</h3>
+    <select [value]="filters.city || ''" (change)="selectCity($any($event.target).value || null); mobileFilterOpen = false" class="shop-select">
+      <option value="">همه شهرها</option>
+      <option *ngFor="let item of cities" [value]="item.city">{{ item.city }} ({{ item.productCount | persianNumber }})</option>
+    </select>
+  </div>
+  <!-- Price -->
+  <div class="shop-filter">
+    <h3 class="shop-filter__title">محدوده قیمت</h3>
+    <div class="shop-price">
+      <div>
+        <label class="shop-price__label"><span>حداقل</span><span class="shop-price__value">{{ priceMin | persianNumber }} تومان</span></label>
+        <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMin" class="shop-range" />
+      </div>
+      <div>
+        <label class="shop-price__label"><span>حداکثر</span><span class="shop-price__value">{{ priceMax | persianNumber }} تومان</span></label>
+        <input type="range" min="0" [max]="priceCap" step="100000" [(ngModel)]="priceMax" class="shop-range" />
+      </div>
+      <button type="button" (click)="applyPrice(); mobileFilterOpen = false" class="shop-btn shop-btn--secondary">اعمال فیلتر قیمت</button>
+    </div>
+  </div>
+  <button type="button" (click)="clearFilters(); mobileFilterOpen = false" class="shop-btn shop-btn--outline">پاک‌کردن فیلترها</button>
+</ng-template>
 
 <!-- Category tree template -->
 <ng-template #tree let-nodes="nodes" let-level="level">
   <ng-container *ngFor="let cat of nodes">
     <li>
       <button type="button" (click)="selectCategory(cat.id); mobileFilterOpen = false"
-              class="w-full text-right text-sm rounded-lg px-2 py-1.5 transition-colors"
+              class="shop-cat-btn"
               [style.padding-right.px]="8 + level * 14"
-              [class]="categoryId === cat.id ? 'bg-bg-muted text-primary font-bold' : 'text-gray-600 hover:bg-gray-50'">
+              [class.is-active]="filters.categoryId === cat.id">
         {{ cat.name }}
       </button>
-      <ul *ngIf="cat.children && cat.children.length" class="space-y-1">
+      <ul *ngIf="cat.children && cat.children.length" class="shop-cat-list">
         <ng-container *ngTemplateOutlet="tree; context: { nodes: cat.children, level: level + 1 }"></ng-container>
       </ul>
     </li>

@@ -17,10 +17,11 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
         <img *ngIf="images.length"
              [src]="images[selectedIndex]"
              [alt]="productName"
+             loading="lazy"
+             width="600" height="600"
              class="w-full h-full object-cover transition-transform duration-200"
              [style.transform]="zoomActive ? 'scale(2)' : 'scale(1)'"
-             [style.transform-origin]="zoomOrigin"
-             loading="lazy">
+             [style.transform-origin]="zoomOrigin">
 
         <div *ngIf="!images.length" class="flex items-center justify-center h-full text-6xl text-gray-300">
           📷
@@ -55,7 +56,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
                 [class.border-primary]="i === selectedIndex"
                 [class.border-transparent]="i !== selectedIndex"
                 [class.opacity-60]="i !== selectedIndex">
-          <img [src]="img" [alt]="productName + ' ' + (i+1)" class="w-full h-full object-cover">
+          <img [src]="img" [alt]="productName + ' ' + (i+1)" loading="lazy" class="w-full h-full object-cover">
         </button>
       </div>
     </div>

@@ -128,29 +128,103 @@
       </div>
     </div>
 
-    <!-- ═══════════════════ مرحله ۲: ارسال ═══════════════════ -->
-    <div *ngIf="!loadingOptions && step === 2" class="animate-in space-y-5">
-      <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
-        <div class="flex items-center gap-2 mb-5">
-          <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">🚚</span>
-          <h2 class="font-bold text-secondary">روش ارسال</h2>
+    <!-- ═══════════════════ مرحله ۲: ارسال هوشمند ═══════════════════ -->
+    <div *ngIf="!loadingOptions && step === 2" class="animate-in checkout-ship">
+      <div class="checkout-ship__card">
+        <div class="checkout-ship__head">
+          <span class="checkout-ship__head-icon">🚚</span>
+          <div>
+            <h2 class="checkout-ship__title">روش ارسال هوشمند</h2>
+            <p class="checkout-ship__subtitle" *ngIf="consolidatedResult">
+              {{ consolidatedResult.sellerCount | persianNumber }} فروشنده ·
+              سریع‌ترین آماده‌سازی در
+              {{ etaText(consolidatedResult.slowestLegEtaDays) }}
+            </p>
+            <p class="checkout-ship__subtitle" *ngIf="!consolidatedResult">در حال محاسبه…</p>
+          </div>
         </div>
-        <div class="space-y-3">
-          <label *ngFor="let method of shippingMethods; let i = index"
-                 class="shipping-option flex items-center justify-between gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
-                 [ngClass]="shippingMethodId === method.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
-            <span class="flex items-center gap-3">
-              <input type="radio" name="shippingMethod" [checked]="shippingMethodId === method.id" (change)="shippingMethodId = method.id" class="accent-primary" />
-              <span><strong class="block text-secondary text-sm">{{ method.name }}</strong><span class="text-xs text-gray-500">{{ method.description || '' }}</span></span>
-            </span>
-            <span class="text-left shrink-0">
-              <strong class="block text-primary text-sm">{{ method.baseCost | number }} تومان</strong>
-              <span *ngIf="method.estimatedDeliveryDays" class="text-xs text-gray-500">{{ method.estimatedDeliveryDays | number:'1.0-0':'fa-IR' }} روز کاری</span>
-            </span>
-          </label>
+
+        <!-- لودینگ محاسبه ارسال -->
+        <div *ngIf="loadingShipping" class="checkout-ship__loading">
+          <span class="checkout-ship__loading-spinner"></span>
+          در حال محاسبه‌ی بهترین گزینه‌های ارسال…
         </div>
-        <p *ngIf="!shippingMethods.length" class="text-gray-400 text-center py-6">روش ارسالی موجود نیست.</p>
+
+        <!-- خطا (مثلاً سبد خالی/آدرس یافت نشد) → فهرست ساده روش‌ها -->
+        <ng-container *ngIf="!loadingShipping && shippingError">
+          <p class="checkout-ship__error">{{ shippingError }}</p>
+          <div class="checkout-ship__options">
+            <label *ngFor="let method of shippingMethods"
+                   class="ship-option"
+                   [class.ship-option--selected]="shippingMethodId === method.id">
+              <input type="radio" name="shippingMethod" [checked]="shippingMethodId === method.id"
+                     (change)="shippingMethodId = method.id" />
+              <span class="ship-option__body">
+                <strong class="ship-option__name">{{ method.name }}</strong>
+                <span class="ship-option__desc">{{ method.description || '' }}</span>
+              </span>
+              <span class="ship-option__cost">
+                <strong>{{ method.baseCost | persianNumber }} تومان</strong>
+              </span>
+            </label>
+          </div>
+        </ng-container>
+
+        <!-- گزینه‌های تجمیعی -->
+        <ng-container *ngIf="!loadingShipping && !shippingError && consolidatedOptions.length">
+          <div class="checkout-ship__options">
+            <label *ngFor="let option of consolidatedOptions"
+                   class="ship-option"
+                   [class.ship-option--selected]="shippingMethodId === option.shippingMethodId"
+                   (click)="selectConsolidatedOption(option)">
+              <input type="radio" name="consolidatedShipping" [checked]="shippingMethodId === option.shippingMethodId" />
+
+              <span class="ship-option__body">
+                <span class="ship-option__name-row">
+                  <strong class="ship-option__name">{{ option.methodName }}</strong>
+                  <span *ngIf="option.isRecommended" class="ship-option__tag ship-option__tag--recommended">پیشنهاد ما</span>
+                  <span *ngIf="option.isFastest && !option.isRecommended" class="ship-option__tag ship-option__tag--fastest">سریع‌ترین</span>
+                  <span *ngIf="option.isFreeShipping" class="ship-option__tag ship-option__tag--free">ارسال رایگان</span>
+                </span>
+                <span class="ship-option__desc">
+                  یک مرسوله‌ی تجمیعی از {{ option.legs.length | persianNumber }} انبار ·
+                  تحویل حداکثر {{ etaText(option.maxEtaDays) }}
+                </span>
+              </span>
+
+              <span class="ship-option__cost">
+                <strong *ngIf="option.isFreeShipping">رایگان</strong>
+                <strong *ngIf="!option.isFreeShipping">{{ option.totalCost | persianNumber }} تومان</strong>
+                <span class="ship-option__eta">{{ etaText(option.maxEtaDays) }}</span>
+              </span>
+            </label>
+          </div>
+
+          <!-- جدول زمان‌بندی هر انبار (خانواده گزینه‌ها یکسان است؛ فقط اولی را نشان بده) -->
+          <details class="ship-legs">
+            <summary class="ship-legs__summary">زمان‌بندی آماده‌سازی هر فروشنده</summary>
+            <div class="ship-legs__body">
+              <div *ngFor="let leg of consolidatedOptions[0].legs" class="ship-leg">
+                <span class="ship-leg__seller">{{ leg.sellerName }}</span>
+                <span class="ship-leg__meta" *ngIf="leg.originCity">از {{ leg.originCity }}</span>
+                <span class="ship-leg__meta" *ngIf="leg.productionLeadDays > 0">
+                  تولید {{ etaText(leg.productionLeadDays) }}
+                </span>
+                <span class="ship-leg__meta">تحویل به پست {{ etaText(leg.handOffDays) }}</span>
+                <strong class="ship-leg__eta">آماده‌ی ارسال در {{ etaText(leg.etaDays) }}</strong>
+              </div>
+              <p class="ship-legs__note">
+                تحویل نهایی = آماده‌سازی کندترین فروشنده + زمان حمل روش انتخابی.
+              </p>
+            </div>
+          </details>
+        </ng-container>
+
+        <p *ngIf="!loadingShipping && !shippingError && !consolidatedOptions.length" class="checkout-ship__error">
+          روش ارسالی موجود نیست.
+        </p>
       </div>
+
       <div class="flex justify-between pt-2">
         <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
         <button type="button" (click)="next()" class="checkout-btn-primary">
@@ -267,7 +341,7 @@
                 </h3>
                 <div *ngIf="selectedShipping" class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">هزینه ارسال</span>
-                  <span class="font-medium">{{ selectedShipping.baseCost | number }} تومان</span>
+                  <span class="font-medium">{{ selectedShipping.baseCost | persianNumber }} تومان</span>
                 </div>
 
                 <!-- Estimated Delivery -->

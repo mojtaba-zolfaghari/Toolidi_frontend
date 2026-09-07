@@ -53,7 +53,7 @@ import {
                 {{ cap.isActive ? 'فعال' : 'غیرفعال' }}
               </span>
             </div>
-            <p class="text-2xl font-extrabold text-secondary">{{ cap.dailyCapacity | number:'1.0-0':'fa-IR' }} <span class="text-sm font-normal text-gray-500">{{ cap.unit }}</span></p>
+            <p class="text-2xl font-extrabold text-secondary">{{ cap.dailyCapacity | persianNumber }} <span class="text-sm font-normal text-gray-500">{{ cap.unit }}</span></p>
             <p class="mt-1 text-xs text-gray-400">ظرفیت روزانه</p>
             <div class="mt-3 space-y-1 text-xs text-gray-500">
               <p *ngIf="cap.effectiveFrom">از: {{ cap.effectiveFrom | persianDate:'yyyy/MM/dd' }}</p>

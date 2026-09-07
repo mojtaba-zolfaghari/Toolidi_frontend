@@ -7,7 +7,12 @@ import { Address, AddressData, AddressService } from '../../core/services/api/ad
 import { OrderService, EstimatedDelivery } from '../../core/services/api/order.service';
 import { PaymentGatewayOption, PaymentGatewayService } from '../../core/services/api/payment-gateway.service';
 import { PaymentService } from '../../core/services/api/payment.service';
-import { ShippingMethod, ShippingService } from '../../core/services/api/shipping.service';
+import {
+  ConsolidatedShippingOption,
+  ConsolidatedShippingResult,
+  ShippingMethod,
+  ShippingService
+} from '../../core/services/api/shipping.service';
 import { LocationService, Province, City } from '../../core/services/api/location.service';
 import { ApiService } from '../../core/services/api.service';
 import { Result } from '../../core/models/api-response.model';
@@ -36,6 +41,12 @@ export class CheckoutComponent implements OnInit {
   shippingMethods: ShippingMethod[] = [];
   addresses: Address[] = [];
   gateways: PaymentGatewayOption[] = [];
+
+  /** نتیجه‌ی ارسال هوشمند تجمیعی (max زمان تولید/تحویل + گزینه‌های ترکیبی) */
+  consolidatedResult: ConsolidatedShippingResult | null = null;
+  consolidatedOptions: ConsolidatedShippingOption[] = [];
+  loadingShipping = false;
+  shippingError = '';
 
   shippingAddressId = '';
   billingAddressId = '';
@@ -121,6 +132,9 @@ export class CheckoutComponent implements OnInit {
       }
     });
 
+    // پس از مشخص‌شدن آدرس پیش‌فرض، ارسال هوشمند را محاسبه کن
+    setTimeout(() => this.loadConsolidatedShipping(), 0);
+
     this.paymentGatewayService.getGateways().subscribe({
       next: (result) => {
         this.gateways = result.data ?? [];
@@ -205,13 +219,54 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  /** انتخاب آدرس برای ارسال یا صورتحساب */
+  /** انتخاب آدرس برای ارسال یا صورتحساب — با محاسبه‌ی مجدد ارسال هوشمند */
   selectAddress(kind: 'shipping' | 'billing', id: string): void {
     if (kind === 'shipping') {
+      if (this.shippingAddressId === id) return;
       this.shippingAddressId = id;
+      this.loadConsolidatedShipping();
     } else {
       this.billingAddressId = id;
     }
+  }
+
+  /** محاسبه‌ی ارسال هوشمند تجمیعی بر اساس آدرس انتخابی */
+  loadConsolidatedShipping(): void {
+    if (!this.shippingAddressId) return;
+    this.loadingShipping = true;
+    this.shippingError = '';
+    this.shippingService.calculateConsolidated({ userAddressId: this.shippingAddressId }).subscribe({
+      next: (result) => {
+        this.consolidatedResult = result.data ?? null;
+        this.consolidatedOptions = this.consolidatedResult?.options ?? [];
+        // انتخاب خودکار گزینه‌ی پیشنهادی
+        const recommended = this.consolidatedOptions.find((option) => option.isRecommended);
+        if (recommended) {
+          this.shippingMethodId = recommended.shippingMethodId;
+        } else if (this.consolidatedOptions.length) {
+          this.shippingMethodId = this.consolidatedOptions[0].shippingMethodId;
+        }
+        this.loadingShipping = false;
+      },
+      error: (err: Error) => {
+        this.consolidatedResult = null;
+        this.consolidatedOptions = [];
+        this.shippingError = err?.message ?? 'محاسبه‌ی ارسال انجام نشد.';
+        this.loadingShipping = false;
+      }
+    });
+  }
+
+  /** انتخاب یک گزینه‌ی ارسال */
+  selectConsolidatedOption(option: ConsolidatedShippingOption): void {
+    this.shippingMethodId = option.shippingMethodId;
+  }
+
+  /** متن فارسی زمان تحویل تخمینی */
+  etaText(days: number): string {
+    if (days <= 0) return 'امروز';
+    if (days === 1) return 'فردا';
+    return `${days.toLocaleString('fa-IR', { maximumFractionDigits: 0 })} روز کاری`;
   }
 
   /** افزودن آدرس جدید */

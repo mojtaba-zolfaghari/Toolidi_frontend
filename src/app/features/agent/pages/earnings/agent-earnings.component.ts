@@ -39,21 +39,21 @@ import {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <div class="rounded-2xl bg-gradient-to-br from-secondary to-secondary-light p-5 text-white shadow-card">
             <span class="text-sm text-white/70">درآمد کل</span>
-            <strong class="mt-2 block text-2xl">{{ summary?.totalEarnings ?? 0 | number }} تومان</strong>
+            <strong class="mt-2 block text-2xl">{{ summary?.totalEarnings ?? 0 | persianNumber }} تومان</strong>
             <span class="mt-1 block text-xs text-white/60">{{ summary?.completedPickups ?? 0 }} تسویه موفق</span>
           </div>
           <div class="rounded-2xl bg-white p-5 shadow-card">
             <span class="text-sm text-gray-500">در انتظار پرداخت</span>
-            <strong class="mt-2 block text-2xl text-orange-600">{{ summary?.pendingWithdrawal ?? 0 | number }} تومان</strong>
+            <strong class="mt-2 block text-2xl text-orange-600">{{ summary?.pendingWithdrawal ?? 0 | persianNumber }} تومان</strong>
             <span class="mt-1 block text-xs text-gray-400">برداشت‌های در جریان</span>
           </div>
           <div class="rounded-2xl bg-white p-5 shadow-card">
             <span class="text-sm text-gray-500">پرداخت‌شده</span>
-            <strong class="mt-2 block text-2xl text-blue-600">{{ summary?.paidAmount ?? 0 | number }} تومان</strong>
+            <strong class="mt-2 block text-2xl text-blue-600">{{ summary?.paidAmount ?? 0 | persianNumber }} تومان</strong>
           </div>
           <div class="rounded-2xl bg-gradient-to-br from-accent-success to-emerald-700 p-5 text-white shadow-card">
             <span class="text-sm text-white/70">قابل برداشت</span>
-            <strong class="mt-2 block text-2xl">{{ summary?.availableForWithdrawal ?? 0 | number }} تومان</strong>
+            <strong class="mt-2 block text-2xl">{{ summary?.availableForWithdrawal ?? 0 | persianNumber }} تومان</strong>
             <span class="mt-1 block text-xs text-white/60">{{ summary?.availablePickupCount ?? 0 }} کمیسیون آماده</span>
           </div>
         </div>
@@ -76,9 +76,9 @@ import {
               <tr *ngFor="let commission of commissions" class="border-b last:border-0 hover:bg-gray-50/70">
                 <td class="p-3">{{ commission.createdAt | persianDate:'yyyy/MM/dd' }}</td>
                 <td class="p-3 text-secondary">{{ commission.notes || '—' }}</td>
-                <td class="p-3">{{ commission.earnings | number }} تومان</td>
-                <td class="p-3">{{ commission.commissionRate | number:'1.0-2' }}٪</td>
-                <td class="p-3 font-bold text-green-700">{{ commission.commissionAmount | number }} تومان</td>
+                <td class="p-3">{{ commission.earnings | persianNumber }} تومان</td>
+                <td class="p-3">{{ commission.commissionRate | persianNumber:0:2 }}٪</td>
+                <td class="p-3 font-bold text-green-700">{{ commission.commissionAmount | persianNumber }} تومان</td>
                 <td class="p-3">
                   <span class="rounded-full px-3 py-1 text-xs font-bold"
                     [class.bg-green-100]="commission.isPaid" [class.text-green-700]="commission.isPaid"
@@ -107,7 +107,7 @@ import {
             <tbody>
               <tr *ngFor="let payout of payouts" class="border-b last:border-0 hover:bg-gray-50/70">
                 <td class="p-3">{{ payout.createdAt | persianDate:'yyyy/MM/dd' }}</td>
-                <td class="p-3 font-bold text-secondary">{{ payout.amount | number }} تومان</td>
+                <td class="p-3 font-bold text-secondary">{{ payout.amount | persianNumber }} تومان</td>
                 <td class="p-3">
                   <span class="rounded-full px-3 py-1 text-xs font-bold"
                     [class.bg-green-100]="payout.status === 'Completed'" [class.text-green-700]="payout.status === 'Completed'"
@@ -138,7 +138,7 @@ import {
               <input formControlName="amount" type="number" min="1" [max]="summary?.availableForWithdrawal ?? null"
                 class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
               <small class="mt-1 block text-xs text-gray-400">
-                حداکثر قابل برداشت: {{ summary?.availableForWithdrawal ?? 0 | number }} تومان
+                حداکثر قابل برداشت: {{ summary?.availableForWithdrawal ?? 0 | persianNumber }} تومان
               </small>
               <small *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid" class="text-red-600">
                 مبلغ باید معتبر و کمتر از موجودی قابل برداشت باشد.

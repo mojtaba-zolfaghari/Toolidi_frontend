@@ -46,6 +46,12 @@
       </button>
       <h1 class="admin-shell__title">{{ isAdmin ? 'پنل مدیریت' : 'پنل ' + roleLoggedIn }}</h1>
       <span class="admin-shell__spacer"></span>
+      <!-- نشان پیام‌های نخوانده چت سفارش‌ها -->
+      <button *ngIf="unreadChatCount > 0" mat-icon-button (click)="openChats()"
+        [matTooltip]="unreadChatCount + ' پیام نخوانده در گفتگوهای سفارش'"
+        class="admin-shell__chat-bell" aria-label="پیام‌های نخوانده چت">
+        <mat-icon [matBadge]="unreadChatCount" [matBadgeHidden]="unreadChatCount === 0" matBadgeColor="warn">forum</mat-icon>
+      </button>
       <span class="admin-shell__role-chip">{{ roleLabel }}</span>
       <div class="admin-shell__user">
         <span class="admin-shell__avatar">{{ username.charAt(0) }}</span>

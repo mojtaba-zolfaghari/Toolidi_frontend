@@ -66,6 +66,7 @@ export class ProfileComponent implements OnInit {
 
   /** تب فعال */
   activeTab: ProfileTab = 'overview';
+  activeTabIndex = 0;
   /** آمار */
   totalOrders = 0;
   deliveredOrders = 0;
@@ -128,9 +129,15 @@ export class ProfileComponent implements OnInit {
     this.loadAddresses();
   }
 
-  /** تغییر تب فعال */
+  /** تغییر تب فعال (API قدیمی — 今は mat-tab-group が更新する) */
   setTab(tab: ProfileTab): void {
     this.activeTab = tab;
+  }
+
+  /** índice の変更を検知して activeTab を同期 */
+  setTabFromIndex(index: number): void {
+    const map: ProfileTab[] = ['overview', 'orders', 'addresses', 'security'];
+    this.activeTab = map[index] ?? 'overview';
   }
 
   /** دریافت متن وضعیت سفارش */

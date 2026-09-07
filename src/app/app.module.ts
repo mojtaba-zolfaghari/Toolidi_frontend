@@ -6,17 +6,39 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { QuicklinkModule } from 'ngx-quicklink';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+
+/** برچسب‌های فارسی برای MatPaginator در کل برنامه */
+function persianPaginatorIntl(): MatPaginatorIntl {
+  const intl = new MatPaginatorIntl();
+  intl.itemsPerPageLabel = 'مورد در هر صفحه:';
+  intl.nextPageLabel = 'صفحه بعد';
+  intl.previousPageLabel = 'صفحه قبل';
+  intl.firstPageLabel = 'صفحه اول';
+  intl.lastPageLabel = 'صفحه آخر';
+  intl.getRangeLabel = (page: number, pageSize: number, length: number): string => {
+    if (length === 0 || pageSize === 0) {
+      return `0 از ${length}`;
+    }
+    const startIndex = page * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, length);
+    return `${startIndex + 1} – ${endIndex} از ${length}`;
+  };
+  return intl;
+}
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-// اینترسپتور توکن (افزودن هدر Authorization و مدیریت خطای 401)
+// 토큰 인터셉터 (Authorization 헤더 및 401 오류 관리)
 import { TokenInterceptor } from './core/interceptors/token.interceptor';
 
-// Core Module (header/footer — stubs for Phase 1)
+// Core Module (헤더/푸터 — 1단계 stub)
 import { CoreModule } from './core/core.module';
 
-// Shared Module (reusable UI components)
+// Shared Module (재사용 가능한 UI 컴포넌트)
 import { SharedModule } from './shared/shared.module';
 
 registerLocaleData(localeFa);
@@ -31,13 +53,17 @@ registerLocaleData(localeFa);
     HttpClientModule,
     FormsModule,
     AppRoutingModule,
+    QuicklinkModule,
     CoreModule,
     SharedModule,
+    ServiceWorkerModule
   ],
   providers: [
-    // ثبت اینترسپتور توکن برای تمام درخواست‌های HTTP
+    // 토큰 인터셉터 등록: 모든 HTTP 요청에 적용
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
-    { provide: LOCALE_ID, useValue: 'fa-IR' }
+    { provide: LOCALE_ID, useValue: 'fa-IR' },
+    // برچسب‌های فارسی صفحه‌بند Material در کل برنامه
+    { provide: MatPaginatorIntl, useValue: persianPaginatorIntl() },
   ],
   bootstrap: [AppComponent]
 })

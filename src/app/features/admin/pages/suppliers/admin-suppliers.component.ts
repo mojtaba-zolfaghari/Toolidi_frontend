@@ -46,8 +46,8 @@ export class AdminSuppliersComponent implements OnInit {
     { key: 'contactInfo', label: 'اطلاعات تماس' },
     { key: 'location', label: 'موقعیت' },
     { key: 'isActive', label: 'وضعیت', type: 'badge', badgeMap: {
-      'true': { label: 'فعال', color: 'bg-green-100 text-green-700' },
-      'false': { label: 'غیرفعال', color: 'bg-red-100 text-red-700' }
+      'true': { label: 'فعال', color: 'data-table__badge--success' },
+      'false': { label: 'غیرفعال', color: 'data-table__badge--danger' }
     }},
     { key: 'createdAt', label: 'تاریخ ثبت', type: 'date' }
   ];
@@ -136,6 +136,24 @@ export class AdminSuppliersComponent implements OnInit {
         contactInfo: supplier.contactInfo,
         location: supplier.location
       });
+      // Prefill استان/شهر selects by matching names so the required validators pass (edit only).
+      if (mode === 'edit') {
+        const province = this.provinces.find(p => p.name === (supplier.location ?? '').split('،').pop()?.trim());
+        this.supplierForm.patchValue({ provinceId: province?.id ?? '', cityId: '' });
+        this.cities = [];
+        if (province) {
+          this.loadingCities = true;
+          this.locationService.getCitiesByProvince(province.id).subscribe({
+            next: result => {
+              this.cities = result.data ?? [];
+              this.loadingCities = false;
+              const city = this.cities.find(c => (supplier.location ?? '').startsWith(c.name));
+              if (city) this.supplierForm.patchValue({ cityId: city.id });
+            },
+            error: () => { this.loadingCities = false; }
+          });
+        }
+      }
     } else {
       this.selectedSupplier = null;
       this.supplierForm.reset();
@@ -169,7 +187,14 @@ export class AdminSuppliersComponent implements OnInit {
     }
 
     this.saving = true;
-    const data = this.supplierForm.getRawValue() as CreateSupplierData;
+    const raw = this.supplierForm.getRawValue();
+    const province = this.provinces.find(p => String(p.id) === String(raw.provinceId));
+    const city = this.cities.find(c => String(c.id) === String(raw.cityId));
+    const data: CreateSupplierData = {
+      name: String(raw.name ?? '').trim(),
+      contactInfo: String(raw.contactInfo ?? '').trim(),
+      location: city && province ? `${city.name}، ${province.name}` : String(raw.location ?? '').trim()
+    };
 
     if (this.dialogMode === 'add') {
       this.adminService.createSupplier(data).subscribe({

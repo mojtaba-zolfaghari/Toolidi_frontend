@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 import { ApiService } from '../api.service';
 import { PagedList, Result } from '../../models/api-response.model';
@@ -39,6 +40,11 @@ export interface CategoryTreeNode {
  */
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
+  /** درخت دسته‌بندی کش می‌شود؛ در سراسر اپلیکیشن (هدر، مگامنو، فروشگاه) ساختار یکسان است. */
+  private readonly categoryTree$ = this.api
+    .get<Result<CategoryTreeNode[]>>('/Category/tree')
+    .pipe(shareReplay({ bufferSize: 1, refCount: false }));
+
   constructor(private readonly api: ApiService) {}
 
   /** دریافت لیست صفحه‌بندی‌شده‌ی دسته‌بندی‌ها */
@@ -46,8 +52,12 @@ export class CategoryService {
     return this.api.get<PagedList<Category>>('/Category');
   }
 
-  /** دریافت درخت سلسله‌مراتبی دسته‌بندی‌ها */
+  /**
+   * دریافت درخت سلسله‌مراتبی دسته‌بندی‌ها.
+   * پاسخ در طول عمر اپلیکیشن کش می‌شود (shareReplay) تا مگامنو، صفحه فروشگاه و
+   * صفحه اصلی هر کدام درخواست جداگانه نزنند.
+   */
   getCategoryTree(): Observable<Result<CategoryTreeNode[]>> {
-    return this.api.get<Result<CategoryTreeNode[]>>('/Category/tree');
+    return this.categoryTree$;
   }
 }

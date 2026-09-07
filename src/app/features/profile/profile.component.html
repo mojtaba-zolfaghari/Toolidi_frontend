@@ -1,414 +1,437 @@
 <!-- ═══════════════════ پروفایل خریدار ═══════════════════ -->
-<section class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30">
+<section class="profile">
 
-  <!-- ─── لودینگ ─── -->
-  <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
-    <div class="text-center space-y-4">
-      <div class="loading-spinner mx-auto"></div>
-      <p class="text-gray-400">در حال بارگذاری اطلاعات حساب کاربری…</p>
+  <!-- ─── لودینگ ─── -->    <div *ngIf="loading" class="profile__loading">
+      <mat-progress-bar mode="indeterminate" class="profile__progress"></mat-progress-bar>
+      <p class="profile__loading-text">در حال بارگذاری اطلاعات حساب کاربری…</p>
     </div>
-  </div>
 
   <!-- ─── خطا ─── -->
-  <div *ngIf="!loading && errorMessage" class="max-w-4xl mx-auto px-4 pt-8">
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-6 py-4 flex items-center gap-3">
-      <span class="text-xl">⚠️</span>
-      <span>{{ errorMessage }}</span>
-    </div>
+  <div *ngIf="!loading && errorMessage" class="profile__error-wrap">
+    <mat-card class="profile__error-card">
+      <div class="mat-card-content">
+        <div class="profile__error-body">
+          <span class="profile__error-icon" aria-hidden="true">⚠️</span>
+          <span class="profile__error-text">{{ errorMessage }}</span>
+        </div>
+      </div>
+    </mat-card>
   </div>
 
   <!-- ─── محتوای اصلی ─── -->
   <ng-container *ngIf="!loading && profile">
 
     <!-- ═══ هدر پروفایل ═══ -->
-    <div class="profile-header">
-      <div class="container mx-auto max-w-6xl px-4 py-8 lg:px-8">
-        <div class="flex flex-col md:flex-row items-center gap-6">
+    <header class="profile__header">
+      <div class="profile__header-inner">
+        <div class="profile__header-row">
           <!-- آواتار -->
-          <div class="profile-avatar">
-            <span class="text-4xl font-extrabold text-white">{{ initial }}</span>
-            <div class="profile-avatar-ring"></div>
+          <div class="profile__avatar">
+            <span class="profile__avatar-letter">{{ initial }}</span>
+            <div class="profile__avatar-ring"></div>
           </div>
 
           <!-- اطلاعات -->
-          <div class="flex-1 text-center md:text-right">
-            <h1 class="text-2xl lg:text-3xl font-extrabold text-white">
+          <div class="profile__identity">
+            <h1 class="profile__identity-name">
               {{ profile.firstName && profile.lastName
                 ? profile.firstName + ' ' + profile.lastName
                 : profile.username }}
             </h1>
-            <p class="text-white/70 mt-1 text-sm">{{ profile.roleName }} · عضو {{ memberSince }}</p>
+            <p class="profile__identity-sub">{{ profile.roleName }} · عضو {{ memberSince }}</p>
           </div>
 
           <!-- دکمه خروج -->
           <button type="button" (click)="logout()"
-                  class="flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-xl px-5 py-2.5 text-sm hover:bg-white/20 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-            </svg>
+                  mat-stroked-button class="profile__logout-btn">
+            <mat-icon aria-hidden="true">logout</mat-icon>
             خروج از حساب
           </button>
         </div>
 
         <!-- ─── آمار سریع ─── -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          <div class="profile-stat-card">
-            <span class="text-2xl">📦</span>
-            <div>
-              <span class="block text-2xl font-extrabold text-white">{{ totalOrders | number:'1.0-0':'fa-IR' }}</span>
-              <span class="text-white/60 text-sm">کل سفارشات</span>
+        <div class="profile__stats">
+          <div class="profile__stat">
+            <span class="profile__stat-icon" aria-hidden="true">📦</span>
+            <div class="profile__stat-body">
+              <span class="profile__stat-value">{{ totalOrders | persianNumber }}</span>
+              <span class="profile__stat-label">کل سفارشات</span>
             </div>
           </div>
-          <div class="profile-stat-card">
-            <span class="text-2xl">✅</span>
-            <div>
-              <span class="block text-2xl font-extrabold text-white">{{ deliveredOrders | number:'1.0-0':'fa-IR' }}</span>
-              <span class="text-white/60 text-sm">تحویل شده</span>
+          <div class="profile__stat">
+            <span class="profile__stat-icon" aria-hidden="true">✅</span>
+            <div class="profile__stat-body">
+              <span class="profile__stat-value">{{ deliveredOrders | persianNumber }}</span>
+              <span class="profile__stat-label">تحویل شده</span>
             </div>
           </div>
-          <div class="profile-stat-card">
-            <span class="text-2xl">⏳</span>
-            <div>
-              <span class="block text-2xl font-extrabold text-white">{{ pendingOrders | number:'1.0-0':'fa-IR' }}</span>
-              <span class="text-white/60 text-sm">در حال پردازش</span>
+          <div class="profile__stat">
+            <span class="profile__stat-icon" aria-hidden="true">⏳</span>
+            <div class="profile__stat-body">
+              <span class="profile__stat-value">{{ pendingOrders | persianNumber }}</span>
+              <span class="profile__stat-label">در حال پردازش</span>
             </div>
           </div>
-          <div class="profile-stat-card">
-            <span class="text-2xl">💰</span>
-            <div>
-              <span class="block text-2xl font-extrabold text-white">{{ formatAmount(totalSpent) }}</span>
-              <span class="text-white/60 text-sm">تومان خرید</span>
+          <div class="profile__stat">
+            <span class="profile__stat-icon" aria-hidden="true">💰</span>
+            <div class="profile__stat-body">
+              <span class="profile__stat-value">{{ formatAmount(totalSpent) }}</span>
+              <span class="profile__stat-label">تومان خرید</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
 
     <!-- ═══ تب‌ها ═══ -->
-    <div class="container mx-auto max-w-6xl px-4 lg:px-8 -mt-6 relative z-10">
-      <nav class="profile-tabs">
-        <button type="button" (click)="setTab('overview')"
-                [class.profile-tab-active]="activeTab === 'overview'"
-                [class.profile-tab]="activeTab !== 'overview'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-          اطلاعات من
-        </button>
-        <button type="button" (click)="setTab('orders')"
-                [class.profile-tab-active]="activeTab === 'orders'"
-                [class.profile-tab]="activeTab !== 'orders'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          سفارشات
-        </button>
-        <button type="button" (click)="setTab('addresses')"
-                [class.profile-tab-active]="activeTab === 'addresses'"
-                [class.profile-tab]="activeTab !== 'addresses'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          آدرس‌ها
-        </button>
-        <button type="button" (click)="setTab('security')"
-                [class.profile-tab-active]="activeTab === 'security'"
-                [class.profile-tab]="activeTab !== 'security'">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          امنیت
-        </button>
-      </nav>
-    </div>
+    <mat-tab-group class="profile__tabs-group" [(selectedIndex)]="activeTabIndex" (selectedIndexChange)="setTabFromIndex($event)">
+      <mat-tab label=" اطلاعات من"></mat-tab>
+      <mat-tab label=" سفارشات"></mat-tab>
+      <mat-tab label=" آدرس‌ها"></mat-tab>
+      <mat-tab label=" امنیت"></mat-tab>
 
-    <!-- ═══ محتوای تب‌ها ═══ -->
-    <div class="container mx-auto max-w-6xl px-4 lg:px-8 py-8">
+      <!-- ═══ محتوای تب‌ها ═══ -->
+      <div class="profile__tab-panes">
+        <!-- ─── تب: اطلاعات من ─── -->
+        <div *ngIf="activeTab === 'overview'" class="profile__tab-body">
+          <div class="profile__overview-grid">
 
-      <!-- ─── تب: اطلاعات من ─── -->
-      <div *ngIf="activeTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- کارت پروفایل -->
-        <div class="profile-card lg:col-span-1">
-          <div class="text-center pb-6 border-b border-gray-100">
-            <div class="profile-avatar-sm mx-auto mb-4">
-              <span class="text-2xl font-bold text-white">{{ initial }}</span>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">
-              {{ profile.firstName && profile.lastName ? profile.firstName + ' ' + profile.lastName : profile.username }}
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">{{ profile.roleName }}</p>
-          </div>
-          <div class="space-y-4 pt-6">
-            <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-              </span>
-              <div><span class="text-gray-400 block text-xs">نام کاربری</span><strong class="text-gray-800">{{ profile.username }}</strong></div>
-            </div>
-            <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">🪪</span>
-              <div><span class="text-gray-400 block text-xs">کد ملی</span><strong class="text-gray-800">{{ profile.nationalCode }}</strong></div>
-            </div>
-            <div class="flex items-center gap-3 text-sm">
-              <span class="w-8 h-8 rounded-lg" [class.bg-emerald-50]="profile.isActive" [class.bg-red-50]="!profile.isActive"
-                   [class.text-emerald-600]="profile.isActive" [class.text-red-500]="!profile.isActive">
-                <svg class="w-4 h-4 m-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </span>
-              <div><span class="text-gray-400 block text-xs">وضعیت حساب</span>
-                <strong [class.text-emerald-600]="profile.isActive" [class.text-red-500]="!profile.isActive">
-                  {{ profile.isActive ? 'فعال ✅' : 'غیرفعال ❌' }}
-                </strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- فرم ویرایش پروفایل -->
-        <div class="profile-card lg:col-span-2">
-          <h2 class="text-xl font-bold text-gray-900 mb-1">ویرایش اطلاعات</h2>
-          <p class="text-sm text-gray-400 mb-6">نام کاربری و کد ملی غیرقابل تغییر هستند.</p>
-
-          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label class="form-field">
-                <span class="form-label">نام</span>
-                <input formControlName="firstName" class="form-input" placeholder="نام خود را وارد کنید" />
-              </label>
-              <label class="form-field">
-                <span class="form-label">نام خانوادگی</span>
-                <input formControlName="lastName" class="form-input" placeholder="نام خانوادگی" />
-              </label>
-              <label class="form-field">
-                <span class="form-label">شماره موبایل</span>
-                <input formControlName="mobileNumber" class="form-input" placeholder="0912xxxxxxx" />
-              </label>
-              <label class="form-field">
-                <span class="form-label">ایمیل</span>
-                <input type="email" formControlName="email" class="form-input" placeholder="example@mail.com" />
-              </label>
-            </div>
-
-            <div *ngIf="profileMessage" class="flex items-center gap-2 bg-emerald-50 text-emerald-700 rounded-xl px-4 py-3 text-sm">
-              <span>✅</span> {{ profileMessage }}
-            </div>
-
-            <button type="submit" [disabled]="savingProfile"
-                    class="btn-primary">
-              <svg *ngIf="savingProfile" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-              {{ savingProfile ? 'در حال ذخیره…' : 'ذخیره تغییرات' }}
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <!-- ─── تب: سفارشات ─── -->
-      <div *ngIf="activeTab === 'orders'">
-        <div *ngIf="ordersLoading" class="text-center py-16">
-          <div class="loading-spinner mx-auto mb-4"></div>
-          <p class="text-gray-400">در حال بارگذاری سفارشات…</p>
-        </div>
-
-        <div *ngIf="!ordersLoading && orders.length === 0" class="profile-card text-center py-16">
-          <span class="text-5xl mb-4 block">📭</span>
-          <h3 class="text-lg font-bold text-gray-700">هنوز سفارشی ثبت نکرده‌اید</h3>
-          <p class="text-gray-400 mt-2 text-sm">وقتی اولین خریدتان را انجام دهید، اینجا نمایش داده می‌شود.</p>
-          <a routerLink="/shop" class="btn-primary mt-6 inline-block">مشاهده فروشگاه</a>
-        </div>
-
-        <div *ngIf="reorderMessage" class="flex items-center gap-2 bg-emerald-50 text-emerald-700 rounded-xl px-4 py-3 text-sm mb-4">
-              <span>🛒</span> {{ reorderMessage }}
-            </div>
-
-        <div *ngIf="!ordersLoading && orders.length > 0" class="space-y-4">
-          <div *ngFor="let order of orders; let i = index" class="profile-card order-card" [style.animation-delay]="i * 60 + 'ms'">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <!-- اطلاعات سفارش -->
-              <div class="flex items-center gap-4">
-                <span class="text-3xl">{{ orderStatusIcon(order.status) }}</span>
-                <div>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <strong class="text-gray-900">#{{ order.orderNumber }}</strong>
-                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset"
-                          [ngClass]="orderStatusColor(order.status)">
-                      {{ orderStatusLabel(order.status) }}
-                    </span>
-                    <span *ngIf="order.isPaid" class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700 ring-1 ring-emerald-200 ring-inset">
-                      پرداخت شده
-                    </span>
+            <!-- کارت پروفایل -->
+            <mat-card class="profile__card profile__identity-card">
+              <div class="mat-card-content">
+                <div class="profile__identity-card-head">
+                  <div class="profile__avatar-sm">
+                    <span class="profile__avatar-letter">{{ initial }}</span>
                   </div>
-                  <p class="text-sm text-gray-400 mt-1">{{ formatDate(order.createdAt) }} · {{ order.items.length || 0 }} آیتم</p>
+                  <h3 class="profile__identity-card-name">
+                    {{ profile.firstName && profile.lastName ? profile.firstName + ' ' + profile.lastName : profile.username }}
+                  </h3>
+                  <p class="profile__identity-card-role">{{ profile.roleName }}</p>
+                </div>
+                <div class="profile__identity-list">
+                  <div class="profile__identity-row">
+                    <span class="profile__identity-icon">
+                      <svg class="profile__identity-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </span>
+                    <div class="profile__identity-text">
+                      <span class="profile__identity-key">نام کاربری</span>
+                      <strong class="profile__identity-val">{{ profile.username }}</strong>
+                    </div>
+                  </div>
+                  <div class="profile__identity-row">
+                    <span class="profile__identity-icon">🪪</span>
+                    <div class="profile__identity-text">
+                      <span class="profile__identity-key">کد ملی</span>
+                      <strong class="profile__identity-val">{{ profile.nationalCode }}</strong>
+                    </div>
+                  </div>
+                  <div class="profile__identity-row">
+                    <span class="profile__identity-icon profile__identity-icon--ok" [class.profile__identity-icon--bad]="!profile.isActive">
+                      <svg class="profile__identity-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </span>
+                    <div class="profile__identity-text">
+                      <span class="profile__identity-key">وضعیت حساب</span>
+                      <strong class="profile__identity-val" [class.profile__identity-val--ok]="profile.isActive" [class.profile__identity-val--bad]="!profile.isActive">
+                        {{ profile.isActive ? 'فعال ✅' : 'غیرفعال ❌' }}
+                      </strong>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </mat-card>
 
-              <!-- مبلغ -->
-              <div class="text-left md:text-right">
-                <span class="text-xl font-extrabold text-gray-900">{{ formatAmount(order.grandTotal || order.totalAmount) }}</span>
-                <span class="text-sm text-gray-400 mr-1">تومان</span>
+            <!-- فرم ویرایش پروفایل -->
+            <mat-card class="profile__card profile__edit-card">
+              <mat-card-header>
+                <mat-card-title>ویرایش اطلاعات</mat-card-title>
+                <mat-card-subtitle>نام کاربری و کد ملی غیرقابل تغییر هستند.</mat-card-subtitle>
+              </mat-card-header>
+              <div class="mat-card-content">
+                <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile__edit-form">
+                  <div class="profile__edit-grid">
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>نام</mat-label>
+                      <input matInput formControlName="firstName" placeholder="نام خود را وارد کنید" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>نام خانوادگی</mat-label>
+                      <input matInput formControlName="lastName" placeholder="نام خانوادگی" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>شماره موبایل</mat-label>
+                      <input matInput formControlName="mobileNumber" placeholder="0912xxxxxxx" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>ایمیل</mat-label>
+                      <input matInput type="email" formControlName="email" placeholder="example@mail.com" />
+                    </mat-form-field>
+                  </div>
+
+                  <div *ngIf="profileMessage" class="profile__form-message profile__form-message--ok">
+                    <span>✅</span> {{ profileMessage }}
+                  </div>
+
+                  <div class="profile__form-actions">
+                    <button type="submit" [disabled]="savingProfile"
+                            mat-flat-button class="profile__save-btn">
+                      <mat-icon *ngIf="savingProfile" aria-hidden="true" class="profile__spin-icon">refresh</mat-icon>
+                      {{ savingProfile ? 'در حال ذخیره…' : 'ذخیره تغییرات' }}
+                    </button>
+                  </div>
+                </form>
               </div>
-            </div>
-
-            <!-- آیتم‌های سفارش -->
-            <div *ngIf="order.items?.length" class="mt-4 pt-4 border-t border-gray-100">
-              <div class="flex flex-wrap gap-2">
-                <span *ngFor="let item of order.items" class="inline-flex items-center gap-1 bg-gray-50 rounded-lg px-3 py-1.5 text-xs text-gray-600">
-                  <span class="font-medium">{{ item.productName }}</span>
-                  <span class="text-gray-400">×{{ item.quantity | number:'1.0-0':'fa-IR' }}</span>
-                </span>
-              </div>
-            </div>
-
-            <!-- دکمه سفارش مجدد -->
-            <div *ngIf="canReorder(order) && order.items?.length" class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-              <p class="text-xs text-gray-400">تمام آیتم‌های این سفارش به سبد خرید اضافه می‌شوند</p>
-              <button type="button"
-                      (click)="reorder(order)"
-                      [disabled]="reorderingOrderId === order.id"
-                      class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-l from-primary to-orange-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-wait">
-                <svg *ngIf="reorderingOrderId !== order.id" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <svg *ngIf="reorderingOrderId === order.id" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                {{ reorderingOrderId === order.id ? 'در حال اضافه کردن…' : '🔄 سفارش مجدد' }}
-              </button>
-            </div>
+            </mat-card>
           </div>
         </div>
-      </div>
 
-      <!-- ─── تب: آدرس‌ها ─── -->
-      <div *ngIf="activeTab === 'addresses'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- لیست آدرس‌ها -->
-        <div class="lg:col-span-2 space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-gray-900">نشانی‌های من</h2>
+        <!-- ─── تب: سفارشات ─── -->
+        <div *ngIf="activeTab === 'orders'" class="profile__tab-body">
+          <div *ngIf="ordersLoading" class="profile__loading profile__loading--compact" fxLayout="row" fxLayoutAlign="center center">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            <p class="profile__loading-text">در حال بارگذاری سفارشات…</p>
           </div>
 
-          <div *ngIf="addressesLoading" class="profile-card text-center py-10">
-            <div class="loading-spinner mx-auto mb-3"></div>
-            <p class="text-gray-400 text-sm">در حال بارگذاری…</p>
+          <div *ngIf="!ordersLoading && orders.length === 0" class="profile__empty">
+            <div class="profile__empty-inner">
+              <span class="profile__empty-icon" aria-hidden="true">📭</span>
+              <h3 class="profile__empty-title">هنوز سفارشی ثبت نکرده‌اید</h3>
+              <p class="profile__empty-text">وقتی اولین خریدتان را انجام دهید، اینجا نمایش داده می‌شود.</p>
+              <a routerLink="/shop" mat-flat-button class="profile__empty-cta">مشاهده فروشگاه</a>
+            </div>
           </div>
 
-          <div *ngIf="!addressesLoading && addresses.length === 0" class="profile-card text-center py-10">
-            <span class="text-4xl block mb-3">📍</span>
-            <p class="text-gray-400">هنوز آدرسی ثبت نشده است.</p>
+          <div *ngIf="reorderMessage" class="profile__reorder-msg">
+            <span>🛒</span> {{ reorderMessage }}
           </div>
 
-          <div *ngFor="let address of addresses" class="profile-card address-card">
-            <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
-              <div class="flex items-start gap-3">
-                <span class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">📍</span>
-                <div>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <strong class="text-gray-900">{{ address.city }}، {{ address.addressLine }}</strong>
-                    <span *ngIf="address.isDefault" class="badge-success">پیش‌فرض</span>
+          <div *ngIf="!ordersLoading && orders.length > 0" class="profile__orders">
+            <mat-card *ngFor="let order of orders; let i = index" class="profile__order-card" [style.animation-delay]="i * 60 + 'ms'">
+              <div class="mat-card-content">
+                <div class="profile__order-head">
+                  <div class="profile__order-identity">
+                    <span class="profile__order-icon">{{ orderStatusIcon(order.status) }}</span>
+                    <div class="profile__order-info">
+                      <div class="profile__order-top">
+                        <strong class="profile__order-number">#{{ order.orderNumber }}</strong>
+                        <span class="profile__order-badge" [class]="orderStatusColor(order.status)">
+                          {{ orderStatusLabel(order.status) }}
+                        </span>
+                        <span *ngIf="order.isPaid" class="profile__order-badge profile__order-badge--paid">
+                          پرداخت شده
+                        </span>
+                      </div>
+                      <p class="profile__order-meta">{{ formatDate(order.createdAt) }} · {{ order.items.length || 0 }} آیتم</p>
+                    </div>
                   </div>
-                  <p class="text-sm text-gray-500 mt-1">
-                    {{ address.state }} · کد پستی {{ address.postalCode }}
-                    <span *ngIf="address.phoneNumber"> · {{ address.phoneNumber }}</span>
-                  </p>
+                  <div class="profile__order-amount">
+                    <span class="profile__order-total">{{ formatAmount(order.grandTotal || order.totalAmount) }}</span>
+                    <span class="profile__order-total-unit">تومان</span>
+                  </div>
+                </div>
+
+                <!-- آیتم‌های سفارش -->
+                <mat-divider class="profile__order-divider"></mat-divider>
+                <div *ngIf="order.items?.length" class="profile__order-items">
+                  <span *ngFor="let item of order.items" class="profile__order-item">
+                    <span class="profile__order-item-name">{{ item.productName }}</span>
+                    <span class="profile__order-item-qty">×{{ item.quantity | persianNumber }}</span>
+                  </span>
+                </div>
+
+                <!-- دکمه سفارش مجدد -->
+                <mat-divider class="profile__order-divider" *ngIf="canReorder(order) && order.items?.length"></mat-divider>
+                <div *ngIf="canReorder(order) && order.items?.length" class="profile__order-reorder">
+                  <p class="profile__order-reorder-text">تمام آیتم‌های این سفارش به سبد خرید اضافه می‌شوند</p>
+                  <button type="button"
+                          (click)="reorder(order)"
+                          [disabled]="reorderingOrderId === order.id"
+                          mat-flat-button class="profile__reorder-btn">
+                    <mat-icon *ngIf="reorderingOrderId !== order.id" aria-hidden="true">replay</mat-icon>
+                    <mat-icon *ngIf="reorderingOrderId === order.id" aria-hidden="true" class="profile__spin-icon">refresh</mat-icon>
+                    {{ reorderingOrderId === order.id ? 'در حال اضافه کردن…' : '🔄 سفارش مجدد' }}
+                  </button>
                 </div>
               </div>
-              <div class="flex gap-2 shrink-0">
-                <button type="button" (click)="editAddress(address)" class="text-sm text-primary hover:underline font-medium">ویرایش</button>
-                <button type="button" (click)="deleteAddress(address)" class="text-sm text-red-500 hover:underline">حذف</button>
-              </div>
-            </div>
+            </mat-card>
           </div>
         </div>
 
-        <!-- فرم آدرس -->
-        <div class="lg:col-span-1">
-          <div class="profile-card lg:sticky lg:top-24">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">{{ selectedAddressId ? 'ویرایش آدرس' : 'آدرس جدید' }}</h3>
-            <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="space-y-4">
-              <label class="form-field">
-                <span class="form-label">نوع آدرس</span>
-                <select formControlName="addressType" class="form-input">
-                  <option value="Both">ارسال و صورتحساب</option>
-                  <option value="Shipping">فقط ارسال</option>
-                  <option value="Billing">فقط صورتحساب</option>
-                </select>
-              </label>
-              <div class="grid grid-cols-2 gap-3">
-                <label class="form-field"><span class="form-label">استان</span><input formControlName="state" class="form-input" placeholder="تهران" /></label>
-                <label class="form-field"><span class="form-label">شهر</span><input formControlName="city" class="form-input" placeholder="تهران" /></label>
-              </div>
-              <label class="form-field">
-                <span class="form-label">نشانی کامل</span>
-                <textarea rows="2" formControlName="addressLine" class="form-input" placeholder="خیابان، کوچه، پلاک…"></textarea>
-              </label>
-              <div class="grid grid-cols-2 gap-3">
-                <label class="form-field"><span class="form-label">کد پستی</span><input formControlName="postalCode" class="form-input" placeholder="1234567890" /></label>
-                <label class="form-field"><span class="form-label">تلفن</span><input formControlName="phoneNumber" class="form-input" placeholder="اختیاری" /></label>
-              </div>
-              <label class="inline-flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                <input type="checkbox" formControlName="isDefault" class="rounded border-gray-300 text-primary focus:ring-primary" />
-                آدرس پیش‌فرض
-              </label>
+        <!-- ─── تب: آدرس‌ها ─── -->
+        <div *ngIf="activeTab === 'addresses'" class="profile__tab-body">
+          <div class="profile__addresses-grid">
+            <!-- لیست آدرس‌ها -->
+            <div class="profile__addresses-list">
+              <h2 class="profile__section-title">نشانی‌های من</h2>
 
-              <div *ngIf="addressMessage" class="flex items-center gap-2 bg-emerald-50 text-emerald-700 rounded-xl px-3 py-2 text-sm">
-                <span>✅</span> {{ addressMessage }}
-              </div>
-              <div *ngIf="addressError" class="flex items-center gap-2 bg-red-50 text-red-600 rounded-xl px-3 py-2 text-sm">
-                <span>⚠️</span> {{ addressError }}
+              <div *ngIf="addressesLoading" class="profile__loading profile__loading--compact" fxLayout="row" fxLayoutAlign="center center">
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                <p class="profile__loading-text">در حال بارگذاری…</p>
               </div>
 
-              <div class="flex gap-3">
-                <button type="submit" [disabled]="savingAddress" class="btn-primary flex-1">
-                  {{ savingAddress ? 'در حال ذخیره…' : (selectedAddressId ? 'ذخیره ویرایش' : 'افزودن آدرس') }}
-                </button>
-                <button *ngIf="selectedAddressId" type="button" (click)="cancelAddressEdit()" class="btn-outline">انصراف</button>
+              <div *ngIf="!addressesLoading && addresses.length === 0" class="profile__empty profile__empty--small">
+                <span class="profile__empty-icon" aria-hidden="true">📍</span>
+                <p class="profile__empty-text">هنوز آدرسی ثبت نشده است.</p>
               </div>
-            </form>
+
+              <mat-card *ngFor="let address of addresses" class="profile__address-card">
+                <div class="mat-card-content">
+                  <div class="profile__address-head">
+                    <div class="profile__address-icon">
+                      <span>📍</span>
+                    </div>
+                    <div class="profile__address-info">
+                      <div class="profile__address-top">
+                        <strong class="profile__address-title">{{ address.city }}، {{ address.addressLine }}</strong>
+                        <span *ngIf="address.isDefault" class="profile__address-badge">پیش‌فرض</span>
+                      </div>
+                      <p class="profile__address-sub">
+                        {{ address.state }} · کد پستی {{ address.postalCode }}
+                        <span *ngIf="address.phoneNumber"> · {{ address.phoneNumber }}</span>
+                      </p>
+                    </div>
+                    <div class="profile__address-actions">
+                      <button type="button" (click)="editAddress(address)"
+                              mat-stroked-button>ویرایش</button>
+                      <button type="button" (click)="deleteAddress(address)"
+                              mat-stroked-button color="warn">حذف</button>
+                    </div>
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+
+            <!-- فرم آدرس -->
+            <mat-card class="profile__address-form-card">
+              <mat-card-header>
+                <mat-card-title>{{ selectedAddressId ? 'ویرایش آدرس' : 'آدرس جدید' }}</mat-card-title>
+              </mat-card-header>
+              <div class="mat-card-content">
+                <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="profile__address-form">
+                  <mat-form-field appearance="outline" class="profile__field profile__field--full">
+                    <mat-label>نوع آدرس</mat-label>
+                    <mat-select formControlName="addressType">
+                      <mat-option value="Both">ارسال و صورتحساب</mat-option>
+                      <mat-option value="Shipping">فقط ارسال</mat-option>
+                      <mat-option value="Billing">فقط صورتحساب</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <div class="profile__address-grid">
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>استان</mat-label>
+                      <input matInput formControlName="state" placeholder="تهران" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>شهر</mat-label>
+                      <input matInput formControlName="city" placeholder="تهران" />
+                    </mat-form-field>
+                  </div>
+
+                  <mat-form-field appearance="outline" class="profile__field profile__field--full">
+                    <mat-label>نشانی کامل</mat-label>
+                    <textarea matInput rows="2" formControlName="addressLine" placeholder="خیابان، کوچه، پلاک…"></textarea>
+                  </mat-form-field>
+
+                  <div class="profile__address-grid">
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>کد پستی</mat-label>
+                      <input matInput formControlName="postalCode" placeholder="1234567890" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="profile__field">
+                      <mat-label>تلفن</mat-label>
+                      <input matInput formControlName="phoneNumber" placeholder="اختیاری" />
+                    </mat-form-field>
+                  </div>
+
+                  <mat-checkbox formControlName="isDefault" class="profile__address-default-check">
+                    آدرس پیش‌فرض
+                  </mat-checkbox>
+
+                  <div *ngIf="addressMessage" class="profile__form-message profile__form-message--ok">
+                    <span>✅</span> {{ addressMessage }}
+                  </div>
+                  <div *ngIf="addressError" class="profile__form-message profile__form-message--err">
+                    <span>⚠️</span> {{ addressError }}
+                  </div>
+
+                  <div class="profile__form-actions">
+                    <button type="submit" [disabled]="savingAddress"
+                            mat-flat-button class="profile__save-btn">
+                      {{ savingAddress ? 'در حال ذخیره…' : (selectedAddressId ? 'ذخیره ویرایش' : 'افزودن آدرس') }}
+                    </button>
+                    <button *ngIf="selectedAddressId" type="button" (click)="cancelAddressEdit()"
+                            mat-stroked-button>انصراف</button>
+                  </div>
+                </form>
+              </div>
+            </mat-card>
           </div>
+        </div>
+
+        <!-- ─── تب: امنیت ─── -->
+        <div *ngIf="activeTab === 'security'" class="profile__tab-body">
+          <mat-card class="profile__card">
+            <mat-card-header>
+              <div class="profile__security-head">
+                <span class="profile__security-icon">🔒</span>
+                <div>
+                  <mat-card-title>تغییر رمز عبور</mat-card-title>
+                  <mat-card-subtitle>رمز عبور باید حداقل ۶ کاراکتر باشد.</mat-card-subtitle>
+                </div>
+              </div>
+            </mat-card-header>
+            <div class="mat-card-content">
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="profile__edit-form">
+                <mat-form-field appearance="outline" class="profile__field profile__field--full">
+                  <mat-label>رمز عبور فعلی</mat-label>
+                  <input matInput type="password" formControlName="currentPassword" placeholder="رمز فعلی خود را وارد کنید" />
+                </mat-form-field>
+                <div class="profile__edit-grid">
+                  <mat-form-field appearance="outline" class="profile__field">
+                    <mat-label>رمز جدید</mat-label>
+                    <input matInput type="password" formControlName="newPassword" placeholder="حداقل ۶ کاراکتر" />
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="profile__field">
+                    <mat-label>تکرار رمز جدید</mat-label>
+                    <input matInput type="password" formControlName="confirmNewPassword" placeholder="تکرار رمز جدید" />
+                  </mat-form-field>
+                </div>
+
+                <div *ngIf="passwordError" class="profile__form-message profile__form-message--err">
+                  <span>⚠️</span> {{ passwordError }}
+                </div>
+                <div *ngIf="passwordMessage" class="profile__form-message profile__form-message--ok">
+                  <span>✅</span> {{ passwordMessage }}
+                </div>
+
+                <div class="profile__form-actions">
+                  <button type="submit" [disabled]="changingPassword"
+                          mat-flat-button class="profile__save-btn">
+                    <mat-icon *ngIf="changingPassword" aria-hidden="true" class="profile__spin-icon">refresh</mat-icon>
+                    {{ changingPassword ? 'در حال تغییر…' : 'تغییر رمز عبور' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </mat-card>
+
+          <!-- نکات امنیتی -->
+          <mat-card class="profile__card profile__tips-card">
+            <mat-card-header>
+              <mat-card-title>💡 نکات امنیتی</mat-card-title>
+            </mat-card-header>
+            <div class="mat-card-content">
+              <ul class="profile__tips">
+                <li><span class="profile__tip-ok">✓</span> از رمز عبور قوی با ترکیب حروف، اعداد و نمادها استفاده کنید.</li>
+                <li><span class="profile__tip-ok">✓</span> رمز عبور خود را با کسی به اشتراک نگذارید.</li>
+                <li><span class="profile__tip-ok">✓</span> در دستگاه‌های عمومی از قابلیت یادآور رمز عبور استفاده نکنید.</li>
+                <li><span class="profile__tip-ok">✓</span> در صورت مشکوک شدن به دسترسی غیرمجاز، فوراً رمز عبور را تغییر دهید.</li>
+              </ul>
+            </div>
+          </mat-card>
         </div>
       </div>
+    </mat-tab-group>
 
-      <!-- ─── تب: امنیت ─── -->
-      <div *ngIf="activeTab === 'security'" class="max-w-2xl mx-auto">
-        <div class="profile-card">
-          <div class="flex items-center gap-3 mb-6">
-            <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-xl">🔒</span>
-            <div>
-              <h2 class="text-xl font-bold text-gray-900">تغییر رمز عبور</h2>
-              <p class="text-sm text-gray-400">رمز عبور باید حداقل ۶ کاراکتر باشد.</p>
-            </div>
-          </div>
-
-          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="space-y-5">
-            <label class="form-field">
-              <span class="form-label">رمز عبور فعلی</span>
-              <input type="password" formControlName="currentPassword" class="form-input" placeholder="رمز فعلی خود را وارد کنید" />
-            </label>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label class="form-field">
-                <span class="form-label">رمز جدید</span>
-                <input type="password" formControlName="newPassword" class="form-input" placeholder="حداقل ۶ کاراکتر" />
-              </label>
-              <label class="form-field">
-                <span class="form-label">تکرار رمز جدید</span>
-                <input type="password" formControlName="confirmNewPassword" class="form-input" placeholder="تکرار رمز جدید" />
-              </label>
-            </div>
-
-            <div *ngIf="passwordError" class="flex items-center gap-2 bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">
-              <span>⚠️</span> {{ passwordError }}
-            </div>
-            <div *ngIf="passwordMessage" class="flex items-center gap-2 bg-emerald-50 text-emerald-700 rounded-xl px-4 py-3 text-sm">
-              <span>✅</span> {{ passwordMessage }}
-            </div>
-
-            <button type="submit" [disabled]="changingPassword" class="btn-primary">
-              <svg *ngIf="changingPassword" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-              {{ changingPassword ? 'در حال تغییر…' : 'تغییر رمز عبور' }}
-            </button>
-          </form>
-        </div>
-
-        <!-- نکات امنیتی -->
-        <div class="profile-card mt-6">
-          <h3 class="font-bold text-gray-900 mb-4">💡 نکات امنیتی</h3>
-          <ul class="space-y-3 text-sm text-gray-600">
-            <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> از رمز عبور قوی با ترکیب حروف، اعداد و نمادها استفاده کنید.</li>
-            <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> رمز عبور خود را با کسی به اشتراک نگذارید.</li>
-            <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> در دستگاه‌های عمومی از قابلیت یادآور رمز عبور استفاده نکنید.</li>
-            <li class="flex items-start gap-2"><span class="text-emerald-500 mt-0.5">✓</span> در صورت مشکوک شدن به دسترسی غیرمجاز، فوراً رمز عبور را تغییر دهید.</li>
-          </ul>
-        </div>
-      </div>
-
-    </div>
   </ng-container>
 </section>

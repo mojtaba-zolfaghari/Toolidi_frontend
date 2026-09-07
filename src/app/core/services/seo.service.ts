@@ -183,4 +183,59 @@ export class SeoService {
       logo: this.defaultLogo,
     };
   }
+
+  /**
+   * Build an AggregateOffer JSON-LD for a deals page.
+   * 此屏障适用于 DealsComponent — نمایش تخفیف‌های گروهی در گوگل.
+   */
+  aggregateOfferJsonLd(offerPool: {
+    name: string;
+    description?: string;
+    url: string;
+    image?: string;
+    offers: Array<{
+      price: number;
+      priceCurrency?: string;
+      priceValidUntil?: string;
+      discountPercent?: number;
+      url: string;
+    }>;
+    rating?: number;
+    reviewCount?: number;
+  }): Record<string, any> {
+    const offers = offerPool.offers.map((o, i) => ({
+      '@type': 'Offer',
+      price: o.price,
+      priceCurrency: o.priceCurrency || 'IRR',
+      priceValidUntil: o.priceValidUntil || undefined,
+      url: o.url || `${this.baseUrl}/${o.url || ''}`,
+      ...(o.discountPercent != null ? { discountPercentage: Math.round(o.discountPercent * 100) / 100 } : {}),
+    }));
+
+    const schema: Record<string, any> = {
+      '@context': 'https://schema.org',
+      '@type': 'AggregateOffer',
+      name: offerPool.name,
+      description: offerPool.description || offerPool.name,
+      url: offerPool.url,
+      image: offerPool.image || this.defaultImage,
+      lowPrice: Math.min(...offers.map(o => o.price)),
+      highPrice: Math.max(...offers.map(o => o.price)),
+      priceCurrency: 'IRR',
+      offerCount: offers.length,
+      offers,
+    };
+
+    if (offerPool.rating && offerPool.reviewCount) {
+      schema['aggregateRating'] = {
+        '@type': 'AggregateRating',
+        ratingValue: offerPool.rating,
+        reviewCount: offerPool.reviewCount,
+        bestRating: 5,
+        worstRating: 1,
+      };
+    }
+
+    return schema;
+  }
 }

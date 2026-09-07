@@ -54,7 +54,7 @@
             <img *ngIf="col.type === 'image'" [src]="getCellValue(row, col)" [alt]="row.name" class="data-table__img" />
             <!-- Currency -->
             <span *ngIf="col.type === 'currency'" class="data-table__currency">
-              {{ getCellValue(row, col) | number: '1.0-0' }}
+              {{ getCellValue(row, col) | persianNumber }}
               <span class="data-table__currency-unit">تومان</span>
             </span>
             <!-- Date -->
@@ -68,11 +68,11 @@
             </span>
             <!-- Number -->
             <span *ngIf="col.type === 'number'" class="data-table__number">
-              {{ getCellValue(row, col) | number: '1.0-0' }}
+              {{ getCellValue(row, col) | persianNumber }}
             </span>
             <!-- Text (default) -->
             <span *ngIf="!col.type || col.type === 'text'" class="data-table__text">
-              {{ getCellValue(row, col) || '-' }}
+              {{ sanitizeDisplay(getCellValue(row, col)) || '—' }}
             </span>
           </td>
         </ng-container>

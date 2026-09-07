@@ -13,24 +13,24 @@ export interface EstimatedDelivery {
 @Component({
   selector: 'app-estimated-delivery',
   template: `
-    <div class="space-y-3" *ngIf="deliveries.length">
-      <h3 class="text-sm font-bold text-secondary">زمان تقریبی تحویل</h3>
+    <div class="est-delivery" *ngIf="deliveries.length">
+      <h3 class="est-delivery__title">زمان تقریبی تحویل</h3>
 
-      <div *ngFor="let item of deliveries" class="rounded-xl border border-gray-100 bg-gray-50 p-3">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <p class="text-sm font-medium text-secondary">{{ item.productName }}</p>
-            <p class="text-xs text-gray-400">فروشنده: {{ item.supplierName }} · تعداد: {{ item.quantity }}</p>
+      <div *ngFor="let item of deliveries" class="est-delivery__item">
+        <div class="est-delivery__row">
+          <div class="est-delivery__info">
+            <p class="est-delivery__product">{{ item.productName }}</p>
+            <p class="est-delivery__meta">فروشنده: {{ item.supplierName }} · تعداد: {{ item.quantity }}</p>
           </div>
-          <div class="text-left">
-            <p *ngIf="item.capacitySet && item.estimatedDeliveryDate" class="text-sm font-bold text-primary">
+          <div class="est-delivery__date">
+            <p *ngIf="item.capacitySet && item.estimatedDeliveryDate" class="est-delivery__date-value">
               {{ item.estimatedDeliveryDate | persianDate:'yyyy/MM/dd' }}
             </p>
-            <p *ngIf="!item.capacitySet" class="text-xs text-orange-500 font-medium">
+            <p *ngIf="!item.capacitySet" class="est-delivery__pending">
               در انتظار تأیید
             </p>
             <p *ngIf="item.capacitySet && !item.estimatedDeliveryDate && item.estimatedReadyDate"
-               class="text-xs text-gray-500">
+               class="est-delivery__ready">
               آماده: {{ item.estimatedReadyDate | persianDate:'yyyy/MM/dd' }}
             </p>
           </div>
@@ -38,15 +38,116 @@ export interface EstimatedDelivery {
       </div>
 
       <!-- Max delivery date (bottleneck) -->
-      <div *ngIf="maxDeliveryDate" class="rounded-xl border border-primary/20 bg-primary/5 p-3">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-bold text-secondary">حداکثر زمان تحویل</span>
-          <span class="text-lg font-extrabold text-primary">{{ maxDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
+      <div *ngIf="maxDeliveryDate" class="est-delivery__max">
+        <div class="est-delivery__row">
+          <span class="est-delivery__max-label">حداکثر زمان تحویل</span>
+          <span class="est-delivery__max-value">{{ maxDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
         </div>
-        <p class="text-xs text-gray-500 mt-1">تاریخ تحویل نهایی بر اساس آخرین آماده‌سازی در بین تمام اقلام</p>
+        <p class="est-delivery__max-hint">تاریخ تحویل نهایی بر اساس آخرین آماده‌سازی در بین تمام اقلام</p>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    :host { display: block; }
+
+    .est-delivery {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .est-delivery__title {
+      margin: 0;
+      color: #1B2A4A;
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    .est-delivery__item {
+      border: 1px solid #f3f4f6;
+      border-radius: 0.75rem;
+      background: #f9fafb;
+      padding: 0.75rem;
+    }
+
+    .est-delivery__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .est-delivery__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .est-delivery__product {
+      margin: 0;
+      color: #1B2A4A;
+      font-size: 0.875rem;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .est-delivery__meta {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 0.75rem;
+    }
+
+    .est-delivery__date {
+      flex-shrink: 0;
+      text-align: left;
+    }
+
+    .est-delivery__date-value {
+      margin: 0;
+      color: var(--mat-sys-primary, #6C3FC5);
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    .est-delivery__pending {
+      margin: 0;
+      color: #f97316;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .est-delivery__ready {
+      margin: 0;
+      color: #6b7280;
+      font-size: 0.75rem;
+    }
+
+    .est-delivery__max {
+      border: 1px solid rgba(108, 63, 197, 0.2);
+      border-radius: 0.75rem;
+      background: rgba(108, 63, 197, 0.05);
+      padding: 0.75rem;
+    }
+
+    .est-delivery__max-label {
+      color: #1B2A4A;
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    .est-delivery__max-value {
+      color: var(--mat-sys-primary, #6C3FC5);
+      font-size: 1.125rem;
+      font-weight: 800;
+    }
+
+    .est-delivery__max-hint {
+      margin: 0.25rem 0 0;
+      color: #6b7280;
+      font-size: 0.75rem;
+    }
+  `]
 })
 export class EstimatedDeliveryComponent {
   @Input() deliveries: EstimatedDelivery[] = [];

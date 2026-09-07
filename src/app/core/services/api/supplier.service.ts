@@ -26,6 +26,28 @@ export interface SupplierOrder {
   city: string;
 }
 
+/** رکورد قیمت تأمین‌کننده برای یک محصول */
+export interface SupplierProductPricing {
+  id: string;
+  supplierId: string;
+  productId: string;
+  productName: string;
+  sku: string;
+  /** قیمت تأمین‌کننده (تومان) */
+  supplyPrice: number;
+  /** حاشیه سود خالص درخواستی (درصد) — صفر یعنی پیش‌فرض سایت */
+  profitMarginPercent: number;
+  /** حاشیه سود مؤثر بعد از اعمال تنظیمات */
+  effectiveMarginPercent: number;
+  /** قیمت پیشنهادی سایت (با حاشیه سود و تعدیل مالیات/ارزش افزوده) */
+  suggestedSitePrice: number;
+  availableQuantity: number;
+  leadTimeHours: number;
+  minOrderQuantity: number;
+  supplierSku?: string;
+  isAvailable: boolean;
+}
+
 export interface SupplierDashboard {
   totalProducts: number;
   activeProducts: number;
@@ -51,6 +73,24 @@ export class SupplierService {
 
   getOrders(): Observable<Result<SupplierOrder[]>> {
     return this.api.get<Result<SupplierOrder[]>>('/v1/suppliers/orders');
+  }
+
+  /** فهرست قیمت‌های تأمین‌کننده جاری برای محصولات */
+  getMyPricing(): Observable<Result<SupplierProductPricing[]>> {
+    return this.api.get<Result<SupplierProductPricing[]>>('/v1/supplier-products/my');
+  }
+
+  /** ثبت/به‌روزرسانی قیمت تأمین‌کننده برای یک محصول */
+  upsertPricing(data: {
+    productId: string;
+    supplyPrice: number;
+    profitMarginPercent?: number;
+    availableQuantity?: number;
+    leadTimeHours?: number;
+    minOrderQuantity?: number;
+    supplierSku?: string;
+  }): Observable<Result<SupplierProductPricing>> {
+    return this.api.post<Result<SupplierProductPricing>>('/v1/supplier-products/my', data);
   }
 
   getProfile(): Observable<Result<any>> {

@@ -1,7 +1,7 @@
-<section dir="rtl" class="mx-auto max-w-7xl space-y-6">
+<section dir="rtl" class="admin-page">
   <app-page-header
     title="فروشندگان"
-    subtitle="بررسی اطلاعات و تأیید فروشندگان"
+    subtitle="بررسی اطلاعات، ویرایش و تأیید فروشندگان"
     [actions]="headerActions"
   ></app-page-header>
 
@@ -29,12 +29,12 @@
     (pageChange)="goToPage($event)"
   ></app-data-table>
 
-  <!-- Create Seller Modal -->
+  <!-- Create / Edit Seller Modal -->
   <div *ngIf="createOpen" class="admin-modal" (click)="closeCreate()">
-    <form [formGroup]="sellerForm" (ngSubmit)="createSeller()" (click)="$event.stopPropagation()"
+    <form [formGroup]="sellerForm" (ngSubmit)="submitSeller()" (click)="$event.stopPropagation()"
       class="admin-modal__card admin-modal__card--wide">
       <div class="admin-modal__header">
-        <h2 class="admin-modal__title">افزودن فروشنده جدید</h2>
+        <h2 class="admin-modal__title">{{ editingSeller ? 'ویرایش فروشنده' : 'افزودن فروشنده جدید' }}</h2>
         <button type="button" mat-icon-button (click)="closeCreate()" aria-label="بستن">
           <mat-icon>close</mat-icon>
         </button>
@@ -85,6 +85,14 @@
           <mat-label>درصد کمیسیون *</mat-label>
           <input matInput type="number" min="0" max="100" formControlName="commissionRate" />
         </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>حداقل مبلغ سفارش (تومان)</mat-label>
+          <input matInput type="number" min="0" formControlName="minimumOrderAmount" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>حداقل تعداد سفارش</mat-label>
+          <input matInput type="number" min="0" formControlName="minimumOrderQuantity" />
+        </mat-form-field>
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
           <mat-label>نشانی *</mat-label>
           <textarea matInput rows="2" formControlName="address"></textarea>
@@ -94,30 +102,218 @@
       <div class="admin-form-actions">
         <button type="button" mat-button (click)="closeCreate()">انصراف</button>
         <button type="submit" mat-flat-button class="admin-btn-primary" [disabled]="creating">
-          {{ creating ? 'در حال ذخیره…' : 'ثبت فروشنده' }}
+          {{ creating ? 'در حال ذخیره…' : (editingSeller ? 'ذخیره تغییرات' : 'ثبت فروشنده') }}
         </button>
       </div>
     </form>
   </div>
 
-  <!-- Documents Modal -->
-  <div *ngIf="documentsSeller" class="admin-modal" (click)="closeDocuments()">
-    <mat-card appearance="outlined" class="admin-modal__card" (click)="$event.stopPropagation()">
+  <!-- Seller Detail Modal (tabbed) -->
+  <div *ngIf="detailSeller" class="admin-modal" (click)="closeDetail()">
+    <div class="admin-modal__card admin-modal__card--wide" (click)="$event.stopPropagation()">
       <div class="admin-modal__header">
-        <h2 class="admin-modal__title">مدارک {{ documentsSeller.companyName }}</h2>
-        <button mat-icon-button (click)="closeDocuments()" aria-label="بستن">
+        <h2 class="admin-modal__title">{{ detailSeller.companyName }}</h2>
+        <button mat-icon-button (click)="closeDetail()" aria-label="بستن">
           <mat-icon>close</mat-icon>
         </button>
       </div>
-      <p *ngIf="documentsLoading" class="admin-modal__loading">در حال بارگذاری مدارک…</p>
-      <div *ngIf="!documentsLoading && documents.length" class="admin-modal__list">
-        <a *ngFor="let document of documents" [href]="document.url" target="_blank" rel="noopener"
-          class="admin-modal__list-item">
-          <mat-icon class="admin-modal__list-icon">description</mat-icon>
-          <span>{{ document.name || document.type || 'مشاهده مدرک' }}</span>
-        </a>
+
+      <nav class="admin-modal__tabs">
+        <button type="button" (click)="switchTab('info')" [class.active]="detailTab === 'info'">اطلاعات</button>
+        <button type="button" (click)="switchTab('orders')" [class.active]="detailTab === 'orders'">
+          سفارش‌ها <span class="admin-modal__tab-hint">({{ detailOrdersTotal }})</span>
+        </button>
+        <button type="button" (click)="switchTab('products')" [class.active]="detailTab === 'products'">
+          محصولات <span class="admin-modal__tab-hint">({{ detailProductsTotal }})</span>
+        </button>
+        <button type="button" (click)="switchTab('reports')" [class.active]="detailTab === 'reports'">گزارش‌ها</button>
+        <button type="button" (click)="switchTab('documents')" [class.active]="detailTab === 'documents'">مدارک</button>
+      </nav>
+
+      <!-- اطلاعات -->
+      <div *ngIf="detailTab === 'info'" class="admin-modal__grid admin-modal__grid--wide">
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">نام شرکت</p>
+          <p class="admin-modal__value">{{ detailSeller.companyName }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">شناسه ملی</p>
+          <p class="admin-modal__value">{{ detailSeller.nationalId || '—' }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">نام تماس</p>
+          <p class="admin-modal__value">{{ detailSeller.contactName }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">ایمیل تماس</p>
+          <p class="admin-modal__value">{{ detailSeller.contactEmail }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">شماره تماس</p>
+          <p class="admin-modal__value" dir="ltr">{{ detailSeller.contactPhone }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">موقعیت</p>
+          <p class="admin-modal__value">{{ (detailSeller.city && detailSeller.province) ? detailSeller.city + '، ' + detailSeller.province : (detailSeller.city || detailSeller.province || '—') }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">کد پستی</p>
+          <p class="admin-modal__value">{{ detailSeller.postalCode || '—' }}</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">کمیسیون</p>
+          <p class="admin-modal__value">{{ detailSeller.commissionRate ?? 0 }}٪</p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">وضعیت تأیید</p>
+          <p class="admin-modal__value">
+            <span class="admin-modal__pill" [class.admin-modal__pill--success]="detailSeller.isVerified" [class.admin-modal__pill--warn]="!detailSeller.isVerified">
+              {{ detailSeller.isVerified ? 'تأیید شده' : 'در انتظار تأیید' }}
+            </span>
+          </p>
+        </div>
+        <div class="admin-modal__field">
+          <p class="admin-modal__label">نشانی</p>
+          <p class="admin-modal__value">{{ detailSeller.address || '—' }}</p>
+        </div>
       </div>
-      <p *ngIf="!documentsLoading && !documents.length" class="admin-modal__empty">مدرکی ثبت نشده است.</p>
-    </mat-card>
+
+      <!-- سفارش‌ها -->
+      <div *ngIf="detailTab === 'orders'">
+        <p *ngIf="detailOrdersLoading" class="admin-modal__loading">در حال بارگذاری سفارش‌ها…</p>
+        <p *ngIf="detailError" class="admin-form-error">{{ detailError }}</p>
+        <div *ngIf="!detailOrdersLoading && detailOrders.length" class="admin-modal__table">
+          <table>
+            <thead>
+              <tr>
+                <th>شماره سفارش</th>
+                <th>وضعیت</th>
+                <th>تعداد اقلام</th>
+                <th>مبلغ کل</th>
+                <th>تاریخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of detailOrders">
+                <td>{{ order.orderNumber }}</td>
+                <td><span class="admin-modal__pill">{{ order.status }}</span></td>
+                <td>{{ order.itemCount }}</td>
+                <td>{{ order.totalAmount | persianNumber }} تومان</td>
+                <td>{{ order.createdAt | persianDate }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="detailOrdersTotal > detailOrders.length" class="admin-modal__pager">
+            <button mat-button [disabled]="detailOrdersPage <= 1" (click)="loadOrders(detailOrdersPage - 1)">قبلی</button>
+            <span>صفحه {{ detailOrdersPage }}</span>
+            <button mat-button [disabled]="detailOrdersPage * 10 >= detailOrdersTotal" (click)="loadOrders(detailOrdersPage + 1)">بعدی</button>
+          </div>
+        </div>
+        <p *ngIf="!detailOrdersLoading && !detailOrders.length" class="admin-modal__empty">سفارشی برای این فروشنده ثبت نشده است.</p>
+      </div>
+
+      <!-- محصولات -->
+      <div *ngIf="detailTab === 'products'">
+        <p *ngIf="detailProductsLoading" class="admin-modal__loading">در حال بارگذاری محصولات…</p>
+        <p *ngIf="detailError" class="admin-form-error">{{ detailError }}</p>
+        <div *ngIf="!detailProductsLoading && detailProducts.length" class="admin-modal__table">
+          <table>
+            <thead>
+              <tr>
+                <th>نام محصول</th>
+                <th>SKU</th>
+                <th>قیمت</th>
+                <th>وضعیت</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of detailProducts">
+                <td>{{ product.name }}</td>
+                <td dir="ltr">{{ product.sku }}</td>
+                <td>{{ product.unitPrice | persianNumber }} تومان</td>
+                <td><span class="admin-modal__pill">{{ product.publishStatus }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="detailProductsTotal > detailProducts.length" class="admin-modal__pager">
+            <button mat-button [disabled]="detailProductsPage <= 1" (click)="loadProducts(detailProductsPage - 1)">قبلی</button>
+            <span>صفحه {{ detailProductsPage }}</span>
+            <button mat-button [disabled]="detailProductsPage * 20 >= detailProductsTotal" (click)="loadProducts(detailProductsPage + 1)">بعدی</button>
+          </div>
+        </div>
+        <p *ngIf="!detailProductsLoading && !detailProducts.length" class="admin-modal__empty">محصولی برای این فروشنده ثبت نشده است.</p>
+      </div>
+
+      <!-- گزارش‌ها -->
+      <div *ngIf="detailTab === 'reports'">
+        <p *ngIf="reportLoading" class="admin-modal__loading">در حال محاسبه گزارش…</p>
+        <div *ngIf="!reportLoading && report" class="admin-modal__grid admin-modal__grid--wide">
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">تعداد سفارش‌ها</p>
+            <p class="admin-modal__value">{{ report.orderCount }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">سفارش‌های تکمیل‌شده</p>
+            <p class="admin-modal__value">{{ report.completedOrderCount }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">درآمد کل</p>
+            <p class="admin-modal__value">{{ report.revenue | persianNumber }} تومان</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">کمیسیون قابل پرداخت</p>
+            <p class="admin-modal__value">{{ report.commissionOwed | persianNumber }} تومان</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">تعداد محصولات</p>
+            <p class="admin-modal__value">{{ report.productCount }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">مدارک در انتظار بررسی</p>
+            <p class="admin-modal__value">{{ report.pendingDocuments }}</p>
+          </div>
+        </div>
+        <p *ngIf="!reportLoading && !report" class="admin-modal__empty">گزارشی در دسترس نیست.</p>
+      </div>
+
+      <!-- مدارک -->
+      <div *ngIf="detailTab === 'documents'">
+        <div class="admin-modal__addresses" style="margin-bottom: 1rem">
+          <div class="admin-form-grid">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1">
+              <mat-label>نوع مدرک</mat-label>
+              <mat-select [(ngModel)]="selectedDocumentType" name="documentType">
+                <mat-option *ngFor="let type of documentTypes" [value]="type.value">{{ type.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <input #fileInput type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)" hidden />
+            <button type="button" mat-flat-button class="admin-btn-primary" [disabled]="uploading" (click)="fileInput.click()">
+              {{ uploading ? 'در حال بارگذاری…' : 'بارگذاری مدرک' }}
+            </button>
+          </div>
+          <p *ngIf="uploadError" class="admin-form-error">{{ uploadError }}</p>
+        </div>
+
+        <p *ngIf="documentsLoading" class="admin-modal__loading">در حال بارگذاری مدارک…</p>
+        <div *ngIf="!documentsLoading && documents.length" class="admin-modal__list">
+          <div *ngFor="let document of documents" class="admin-modal__list-item admin-modal__list-item--row">
+            <a [href]="document.url" target="_blank" rel="noopener" class="admin-modal__list-link">
+              <mat-icon class="admin-modal__list-icon">description</mat-icon>
+              <span>{{ document.name || document.type || 'مشاهده مدرک' }}</span>
+            </a>
+            <span class="admin-modal__pill"
+              [class.admin-modal__pill--success]="document.isVerified === true"
+              [class.admin-modal__pill--warn]="document.isVerified === false">
+              {{ document.isVerified === true ? 'تأیید شده' : document.isVerified === false ? 'رد شده' : 'در انتظار بررسی' }}
+            </span>
+            <span *ngIf="!document.isVerified" class="admin-modal__actions">
+              <button mat-button color="primary" (click)="verifyDocument(document)">تأیید</button>
+              <button mat-button color="warn" (click)="rejectDocument(document)">رد</button>
+            </span>
+          </div>
+        </div>
+        <p *ngIf="!documentsLoading && !documents.length" class="admin-modal__empty">مدرکی ثبت نشده است. با دکمه بالا اولین مدرک را بارگذاری کنید.</p>
+      </div>
+    </div>
   </div>
 </section>
