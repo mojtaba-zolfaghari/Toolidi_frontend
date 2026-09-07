@@ -1,7 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.2 - Active mode FTP deployment
+# Version: 2.3 - Fixed directory creation and active mode
 name: CI/CD Frontend Deploy
 
 on:
@@ -99,38 +99,55 @@ jobs:
           ftp.set_pasv(False)  # Active mode
           print("Using active mode")
 
+          # Create remote directory recursively
+          print(f"Creating remote directory: {remote_dir}")
+          parts = remote_dir.strip('/').split('/')
+          current = ''
+          for part in parts:
+              current += '/' + part
+              try:
+                  ftp.cwd(current)
+              except:
+                  try:
+                      ftp.mkd(part)
+                      ftp.cwd(current)
+                  except Exception as e:
+                      print(f"Warning: Could not create {current}: {e}")
+
           ftp.cwd(remote_dir)
-          
+          print(f"Changed to: {remote_dir}")
+
           local_path = Path(local_dir)
           uploaded = 0
-          
+
           for filepath in local_path.rglob('*'):
               if filepath.is_file():
                   rel_path = str(filepath.relative_to(local_path))
                   remote_path = remote_dir.rstrip('/') + '/' + rel_path
                   
-                  # Create directory structure
+                  print(f"Uploading: {rel_path}")
+                  
+                  # Create subdirectories
                   remote_parent = os.path.dirname(remote_path)
                   try:
                       ftp.cwd(remote_parent)
-                  except ftplib.error_perm:
-                      dirs = remote_parent.replace(remote_dir, '').split('/')
+                  except:
+                      parts = remote_parent.replace(remote_dir, '').split('/')
                       current = remote_dir
-                      for d in dirs:
-                          if d:
-                              current += '/' + d
+                      for p in parts:
+                          if p:
+                              current += '/' + p
                               try:
-                                  ftp.mkd(d)
-                                  ftp.cwd(d)
+                                  ftp.mkd(p)
+                                  ftp.cwd(p)
                               except:
-                                  ftp.cwd(d)
-                      ftp.cwd(remote_dir)
-                  
-                  print(f"Uploading: {rel_path}")
+                                  ftp.cwd(p)
+
+                  # Upload file
                   with open(filepath, 'rb') as f:
-                      ftp.storbinary(f'STOR {remote_path}', f)
+                      ftp.storbinary(f'STOR {os.path.basename(remote_path)}', f)
                   uploaded += 1
-          
+
           print(f"\n✅ Successfully uploaded {uploaded} files")
           ftp.quit()
           EOF

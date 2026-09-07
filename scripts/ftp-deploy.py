@@ -2,10 +2,9 @@
 """
 FTP Deployment Script - Uses active mode to avoid firewall issues
 """
-import sys
 import os
+import sys
 import ftplib
-import zipfile
 from pathlib import Path
 
 def main():
@@ -21,17 +20,18 @@ def main():
     
     print(f"Connecting to {server}...")
     try:
-        # Create FTP connection
         ftp = ftplib.FTP(server)
         ftp.login(username, password)
+        ftp.set_pasv(False)  # Active mode
+        print("Using active mode")
         
-        # Set active mode (default is false for active, true for passive)
-        ftp.set_pasv(False)
-        print("Using active mode (PASV disabled)")
+        # Create remote directory if it doesn't exist
+        print(f"Creating remote directory: {remote_dir}")
+        create_directory_recursive(ftp, remote_dir)
         
         # Change to remote directory
         ftp.cwd(remote_dir)
-        print(f"Changed to remote directory: {remote_dir}")
+        print(f"Changed to: {remote_dir}")
         
         # Upload files
         local_path = Path(local_dir)
@@ -39,44 +39,45 @@ def main():
         
         for filepath in local_path.rglob('*'):
             if filepath.is_file():
-                # Skip dist folder in source
-                if '/dist/' in str(filepath) and 'toolidi' not in str(filepath):
-                    continue
-                
-                # Get relative path
                 rel_path = str(filepath.relative_to(local_path))
                 remote_path = remote_dir.rstrip('/') + '/' + rel_path
                 
                 print(f"Uploading: {rel_path}")
                 
-                # Create remote directory if needed
+                # Create subdirectories if needed
                 remote_parent = os.path.dirname(remote_path)
                 try:
                     ftp.cwd(remote_parent)
                 except ftplib.error_perm:
-                    # Create parent directories
-                    dirs = remote_parent.replace(remote_dir, '').split('/')
-                    current = remote_dir
-                    for d in dirs:
-                        if d:
-                            current = current.rstrip('/') + '/' + d
-                            try:
-                                ftp.mkd(d)
-                                ftp.cwd(d)
-                            except:
-                                pass
-                    
+                    create_directory_recursive(ftp, remote_parent)
+                    ftp.cwd(remote_parent)
+                
                 # Upload file
                 with open(filepath, 'rb') as f:
-                    ftp.storbinary(f'STOR {remote_path}', f)
+                    ftp.storbinary(f'STOR {os.path.basename(remote_path)}', f)
                 uploaded += 1
         
-        print(f"\nSuccessfully uploaded {uploaded} files")
+        print(f"\n✅ Successfully uploaded {uploaded} files")
         ftp.quit()
         
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
+
+def create_directory_recursive(ftp, path):
+    """Create directory and all parent directories recursively"""
+    parts = path.strip('/').split('/')
+    current = ''
+    for part in parts:
+        current += '/' + part
+        try:
+            ftp.cwd(current)
+        except ftplib.error_perm:
+            try:
+                ftp.mkd(part)
+                ftp.cwd(current)
+            except Exception as e:
+                print(f"Warning: Could not create {current}: {e}")
 
 if __name__ == '__main__':
     main()
