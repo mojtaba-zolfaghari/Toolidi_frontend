@@ -102,26 +102,26 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       benefits: [
         'دسترسی به شبکه بزرگ فروشندگان عمده',
         'مدیریت سفارشات و موجودی از داشبورد یکپارچه',
-        'پرداخت سریع و تضمین‌شده',
+        'پرداخت سریع و تضمینشده',
         'پشتیبانی لجستیک و ارسال'
       ],
-      ctaText: 'ثبت‌نام تولیدکننده',
-      ctaLink: '/supplier/benefits',
+      ctaText: 'ثبتنام تولیدکننده',
+      ctaLink: '/auth/supplier-register',
       gradient: 'linear-gradient(135deg, #6C3FC5 0%, #4A2E9E 100%)'
     },
     {
       id: 'seller',
       title: 'فروشنده شوید',
-      subtitle: 'به شبکه تامین‌کنندگان معتبر متصل شوید',
+      subtitle: 'به شبکه تامینکنندگان معتبر متصل شوید',
       icon: 'store',
       benefits: [
-        'دسترسی به صدها تامین‌کننده معتبر',
+        'دسترسی به صدها تامینکننده معتبر',
         'مدیریت چند فروشنده در یک پنل',
-        'ابزارهای تحلیل فروش و گزارش‌گیری',
+        'ابزارهای تحلیل فروش و گزارشگیری',
         'پشتیبانی ۲۴ ساعته'
       ],
-      ctaText: 'ثبت‌نام فروشنده',
-      ctaLink: '/seller/benefits',
+      ctaText: 'ثبتنام فروشنده',
+      ctaLink: '/auth/seller-register',
       gradient: 'linear-gradient(135deg, #1B2A4A 0%, #2A3F6B 100%)'
     },
     {
@@ -136,7 +136,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         'ارسال سریع به سراسر کشور'
       ],
       ctaText: 'شروع خرید',
-      ctaLink: '/buyer/benefits',
+      ctaLink: '/auth/register',
       gradient: 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
     }
   ];

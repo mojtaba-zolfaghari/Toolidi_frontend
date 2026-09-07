@@ -1,0 +1,305 @@
+/* کیف پول و تسویه فروشنده — کلاس‌های معنایی BEM با توکن‌های متریال (جانشین کلاس‌های Tailwind) */
+:host {
+  --sp-primary: var(--mat-sys-primary, #6C3FC5);
+  --sp-primary-container: var(--mat-sys-primary-container, #ede4ff);
+  --sp-secondary: var(--mat-sys-on-surface, #1B2A4A);
+  --sp-surface: var(--mat-sys-surface, #ffffff);
+  --sp-surface-container: var(--mat-sys-surface-container, #f5f3f0);
+  --sp-outline: var(--mat-sys-outline-variant, #e7e4ee);
+  --sp-muted: #6b7280;
+  --sp-ok: #059669;
+  --sp-ok-bg: #f0fdf4;
+  --sp-warn: #ea580c;
+  --sp-err: #dc2626;
+  --sp-err-bg: #fef2f2;
+  --sp-info: #1d4ed8;
+  --sp-shadow: 0 1px 3px rgb(15 23 42 / 6%), 0 1px 2px rgb(15 23 42 / 4%);
+  display: block;
+}
+
+.payouts {
+  max-width: 80rem;
+  margin-inline: auto;
+  padding: 1.5rem 1rem 3rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* ─── هدر ─── */
+.payouts__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.payouts__eyebrow {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--sp-primary);
+}
+
+.payouts__title {
+  margin: 0.25rem 0 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--sp-secondary);
+}
+
+.payouts__subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--sp-muted);
+}
+
+.payouts__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ─── هشدارها ─── */
+.payouts__alert {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+
+  &--error {
+    background: var(--sp-err-bg);
+    color: var(--sp-err);
+    border: 1px solid #fecaca;
+  }
+
+  &--success {
+    background: var(--sp-ok-bg);
+    color: var(--sp-ok);
+    border: 1px solid #bbf7d0;
+  }
+}
+
+.payouts__loading {
+  padding: 4rem 1rem;
+  border-radius: 1rem;
+  background: var(--sp-surface);
+  box-shadow: var(--sp-shadow);
+  text-align: center;
+  color: var(--sp-muted);
+}
+
+/* ─── کارت‌های کیف پول ─── */
+.payouts__cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 640px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 1280px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.payouts__card {
+  border-radius: 1rem;
+  background: var(--sp-surface);
+  box-shadow: var(--sp-shadow);
+  padding: 1.25rem;
+
+  &--primary {
+    background: linear-gradient(135deg, var(--sp-secondary, #1B2A4A), #2c3e63);
+    color: #ffffff;
+
+    .payouts__card-label { color: rgb(255 255 255 / 70%); }
+  }
+
+  &--success {
+    background: linear-gradient(135deg, var(--sp-ok), #047857);
+    color: #ffffff;
+
+    .payouts__card-label { color: rgb(255 255 255 / 70%); }
+  }
+}
+
+.payouts__card-label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--sp-muted);
+}
+
+.payouts__card-value {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sp-secondary);
+
+  &--warn { color: var(--sp-warn); }
+  &--info { color: var(--sp-info); }
+}
+
+.payouts__card--primary .payouts__card-value,
+.payouts__card--success .payouts__card-value {
+  color: #ffffff;
+}
+
+/* ─── جدول تراکنش‌ها ─── */
+.payouts__table-card {
+  background: var(--sp-surface);
+  border-radius: 1rem;
+  box-shadow: var(--sp-shadow);
+  padding: 1.5rem;
+}
+
+.payouts__section-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sp-secondary);
+}
+
+.payouts__table-wrap {
+  overflow-x: auto;
+}
+
+.payouts__table {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: right;
+
+  th {
+    padding: 0.75rem;
+    font-weight: 500;
+    color: var(--sp-muted);
+    border-bottom: 1px solid var(--sp-outline);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--sp-outline);
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.payouts__amount {
+  font-weight: 700;
+  color: var(--sp-ok);
+
+  &--neg {
+    color: var(--sp-err);
+  }
+}
+
+.payouts__status-chip {
+  display: inline-block;
+  background: var(--sp-surface-container);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.6875rem;
+  color: var(--sp-secondary);
+}
+
+.payouts__empty {
+  margin: 0;
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--sp-muted);
+}
+
+/* ─── مودال برداشت ─── */
+.payouts__modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(27 42 74 / 50%);
+}
+
+.payouts__modal {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  background: var(--sp-surface);
+  border-radius: 1rem;
+  box-shadow: var(--mat-sys-level3, 0 8px 30px rgb(15 23 42 / 25%));
+  padding: 1.5rem;
+}
+
+.payouts__modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.payouts__modal-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sp-secondary);
+}
+
+.payouts__modal-close {
+  border: 0;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #9ca3af;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--sp-secondary);
+  }
+}
+
+.payouts__field {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.payouts__field-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--sp-secondary);
+}
+
+.payouts__input {
+  width: 100%;
+  border: 1px solid var(--sp-outline);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: var(--sp-primary);
+    box-shadow: 0 0 0 3px rgb(108 63 197 / 15%);
+  }
+}
+
+.payouts__field-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--sp-err);
+}
+
+.payouts__modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}

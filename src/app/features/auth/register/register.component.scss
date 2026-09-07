@@ -117,10 +117,28 @@
 .submit-arrow { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #426da9; background: rgba(255,255,255,.9); font-size: 18px; }
 .trust-row { justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; color: #9aa7bb; font-size: 9px; }
 .login-link { margin: 26px 0 16px; color: #8793a6; text-align: center; font-size: 11px; }
-.login-link a, .business-link a { color: #4b82d5; font-weight: 800; text-decoration: none; }
-.business-link { gap: 10px; padding-top: 16px; border-top: 1px solid #edf0f5; color: #a4afc0; font-size: 10px; }
+.login-link a, .business-link a { color: #4b82d5; font-weight: 800; text-decoration: none; }  .business-link { gap: 10px; padding-top: 16px; border-top: 1px solid #edf0f5; color: #a4afc0; font-size: 10px; }
 
-@keyframes registerPulse { 50% { transform: scale(1.18); opacity: .65; } }
+  .reg-verify-note {
+    margin: 22px 0 0;
+    color: #8793a6;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  .form-message-info {
+    margin: 12px 0;
+    padding: 11px 13px;
+    border-radius: 12px;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #2a5a8a;
+    background: #eaf2fb;
+  }
+
+@keyframes registerPulse {
+ 50% { transform: scale(1.18); opacity: .65; } }
 @keyframes packageTravel { 0%, 100% { transform: translate(-5px, 3px); } 50% { transform: translate(10px, -10px); } }
 
 @media (max-width: 840px) {

@@ -1,20 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
 import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
+import { RegistrationUxService } from '../register/registration-ux.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+/**
+ * ثبتنام تأمینکننده — Material-only design (Tailwind migration complete).
+ * Flow: 3 steps (حساب → شرکت/تماس → آپلود مدارک) → submit → success state.
+ */
+interface UploadFileState {
+  file: File;
+  progress: number;
+  error: string;
+  uploaded?: boolean;
+}
 
 @Component({
   selector: 'app-supplier-register',
   templateUrl: './supplier-register.component.html',
   styleUrls: ['./supplier-register.component.scss']
 })
-export class SupplierRegisterComponent implements OnInit {
+export class SupplierRegisterComponent implements OnInit, OnDestroy {
   form: FormGroup;
   loading = false;
   errorMessage = '';
   successMessage = '';
+  submitted = false;
   currentStep = 1;
   totalSteps = 3;
 
@@ -31,20 +45,29 @@ export class SupplierRegisterComponent implements OnInit {
   registrationCheckMessage = '';
 
   categories = [
-    'انگشتر نقره‌نگین', 'طلای زرد', 'طلای سفید', 'نقره‌آلات',
-    'سنگ‌های قیمتی و نیمه‌قیمتی', 'ابزار و تجهیزات معدن',
-    'حلقه‌های نامزدی و ازدواج', 'گردنبند و زنجیر', 'دستبند و النگو',
+    'انگشتر نقرهنگین', 'طلای زرد', 'طلای سفید', 'نقرهآلات',
+    'سنگهای قیمتی و نیمهقیمتی', 'ابزار و تجهیزات معدن',
+    'حلقههای نامزدی و ازدواج', 'گردنبند و زنجیر', 'دستبند و النگو',
     'گوشواره', 'لباس و پوشاک', 'لوازم آرایشی و بهداشتی',
-    'صنایع پلاستیکی', 'زیورآلات دست‌ساز', 'جواهرات عتیقه و کلکسیونی'
+    'صنایع پلاستیکی', 'زیورآلات دستساز', 'جواهرات عتیقه و کلکسیونی'
   ];
 
   selectedCategories: string[] = [];
+
+  @ViewChild('stepContainer') stepContainer!: ElementRef;
+
+  // Document upload state
+  private readonly UNSAVED_MESSAGE = 'شما تغییرات ذخیرهنشدهای دارید. آیا میخواهید از این صفحه خارج شوید؟';
+  supplierUploadedFiles: Array<{ name: string; url?: string; size?: number }> = [];
+  supplierUploadingFiles: UploadFileState[] = [];
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly locationService: LocationService
+    private readonly locationService: LocationService,
+    private readonly ux: RegistrationUxService,
+    private readonly snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
       nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -52,8 +75,6 @@ export class SupplierRegisterComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
       companyName: ['', [Validators.required, Validators.minLength(3)]],
-      city: ['', [Validators.required]],
-      province: ['', [Validators.required]],
       provinceId: [''],
       cityId: [''],
       phone: ['', [Validators.required, Validators.pattern(/^09\d{9}$/)]],
@@ -64,12 +85,17 @@ export class SupplierRegisterComponent implements OnInit {
       leadTimeDays: [3, [Validators.required, Validators.min(1)]],
       minOrderAmount: [0],
       acceptsReturns: [true],
-      isVerified: [false]
+      terms: [false, [Validators.requiredTrue]]
     });
   }
 
   ngOnInit(): void {
     this.loadProvinces();
+    this.ux.enableUnsavedWarning(this.UNSAVED_MESSAGE);
+  }
+
+  ngOnDestroy(): void {
+    this.ux.disableUnsavedWarning();
   }
 
   /** Load provinces from API */
@@ -89,7 +115,6 @@ export class SupplierRegisterComponent implements OnInit {
   onProvinceChange(): void {
     const provinceId = this.form.get('provinceId')?.value;
     this.apiCities = [];
-    this.form.patchValue({ cityId: '' });
     this.registrationAllowed = true;
     this.registrationCheckMessage = '';
 
@@ -105,22 +130,21 @@ export class SupplierRegisterComponent implements OnInit {
     });
   }
 
-  /** When city changes, check if agent registration is allowed */
+  /** When city changes, check if registration is allowed */
   onCityChange(): void {
     const provinceId = this.form.get('provinceId')?.value;
-    const cityId = this.form.get('cityId')?.value;
 
     this.registrationAllowed = true;
     this.registrationCheckMessage = '';
 
-    if (!provinceId || !cityId) return;
+    if (!provinceId) return;
 
-    this.locationService.isAgentRegistrationAvailable(provinceId, cityId).subscribe({
+    this.locationService.isAgentRegistrationAvailable(provinceId, '').subscribe({
       next: (result) => {
         if (result.isSuccess) {
           this.registrationAllowed = result.data ?? true;
           if (!this.registrationAllowed) {
-            this.registrationCheckMessage = 'ثبت‌نام کارپخش در این شهر فعال نیست';
+            this.registrationCheckMessage = 'ثبتنام تأمینکننده در این شهر فعلاً فعال نیست';
           }
         }
       },
@@ -150,17 +174,23 @@ export class SupplierRegisterComponent implements OnInit {
   }
 
   isStepValid(step: number): boolean {
-    const stepFields: { [key: number]: string[] } = {
+    const stepFields: Record<number, string[]> = {
       1: ['nationalCode', 'username', 'password', 'confirmPassword'],
-      2: ['companyName', 'city', 'province', 'phone', 'email'],
-      3: ['description', 'capacity', 'leadTimeDays']
+      2: ['companyName', 'provinceId', 'cityId', 'phone', 'email'],
+      3: ['acceptsReturns']
     };
     return stepFields[step]?.every(f => this.form.get(f)?.valid) ?? false;
+  }
+
+  hasError(field: string): boolean {
+    const control = this.form.get(field);
+    return !!control?.invalid && !!control?.touched;
   }
 
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.scrollToFirstInvalid();
       return;
     }
 
@@ -177,17 +207,29 @@ export class SupplierRegisterComponent implements OnInit {
       nationalCode: this.form.value.nationalCode,
       username: this.form.value.username,
       password: this.form.value.password,
-      confirmPassword: this.form.value.confirmPassword
+      confirmPassword: this.form.value.confirmPassword,
+      companyName: this.form.value.companyName,
+      provinceId: this.form.value.provinceId,
+      cityId: this.form.value.cityId,
+      phone: this.form.value.phone,
+      email: this.form.value.email,
+      address: this.form.value.address,
+      description: this.form.value.description,
+      capacity: this.form.value.capacity,
+      leadTimeDays: this.form.value.leadTimeDays,
+      minOrderAmount: this.form.value.minOrderAmount,
+      acceptsReturns: this.form.value.acceptsReturns,
+      selectedCategories: this.selectedCategories
     };
 
     this.authService.registerSeller(data).subscribe({
       next: (result) => {
         this.loading = false;
         if (result.isSuccess) {
-          this.successMessage = 'ثبت‌نام تأمین‌کننده با موفقیت انجام شد! اکنون می‌توانید وارد شوید.';
-          setTimeout(() => this.router.navigate(['/login']), 2000);
+          this.submitted = true;
+          this.successMessage = 'ثبتنام تأمینکننده با موفقیت انجام شد! اکنون حساب شما در حال بررسی است.';
         } else {
-          this.errorMessage = result.errorMessage ?? 'ثبت‌نام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
+          this.errorMessage = result.errorMessage ?? 'ثبتنام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
         }
       },
       error: (err: Error) => {
@@ -195,5 +237,63 @@ export class SupplierRegisterComponent implements OnInit {
         this.errorMessage = err?.message ?? 'خطا در ارتباط با سرور';
       }
     });
+  }
+
+  goToSupplierPanel(): void {
+    this.router.navigate(['/auth/login']);
+  }
+
+  startAgain(): void {
+    this.submitted = false;
+    this.currentStep = 1;
+    this.form.reset({
+      acceptsReturns: true,
+      capacity: 100,
+      leadTimeDays: 3,
+      minOrderAmount: 0
+    });
+    this.supplierUploadedFiles = [];
+    this.supplierUploadingFiles = [];
+  }
+
+  scrollToFirstInvalid(): void {
+    this.ux.scrollToFirstInvalid(this.form, this.stepContainer?.nativeElement);
+  }
+
+  // ─── Document Upload Handlers ──────────────────────────────
+
+  onFilesSelected(files: FileList | null): void {
+    if (!files) return;
+    this.onSupplierFileSelected(Array.from(files));
+  }
+
+  onSupplierFileSelected(files: File[]): void {
+    const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+    const MAX_BYTES = 5 * 1024 * 1024;
+
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        this.snackBar.open(`نوع فایل "${file.name}" پذیرفته نیست (PDF، JPG یا PNG).`, 'بستن', { duration: 4000 });
+        continue;
+      }
+      if (file.size > MAX_BYTES) {
+        this.snackBar.open(`حجم فایل "${file.name}" باید کمتر از ۵ مگابایت باشد.`, 'بستن', { duration: 4000 });
+        continue;
+      }
+      this.supplierUploadingFiles.push({ file, progress: 100, error: '' });
+      this.supplierUploadedFiles.push({ name: file.name, size: file.size });
+    }
+  }
+
+  removeUploadedFile(index: number): void {
+    this.supplierUploadedFiles.splice(index, 1);
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.form.touched) {
+      event.preventDefault();
+      event.returnValue = this.UNSAVED_MESSAGE;
+    }
   }
 }

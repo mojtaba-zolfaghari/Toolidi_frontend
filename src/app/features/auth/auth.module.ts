@@ -10,6 +10,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
@@ -18,6 +22,9 @@ import { SupplierRegisterComponent } from './supplier-register/supplier-register
 import { AgentRegisterComponent } from './agent-register/agent-register.component';
 import { AuthLandingComponent } from './auth-landing.component';
 import { OfflineComponent } from './offline.component';
+
+import { BuyerProfileApiService } from './register/buyer-profile-api.service';
+import { DocumentUploadService } from './register/document-upload.service';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -42,6 +49,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule.forChild(routes),
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -49,7 +57,14 @@ const routes: Routes = [
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
-    RouterModule.forChild(routes)
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatSelectModule
+  ],
+  providers: [
+    BuyerProfileApiService,
+    DocumentUploadService
   ]
 })
 export class AuthModule { }

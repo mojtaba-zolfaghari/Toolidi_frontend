@@ -1,10 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../../../environments/environment';
 import { ApiService } from '../api.service';
 import { PagedList, Result } from '../../models/api-response.model';
 import { buildQueryString } from './query.util';
 import { SalesReport } from './reports.service';
+
+/** آدرس مطلق فایل مدارک — API آدرس را نسبی (بدون origin) برمی‌گرداند. */
+export function toDocumentFileUrl(relativeUrl: string): string {
+  if (!relativeUrl) return '';
+  if (/^https?:\/\//i.test(relativeUrl)) return relativeUrl;
+  const origin = environment.apiUrl.replace(/\/?api\/?$/, '');
+  return `${origin}/${relativeUrl.replace(/^\//, '')}`;
+}
 
 /** کاربر قابل مدیریت در پنل مدیر */
 export interface AdminUser {
@@ -176,6 +185,20 @@ export interface AdminSupplier {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+/** مدرک بارگذاری‌شده‌ی تولیدکننده (سمت ادمین) */
+export interface SupplierDocument {
+  id: string;
+  supplierId: string;
+  documentType: string;
+  fileName: string;
+  url: string;
+  contentType: string;
+  fileSizeBytes: number;
+  isVerified: boolean;
+  verificationNote?: string;
+  createdAt: string;
 }
 
 /** داده‌ی ایجاد/ویرایش تأمین‌کننده */
@@ -428,6 +451,23 @@ export class AdminService {
 
   rejectSellerDocument(documentId: string, note?: string): Observable<Result<boolean>> {
     return this.api.put<Result<boolean>>(`/admin/sellers/documents/${documentId}/reject`, { note });
+  }
+
+  // ─── Supplier Documents (تأیید مدارک تولیدکننده — TASK-BE-SUPPLIER-DOCUMENT-API) ──
+
+  /** مدارک بارگذاری‌شده‌ی یک تولیدکننده */
+  getSupplierDocuments(supplierId: string): Observable<Result<SupplierDocument[]>> {
+    return this.api.get<Result<SupplierDocument[]>>(`/v1/suppliers/documents/${supplierId}`);
+  }
+
+  /** تأیید مدرک تولیدکننده */
+  verifySupplierDocument(documentId: string, note?: string): Observable<Result<boolean>> {
+    return this.api.put<Result<boolean>>(`/v1/suppliers/documents/${documentId}/verify`, { note });
+  }
+
+  /** رد مدرک تولیدکننده */
+  rejectSupplierDocument(documentId: string, note?: string): Observable<Result<boolean>> {
+    return this.api.put<Result<boolean>>(`/v1/suppliers/documents/${documentId}/reject`, { note });
   }
 
   // ─── Supplier Management (تأمین‌کنندگان) ───────────────────────

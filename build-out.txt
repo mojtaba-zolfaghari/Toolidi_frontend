@@ -1,0 +1,78 @@
+npm notice run toolidi-frontend@0.1.0 npx
+npm notice run ng build
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m          [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-NEYVSA7O.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m315.33 kB[39m[2m | [22m               [36m84.89 kB[39m
+[32mchunk-O7FUQH6L.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m118.09 kB[39m[2m | [22m               [36m23.85 kB[39m
+[32mmain-PCVH6CJO.js[39m     [2m | [22m[2mmain[22m           [2m | [22m[36m106.42 kB[39m[2m | [22m               [36m26.25 kB[39m
+[32mchunk-B7UPKTAG.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m100.85 kB[39m[2m | [22m               [36m15.50 kB[39m
+[32mstyles-OV6UXT2X.css[39m  [2m | [22m[2mstyles[22m         [2m | [22m [36m82.58 kB[39m[2m | [22m               [36m10.44 kB[39m
+[32mchunk-HNOZUFI4.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m69.09 kB[39m[2m | [22m               [36m16.72 kB[39m
+[32mchunk-KHKM45FV.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m54.16 kB[39m[2m | [22m                [36m9.04 kB[39m
+[32mchunk-A5DM35DJ.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m49.45 kB[39m[2m | [22m                [36m9.59 kB[39m
+[32mpolyfills-X72VKMR3.js[39m[2m | [22m[2mpolyfills[22m      [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.38 kB[39m
+[32mchunk-JQKE5SEY.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m24.33 kB[39m[2m | [22m                [36m6.62 kB[39m
+[32mchunk-MXZAYZPN.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m17.58 kB[39m[2m | [22m                [36m4.77 kB[39m
+[32mchunk-4OLTSYPR.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m12.25 kB[39m[2m | [22m                [36m3.29 kB[39m
+[32mchunk-RFMIOPK7.js[39m    [2m | [22m[2m-[22m              [2m | [22m  [36m5.61 kB[39m[2m | [22m                [36m1.01 kB[39m
+[32mchunk-KQLB7ALJ.js[39m    [2m | [22m[2m-[22m              [2m | [22m  [36m4.36 kB[39m[2m | [22m                [36m1.11 kB[39m
+[32mchunk-E7VG2R7V.js[39m    [2m | [22m[2m-[22m              [2m | [22m  [36m4.04 kB[39m[2m | [22m                [36m1.43 kB[39m
+[32mchunk-AVTQBW6U.js[39m    [2m | [22m[2m-[22m              [2m | [22m  [36m2.75 kB[39m[2m | [22m              [36m780 bytes[39m
+[32mchunk-OKLNUCOE.js[39m    [2m | [22m[2m-[22m              [2m | [22m  [36m2.31 kB[39m[2m | [22m              [36m584 bytes[39m
+[32mchunk-766LFR7V.js[39m    [2m | [22m[2m-[22m              [2m | [22m  [36m2.21 kB[39m[2m | [22m              [36m808 bytes[39m
+[32mchunk-XUSGXKDE.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m666 bytes[39m[2m | [22m              [36m666 bytes[39m
+[32mchunk-V4NFZARU.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m623 bytes[39m[2m | [22m              [36m623 bytes[39m
+[32mchunk-QRZWCHAT.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m474 bytes[39m[2m | [22m              [36m474 bytes[39m
+[32mchunk-SEO4NSTV.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m253 bytes[39m[2m | [22m              [36m253 bytes[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m  [2m | [22m  [1m[93m1.01 MB[39m[22m[2m | [22m              [1m230.07 kB[22m
+
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m          [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-TMSQNS7E.js[39m    [2m | [22m[2madmin-module[22m   [2m | [22m[36m414.57 kB[39m[2m | [22m               [36m59.87 kB[39m
+[32mchunk-WUYR7LG7.js[39m    [2m | [22m[2m-[22m              [2m | [22m[36m252.38 kB[39m[2m | [22m               [36m43.94 kB[39m
+[32mchunk-ZUE6HI7U.js[39m    [2m | [22m[2mhome-module[22m    [2m | [22m[36m249.95 kB[39m[2m | [22m               [36m43.17 kB[39m
+[32mchunk-FB3IKEKD.js[39m    [2m | [22m[2mseller-module[22m  [2m | [22m[36m161.68 kB[39m[2m | [22m               [36m26.83 kB[39m
+[32mchunk-2RKYIPNT.js[39m    [2m | [22m[2mauth-module[22m    [2m | [22m[36m161.37 kB[39m[2m | [22m               [36m24.68 kB[39m
+[32mchunk-4DPNKB6K.js[39m    [2m | [22m[2msupplier-module[22m[2m | [22m [36m71.00 kB[39m[2m | [22m               [36m12.32 kB[39m
+[32mchunk-2PCFGDZ7.js[39m    [2m | [22m[2mproduct-module[22m [2m | [22m [36m57.38 kB[39m[2m | [22m               [36m11.52 kB[39m
+[32mchunk-3S77S6IJ.js[39m    [2m | [22m[2mcheckout-module[22m[2m | [22m [36m51.94 kB[39m[2m | [22m               [36m11.03 kB[39m
+[32mchunk-YP5YUIDY.js[39m    [2m | [22m[2mprofile-module[22m [2m | [22m [36m50.36 kB[39m[2m | [22m                [36m9.94 kB[39m
+[32mchunk-W7AZD66B.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m41.58 kB[39m[2m | [22m                [36m8.92 kB[39m
+[32mchunk-XGQEEJTV.js[39m    [2m | [22m[2mblog-module[22m    [2m | [22m [36m41.09 kB[39m[2m | [22m                [36m9.19 kB[39m
+[32mchunk-J27NHYDU.js[39m    [2m | [22m[2magent-module[22m   [2m | [22m [36m35.78 kB[39m[2m | [22m                [36m6.77 kB[39m
+[32mchunk-EGBJ6HIF.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m35.69 kB[39m[2m | [22m                [36m5.89 kB[39m
+[32mchunk-5JTRSLOF.js[39m    [2m | [22m[2mcart-module[22m    [2m | [22m [36m35.02 kB[39m[2m | [22m                [36m7.44 kB[39m
+[32mchunk-YPCJWDQU.js[39m    [2m | [22m[2m-[22m              [2m | [22m [36m33.52 kB[39m[2m | [22m                [36m6.46 kB[39m
+[2m...and 20 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+Application bundle generation complete. [17.547 seconds]
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mbundle initial exceeded maximum budget. Budget 819.20 kB was not met by 188.79 kB with a total of 1.01 MB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m20 rules skipped due to selector errors:
+  .sm\\:py-10 -> Unknown pseudo-class :py-10
+  .sm\\:py-20 -> Unknown pseudo-class :py-20
+  .sm\\:grid-cols-2 -> Unknown pseudo-class :grid-cols-2
+  .sm\\:grid-cols-4 -> Unknown pseudo-class :grid-cols-4
+  .sm\\:grid-cols-3 -> Unknown pseudo-class :grid-cols-3
+  .sm\\:text-base -> Unknown pseudo-class :text-base
+  .sm\\:text-3xl -> Unknown pseudo-class :text-3xl
+  .sm\\:px-5 -> Unknown pseudo-class :px-5
+  .sm\\:gap-4 -> Unknown pseudo-class :gap-4
+  .sm\\:w-20 -> Unknown pseudo-class :w-20
+  .sm\\:h-20 -> Unknown pseudo-class :h-20
+  .md\\:grid-cols-2 -> Unknown pseudo-class :grid-cols-2
+  .md\\:grid-cols-3 -> Unknown pseudo-class :grid-cols-3
+  .lg\\:sticky -> Unknown pseudo-class :sticky
+  .lg\\:top-20 -> Unknown pseudo-class :top-20
+  .lg\\:self-start -> Unknown pseudo-class :self-start
+  .lg\\:grid-cols-3 -> Unknown pseudo-class :grid-cols-3
+  .lg\\:grid-cols-5 -> Unknown pseudo-class :grid-cols-5
+  .lg\\:grid-cols-4 -> Unknown pseudo-class :grid-cols-4
+  .lg\\:w-24 -> Unknown pseudo-class :w-24[0m
+
+[39m[22m
+Output location: D:\Projects\Toolidi\frontend\dist\toolidi
+

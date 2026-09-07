@@ -1,0 +1,307 @@
+/* سفارشات فروشنده — کلاس‌های معنایی BEM با توکن‌های متریال (جانشین کلاس‌های Tailwind) */
+:host {
+  --so-primary: var(--mat-sys-primary, #6C3FC5);
+  --so-secondary: var(--mat-sys-on-surface, #1B2A4A);
+  --so-surface: var(--mat-sys-surface, #ffffff);
+  --so-surface-container: var(--mat-sys-surface-container, #f5f3f0);
+  --so-outline: var(--mat-sys-outline-variant, #e7e4ee);
+  --so-muted: #6b7280;
+  --so-ok: #059669;
+  --so-warn: #b45309;
+  --so-err: #dc2626;
+  --so-shadow: 0 1px 3px rgb(15 23 42 / 6%), 0 1px 2px rgb(15 23 42 / 4%);
+  display: block;
+}
+
+.seller-orders {
+  max-width: 80rem;
+  margin-inline: auto;
+  padding: 1.5rem 1rem 3rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.seller-orders__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.seller-orders__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--so-secondary);
+}
+
+.seller-orders__subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--so-muted);
+}
+
+/* ─── کارت‌های آمار ─── */
+.seller-orders__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  @media (min-width: 768px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.seller-orders__stat {
+  background: var(--so-surface);
+  border: 1px solid var(--so-outline);
+  border-radius: 0.875rem;
+  padding: 1rem;
+  text-align: center;
+
+  &--info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+
+    .seller-orders__stat-value,
+    .seller-orders__stat-label { color: #1d4ed8; }
+  }
+
+  &--warn {
+    background: #fffbeb;
+    border-color: #fde68a;
+
+    .seller-orders__stat-value,
+    .seller-orders__stat-label { color: var(--so-warn); }
+  }
+
+  &--ok {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+
+    .seller-orders__stat-value,
+    .seller-orders__stat-label { color: var(--so-ok); }
+  }
+}
+
+.seller-orders__stat-value {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--so-secondary);
+}
+
+.seller-orders__stat-label {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--so-muted);
+}
+
+/* ─── تب‌های فیلتر وضعیت ─── */
+.seller-orders__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.seller-orders__tab {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--so-outline);
+  background: var(--so-surface);
+  color: var(--so-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: var(--so-surface-container);
+  }
+
+  &--active {
+    background: var(--so-primary);
+    border-color: var(--so-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgb(108 63 197 / 25%);
+  }
+}
+
+/* ─── فهرست سفارش‌ها ─── */
+.seller-orders__list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.seller-orders__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--so-surface);
+  border: 1px solid var(--so-outline);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: var(--mat-sys-level2, 0 2px 6px rgb(15 23 42 / 10%));
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+}
+
+.seller-orders__item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.seller-orders__item-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.seller-orders__order-number {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: var(--so-surface-container);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.seller-orders__badge {
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 500;
+
+  &--pending {
+    background: #fef3c7;
+    color: #a16207;
+  }
+
+  &--processing {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &--shipped {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+
+  &--delivered {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  &--cancelled {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+
+  &--default {
+    background: var(--so-surface-container);
+    color: var(--so-muted);
+  }
+}
+
+.seller-orders__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.seller-orders__line {
+  font-size: 0.75rem;
+  color: var(--so-secondary);
+}
+
+.seller-orders__line-muted {
+  color: #9ca3af;
+}
+
+.seller-orders__line-cost {
+  color: var(--so-warn);
+}
+
+.seller-orders__line-profit {
+  font-weight: 700;
+  color: var(--so-ok);
+
+  &--neg {
+    color: var(--so-err);
+  }
+}
+
+.seller-orders__item-side {
+  flex-shrink: 0;
+  text-align: left;
+  display: grid;
+  gap: 0.25rem;
+  justify-items: start;
+}
+
+.seller-orders__revenue {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--so-primary);
+}
+
+.seller-orders__profit {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--so-ok);
+}
+
+.seller-orders__date {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.seller-orders__chat-btn {
+  margin-top: 0.25rem;
+  background: #0f766e;
+  color: #ffffff;
+  font-size: 0.75rem;
+}
+
+/* ─── مودال چت ─── */
+.seller-orders__modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 40%);
+}
+
+.seller-orders__modal {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  height: 70vh;
+  background: var(--so-surface-container);
+  border-radius: 1rem;
+  box-shadow: var(--mat-sys-level3, 0 8px 30px rgb(15 23 42 / 25%));
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.seller-orders__empty {
+  margin: 0;
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--so-muted);
+}

@@ -53,7 +53,7 @@
         </div>
         <div class="seller-progress-line"><span [style.width.%]="((currentStep - 1) / 3) * 100"></span></div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <form #stepContainer="ngForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
           <div [ngSwitch]="currentStep" class="seller-step-container">
             <section *ngSwitchCase="1" class="seller-step" aria-labelledby="seller-account-title">
               <div class="seller-step-heading"><span>01</span><div><h3 id="seller-account-title">حساب خودت را بساز</h3><p>این اطلاعات برای ورود و امنیت حساب استفاده می‌شود.</p></div></div>
@@ -72,7 +72,7 @@
                 <label class="seller-field"><span>استان</span><select formControlName="provinceId" (change)="onProvinceChange()"><option value="">انتخاب استان</option><option *ngFor="let p of apiProvinces" [value]="p.id">{{ p.name }}</option></select><em *ngIf="hasError('provinceId')">استان را انتخاب کنید.</em></label>
                 <label class="seller-field"><span>شهرستان</span><select formControlName="cityId" (change)="onCityChange()" [disabled]="loadingCities || !form.get('provinceId')?.value"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : 'انتخاب شهرستان' }}</option><option *ngFor="let c of apiCities" [value]="c.id">{{ c.name }}</option></select><em *ngIf="hasError('cityId')">شهرستان را انتخاب کنید.</em></label>
                 <div *ngIf="!registrationAllowed && registrationCheckMessage" class="seller-field seller-field-full">
-                  <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">⚠️ {{ registrationCheckMessage }}</div>
+                  <div class="seller-validation-msg">⚠️ {{ registrationCheckMessage }}</div>
                 </div>
                 <label class="seller-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" dir="ltr" placeholder="09xxxxxxxxx"><em *ngIf="hasError('phone')">شماره موبایل معتبر وارد کنید.</em></label>
                 <label class="seller-field"><span>ایمیل</span><input formControlName="email" type="email" dir="ltr" placeholder="you@example.com"><em *ngIf="hasError('email')">ایمیل معتبر وارد کنید.</em></label>
@@ -95,9 +95,11 @@
             </section>
           </div>
 
-          <div *ngIf="errorMessage" class="seller-alert">⚠️ {{ errorMessage }}</div>
+          <div *ngIf="errorMessage" class="seller-alert" role="alert">⚠️ {{ errorMessage }}</div>
           <div class="seller-actions"><button *ngIf="currentStep > 1" type="button" class="seller-secondary-action" (click)="previousStep()">← مرحله قبل</button><span *ngIf="currentStep === 1"></span><button *ngIf="currentStep < totalSteps" type="button" class="seller-primary-action" (click)="nextStep()">ادامه <span>←</span></button><button *ngIf="currentStep === totalSteps" type="submit" class="seller-primary-action" [disabled]="loading">{{ loading ? 'در حال ساخت حساب...' : 'ساخت حساب فروشنده' }} <span>✦</span></button></div>
         </form>
+
+        <p class="seller-verify-note">پس از ثبت‌نام، حساب شما در حال بررسی است و لینک تأیید به ایمیل یا پیامک ارسال می‌شود.</p>
       </div>
 
       <ng-template #sellerSuccess>

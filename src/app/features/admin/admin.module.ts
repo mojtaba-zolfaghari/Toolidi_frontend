@@ -20,6 +20,9 @@ import { AdminSurveysComponent } from './pages/surveys/admin-surveys.component';
 import { AdminCommissionRulesComponent } from './pages/commission/admin-commission-rules.component';
 import { AdminSupplierPricingComponent } from './pages/supplier-pricing/admin-supplier-pricing.component';
 import { ImportStudioComponent } from './components/import-studio/import-studio.component';
+import { SellerVerificationComponent } from './pages/seller-verification/seller-verification.component';
+import { SupplierVerificationComponent } from './pages/supplier-verification/supplier-verification.component';
+import { DocumentReviewDialogComponent } from './components/document-review/document-review-dialog.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -28,7 +31,9 @@ const routes: Routes = [
   { path: 'users', component: AdminUsersComponent },
   { path: 'products', component: AdminProductsComponent },
   { path: 'sellers', component: AdminSellersComponent },
+  { path: 'sellers/verification', component: SellerVerificationComponent },
   { path: 'suppliers', component: AdminSuppliersComponent },
+  { path: 'suppliers/verification', component: SupplierVerificationComponent },
   { path: 'agents', component: AdminAgentsComponent },
   { path: 'reports', component: AdminReportsComponent },
   { path: 'costs', component: AdminCostsComponent },
@@ -57,7 +62,10 @@ const routes: Routes = [
     AdminDiscountsComponent,
     AdminSurveysComponent,
     AdminCommissionRulesComponent,
-    ImportStudioComponent
+    ImportStudioComponent,
+    SellerVerificationComponent,
+    SupplierVerificationComponent,
+    DocumentReviewDialogComponent
   ],
     imports: [CommonModule, FormsModule, ReactiveFormsModule, SharedModule, PanelSharedModule, RouterModule.forChild(routes)],
   exports: [RouterModule]

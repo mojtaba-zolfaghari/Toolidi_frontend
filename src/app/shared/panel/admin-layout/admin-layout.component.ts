@@ -169,7 +169,9 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
           label: 'شرکا',
           items: [
             { label: 'فروشندگان', path: '/admin/sellers', icon: '🏬', matIcon: 'storefront' },
+            { label: 'تأیید مدارک فروشندگان', path: '/admin/sellers/verification', icon: '✅', matIcon: 'fact_check' },
             { label: 'تأمین‌کنندگان', path: '/admin/suppliers', icon: '🏭', matIcon: 'factory' },
+            { label: 'تأیید مدارک تولیدکنندگان', path: '/admin/suppliers/verification', icon: '📋', matIcon: 'rule' },
             { label: 'کارپخش‌ها', path: '/admin/agents', icon: '🛵', matIcon: 'two_wheeler' },
             { label: 'کاربران', path: '/admin/users', icon: '👥', matIcon: 'group' }
           ]

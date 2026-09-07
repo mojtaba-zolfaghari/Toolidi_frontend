@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { BarChartDatum } from '../../../shared/components/bar-chart/bar-chart.component';
 import {
@@ -14,7 +15,8 @@ import {
 /** داشبورد آماری فروشنده */
 @Component({
   selector: 'app-seller-dashboard',
-  templateUrl: './seller-dashboard.component.html'
+  templateUrl: './seller-dashboard.component.html',
+  styleUrls: ['./seller-dashboard.component.scss']
 })
 export class SellerDashboardComponent implements OnInit {
   dashboard: DashboardSummary | null = null;
@@ -28,7 +30,13 @@ export class SellerDashboardComponent implements OnInit {
   loading = true;
   errorMessage = '';
 
-  constructor(private readonly sellerService: SellerService) {}
+  /** اکشن‌های هدر صفحه (اجرا از طریق app-page-header) */
+  readonly headerActions = [
+    { label: 'مدیریت محصولات', icon: '📦', color: 'primary', click: () => this.router.navigate(['/seller/products']) },
+    { label: 'بازخوانی', icon: '🔄', color: 'secondary', click: () => this.loadDashboard() }
+  ];
+
+  constructor(private readonly sellerService: SellerService, private readonly router: Router) {}
 
   ngOnInit(): void {
     this.loadDashboard();

@@ -1,17 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
 import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
+import { RegistrationUxService } from '../register/registration-ux.service';
 
-/** صفحه ثبت‌نام اختصاصی فروشنده برای شروع فروش در شبکه تولیدی. */
+/**
+ * TODO(task: TASK-FE-REGISTRATION-UX-INCOMPLETE)
+ * صفحه ثبت‌نام اختصاصی فروشنده برای شروع فروش در شبکه تولیدی.
+ *
+ * - اسکرول به مرحله/فیلد نامعتبر (acceptance criteria 1)
+ * - onbeforeunload warning (acceptance criteria 4)
+ * - Persian RTL preserved
+ */
 @Component({
   selector: 'app-seller-register',
   templateUrl: './seller-register.component.html',
   styleUrls: ['./seller-register.component.scss']
 })
-export class SellerRegisterComponent implements OnInit {
+export class SellerRegisterComponent implements OnInit, OnDestroy {
   form: FormGroup;
   currentStep = 1;
   readonly totalSteps = 4;
@@ -37,11 +45,16 @@ export class SellerRegisterComponent implements OnInit {
     'لباس و پوشاک', 'لوازم آرایشی و بهداشتی', 'صنایع پلاستیکی', 'سایر'
   ];
 
+  @ViewChild('stepContainer') stepContainer!: ElementRef;
+
+  private readonly UNSAVED_MESSAGE = 'شما تغییرات ذخیره‌نشده‌ای دارید. آیا می‌خواهید از این صفحه خارج شوید؟';
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly locationService: LocationService
+    private readonly locationService: LocationService,
+    private readonly ux: RegistrationUxService
   ) {
     this.form = this.fb.group({
       nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -64,6 +77,11 @@ export class SellerRegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProvinces();
+    this.ux.enableUnsavedWarning(this.UNSAVED_MESSAGE);
+  }
+
+  ngOnDestroy(): void {
+    this.ux.disableUnsavedWarning();
   }
 
   /** Load provinces from API */
@@ -71,8 +89,7 @@ export class SellerRegisterComponent implements OnInit {
     this.locationService.getProvinces().subscribe({
       next: (result) => {
         if (result.isSuccess && result.data && result.data.length > 0) {
-              this.apiProvinces = result.data;
-          this.useApiData = true;
+          this.apiProvinces = result.data;
           this.useApiData = true;
         }
       },
@@ -131,6 +148,7 @@ export class SellerRegisterComponent implements OnInit {
   nextStep(): void {
     if (!this.isStepValid(this.currentStep)) {
       this.touchStep(this.currentStep);
+      this.ux.scrollToFirstInvalid(this.form, this.stepContainer.nativeElement);
       return;
     }
     if (this.currentStep < this.totalSteps) {
@@ -156,6 +174,7 @@ export class SellerRegisterComponent implements OnInit {
     const value = this.form.getRawValue();
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.ux.scrollToFirstInvalid(this.form, this.stepContainer.nativeElement);
       return;
     }
     if (value.password !== value.confirmPassword) {
@@ -165,6 +184,7 @@ export class SellerRegisterComponent implements OnInit {
 
     this.loading = true;
     this.errorMessage = '';
+
     this.authService.registerSeller({
       nationalCode: value.nationalCode,
       username: value.username,
@@ -224,5 +244,13 @@ export class SellerRegisterComponent implements OnInit {
 
   private touchStep(step: number): void {
     this.stepFields(step).forEach((field) => this.form.get(field)?.markAsTouched());
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.form.touched) {
+      event.preventDefault();
+      event.returnValue = this.UNSAVED_MESSAGE;
+    }
   }
 }

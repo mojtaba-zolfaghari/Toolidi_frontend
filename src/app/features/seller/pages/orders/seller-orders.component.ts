@@ -12,97 +12,93 @@ interface SellerOrder {
   shippingCity: string;
 }
 
+/** سفارشات فروشنده با جزئیات سود — BEM + متریال (جانشین کلاس‌های Tailwind) */
 @Component({
   selector: 'app-seller-orders',
+  styleUrls: ['./seller-orders.component.scss'],
   template: `
-    <section class="space-y-6">
-      <div class="flex items-center justify-between">
+    <section class="seller-orders" dir="rtl">
+      <header class="seller-orders__header">
         <div>
-          <h1 class="text-2xl font-extrabold text-secondary">سفارشات من 🛒</h1>
-          <p class="text-gray-500 mt-1">پیگیری سفارشات، سود واقعی و گفتگو با تأمین‌کننده</p>
+          <h1 class="seller-orders__title">سفارشات من 🛒</h1>
+          <p class="seller-orders__subtitle">پیگیری سفارشات، سود واقعی و گفتگو با تأمین‌کننده</p>
         </div>
-        <button (click)="loadOrders()" class="rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">
-          🔄 بروزرسانی
-        </button>
+        <button type="button" mat-stroked-button color="primary" (click)="loadOrders()">🔄 بروزرسانی</button>
+      </header>
+
+      <!-- کارت‌های آمار -->
+      <div class="seller-orders__stats">
+        <div class="seller-orders__stat">
+          <p class="seller-orders__stat-value">{{ profitOrders.length | persianNumber }}</p>
+          <p class="seller-orders__stat-label">کل سفارشات</p>
+        </div>
+        <div class="seller-orders__stat seller-orders__stat--info">
+          <p class="seller-orders__stat-value">{{ formatCurrencyShort(totalRevenue) }}</p>
+          <p class="seller-orders__stat-label">درآمد (بدون مالیات)</p>
+        </div>
+        <div class="seller-orders__stat seller-orders__stat--warn">
+          <p class="seller-orders__stat-value">{{ formatCurrencyShort(totalCost) }}</p>
+          <p class="seller-orders__stat-label">قیمت خرید از تأمین‌کننده</p>
+        </div>
+        <div class="seller-orders__stat seller-orders__stat--ok">
+          <p class="seller-orders__stat-value">{{ formatCurrencyShort(totalProfit) }}</p>
+          <p class="seller-orders__stat-label">سود ناخالص شما</p>
+        </div>
       </div>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-          <p class="text-2xl font-bold text-secondary">{{ profitOrders.length }}</p>
-          <p class="text-xs text-gray-500">کل سفارشات</p>
-        </div>
-        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 text-center">
-          <p class="text-2xl font-bold text-blue-600">{{ formatCurrencyShort(totalRevenue) }}</p>
-          <p class="text-xs text-blue-600">درآمد (بدون مالیات)</p>
-        </div>
-        <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-100 text-center">
-          <p class="text-2xl font-bold text-yellow-600">{{ formatCurrencyShort(totalCost) }}</p>
-          <p class="text-xs text-yellow-600">قیمت خرید از تأمین‌کننده</p>
-        </div>
-        <div class="bg-green-50 rounded-xl p-4 border border-green-100 text-center">
-          <p class="text-2xl font-bold text-green-600">{{ formatCurrencyShort(totalProfit) }}</p>
-          <p class="text-xs text-green-600">سود ناخالص شما</p>
-        </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="flex gap-2 flex-wrap">
-        <button *ngFor="let tab of statusTabs" (click)="activeStatus = tab.value"
-                class="px-4 py-2 rounded-xl text-sm font-medium transition-all"
-                [class]="activeStatus === tab.value ? 'bg-primary text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
+      <!-- فیلتر وضعیت -->
+      <div class="seller-orders__tabs" role="tablist">
+        <button type="button" *ngFor="let tab of statusTabs" (click)="activeStatus = tab.value"
+                class="seller-orders__tab" [class.seller-orders__tab--active]="activeStatus === tab.value">
           {{ tab.label }}
         </button>
       </div>
 
-      <!-- Orders -->
-      <div class="space-y-3">
-        <div *ngFor="let order of filteredOrders" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded">{{ order.orderNumber }}</span>
-                <span class="text-xs px-2 py-0.5 rounded-full font-medium" [ngClass]="getStatusColor(order.status)">
-                  {{ getStatusLabel(order.status) }}
+      <!-- فهرست سفارش‌ها -->
+      <div class="seller-orders__list">
+        <article *ngFor="let order of filteredOrders" class="seller-orders__item">
+          <div class="seller-orders__item-main">
+            <div class="seller-orders__item-head">
+              <span class="seller-orders__order-number">{{ order.orderNumber }}</span>
+              <span class="seller-orders__badge" [ngClass]="getStatusColor(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </div>
+            <ul class="seller-orders__items">
+              <li *ngFor="let item of order.items" class="seller-orders__line">
+                📦 {{ item.productName }} × {{ item.quantity | persianNumber }}
+                <span class="seller-orders__line-muted">
+                  — فروش: {{ formatCurrencyShort(item.unitPrice * item.quantity) }}
                 </span>
-              </div>
-              <div class="mt-2 space-y-1">
-                <div *ngFor="let item of order.items" class="text-xs">
-                  📦 {{ item.productName }} × {{ item.quantity }}
-                  <span class="text-gray-400">
-                    — فروش: {{ formatCurrencyShort(item.unitPrice * item.quantity) }}
-                  </span>
-                  <span class="text-yellow-600" *ngIf="item.supplierUnitCost > 0">
-                    | خرید: {{ formatCurrencyShort(item.supplierTotalCost) }}
-                  </span>
-                  <span class="font-bold" [class.text-green-600]="item.grossProfit > 0" [class.text-red-500]="item.grossProfit <= 0"
-                        *ngIf="item.supplierUnitCost > 0">
-                    | سود: {{ formatCurrencyShort(item.grossProfit) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div class="text-left shrink-0">
-              <p class="text-lg font-bold text-primary">{{ formatCurrencyShort(order.revenue) }}</p>
-              <p *ngIf="order.supplierCost > 0" class="text-xs text-green-600 font-bold mt-1">
-                سود: {{ formatCurrencyShort(order.profit) }}
-              </p>
-              <p class="text-xs text-gray-400 mt-1">{{ order.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}</p>
-              <button (click)="openChat(order.orderId)"
-                      class="mt-2 text-xs bg-teal-600 text-white px-3 py-1.5 rounded-lg hover:bg-teal-700">
-                💬 چت سفارش
-              </button>
-            </div>
+                <span class="seller-orders__line-cost" *ngIf="item.supplierUnitCost > 0">
+                  | خرید: {{ formatCurrencyShort(item.supplierTotalCost) }}
+                </span>
+                <span *ngIf="item.supplierUnitCost > 0"
+                      class="seller-orders__line-profit"
+                      [class.seller-orders__line-profit--neg]="item.grossProfit <= 0">
+                  | سود: {{ formatCurrencyShort(item.grossProfit) }}
+                </span>
+              </li>
+            </ul>
           </div>
-        </div>
+          <div class="seller-orders__item-side">
+            <p class="seller-orders__revenue">{{ formatCurrencyShort(order.revenue) }}</p>
+            <p *ngIf="order.supplierCost > 0" class="seller-orders__profit">
+              سود: {{ formatCurrencyShort(order.profit) }}
+            </p>
+            <p class="seller-orders__date">{{ order.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}</p>
+            <button type="button" mat-flat-button class="seller-orders__chat-btn" (click)="openChat(order.orderId)">
+              💬 چت سفارش
+            </button>
+          </div>
+        </article>
       </div>
-      <p *ngIf="!filteredOrders.length" class="text-gray-400 text-center py-12">سفارشی یافت نشد</p>
+      <p *ngIf="!filteredOrders.length" class="seller-orders__empty">سفارشی یافت نشد</p>
     </section>
 
-    <!-- Chat Modal -->
-    <div *ngIf="chatOrderId" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40" (click)="closeChat()"></div>
-      <div class="relative bg-gray-50 rounded-2xl shadow-2xl w-full max-w-lg h-[70vh] p-5 flex flex-col">
+    <!-- مودال چت -->
+    <div *ngIf="chatOrderId" class="seller-orders__modal-overlay" (click)="closeChat()">
+      <div class="seller-orders__modal" (click)="$event.stopPropagation()">
         <app-order-chat [orderId]="chatOrderId" (closed)="closeChat()"></app-order-chat>
       </div>
     </div>
@@ -168,9 +164,16 @@ export class SellerOrdersComponent implements OnInit {
     return labels[status] || status;
   }
 
+  /** کلاس BEM نشانگر وضعیت (استایل در SCSS — بدون کلاس Tailwind) */
   getStatusColor(status: string): string {
-    const colors: { [k: string]: string } = { 'Pending': 'bg-yellow-100 text-yellow-700', 'Processing': 'bg-blue-100 text-blue-700', 'Shipped': 'bg-purple-100 text-purple-700', 'Delivered': 'bg-green-100 text-green-700', 'Cancelled': 'bg-red-100 text-red-700' };
-    return colors[status] || 'bg-gray-100 text-gray-600';
+    const colors: { [k: string]: string } = {
+      'Pending': 'seller-orders__badge--pending',
+      'Processing': 'seller-orders__badge--processing',
+      'Shipped': 'seller-orders__badge--shipped',
+      'Delivered': 'seller-orders__badge--delivered',
+      'Cancelled': 'seller-orders__badge--cancelled'
+    };
+    return colors[status] || 'seller-orders__badge--default';
   }
 
   formatCurrencyShort(amount: number): string {

@@ -43,7 +43,7 @@
       </div>
       <p class="card-description">فقط دو مورد لازم است. اطلاعات تکمیلی را هر زمان خواستی از پروفایلت کامل کن.</p>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <form #formElement="ngForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <div class="field-group">
           <label for="identifier">شماره موبایل یا ایمیل</label>
           <div class="input-wrap" [class.input-error]="form.get('identifier')?.invalid && form.get('identifier')?.touched">
@@ -62,8 +62,26 @@
           <p *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="field-error">رمز عبور باید حداقل ۶ کاراکتر باشد.</p>
         </div>
 
+        <div class="field-group">
+          <label for="mobile">شماره موبایل <small>اختیاری</small></label>
+          <div class="input-wrap">
+            <span class="input-icon">◎</span>
+            <input id="mobile" type="tel" formControlName="mobile" inputmode="tel" dir="ltr" autocomplete="tel" placeholder="مثلاً ۰۹۱۲۱۲۳۴۵۶۷" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="postalAddress">آدرس پستی <small>اختیاری</small></label>
+          <div class="input-wrap">
+            <span class="input-icon">⌂</span>
+            <input id="postalAddress" type="text" formControlName="postalAddress" autocomplete="street-address" placeholder="آدرس پستی خود را بنویسید" />
+          </div>
+        </div>
+
         <div *ngIf="errorMessage" class="form-message form-message-error" role="alert">{{ errorMessage }}</div>
         <div *ngIf="successMessage" class="form-message form-message-success" role="status">{{ successMessage }}</div>
+
+        <div *ngIf="automaticVerificationNotice" class="form-message form-message-info" role="status">{{ automaticVerificationNotice }}</div>
 
         <button type="submit" class="quick-submit" [disabled]="form.invalid || loading">
           <span>{{ loading ? 'در حال ساخت حساب…' : 'شروع خرید در تولیدی' }}</span>
@@ -75,6 +93,8 @@
 
       <p class="login-link">قبلاً حساب ساخته‌ای؟ <a routerLink="/login">وارد شو</a></p>
       <div class="business-link"><span>برای فروش عمده ثبت‌نام می‌کنی؟</span><a routerLink="/auth/seller-register">صفحه فروشنده ←</a></div>
+
+      <p class="reg-verify-note">پس از ثبت‌نام، لینک تأیید به ایمیل یا پیامک به شماره شما ارسال می‌شود.</p>
     </main>
   </div>
 </section>
