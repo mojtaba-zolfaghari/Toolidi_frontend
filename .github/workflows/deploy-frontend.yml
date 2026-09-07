@@ -26,9 +26,6 @@ jobs:
   frontend-build:
     name: Frontend Build & Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
 
     steps:
       - name: Checkout
@@ -42,7 +39,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
@@ -57,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build-${{ github.sha }}
-          path: frontend/dist/
+          path: dist/
           retention-days: 7
 
       - name: Upload source maps
@@ -65,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: source-maps-${{ github.sha }}
-          path: frontend/dist/**/*.map
+          path: dist/**/*.map
           retention-days: 7
 
   # ─── FTP Deploy ─────────────────────────────────────
