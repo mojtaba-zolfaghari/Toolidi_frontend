@@ -12,11 +12,12 @@ import { CartButtonState } from '../add-to-cart-button/add-to-cart-button.compon
  * دکمه دارای انیمیشن ripple، spinner و checkmark است.
  */
 @Component({
-  selector: 'app-product-card',
-  templateUrl: './product-card.component.html',
-  styleUrls: ['./product-card.component.scss'],
-  // OnPush: کارت‌ها فقط با تغییر ورودی ورِندر می‌شوند؛ مهم برای گرید‌های فروشگاه/صفحه اصلی.
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-product-card',
+    templateUrl: './product-card.component.html',
+    styleUrls: ['./product-card.component.scss'],
+    // OnPush: کارت‌ها فقط با تغییر ورودی ورِندر می‌شوند؛ مهم برای گرید‌های فروشگاه/صفحه اصلی.
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ProductCardComponent {
   @Input() product!: Product;

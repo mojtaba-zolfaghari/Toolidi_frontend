@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AdminSeller, AdminService } from '../../../../core/services/api/admin.service';
 import { CostItem, CostItemData, CostService } from '../../../../core/services/api/cost.service';
 
 @Component({
-  selector: 'app-admin-costs',
-  templateUrl: './admin-costs.component.html'
+    selector: 'app-admin-costs',
+    templateUrl: './admin-costs.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminCostsComponent implements OnInit {
   costs: CostItem[] = [];

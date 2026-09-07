@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 /** Estimated delivery for a single cart item */
 export interface EstimatedDelivery {
@@ -11,43 +11,53 @@ export interface EstimatedDelivery {
 }
 
 @Component({
-  selector: 'app-estimated-delivery',
-  template: `
-    <div class="est-delivery" *ngIf="deliveries.length">
-      <h3 class="est-delivery__title">زمان تقریبی تحویل</h3>
-
-      <div *ngFor="let item of deliveries" class="est-delivery__item">
-        <div class="est-delivery__row">
-          <div class="est-delivery__info">
-            <p class="est-delivery__product">{{ item.productName }}</p>
-            <p class="est-delivery__meta">فروشنده: {{ item.supplierName }} · تعداد: {{ item.quantity }}</p>
+    selector: 'app-estimated-delivery',
+    template: `
+    @if (deliveries.length) {
+      <div class="est-delivery">
+        <h3 class="est-delivery__title">زمان تقریبی تحویل</h3>
+        @for (item of deliveries; track item) {
+          <div class="est-delivery__item">
+            <div class="est-delivery__row">
+              <div class="est-delivery__info">
+                <p class="est-delivery__product">{{ item.productName }}</p>
+                <p class="est-delivery__meta">فروشنده: {{ item.supplierName }} · تعداد: {{ item.quantity }}</p>
+              </div>
+              <div class="est-delivery__date">
+                @if (item.capacitySet && item.estimatedDeliveryDate) {
+                  <p class="est-delivery__date-value">
+                    {{ item.estimatedDeliveryDate | persianDate:'yyyy/MM/dd' }}
+                  </p>
+                }
+                @if (!item.capacitySet) {
+                  <p class="est-delivery__pending">
+                    در انتظار تأیید
+                  </p>
+                }
+                @if (item.capacitySet && !item.estimatedDeliveryDate && item.estimatedReadyDate) {
+                  <p
+                    class="est-delivery__ready">
+                    آماده: {{ item.estimatedReadyDate | persianDate:'yyyy/MM/dd' }}
+                  </p>
+                }
+              </div>
+            </div>
           </div>
-          <div class="est-delivery__date">
-            <p *ngIf="item.capacitySet && item.estimatedDeliveryDate" class="est-delivery__date-value">
-              {{ item.estimatedDeliveryDate | persianDate:'yyyy/MM/dd' }}
-            </p>
-            <p *ngIf="!item.capacitySet" class="est-delivery__pending">
-              در انتظار تأیید
-            </p>
-            <p *ngIf="item.capacitySet && !item.estimatedDeliveryDate && item.estimatedReadyDate"
-               class="est-delivery__ready">
-              آماده: {{ item.estimatedReadyDate | persianDate:'yyyy/MM/dd' }}
-            </p>
+        }
+        <!-- Max delivery date (bottleneck) -->
+        @if (maxDeliveryDate) {
+          <div class="est-delivery__max">
+            <div class="est-delivery__row">
+              <span class="est-delivery__max-label">حداکثر زمان تحویل</span>
+              <span class="est-delivery__max-value">{{ maxDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
+            </div>
+            <p class="est-delivery__max-hint">تاریخ تحویل نهایی بر اساس آخرین آماده‌سازی در بین تمام اقلام</p>
           </div>
-        </div>
+        }
       </div>
-
-      <!-- Max delivery date (bottleneck) -->
-      <div *ngIf="maxDeliveryDate" class="est-delivery__max">
-        <div class="est-delivery__row">
-          <span class="est-delivery__max-label">حداکثر زمان تحویل</span>
-          <span class="est-delivery__max-value">{{ maxDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
-        </div>
-        <p class="est-delivery__max-hint">تاریخ تحویل نهایی بر اساس آخرین آماده‌سازی در بین تمام اقلام</p>
-      </div>
-    </div>
-  `,
-  styles: [`
+    }
+    `,
+    styles: [`
     :host { display: block; }
 
     .est-delivery {
@@ -147,7 +157,9 @@ export interface EstimatedDelivery {
       color: #6b7280;
       font-size: 0.75rem;
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EstimatedDeliveryComponent {
   @Input() deliveries: EstimatedDelivery[] = [];

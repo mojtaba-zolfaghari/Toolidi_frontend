@@ -1,39 +1,48 @@
 <section class="bg-warm min-h-screen py-10">
   <div class="container mx-auto px-4 max-w-5xl">
     <a routerLink="/orders" class="text-primary text-sm hover:underline">← بازگشت به سفارش‌ها</a>
-    <div *ngIf="loading" class="bg-white rounded-2xl shadow-card py-20 mt-6 text-center text-gray-400">در حال بارگذاری جزئیات…</div>
-    <div *ngIf="!loading && errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 mt-6">{{ errorMessage }}</div>
+    @if (loading) {
+      <div class="bg-white rounded-2xl shadow-card py-20 mt-6 text-center text-gray-400">در حال بارگذاری جزئیات…</div>
+    }
+    @if (!loading && errorMessage) {
+      <div class="bg-red-50 text-red-600 rounded-xl px-4 py-3 mt-6">{{ errorMessage }}</div>
+    }
 
-    <ng-container *ngIf="!loading && order">
+    @if (!loading && order) {
       <div class="flex flex-wrap items-end justify-between gap-4 mt-6 mb-6">
         <div><p class="text-sm text-primary font-medium">جزئیات سفارش</p><h1 class="text-3xl font-bold text-secondary mt-1">{{ order.orderNumber }}</h1></div>
         <span class="rounded-full px-4 py-2 font-medium" [class]="statusClass(order.status)">{{ order.status }}</span>
       </div>
-
-      <div *ngIf="actionMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 mb-4">{{ actionMessage }}</div>
-
-      <div *ngIf="canCancel" class="mb-6">
-        <button type="button" (click)="cancelOrder()" [disabled]="canceling" class="border border-red-200 text-red-600 rounded-xl px-5 py-2 hover:bg-red-50 transition-colors disabled:opacity-50">
-          {{ canceling ? 'در حال لغو…' : 'لغو سفارش' }}
-        </button>
-      </div>
-
+      @if (actionMessage) {
+        <div class="bg-green-50 text-green-600 rounded-xl px-4 py-3 mb-4">{{ actionMessage }}</div>
+      }
+      @if (canCancel) {
+        <div class="mb-6">
+          <button type="button" (click)="cancelOrder()" [disabled]="canceling" class="border border-red-200 text-red-600 rounded-xl px-5 py-2 hover:bg-red-50 transition-colors disabled:opacity-50">
+            {{ canceling ? 'در حال لغو…' : 'لغو سفارش' }}
+          </button>
+        </div>
+      }
       <!-- Timeline -->
-      <div *ngIf="timelineSteps.length" class="bg-white rounded-2xl shadow-card p-6 mb-6">
-        <h2 class="text-xl font-bold text-secondary mb-5">زمان‌بندی سفارش</h2>
-        <app-tracking-timeline [steps]="timelineSteps"></app-tracking-timeline>
-      </div>
-
+      @if (timelineSteps.length) {
+        <div class="bg-white rounded-2xl shadow-card p-6 mb-6">
+          <h2 class="text-xl font-bold text-secondary mb-5">زمان‌بندی سفارش</h2>
+          <app-tracking-timeline [steps]="timelineSteps"></app-tracking-timeline>
+        </div>
+      }
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-card p-6">
           <h2 class="text-xl font-bold text-secondary mb-5">اقلام سفارش</h2>
-          <div *ngFor="let item of order.items" class="flex items-center justify-between gap-4 border-b last:border-0 py-4">
-            <div><p class="font-bold text-secondary">{{ item.productName }}</p><p class="text-sm text-gray-500 mt-1">تعداد: {{ item.quantity | persianNumber }} × {{ item.unitPrice | persianNumber }} تومان</p></div>
-            <strong class="text-primary">{{ item.totalPrice | persianNumber }} تومان</strong>
-          </div>
-          <p *ngIf="!order.items.length" class="text-gray-400 py-6 text-center">جزئیات اقلام موجود نیست.</p>
+          @for (item of order.items; track item) {
+            <div class="flex items-center justify-between gap-4 border-b last:border-0 py-4">
+              <div><p class="font-bold text-secondary">{{ item.productName }}</p><p class="text-sm text-gray-500 mt-1">تعداد: {{ item.quantity | persianNumber }} × {{ item.unitPrice | persianNumber }} تومان</p></div>
+              <strong class="text-primary">{{ item.totalPrice | persianNumber }} تومان</strong>
+            </div>
+          }
+          @if (!order.items.length) {
+            <p class="text-gray-400 py-6 text-center">جزئیات اقلام موجود نیست.</p>
+          }
         </div>
-
         <aside class="space-y-6">
           <div class="bg-white rounded-2xl shadow-card p-6">
             <h2 class="text-xl font-bold text-secondary mb-4">خلاصه پرداخت</h2>
@@ -44,25 +53,43 @@
               <div class="flex justify-between border-t pt-3 font-bold text-secondary"><span>مبلغ نهایی</span><span class="text-primary">{{ order.grandTotal | persianNumber }} تومان</span></div>
             </div>
           </div>
-
-          <div class="bg-white rounded-2xl shadow-card p-6" *ngIf="tracking">
-            <h2 class="text-xl font-bold text-secondary mb-4">پیگیری ارسال</h2>
-            <p *ngIf="tracking.trackingCode" class="text-sm text-gray-500 mb-2">کد رهگیری: <strong class="text-secondary">{{ tracking.trackingCode }}</strong></p>
-            <p *ngIf="tracking.carrierName" class="text-sm text-gray-500 mb-2">حامل: {{ tracking.carrierName }}</p>
-            <p *ngIf="tracking.currentLocation" class="text-sm text-gray-500">موقعیت فعلی: {{ tracking.currentLocation }}</p>
-            <div *ngIf="tracking.history.length" class="border-r-2 border-primary pr-4 mt-5 space-y-4">
-              <div *ngFor="let event of tracking.history"><p class="font-medium text-secondary">{{ event.status }}</p><p class="text-xs text-gray-400">{{ event.changedAt | persianDate:'yyyy/MM/dd HH:mm' }}<span *ngIf="event.note"> — {{ event.note }}</span></p></div>
-            </div>
+          @if (tracking) {
+            <div class="bg-white rounded-2xl shadow-card p-6">
+              <h2 class="text-xl font-bold text-secondary mb-4">پیگیری ارسال</h2>
+              @if (tracking.trackingCode) {
+                <p class="text-sm text-gray-500 mb-2">کد رهگیری: <strong class="text-secondary">{{ tracking.trackingCode }}</strong></p>
+              }
+              @if (tracking.carrierName) {
+                <p class="text-sm text-gray-500 mb-2">حامل: {{ tracking.carrierName }}</p>
+              }
+              @if (tracking.currentLocation) {
+                <p class="text-sm text-gray-500">موقعیت فعلی: {{ tracking.currentLocation }}</p>
+              }
+              @if (tracking.history.length) {
+                <div class="border-r-2 border-primary pr-4 mt-5 space-y-4">
+                  @for (event of tracking.history; track event) {
+                    <div><p class="font-medium text-secondary">{{ event.status }}</p><p class="text-xs text-gray-400">{{ event.changedAt | persianDate:'yyyy/MM/dd HH:mm' }}@if (event.note) {
+                    <span> — {{ event.note }}</span>
+                  }</p></div>
+                }
+              </div>
+            }
           </div>
-        </aside>
-      </div>
-
-      <div *ngIf="order.history.length" class="bg-white rounded-2xl shadow-card p-6 mt-6">
+        }
+      </aside>
+    </div>
+    @if (order.history.length) {
+      <div class="bg-white rounded-2xl shadow-card p-6 mt-6">
         <h2 class="text-xl font-bold text-secondary mb-5">تاریخچه وضعیت</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div *ngFor="let event of order.history" class="border-r-2 border-primary pr-4"><p class="font-medium text-secondary">{{ event.previousStatus }} ← {{ event.newStatus }}</p><p class="text-xs text-gray-400 mt-1">{{ event.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}<span *ngIf="event.comments"> — {{ event.comments }}</span></p></div>
-        </div>
+          @for (event of order.history; track event) {
+            <div class="border-r-2 border-primary pr-4"><p class="font-medium text-secondary">{{ event.previousStatus }} ← {{ event.newStatus }}</p><p class="text-xs text-gray-400 mt-1">{{ event.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}@if (event.comments) {
+            <span> — {{ event.comments }}</span>
+          }</p></div>
+        }
       </div>
-    </ng-container>
-  </div>
+    </div>
+  }
+}
+</div>
 </section>

@@ -1,41 +1,49 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 // ═══════════════════════════════════════════════════════
 // TASK-FE-022: Product Quick View Modal
 // ═══════════════════════════════════════════════════════
 @Component({
-  selector: 'app-product-quick-view',
-  template: `
-    <div *ngIf="visible" class="quick-view" (click)="close.emit()">
-      <div class="quick-view__card" (click)="$event.stopPropagation()">
-        <div class="quick-view__head">
-          <h2 class="quick-view__title">پیش‌نمایش محصول</h2>
-          <button type="button" (click)="close.emit()" class="quick-view__close" aria-label="بستن">×</button>
-        </div>
-        <div class="quick-view__body">
-          <div class="quick-view__media">
-            {{ product?.imageUrl ? '' : '📷' }}
-            <img *ngIf="product?.imageUrl" [src]="product!.imageUrl" class="quick-view__img" alt="">
+    selector: 'app-product-quick-view',
+    template: `
+    @if (visible) {
+      <div class="quick-view" (click)="close.emit()">
+        <div class="quick-view__card" (click)="$event.stopPropagation()">
+          <div class="quick-view__head">
+            <h2 class="quick-view__title">پیش‌نمایش محصول</h2>
+            <button type="button" (click)="close.emit()" class="quick-view__close" aria-label="بستن">×</button>
           </div>
-          <div class="quick-view__info">
-            <h3 class="quick-view__name">{{ product?.name }}</h3>
-            <p class="quick-view__desc">{{ product?.shortDescription }}</p>
-            <div class="quick-view__prices">
-              <span class="quick-view__price">{{ product?.unitPrice | persianNumber }} تومان</span>
-              <span *ngIf="product?.comparePrice" class="quick-view__compare">{{ product!.comparePrice | persianNumber }}</span>
+          <div class="quick-view__body">
+            <div class="quick-view__media">
+              {{ product?.imageUrl ? '' : '📷' }}
+              @if (product?.imageUrl) {
+                <img [src]="product!.imageUrl" class="quick-view__img" alt="">
+              }
             </div>
-            <div *ngIf="product?.ratingAverage" class="quick-view__rating">
-              <span class="quick-view__rating-star" aria-hidden="true">⭐</span>
-              <span class="quick-view__rating-value">{{ product!.ratingAverage }}</span>
-              <span class="quick-view__rating-count">({{ product!.ratingCount }} نظر)</span>
+            <div class="quick-view__info">
+              <h3 class="quick-view__name">{{ product?.name }}</h3>
+              <p class="quick-view__desc">{{ product?.shortDescription }}</p>
+              <div class="quick-view__prices">
+                <span class="quick-view__price">{{ $safeNavigationMigration(product?.unitPrice) | persianNumber }} تومان</span>
+                @if (product?.comparePrice) {
+                  <span class="quick-view__compare">{{ product!.comparePrice | persianNumber }}</span>
+                }
+              </div>
+              @if (product?.ratingAverage) {
+                <div class="quick-view__rating">
+                  <span class="quick-view__rating-star" aria-hidden="true">⭐</span>
+                  <span class="quick-view__rating-value">{{ product!.ratingAverage }}</span>
+                  <span class="quick-view__rating-count">({{ product!.ratingCount }} نظر)</span>
+                </div>
+              }
+              <button type="button" class="quick-view__add-btn">افزودن به سبد خرید</button>
             </div>
-            <button type="button" class="quick-view__add-btn">افزودن به سبد خرید</button>
           </div>
         </div>
       </div>
-    </div>
-  `,
-  styles: [`
+    }
+    `,
+    styles: [`
     :host { display: contents; }
 
     .quick-view {
@@ -186,7 +194,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
     .quick-view__add-btn:hover {
       background: #5b32a8;
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ProductQuickViewComponent {
   @Input() visible = false;
@@ -198,18 +208,20 @@ export class ProductQuickViewComponent {
 // TASK-FE-029: Global Error Handler
 // ═══════════════════════════════════════════════════════
 @Component({
-  selector: 'app-global-error',
-  template: `
-    <div *ngIf="error" class="global-error" (click)="dismiss()">
-      <div class="global-error__card" (click)="$event.stopPropagation()">
-        <div class="global-error__icon" aria-hidden="true">⚠️</div>
-        <h2 class="global-error__title">خطایی رخ داد</h2>
-        <p class="global-error__message">{{ error }}</p>
-        <button type="button" (click)="dismiss()" class="global-error__btn">بستن</button>
+    selector: 'app-global-error',
+    template: `
+    @if (error) {
+      <div class="global-error" (click)="dismiss()">
+        <div class="global-error__card" (click)="$event.stopPropagation()">
+          <div class="global-error__icon" aria-hidden="true">⚠️</div>
+          <h2 class="global-error__title">خطایی رخ داد</h2>
+          <p class="global-error__message">{{ error }}</p>
+          <button type="button" (click)="dismiss()" class="global-error__btn">بستن</button>
+        </div>
       </div>
-    </div>
-  `,
-  styles: [`
+    }
+    `,
+    styles: [`
     :host { display: contents; }
 
     .global-error {
@@ -266,7 +278,9 @@ export class ProductQuickViewComponent {
     .global-error__btn:hover {
       background: #5b32a8;
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class GlobalErrorComponent {
   error: string | null = null;

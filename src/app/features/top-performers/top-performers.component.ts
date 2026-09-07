@@ -1,12 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { SeoService } from '../../core/services/seo.service';
 
 @Component({
-  selector: 'app-top-performers',
-  templateUrl: './top-performers.component.html',
-  styleUrls: ['./top-performers.component.scss']
+    selector: 'app-top-performers',
+    templateUrl: './top-performers.component.html',
+    styleUrls: ['./top-performers.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class TopPerformersComponent implements OnInit {
   activeTab: 'sellers' | 'couriers' = 'sellers';

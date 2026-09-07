@@ -5,95 +5,116 @@
     [actions]="headerActions">
   </app-page-header>
 
-  <p *ngIf="errorMessage" class="seller-dash__alert seller-dash__alert--error">{{ errorMessage }}</p>
-  <div *ngIf="loading && !dashboard" class="seller-dash__loading">در حال دریافت آمار فروش…</div>
+  @if (errorMessage) {
+    <p class="seller-dash__alert seller-dash__alert--error">{{ errorMessage }}</p>
+  }
+  @if (loading && !dashboard) {
+    <div class="seller-dash__loading">در حال دریافت آمار فروش…</div>
+  }
 
-  <ng-container *ngIf="dashboard">
+  @if (dashboard) {
     <div class="seller-dash__kpi-grid">
       <app-stat-card title="کل فروش" [value]="dashboard.totalSales | persianNumber" subtitle="تومان" icon="💳" color="primary"></app-stat-card>
       <app-stat-card title="تعداد سفارشات" [value]="dashboard.totalOrders | persianNumber" icon="🛍️" color="info"></app-stat-card>
       <app-stat-card title="کمیسیون" [value]="dashboard.totalCommission | persianNumber" subtitle="تومان" icon="🤝" color="warning"></app-stat-card>
       <app-stat-card title="سود خالص" [value]="dashboard.netProfit | persianNumber" subtitle="تومان" icon="📈" color="success"></app-stat-card>
     </div>
-
     <div class="seller-dash__mini-grid">
       <app-stat-card title="محصولات فعال" [value]="dashboard.activeProducts | persianNumber"></app-stat-card>
       <app-stat-card title="محصولات فروخته‌شده" [value]="dashboard.totalProductsSold | persianNumber"></app-stat-card>
       <app-stat-card title="سفارش‌های باز" [value]="dashboard.openOrders | persianNumber"></app-stat-card>
       <app-stat-card title="امتیاز میانگین" [value]="dashboard.averageRating | persianNumber:1:1" subtitle="از ۵"></app-stat-card>
     </div>
-  </ng-container>
+  }
 
   <div class="seller-dash__card">
     <h2 class="seller-dash__card-title">روند فروش</h2>
-    <app-bar-chart *ngIf="salesTrendData.length" [data]="salesTrendData"></app-bar-chart>
-    <p *ngIf="!salesTrendData.length" class="seller-dash__empty">داده‌ای برای روند فروش موجود نیست.</p>
+    @if (salesTrendData.length) {
+      <app-bar-chart [data]="salesTrendData"></app-bar-chart>
+    }
+    @if (!salesTrendData.length) {
+      <p class="seller-dash__empty">داده‌ای برای روند فروش موجود نیست.</p>
+    }
   </div>
 
   <div class="seller-dash__two-col">
-    <div class="seller-dash__card" *ngIf="orderStats as stats">
-      <h2 class="seller-dash__card-title">آمار سفارش‌ها</h2>
-      <div class="seller-dash__order-grid">
-        <div><span class="seller-dash__label">در انتظار</span><strong class="seller-dash__value">{{ stats.pendingOrders | persianNumber }}</strong></div>
-        <div><span class="seller-dash__label">در حال پردازش</span><strong class="seller-dash__value">{{ stats.processingOrders | persianNumber }}</strong></div>
-        <div><span class="seller-dash__label">ارسال‌شده</span><strong class="seller-dash__value">{{ stats.shippedOrders | persianNumber }}</strong></div>
-        <div><span class="seller-dash__label">تحویل‌شده</span><strong class="seller-dash__value seller-dash__value--ok">{{ stats.deliveredOrders | persianNumber }}</strong></div>
-        <div><span class="seller-dash__label">لغوشده</span><strong class="seller-dash__value seller-dash__value--err">{{ stats.cancelledOrders | persianNumber }}</strong></div>
-        <div><span class="seller-dash__label">مرجوعی</span><strong class="seller-dash__value seller-dash__value--warn">{{ stats.returnedOrders | persianNumber }}</strong></div>
+    @if (orderStats; as stats) {
+      <div class="seller-dash__card">
+        <h2 class="seller-dash__card-title">آمار سفارش‌ها</h2>
+        <div class="seller-dash__order-grid">
+          <div><span class="seller-dash__label">در انتظار</span><strong class="seller-dash__value">{{ stats.pendingOrders | persianNumber }}</strong></div>
+          <div><span class="seller-dash__label">در حال پردازش</span><strong class="seller-dash__value">{{ stats.processingOrders | persianNumber }}</strong></div>
+          <div><span class="seller-dash__label">ارسال‌شده</span><strong class="seller-dash__value">{{ stats.shippedOrders | persianNumber }}</strong></div>
+          <div><span class="seller-dash__label">تحویل‌شده</span><strong class="seller-dash__value seller-dash__value--ok">{{ stats.deliveredOrders | persianNumber }}</strong></div>
+          <div><span class="seller-dash__label">لغوشده</span><strong class="seller-dash__value seller-dash__value--err">{{ stats.cancelledOrders | persianNumber }}</strong></div>
+          <div><span class="seller-dash__label">مرجوعی</span><strong class="seller-dash__value seller-dash__value--warn">{{ stats.returnedOrders | persianNumber }}</strong></div>
+        </div>
+        <div class="seller-dash__card-footer">
+          <span>فروش این دوره</span>
+          <strong class="seller-dash__footer-value">{{ stats.totalSales | persianNumber }} تومان</strong>
+        </div>
       </div>
-      <div class="seller-dash__card-footer">
-        <span>فروش این دوره</span>
-        <strong class="seller-dash__footer-value">{{ stats.totalSales | persianNumber }} تومان</strong>
-      </div>
-    </div>
+    }
 
-    <div class="seller-dash__card" *ngIf="statistics as stats">
-      <h2 class="seller-dash__card-title">شاخص‌های عملکرد</h2>
-      <ul class="seller-dash__metrics">
-        <li class="seller-dash__metric"><span class="seller-dash__label">میانگین ارزش سفارش</span><strong>{{ stats.averageOrderValue | persianNumber }} تومان</strong></li>
-        <li class="seller-dash__metric"><span class="seller-dash__label">بازدید محصولات</span><strong>{{ stats.totalViews | persianNumber }}</strong></li>
-        <li class="seller-dash__metric"><span class="seller-dash__label">نرخ تبدیل</span><strong>{{ stats.conversionRate | persianNumber:1:2 }}٪</strong></li>
-        <li class="seller-dash__metric"><span class="seller-dash__label">امتیاز میانگین</span><strong>{{ stats.averageRating | persianNumber:1:1 }}</strong></li>
-      </ul>
-    </div>
+    @if (statistics; as stats) {
+      <div class="seller-dash__card">
+        <h2 class="seller-dash__card-title">شاخص‌های عملکرد</h2>
+        <ul class="seller-dash__metrics">
+          <li class="seller-dash__metric"><span class="seller-dash__label">میانگین ارزش سفارش</span><strong>{{ stats.averageOrderValue | persianNumber }} تومان</strong></li>
+          <li class="seller-dash__metric"><span class="seller-dash__label">بازدید محصولات</span><strong>{{ stats.totalViews | persianNumber }}</strong></li>
+          <li class="seller-dash__metric"><span class="seller-dash__label">نرخ تبدیل</span><strong>{{ stats.conversionRate | persianNumber:1:2 }}٪</strong></li>
+          <li class="seller-dash__metric"><span class="seller-dash__label">امتیاز میانگین</span><strong>{{ stats.averageRating | persianNumber:1:1 }}</strong></li>
+        </ul>
+      </div>
+    }
   </div>
 
   <div class="seller-dash__card">
     <h2 class="seller-dash__card-title">عملکرد محصولات</h2>
-    <div class="seller-dash__table-wrap" *ngIf="productStats.length; else noProducts">
-      <table class="seller-dash__table">
-        <thead><tr><th>محصول</th><th>بازدید</th><th>خرید</th><th>نرخ تبدیل</th><th>فروش</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let product of productStats">
-            <td class="seller-dash__cell-strong">{{ product.productName }}</td>
-            <td>{{ product.views | persianNumber }}</td>
-            <td>{{ product.purchases | persianNumber }}</td>
-            <td>{{ product.conversionRate | persianNumber:1:2 }}٪</td>
-            <td class="seller-dash__cell-primary">{{ product.salesAmount | persianNumber }} تومان</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <ng-template #noProducts><p class="seller-dash__empty">آمار محصولی برای نمایش وجود ندارد.</p></ng-template>
+    @if (productStats.length) {
+      <div class="seller-dash__table-wrap">
+        <table class="seller-dash__table">
+          <thead><tr><th>محصول</th><th>بازدید</th><th>خرید</th><th>نرخ تبدیل</th><th>فروش</th></tr></thead>
+          <tbody>
+            @for (product of productStats; track product) {
+              <tr>
+                <td class="seller-dash__cell-strong">{{ product.productName }}</td>
+                <td>{{ product.views | persianNumber }}</td>
+                <td>{{ product.purchases | persianNumber }}</td>
+                <td>{{ product.conversionRate | persianNumber:1:2 }}٪</td>
+                <td class="seller-dash__cell-primary">{{ product.salesAmount | persianNumber }} تومان</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="seller-dash__empty">آمار محصولی برای نمایش وجود ندارد.</p>
+    }
   </div>
 
   <div class="seller-dash__card">
     <h2 class="seller-dash__card-title">ریز کمیسیون‌ها</h2>
-    <div class="seller-dash__table-wrap" *ngIf="commissions.length; else noCommissions">
-      <table class="seller-dash__table">
-        <thead><tr><th>سفارش</th><th>محصول</th><th>مبلغ فروش</th><th>نرخ</th><th>کمیسیون</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let commission of commissions">
-            <td>{{ commission.orderNumber }}</td>
-            <td>{{ commission.productName }}</td>
-            <td>{{ commission.saleAmount | persianNumber }} تومان</td>
-            <td>{{ commission.commissionRate | persianNumber:1:2 }}٪</td>
-            <td class="seller-dash__cell-warn">{{ commission.commissionAmount | persianNumber }} تومان</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <ng-template #noCommissions><p class="seller-dash__empty">ریز کمیسیونی برای نمایش وجود ندارد.</p></ng-template>
+    @if (commissions.length) {
+      <div class="seller-dash__table-wrap">
+        <table class="seller-dash__table">
+          <thead><tr><th>سفارش</th><th>محصول</th><th>مبلغ فروش</th><th>نرخ</th><th>کمیسیون</th></tr></thead>
+          <tbody>
+            @for (commission of commissions; track commission) {
+              <tr>
+                <td>{{ commission.orderNumber }}</td>
+                <td>{{ commission.productName }}</td>
+                <td>{{ commission.saleAmount | persianNumber }} تومان</td>
+                <td>{{ commission.commissionRate | persianNumber:1:2 }}٪</td>
+                <td class="seller-dash__cell-warn">{{ commission.commissionAmount | persianNumber }} تومان</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="seller-dash__empty">ریز کمیسیونی برای نمایش وجود ندارد.</p>
+    }
   </div>
 
   <div class="seller-dash__card">
@@ -104,15 +125,21 @@
       </div>
       <button type="button" mat-stroked-button color="primary" (click)="loadReport()">بازخوانی</button>
     </div>
-    <p *ngIf="reportError" class="seller-dash__report-error">{{ reportError }}</p>
-    <p *ngIf="reportLoading && !report" class="seller-dash__empty">در حال دریافت گزارش…</p>
-    <div *ngIf="report" class="seller-dash__report-grid">
-      <div class="seller-dash__tile"><span class="seller-dash__label">کل سفارش‌ها</span><strong class="seller-dash__tile-value">{{ report.orderCount | persianNumber }}</strong></div>
-      <div class="seller-dash__tile"><span class="seller-dash__label">سفارش‌های تکمیل‌شده</span><strong class="seller-dash__tile-value seller-dash__tile-value--ok">{{ report.completedOrderCount | persianNumber }}</strong></div>
-      <div class="seller-dash__tile"><span class="seller-dash__label">درآمد (سفارش‌های پرداخت‌شده)</span><strong class="seller-dash__tile-value seller-dash__tile-value--primary">{{ report.revenue | persianNumber }} <small>تومان</small></strong></div>
-      <div class="seller-dash__tile"><span class="seller-dash__label">کمیسیون قابل پرداخت</span><strong class="seller-dash__tile-value seller-dash__tile-value--warn">{{ report.commissionOwed | persianNumber }} <small>تومان</small></strong></div>
-      <div class="seller-dash__tile"><span class="seller-dash__label">تعداد محصولات</span><strong class="seller-dash__tile-value">{{ report.productCount | persianNumber }}</strong></div>
-      <div class="seller-dash__tile"><span class="seller-dash__label">مدارک در انتظار بررسی</span><strong class="seller-dash__tile-value" [ngClass]="{ 'seller-dash__tile-value--err': report.pendingDocuments > 0 }">{{ report.pendingDocuments | persianNumber }}</strong></div>
-    </div>
+    @if (reportError) {
+      <p class="seller-dash__report-error">{{ reportError }}</p>
+    }
+    @if (reportLoading && !report) {
+      <p class="seller-dash__empty">در حال دریافت گزارش…</p>
+    }
+    @if (report) {
+      <div class="seller-dash__report-grid">
+        <div class="seller-dash__tile"><span class="seller-dash__label">کل سفارش‌ها</span><strong class="seller-dash__tile-value">{{ report.orderCount | persianNumber }}</strong></div>
+        <div class="seller-dash__tile"><span class="seller-dash__label">سفارش‌های تکمیل‌شده</span><strong class="seller-dash__tile-value seller-dash__tile-value--ok">{{ report.completedOrderCount | persianNumber }}</strong></div>
+        <div class="seller-dash__tile"><span class="seller-dash__label">درآمد (سفارش‌های پرداخت‌شده)</span><strong class="seller-dash__tile-value seller-dash__tile-value--primary">{{ report.revenue | persianNumber }} <small>تومان</small></strong></div>
+        <div class="seller-dash__tile"><span class="seller-dash__label">کمیسیون قابل پرداخت</span><strong class="seller-dash__tile-value seller-dash__tile-value--warn">{{ report.commissionOwed | persianNumber }} <small>تومان</small></strong></div>
+        <div class="seller-dash__tile"><span class="seller-dash__label">تعداد محصولات</span><strong class="seller-dash__tile-value">{{ report.productCount | persianNumber }}</strong></div>
+        <div class="seller-dash__tile"><span class="seller-dash__label">مدارک در انتظار بررسی</span><strong class="seller-dash__tile-value" [ngClass]="{ 'seller-dash__tile-value--err': report.pendingDocuments > 0 }">{{ report.pendingDocuments | persianNumber }}</strong></div>
+      </div>
+    }
   </div>
 </section>

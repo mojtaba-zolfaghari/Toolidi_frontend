@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 interface NavItem {
@@ -9,22 +9,24 @@ interface NavItem {
 }
 
 @Component({
-  selector: 'app-bottom-nav',
-  template: `
+    selector: 'app-bottom-nav',
+    template: `
     <nav class="bottom-nav">
       <div class="bottom-nav__inner">
-        <a *ngFor="let item of items"
-           [routerLink]="item.route"
-           routerLinkActive="active"
-           class="bottom-nav__item"
-           [class.bottom-nav__item--active]="isActive(item.route)">
-          <span class="bottom-nav__icon">{{ isActive(item.route) && item.activeIcon ? item.activeIcon : item.icon }}</span>
-          <span class="bottom-nav__label">{{ item.label }}</span>
-        </a>
+        @for (item of items; track item) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="bottom-nav__item"
+            [class.bottom-nav__item--active]="isActive(item.route)">
+            <span class="bottom-nav__icon">{{ isActive(item.route) && item.activeIcon ? item.activeIcon : item.icon }}</span>
+            <span class="bottom-nav__label">{{ item.label }}</span>
+          </a>
+        }
       </div>
     </nav>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: block; }
 
     .bottom-nav {
@@ -81,7 +83,9 @@ interface NavItem {
     @media (min-width: 768px) {
       .bottom-nav { display: none; }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class BottomNavComponent {
   items: NavItem[] = [

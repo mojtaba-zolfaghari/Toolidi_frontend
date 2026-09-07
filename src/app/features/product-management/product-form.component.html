@@ -10,200 +10,223 @@
 
     <!-- شاخص مراحل -->
     <ol class="mb-8 flex flex-wrap items-center gap-2">
-      <ng-container *ngFor="let s of steps; let i = index">
+      @for (s of steps; track s; let i = $index) {
         <li>
           <button type="button" (click)="step = s.index" class="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold transition-colors"
-                  [class.bg-primary]="step === s.index"
-                  [class.text-white]="step === s.index"
-                  [class.bg-white]="step !== s.index"
-                  [class.text-gray-500]="step !== s.index"
-                  [class.shadow-card]="step !== s.index">
+            [class.bg-primary]="step === s.index"
+            [class.text-white]="step === s.index"
+            [class.bg-white]="step !== s.index"
+            [class.text-gray-500]="step !== s.index"
+            [class.shadow-card]="step !== s.index">
             <span>{{ s.index }}</span> {{ s.label }}
           </button>
         </li>
-        <li *ngIf="i < steps.length - 1" class="h-px w-3 bg-gray-300"></li>
-      </ng-container>
+        @if (i < steps.length - 1) {
+          <li class="h-px w-3 bg-gray-300"></li>
+        }
+      }
     </ol>
 
-    <div *ngIf="loading" class="rounded-2xl bg-white py-20 shadow-card"><app-spinner label="در حال بارگذاری…"></app-spinner></div>
+    @if (loading) {
+      <div class="rounded-2xl bg-white py-20 shadow-card"><app-spinner label="در حال بارگذاری…"></app-spinner></div>
+    }
 
-    <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="isAdmin ? saveProduct() : saveDraft()" class="space-y-6">
-      <!-- مرحله ۱: اطلاعات پایه -->
-      <div [hidden]="step !== 1" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">اطلاعات پایه</h2>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label class="block md:col-span-2">
-            <span class="mb-1 block text-sm font-medium text-secondary">نام محصول *</span>
-            <input type="text" formControlName="name" placeholder="نام محصول" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <p *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="mt-1 text-xs text-red-500">نام محصول الزامی است (حداکثر ۳۰۰ کاراکتر).</p>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">اسلاگ (URL)</span>
-            <input type="text" formControlName="slug" placeholder="product-slug" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-          </label>
-          <div class="flex items-end">
-            <button type="button" (click)="generateSlug()" class="w-full rounded-xl bg-secondary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-secondary-light">تولید اسلاگ از نام</button>
+    @if (!loading) {
+      <form [formGroup]="form" (ngSubmit)="isAdmin ? saveProduct() : saveDraft()" class="space-y-6">
+        <!-- مرحله ۱: اطلاعات پایه -->
+        <div [hidden]="step !== 1" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">اطلاعات پایه</h2>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <label class="block md:col-span-2">
+              <span class="mb-1 block text-sm font-medium text-secondary">نام محصول *</span>
+              <input type="text" formControlName="name" placeholder="نام محصول" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+              @if (form.get('name')?.invalid && form.get('name')?.touched) {
+                <p class="mt-1 text-xs text-red-500">نام محصول الزامی است (حداکثر ۳۰۰ کاراکتر).</p>
+              }
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">اسلاگ (URL)</span>
+              <input type="text" formControlName="slug" placeholder="product-slug" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+            </label>
+            <div class="flex items-end">
+              <button type="button" (click)="generateSlug()" class="w-full rounded-xl bg-secondary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-secondary-light">تولید اسلاگ از نام</button>
+            </div>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">شناسه کالا (SKU) *</span>
+              <input type="text" formControlName="sku" placeholder="مثلاً CSM-001" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+              @if (form.get('sku')?.invalid && form.get('sku')?.touched) {
+                <p class="mt-1 text-xs text-red-500">شناسه کالا الزامی است.</p>
+              }
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">دسته‌بندی *</span>
+              <select formControlName="categoryId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">انتخاب دسته‌بندی</option>
+                @for (category of categories; track category) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                }
+              </select>
+              @if (form.get('categoryId')?.invalid && form.get('categoryId')?.touched) {
+                <p class="mt-1 text-xs text-red-500">دسته‌بندی الزامی است.</p>
+              }
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">برند (اختیاری)</span>
+              <select formControlName="brandId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">بدون برند</option>
+                @for (brand of brands; track brand) {
+                  <option [value]="brand.id">{{ brand.name }}</option>
+                }
+              </select>
+            </label>
+            <label class="block md:col-span-2">
+              <span class="mb-1 block text-sm font-medium text-secondary">توضیح کوتاه</span>
+              <textarea formControlName="shortDescription" rows="2" placeholder="خلاصه‌ای کوتاه از محصول" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+            </label>
+            <label class="block md:col-span-2">
+              <span class="mb-1 block text-sm font-medium text-secondary">توضیح کامل</span>
+              <textarea formControlName="fullDescription" rows="5" placeholder="توضیحات کامل محصول" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+            </label>
           </div>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">شناسه کالا (SKU) *</span>
-            <input type="text" formControlName="sku" placeholder="مثلاً CSM-001" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <p *ngIf="form.get('sku')?.invalid && form.get('sku')?.touched" class="mt-1 text-xs text-red-500">شناسه کالا الزامی است.</p>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">دسته‌بندی *</span>
-            <select formControlName="categoryId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="">انتخاب دسته‌بندی</option>
-              <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
-            </select>
-            <p *ngIf="form.get('categoryId')?.invalid && form.get('categoryId')?.touched" class="mt-1 text-xs text-red-500">دسته‌بندی الزامی است.</p>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">برند (اختیاری)</span>
-            <select formControlName="brandId" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary">
-              <option value="">بدون برند</option>
-              <option *ngFor="let brand of brands" [value]="brand.id">{{ brand.name }}</option>
-            </select>
-          </label>
-          <label class="block md:col-span-2">
-            <span class="mb-1 block text-sm font-medium text-secondary">توضیح کوتاه</span>
-            <textarea formControlName="shortDescription" rows="2" placeholder="خلاصه‌ای کوتاه از محصول" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-          </label>
-          <label class="block md:col-span-2">
-            <span class="mb-1 block text-sm font-medium text-secondary">توضیح کامل</span>
-            <textarea formControlName="fullDescription" rows="5" placeholder="توضیحات کامل محصول" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-          </label>
         </div>
-      </div>
-
-      <!-- مرحله ۲: قیمت و موجودی -->
-      <div [hidden]="step !== 2" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">قیمت و موجودی</h2>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">قیمت (تومان) *</span>
-            <input type="number" min="1" formControlName="unitPrice" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <p *ngIf="form.get('unitPrice')?.invalid && form.get('unitPrice')?.touched" class="mt-1 text-xs text-red-500">قیمت باید بیشتر از صفر باشد.</p>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">قیمت مقایسه (تخفیف نمایشی)</span>
-            <input type="number" min="0" formControlName="comparePrice" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">قیمت تمام‌شده</span>
-            <input type="number" min="0" formControlName="costPrice" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">موجودی</span>
-            <input type="number" min="0" formControlName="stockQuantity" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-            <span class="mt-1 block text-xs text-gray-400">در صورت داشتن تنوع، موجودی هر تنوع جداگانه تعیین می‌شود.</span>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">وزن (کیلوگرم)</span>
-            <input type="number" min="0" formControlName="weight" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">نرخ مالیات (٪)</span>
-            <input type="number" min="0" max="100" formControlName="taxRate" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
-          </label>
+        <!-- مرحله ۲: قیمت و موجودی -->
+        <div [hidden]="step !== 2" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">قیمت و موجودی</h2>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">قیمت (تومان) *</span>
+              <input type="number" min="1" formControlName="unitPrice" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+              @if (form.get('unitPrice')?.invalid && form.get('unitPrice')?.touched) {
+                <p class="mt-1 text-xs text-red-500">قیمت باید بیشتر از صفر باشد.</p>
+              }
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">قیمت مقایسه (تخفیف نمایشی)</span>
+              <input type="number" min="0" formControlName="comparePrice" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">قیمت تمام‌شده</span>
+              <input type="number" min="0" formControlName="costPrice" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">موجودی</span>
+              <input type="number" min="0" formControlName="stockQuantity" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+              <span class="mt-1 block text-xs text-gray-400">در صورت داشتن تنوع، موجودی هر تنوع جداگانه تعیین می‌شود.</span>
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">وزن (کیلوگرم)</span>
+              <input type="number" min="0" formControlName="weight" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">نرخ مالیات (٪)</span>
+              <input type="number" min="0" max="100" formControlName="taxRate" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary" />
+            </label>
+          </div>
+          <div class="mt-4 flex gap-6">
+            <label class="flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="isPhysical" class="accent-primary" /> کالای فیزیکی</label>
+            <label class="flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="isTaxable" class="accent-primary" /> مشمول مالیات</label>
+          </div>
         </div>
-        <div class="mt-4 flex gap-6">
-          <label class="flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="isPhysical" class="accent-primary" /> کالای فیزیکی</label>
-          <label class="flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="isTaxable" class="accent-primary" /> مشمول مالیات</label>
+        <!-- مرحله ۳: تصاویر -->
+        <div [hidden]="step !== 3" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">تصاویر محصول</h2>
+          <app-image-upload></app-image-upload>
         </div>
-      </div>
-
-      <!-- مرحله ۳: تصاویر -->
-      <div [hidden]="step !== 3" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">تصاویر محصول</h2>
-        <app-image-upload></app-image-upload>
-      </div>
-
-      <!-- مرحله ۴: ویژگی‌ها -->
-      <div [hidden]="step !== 4" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">ویژگی‌ها</h2>
-        <app-product-attributes></app-product-attributes>
-      </div>
-
-      <!-- مرحله ۵: تنوع‌ها -->
-      <div [hidden]="step !== 5" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">تنوع‌ها</h2>
-        <app-product-variations [attributes]="attributeGroups" [baseSku]="form.get('sku')?.value"></app-product-variations>
-      </div>
-
-      <!-- مرحله ۶: تخفیف -->
-      <div [hidden]="step !== 6" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">تخفیف (اختیاری)</h2>
-        <label class="mb-4 flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="discountEnabled" class="accent-primary" /> فعال‌سازی تخفیف</label>
-        <div *ngIf="form.get('discountEnabled')?.value" class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">نوع تخفیف</span>
-            <select formControlName="discountType" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
-              <option value="percentage">درصدی</option>
-              <option value="fixed">مبلغ ثابت</option>
-            </select>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">مقدار تخفیف</span>
-            <input type="number" min="0" formControlName="discountValue" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">تاریخ شروع</span>
-            <input type="date" formControlName="discountStartDate" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">تاریخ پایان</span>
-            <input type="date" formControlName="discountEndDate" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-          </label>
+        <!-- مرحله ۴: ویژگی‌ها -->
+        <div [hidden]="step !== 4" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">ویژگی‌ها</h2>
+          <app-product-attributes></app-product-attributes>
         </div>
-      </div>
-
-      <!-- مرحله ۷: سئو و انتشار -->
-      <div [hidden]="step !== 7" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
-        <h2 class="mb-5 text-xl font-bold text-secondary">سئو و انتشار</h2>
-        <div class="grid grid-cols-1 gap-4">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">عنوان متا (SEO)</span>
-            <input type="text" formControlName="metaTitle" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">توضیحات متا</span>
-            <textarea formControlName="metaDescription" rows="2" class="w-full rounded-xl border border-gray-300 px-4 py-2.5"></textarea>
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-secondary">کلمات کلیدی (با کاما جدا کنید)</span>
-            <input type="text" formControlName="metaKeywords" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-          </label>
+        <!-- مرحله ۵: تنوع‌ها -->
+        <div [hidden]="step !== 5" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">تنوع‌ها</h2>
+          <app-product-variations [attributes]="attributeGroups" [baseSku]="$safeNavigationMigration(form.get('sku')?.value)"></app-product-variations>
         </div>
-
-        <p *ngIf="errorMessage" class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage }}</p>
-        <p *ngIf="successMessage" class="mt-4 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-600">{{ successMessage }}</p>
-
-        <div class="mt-6 flex flex-wrap justify-end gap-3">
-          <button type="button" (click)="isAdmin ? saveProduct() : saveDraft()" [disabled]="submitting" class="rounded-xl border border-gray-300 px-6 py-3 font-bold text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50">
-            {{ submitting ? 'در حال ذخیره…' : (isAdmin ? 'ذخیره تغییرات' : 'ذخیره پیش‌نویس') }}
-          </button>
-          <button *ngIf="!isAdmin" type="button" (click)="submitForApproval()" [disabled]="submitting" class="rounded-xl bg-secondary px-6 py-3 font-bold text-white shadow-lg shadow-secondary/20 transition-colors hover:bg-secondary-light disabled:opacity-50">
-            {{ submitting ? 'در حال ارسال…' : 'ارسال برای تأیید' }}
-          </button>
-          <button *ngIf="isAdmin" type="button" (click)="publishProduct()" [disabled]="submitting" class="rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary-dark disabled:opacity-50">
-            {{ submitting ? 'در حال انتشار…' : 'ذخیره و انتشار' }}
-          </button>
+        <!-- مرحله ۶: تخفیف -->
+        <div [hidden]="step !== 6" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">تخفیف (اختیاری)</h2>
+          <label class="mb-4 flex items-center gap-2 text-sm text-secondary"><input type="checkbox" formControlName="discountEnabled" class="accent-primary" /> فعال‌سازی تخفیف</label>
+          @if (form.get('discountEnabled')?.value) {
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-secondary">نوع تخفیف</span>
+                <select formControlName="discountType" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+                  <option value="percentage">درصدی</option>
+                  <option value="fixed">مبلغ ثابت</option>
+                </select>
+              </label>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-secondary">مقدار تخفیف</span>
+                <input type="number" min="0" formControlName="discountValue" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+              </label>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-secondary">تاریخ شروع</span>
+                <input type="date" formControlName="discountStartDate" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+              </label>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-secondary">تاریخ پایان</span>
+                <input type="date" formControlName="discountEndDate" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+              </label>
+            </div>
+          }
         </div>
-        <p class="mt-3 text-xs text-gray-400">فروشنده می‌تواند محصول را ذخیره یا برای بررسی ارسال کند؛ مدیر پس از بررسی امکان انتشار مستقیم دارد.</p>
-      </div>
-
-      <!-- ناوبری مراحل -->
-      <div class="flex items-center justify-between">
-        <button type="button" (click)="back()" [disabled]="step === 1" class="rounded-xl border border-gray-300 px-6 py-2.5 font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-40">مرحله قبل</button>
-        <button *ngIf="step < 7" type="button" (click)="next()" [disabled]="!currentStepValid" class="rounded-xl bg-secondary px-6 py-2.5 font-bold text-white transition-colors hover:bg-secondary-light disabled:opacity-40">مرحله بعد</button>
-      </div>
-    </form>
+        <!-- مرحله ۷: سئو و انتشار -->
+        <div [hidden]="step !== 7" class="rounded-2xl bg-white p-6 shadow-card" [@fadeIn]>
+          <h2 class="mb-5 text-xl font-bold text-secondary">سئو و انتشار</h2>
+          <div class="grid grid-cols-1 gap-4">
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">عنوان متا (SEO)</span>
+              <input type="text" formControlName="metaTitle" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">توضیحات متا</span>
+              <textarea formControlName="metaDescription" rows="2" class="w-full rounded-xl border border-gray-300 px-4 py-2.5"></textarea>
+            </label>
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-secondary">کلمات کلیدی (با کاما جدا کنید)</span>
+              <input type="text" formControlName="metaKeywords" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+            </label>
+          </div>
+          @if (errorMessage) {
+            <p class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage }}</p>
+          }
+          @if (successMessage) {
+            <p class="mt-4 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-600">{{ successMessage }}</p>
+          }
+          <div class="mt-6 flex flex-wrap justify-end gap-3">
+            <button type="button" (click)="isAdmin ? saveProduct() : saveDraft()" [disabled]="submitting" class="rounded-xl border border-gray-300 px-6 py-3 font-bold text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50">
+              {{ submitting ? 'در حال ذخیره…' : (isAdmin ? 'ذخیره تغییرات' : 'ذخیره پیش‌نویس') }}
+            </button>
+            @if (!isAdmin) {
+              <button type="button" (click)="submitForApproval()" [disabled]="submitting" class="rounded-xl bg-secondary px-6 py-3 font-bold text-white shadow-lg shadow-secondary/20 transition-colors hover:bg-secondary-light disabled:opacity-50">
+                {{ submitting ? 'در حال ارسال…' : 'ارسال برای تأیید' }}
+              </button>
+            }
+            @if (isAdmin) {
+              <button type="button" (click)="publishProduct()" [disabled]="submitting" class="rounded-xl bg-primary px-6 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-colors hover:bg-primary-dark disabled:opacity-50">
+                {{ submitting ? 'در حال انتشار…' : 'ذخیره و انتشار' }}
+              </button>
+            }
+          </div>
+          <p class="mt-3 text-xs text-gray-400">فروشنده می‌تواند محصول را ذخیره یا برای بررسی ارسال کند؛ مدیر پس از بررسی امکان انتشار مستقیم دارد.</p>
+        </div>
+        <!-- ناوبری مراحل -->
+        <div class="flex items-center justify-between">
+          <button type="button" (click)="back()" [disabled]="step === 1" class="rounded-xl border border-gray-300 px-6 py-2.5 font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-40">مرحله قبل</button>
+          @if (step < 7) {
+            <button type="button" (click)="next()" [disabled]="!currentStepValid" class="rounded-xl bg-secondary px-6 py-2.5 font-bold text-white transition-colors hover:bg-secondary-light disabled:opacity-40">مرحله بعد</button>
+          }
+        </div>
+      </form>
+    }
 
     <!-- overlay بارگذاری -->
-    <div *ngIf="submitting" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div class="rounded-2xl bg-white p-8 text-center shadow-2xl">
-        <app-spinner label="در حال ذخیره محصول…"></app-spinner>
+    @if (submitting) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div class="rounded-2xl bg-white p-8 text-center shadow-2xl">
+          <app-spinner label="در حال ذخیره محصول…"></app-spinner>
+        </div>
       </div>
-    </div>
+    }
   </div>
 </section>

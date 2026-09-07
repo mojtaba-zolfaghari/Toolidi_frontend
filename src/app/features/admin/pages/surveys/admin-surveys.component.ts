@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -7,8 +7,10 @@ import { Survey, SurveyData, SurveyQuestion, SurveyResult, SurveyService } from 
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 @Component({
-  selector: 'app-admin-surveys',
-  templateUrl: './admin-surveys.component.html'
+    selector: 'app-admin-surveys',
+    templateUrl: './admin-surveys.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminSurveysComponent implements OnInit {
   surveys: Survey[] = [];

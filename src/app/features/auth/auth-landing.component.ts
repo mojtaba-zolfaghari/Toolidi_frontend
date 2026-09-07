@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { getCurrentRole, navigateAfterLogin } from '../../core/utils/auth-redirect.util';
@@ -20,10 +20,10 @@ interface RoleOption {
  * کاربر واردشده مستقیم به پنل نقش خودش فرستاده می‌شود (انتخاب نقش برای او بی‌معناست).
  */
 @Component({
-  selector: 'app-auth-landing',
-  templateUrl: './auth-landing.component.html',
-  styles: [
-    `
+    selector: 'app-auth-landing',
+    templateUrl: './auth-landing.component.html',
+    styles: [
+        `
       .role-card {
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -137,7 +137,9 @@ interface RoleOption {
         text-decoration: underline;
       }
     `,
-  ],
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AuthLandingComponent implements OnInit {
   constructor(

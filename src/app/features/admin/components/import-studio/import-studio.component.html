@@ -1,8 +1,12 @@
 <div class="import-studio-page" dir="rtl">
-  <div *ngIf="errorMessage" class="admin-alert admin-alert--error studio-mb-4">{{ errorMessage }}</div>
-  <div *ngIf="successMessage" class="admin-alert admin-alert--success studio-mb-4">{{ successMessage }}</div>
+  @if (errorMessage) {
+    <div class="admin-alert admin-alert--error studio-mb-4">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="admin-alert admin-alert--success studio-mb-4">{{ successMessage }}</div>
+  }
 
-  <ng-container *ngIf="step === 0">
+  @if (step === 0) {
     <div class="studio-page-head">
       <div>
         <h1 class="studio-page-title">استودیو ایمپورت محصول</h1>
@@ -10,44 +14,49 @@
       </div>
       <button (click)="openCreateForm()" mat-flat-button class="admin-btn-primary">+ فلو جدید</button>
     </div>
-
-    <div *ngIf="formOpen" class="studio-card">
-      <h2 class="studio-card__title">{{ editingId ? 'ویرایش فلو' : 'فلو جدید' }}</h2>
-      <form [formGroup]="flowForm" (ngSubmit)="saveFlow()" class="studio-form-grid">
-        <div class="studio-field">
-          <span class="studio-field__label">نام سایت</span>
-          <input formControlName="siteName" class="studio-input" />
-        </div>
-        <div class="studio-field">
-          <span class="studio-field__label">آدرس منبع</span>
-          <input formControlName="sourceUrl" type="url" class="studio-input" />
-        </div>
-        <div class="studio-form-actions studio-form-grid__full">
-          <button [disabled]="saving" mat-flat-button class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره' }}</button>
-          <button type="button" (click)="formOpen=false" class="studio-btn">انصراف</button>
-        </div>
-      </form>
-    </div>
-
-    <div *ngIf="loadingFlows" class="studio-empty">در حال بارگذاری…</div>
-
-    <div *ngIf="!loadingFlows" class="studio-grid studio-grid--3">
-      <div *ngFor="let flow of flows" class="studio-card">
-        <div class="studio-card__head-row">
-          <h3 class="studio-card__title">{{ flow.siteName }}</h3>
-          <span class="studio-status studio-status--active">{{ flow.isActive ? 'فعال' : 'غیرفعال' }}</span>
-        </div>
-        <p class="studio-url studio-truncate">{{ flow.sourceUrl }}</p>
-        <button (click)="selectFlow(flow)" mat-flat-button class="admin-btn-primary studio-btn--full">باز کردن استودیو</button>
-        <div class="studio-actions-row">
-          <button (click)="openEditForm(flow)" class="studio-btn">ویرایش</button>
-          <button (click)="removeFlow(flow)" class="studio-btn studio-btn--danger">حذف</button>
-        </div>
+    @if (formOpen) {
+      <div class="studio-card">
+        <h2 class="studio-card__title">{{ editingId ? 'ویرایش فلو' : 'فلو جدید' }}</h2>
+        <form [formGroup]="flowForm" (ngSubmit)="saveFlow()" class="studio-form-grid">
+          <div class="studio-field">
+            <span class="studio-field__label">نام سایت</span>
+            <input formControlName="siteName" class="studio-input" />
+          </div>
+          <div class="studio-field">
+            <span class="studio-field__label">آدرس منبع</span>
+            <input formControlName="sourceUrl" type="url" class="studio-input" />
+          </div>
+          <div class="studio-form-actions studio-form-grid__full">
+            <button [disabled]="saving" mat-flat-button class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره' }}</button>
+            <button type="button" (click)="formOpen=false" class="studio-btn">انصراف</button>
+          </div>
+        </form>
       </div>
-    </div>
-  </ng-container>
+    }
+    @if (loadingFlows) {
+      <div class="studio-empty">در حال بارگذاری…</div>
+    }
+    @if (!loadingFlows) {
+      <div class="studio-grid studio-grid--3">
+        @for (flow of flows; track flow) {
+          <div class="studio-card">
+            <div class="studio-card__head-row">
+              <h3 class="studio-card__title">{{ flow.siteName }}</h3>
+              <span class="studio-status studio-status--active">{{ flow.isActive ? 'فعال' : 'غیرفعال' }}</span>
+            </div>
+            <p class="studio-url studio-truncate">{{ flow.sourceUrl }}</p>
+            <button (click)="selectFlow(flow)" mat-flat-button class="admin-btn-primary studio-btn--full">باز کردن استودیو</button>
+            <div class="studio-actions-row">
+              <button (click)="openEditForm(flow)" class="studio-btn">ویرایش</button>
+              <button (click)="removeFlow(flow)" class="studio-btn studio-btn--danger">حذف</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
 
-  <ng-container *ngIf="step > 0 && selectedFlow">
+  @if (step > 0 && selectedFlow) {
     <div class="import-studio-header">
       <div>
         <button (click)="backToFlows()" class="back-link">← بازگشت به فلوها</button>
@@ -59,329 +68,412 @@
         <strong>{{ selectedFlow.siteName }}</strong>
       </div>
     </div>
-
     <div class="studio-steps">
-      <button *ngFor="let label of steps; let i=index" (click)="i > 0 && i <= step ? go(i) : null" class="studio-step" [class.is-active]="i===step" [class.is-done]="i<step" [disabled]="i===0 || i>step">
-        <span>{{ i + 1 }}</span>{{ label }}
-      </button>
+      @for (label of steps; track label; let i = $index) {
+        <button (click)="i > 0 && i <= step ? go(i) : null" class="studio-step" [class.is-active]="i===step" [class.is-done]="i<step" [disabled]="i===0 || i>step">
+          <span>{{ i + 1 }}</span>{{ label }}
+        </button>
+      }
     </div>
-
-    <mat-card appearance="outlined" *ngIf="step===1" class="studio-card">
-      <div class="studio-card__head">
-        <h2 class="studio-card__title">انتخاب لیست محصولات</h2>
-        <p class="studio-card__subtitle">آدرس لیست را وارد کنید. سیستم به‌صورت خودکار کارت‌های محصول را از صفحه تشخیص می‌دهد؛ سپس انتخاب کنید کدام‌ها دارای داده هستند.</p>
-      </div>
-
-      <div class="studio-row">
-        <div class="studio-field">
-          <span class="studio-field__label">آدرس صفحه لیست (Listing URL)</span>
-          <input [(ngModel)]="selectedFlow.sourceUrl" class="studio-input" placeholder="https://example.com/category" />
+    @if (step===1) {
+      <mat-card appearance="outlined" class="studio-card">
+        <div class="studio-card__head">
+          <h2 class="studio-card__title">انتخاب لیست محصولات</h2>
+          <p class="studio-card__subtitle">آدرس لیست را وارد کنید. سیستم به‌صورت خودکار کارت‌های محصول را از صفحه تشخیص می‌دهد؛ سپس انتخاب کنید کدام‌ها دارای داده هستند.</p>
         </div>
-        <button (click)="preview(false)" [disabled]="previewing" mat-flat-button class="admin-btn-primary">{{ previewing ? 'در حال تشخیص محصولات…' : 'تشخیص محصولات' }}</button>
-      </div>
-
-      <div class="studio-alert studio-alert--info">
         <div class="studio-row">
-          <div>
-            <h3 class="studio-card__title">{{ pickerMode === 'detail' ? 'انتخاب تگ‌های صفحه محصول (جزئیات)' : 'انتخاب دستی با کلیک' }}</h3>
-            <p class="studio-card__subtitle" *ngIf="pickerMode === 'detail'">{{ pickerDetailUrl }}</p>
-            <p class="studio-card__subtitle" *ngIf="pickerMode === 'listing'">سایت بارگذاری می‌شود؛ به ترتیب روی کارت محصول، لینک، عنوان، قیمت، تصویر و سپس صفحه‌بندی (بعدی/قبلی) کلیک کنید. با روشن بودن «پیش‌نمایش استخراج»، می‌توانید مستقیماً روی کادرهای رنگی هم کلیک کنید تا همان عنصر هایلایت‌شده ثبت شود.</p>
+          <div class="studio-field">
+            <span class="studio-field__label">آدرس صفحه لیست (Listing URL)</span>
+            <input [(ngModel)]="selectedFlow.sourceUrl" class="studio-input" placeholder="https://example.com/category" />
           </div>
-          <div class="studio-actions-row">
-            <button (click)="openPicker()" [disabled]="pickerLoading || previewing" mat-flat-button class="admin-btn-primary">{{ pickerLoading ? 'در حال بارگذاری سایت…' : (pickerMode === 'detail' ? 'بارگذاری صفحه محصول' : 'لود سایت و انتخاب تگ‌ها') }}</button>
-            <button *ngIf="pickerMode === 'detail'" (click)="openPicker('listing')" class="studio-btn">بازگشت به لیست</button>
-            <button *ngIf="pickerOpen" type="button" (click)="togglePickerPreview()" class="studio-btn" [class.studio-btn--active]="pickerPreviewEnabled">{{ pickerPreviewEnabled ? 'پیش‌نمایش استخراج: روشن' : 'پیش‌نمایش استخراج: خاموش' }}</button>
-            <button *ngIf="pickerOpen" (click)="closePicker()" class="studio-btn">بستن</button>
+          <button (click)="preview(false)" [disabled]="previewing" mat-flat-button class="admin-btn-primary">{{ previewing ? 'در حال تشخیص محصولات…' : 'تشخیص محصولات' }}</button>
+        </div>
+        <div class="studio-alert studio-alert--info">
+          <div class="studio-row">
+            <div>
+              <h3 class="studio-card__title">{{ pickerMode === 'detail' ? 'انتخاب تگ‌های صفحه محصول (جزئیات)' : 'انتخاب دستی با کلیک' }}</h3>
+              @if (pickerMode === 'detail') {
+                <p class="studio-card__subtitle">{{ pickerDetailUrl }}</p>
+              }
+              @if (pickerMode === 'listing') {
+                <p class="studio-card__subtitle">سایت بارگذاری می‌شود؛ به ترتیب روی کارت محصول، لینک، عنوان، قیمت، تصویر و سپس صفحه‌بندی (بعدی/قبلی) کلیک کنید. با روشن بودن «پیش‌نمایش استخراج»، می‌توانید مستقیماً روی کادرهای رنگی هم کلیک کنید تا همان عنصر هایلایت‌شده ثبت شود.</p>
+              }
+            </div>
+            <div class="studio-actions-row">
+              <button (click)="openPicker()" [disabled]="pickerLoading || previewing" mat-flat-button class="admin-btn-primary">{{ pickerLoading ? 'در حال بارگذاری سایت…' : (pickerMode === 'detail' ? 'بارگذاری صفحه محصول' : 'لود سایت و انتخاب تگ‌ها') }}</button>
+              @if (pickerMode === 'detail') {
+                <button (click)="openPicker('listing')" class="studio-btn">بازگشت به لیست</button>
+              }
+              @if (pickerOpen) {
+                <button type="button" (click)="togglePickerPreview()" class="studio-btn" [class.studio-btn--active]="pickerPreviewEnabled">{{ pickerPreviewEnabled ? 'پیش‌نمایش استخراج: روشن' : 'پیش‌نمایش استخراج: خاموش' }}</button>
+              }
+              @if (pickerOpen) {
+                <button (click)="closePicker()" class="studio-btn">بستن</button>
+              }
+            </div>
+          </div>
+          <div class="studio-chips-row">
+            <span class="studio-label">هدف کلیک:</span>
+            @for (chip of pickerChips(); track chip) {
+              <button type="button" (click)="setPickerTarget(chip.key)" class="studio-chip" [class.studio-chip--active]="chip.active" [class.studio-chip--done]="chip.done && !chip.active">{{ chip.label }}@if (chip.done) {
+                <span class="studio-chip__done">✓</span>
+              }</button>
+            }
+            @if (pickerLastPicked) {
+              <span class="studio-meta">آخرین انتخاب: <code class="studio-code">{{ pickerLastPicked }}</code></span>
+            }
+          </div>
+          @if (pickerLoading) {
+            <div class="studio-picker-loading">
+              <span class="studio-spinner"></span>{{ pickerMode === 'detail' ? 'در حال بارگذاری صفحه محصول…' : 'در حال بارگذاری سایت منبع…' }}
+            </div>
+          }
+          @if (pickerError) {
+            <div class="studio-alert studio-alert--error">بارگذاری سایت در انتخابگر ناموفق بود: {{ pickerError }}</div>
+          }
+          @if (pickerOpen) {
+            <div class="studio-actions-row">
+              <button (click)="pickerMode === 'detail' ? saveDetailSelectors() : savePickerAndPreview()" mat-flat-button class="admin-btn-primary">{{ pickerMode === 'detail' ? 'ذخیره سلکتورها' : 'ذخیره و تشخیص محصولات' }}</button>
+            </div>
+          }
+          @if (pickerOpen) {
+            <div id="import-studio-picker-mount" class="import-studio-picker-frame"></div>
+          }
+        </div>
+        <div class="studio-form-grid studio-grid--4">
+          <div class="studio-field">
+            <span class="studio-field__label">صفحه بعدی (Next Page selector)</span>
+            <input [(ngModel)]="selectedFlow.flowConfig.nextPageSelector" class="studio-input" placeholder=".next-link" dir="ltr" />
+          </div>
+          <div class="studio-field">
+            <span class="studio-field__label">صفحه قبلی (Prev Page selector)</span>
+            <input [(ngModel)]="selectedFlow.flowConfig.prevPageSelector" class="studio-input" placeholder=".prev-link" dir="ltr" />
+          </div>
+          <div class="studio-field">
+            <span class="studio-field__label">حداکثر صفحات</span>
+            <input type="number" min="1" max="50" [(ngModel)]="selectedFlow.flowConfig.maxPages" class="studio-input" />
+          </div>
+          <div class="studio-field">
+            <span class="studio-field__label">حداکثر محصولات</span>
+            <input type="number" min="1" max="500" [(ngModel)]="selectedFlow.flowConfig.maxProducts" class="studio-input" />
           </div>
         </div>
-        <div class="studio-chips-row">
-          <span class="studio-label">هدف کلیک:</span>
-          <button type="button" *ngFor="let chip of pickerChips()" (click)="setPickerTarget(chip.key)" class="studio-chip" [class.studio-chip--active]="chip.active" [class.studio-chip--done]="chip.done && !chip.active">{{ chip.label }}<span *ngIf="chip.done" class="studio-chip__done">✓</span></button>
-          <span *ngIf="pickerLastPicked" class="studio-meta">آخرین انتخاب: <code class="studio-code">{{ pickerLastPicked }}</code></span>
+        <div class="studio-actions-row">
+          <button (click)="saveFlowConfig()" [disabled]="saving" mat-flat-button class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره تنظیمات فلو' }}</button>
+          <button (click)="openPicker('listing')" [disabled]="pickerLoading" class="studio-btn">انتخاب صفحه‌بندی از سایت</button>
         </div>
-        <div *ngIf="pickerLoading" class="studio-picker-loading">
-          <span class="studio-spinner"></span>{{ pickerMode === 'detail' ? 'در حال بارگذاری صفحه محصول…' : 'در حال بارگذاری سایت منبع…' }}
+        <div class="studio-actions-row">
+          <button (click)="selectAll(true)" class="studio-btn">انتخاب همه</button>
+          <button (click)="selectAll(false)" class="studio-btn">حذف انتخاب</button>
+          <button (click)="goToDetails()" [disabled]="!previewReady || !selectedCount" mat-flat-button class="admin-btn-primary">ذخیره و ادامه</button>
         </div>
-        <div *ngIf="pickerError" class="studio-alert studio-alert--error">بارگذاری سایت در انتخابگر ناموفق بود: {{ pickerError }}</div>
-        <div *ngIf="pickerOpen" class="studio-actions-row">
-          <button (click)="pickerMode === 'detail' ? saveDetailSelectors() : savePickerAndPreview()" mat-flat-button class="admin-btn-primary">{{ pickerMode === 'detail' ? 'ذخیره سلکتورها' : 'ذخیره و تشخیص محصولات' }}</button>
-        </div>
-        <div *ngIf="pickerOpen" id="import-studio-picker-mount" class="import-studio-picker-frame"></div>
-      </div>
-
-      <div class="studio-form-grid studio-grid--4">
-        <div class="studio-field">
-          <span class="studio-field__label">صفحه بعدی (Next Page selector)</span>
-          <input [(ngModel)]="selectedFlow.flowConfig.nextPageSelector" class="studio-input" placeholder=".next-link" dir="ltr" />
-        </div>
-        <div class="studio-field">
-          <span class="studio-field__label">صفحه قبلی (Prev Page selector)</span>
-          <input [(ngModel)]="selectedFlow.flowConfig.prevPageSelector" class="studio-input" placeholder=".prev-link" dir="ltr" />
-        </div>
-        <div class="studio-field">
-          <span class="studio-field__label">حداکثر صفحات</span>
-          <input type="number" min="1" max="50" [(ngModel)]="selectedFlow.flowConfig.maxPages" class="studio-input" />
-        </div>
-        <div class="studio-field">
-          <span class="studio-field__label">حداکثر محصولات</span>
-          <input type="number" min="1" max="500" [(ngModel)]="selectedFlow.flowConfig.maxProducts" class="studio-input" />
-        </div>
-      </div>
-
-      <div class="studio-actions-row">
-        <button (click)="saveFlowConfig()" [disabled]="saving" mat-flat-button class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره تنظیمات فلو' }}</button>
-        <button (click)="openPicker('listing')" [disabled]="pickerLoading" class="studio-btn">انتخاب صفحه‌بندی از سایت</button>
-      </div>
-
-      <div class="studio-actions-row">
-        <button (click)="selectAll(true)" class="studio-btn">انتخاب همه</button>
-        <button (click)="selectAll(false)" class="studio-btn">حذف انتخاب</button>
-        <button (click)="goToDetails()" [disabled]="!previewReady || !selectedCount" mat-flat-button class="admin-btn-primary">ذخیره و ادامه</button>
-      </div>
-
-      <div *ngIf="scrapeErrors.length" class="studio-alert studio-alert--error">
-        <strong>خطاها:</strong>
-        <ul class="studio-error-list">
-          <li *ngFor="let e of scrapeErrors">{{ e }}</li>
-        </ul>
-      </div>
-
-      <div *ngIf="previewing" class="studio-empty">در حال استخراج…</div>
-
-      <div *ngIf="previewReady" class="studio-preview">
+        @if (scrapeErrors.length) {
+          <div class="studio-alert studio-alert--error">
+            <strong>خطاها:</strong>
+            <ul class="studio-error-list">
+              @for (e of scrapeErrors; track e) {
+                <li>{{ e }}</li>
+              }
+            </ul>
+          </div>
+        }
+        @if (previewing) {
+          <div class="studio-empty">در حال استخراج…</div>
+        }
+        @if (previewReady) {
+          <div class="studio-preview">
+            <div class="studio-row studio-row--between">
+              <h3 class="studio-card__title">محصولات یافت‌شده ({{ products.length }}) — {{ selectedCount }} انتخاب‌شده</h3>
+            </div>
+            <div class="studio-tablewrap">
+              <table class="studio-table">
+                <thead>
+                  <tr>
+                    <th class="studio-table__check">
+                      <input type="checkbox" [checked]="selectedCount===products.length" (change)="selectAll($any($event.target).checked)" />
+                    </th>
+                    <th>عنوان</th>
+                    <th>قیمت</th>
+                    <th>تصویر</th>
+                    <th>آدرس</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of products; track p) {
+                    <tr class="studio-table__row" [class.studio-table__row--selected]="selectedUrls.has(p.url)">
+                      <td><input type="checkbox" [checked]="selectedUrls.has(p.url)" (change)="toggleProduct(p.url)" /></td>
+                      <td><b>{{ p.title || 'بدون عنوان' }}</b></td>
+                      <td>{{ p.price || '—' }}</td>
+                      <td>
+                        @if (p.imageUrls?.[0]) {
+                          <img [src]="p.imageUrls[0]" class="studio-thumb" alt="" />
+                        }
+                        @if (!p.imageUrls?.length) {
+                          <span class="studio-muted">—</span>
+                        }
+                      </td>
+                      <td class="studio-url-cell"><span class="studio-meta">{{ p.url }}</span></td>
+                      <td><button (click)="openPicker('detail', p.url)" class="studio-btn studio-btn--purple">انتخاب تگ‌های جزئیات</button></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </mat-card>
+    }
+    @if (step===2) {
+      <mat-card appearance="outlined" class="studio-card">
         <div class="studio-row studio-row--between">
-          <h3 class="studio-card__title">محصولات یافت‌شده ({{ products.length }}) — {{ selectedCount }} انتخاب‌شده</h3>
+          <h2 class="studio-card__title">نگاشت فیلدها</h2>
+          <button (click)="addMapping()" mat-flat-button class="admin-btn-primary">+ فیلد</button>
         </div>
+        <p class="studio-card__subtitle">سلکتورهای استخراج و مقصد داخلی را تنظیم کنید. ستون «صفحه» تعیین می‌کند که سلکتور روی صفحه لیست، صفحه محصول یا هر دو اعمال شود؛ با «انتخاب با کلیک» همان فیلد را به‌صورت دیداری ثبت کنید.</p>
         <div class="studio-tablewrap">
           <table class="studio-table">
             <thead>
               <tr>
-                <th class="studio-table__check">
-                  <input type="checkbox" [checked]="selectedCount===products.length" (change)="selectAll($any($event.target).checked)" />
-                </th>
-                <th>عنوان</th>
-                <th>قیمت</th>
-                <th>تصویر</th>
-                <th>آدرس</th>
+                <th>فیلد منبع</th>
+                <th>فیلد Toolidi</th>
+                <th>CSS selector</th>
+                <th>نوع</th>
+                <th>صفحه</th>
+                <th></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let p of products" class="studio-table__row" [class.studio-table__row--selected]="selectedUrls.has(p.url)">
-                <td><input type="checkbox" [checked]="selectedUrls.has(p.url)" (change)="toggleProduct(p.url)" /></td>
-                <td><b>{{ p.title || 'بدون عنوان' }}</b></td>
-                <td>{{ p.price || '—' }}</td>
-                <td>
-                  <img *ngIf="p.imageUrls?.[0]" [src]="p.imageUrls[0]" class="studio-thumb" alt="" />
-                  <span *ngIf="!p.imageUrls?.length" class="studio-muted">—</span>
-                </td>
-                <td class="studio-url-cell"><span class="studio-meta">{{ p.url }}</span></td>
-                <td><button (click)="openPicker('detail', p.url)" class="studio-btn studio-btn--purple">انتخاب تگ‌های جزئیات</button></td>
-              </tr>
+              @for (field of mappingFields; track field; let i = $index) {
+                <tr class="studio-table__row">
+                  <td><input [(ngModel)]="field.sourceField" class="studio-input studio-input--sm" /></td>
+                  <td><input [(ngModel)]="field.targetField" class="studio-input studio-input--sm" /></td>
+                  <td><input [(ngModel)]="field.selector" class="studio-input studio-input--sm" dir="ltr" /></td>
+                  <td>
+                    <select [(ngModel)]="field.expectedType" class="studio-input studio-input--sm">
+                      <option>Text</option>
+                      <option>Number</option>
+                      <option>Url</option>
+                      <option>Html</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select [(ngModel)]="field.scope" class="studio-input studio-input--sm">
+                      <option value="Both">هر دو</option>
+                      <option value="Listing">لیست</option>
+                      <option value="Detail">جزئیات</option>
+                    </select>
+                  </td>
+                  <td><button (click)="pickFieldVisual(field)" class="studio-btn studio-btn--purple">انتخاب با کلیک</button></td>
+                  <td><button (click)="removeMapping(i)" class="studio-btn--danger-text">حذف</button></td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" *ngIf="step===2" class="studio-card">
-      <div class="studio-row studio-row--between">
-        <h2 class="studio-card__title">نگاشت فیلدها</h2>
-        <button (click)="addMapping()" mat-flat-button class="admin-btn-primary">+ فیلد</button>
-      </div>
-      <p class="studio-card__subtitle">سلکتورهای استخراج و مقصد داخلی را تنظیم کنید. ستون «صفحه» تعیین می‌کند که سلکتور روی صفحه لیست، صفحه محصول یا هر دو اعمال شود؛ با «انتخاب با کلیک» همان فیلد را به‌صورت دیداری ثبت کنید.</p>
-      <div class="studio-tablewrap">
-        <table class="studio-table">
-          <thead>
-            <tr>
-              <th>فیلد منبع</th>
-              <th>فیلد Toolidi</th>
-              <th>CSS selector</th>
-              <th>نوع</th>
-              <th>صفحه</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let field of mappingFields; let i=index" class="studio-table__row">
-              <td><input [(ngModel)]="field.sourceField" class="studio-input studio-input--sm" /></td>
-              <td><input [(ngModel)]="field.targetField" class="studio-input studio-input--sm" /></td>
-              <td><input [(ngModel)]="field.selector" class="studio-input studio-input--sm" dir="ltr" /></td>
-              <td>
-                <select [(ngModel)]="field.expectedType" class="studio-input studio-input--sm">
-                  <option>Text</option>
-                  <option>Number</option>
-                  <option>Url</option>
-                  <option>Html</option>
-                </select>
-              </td>
-              <td>
-                <select [(ngModel)]="field.scope" class="studio-input studio-input--sm">
-                  <option value="Both">هر دو</option>
-                  <option value="Listing">لیست</option>
-                  <option value="Detail">جزئیات</option>
-                </select>
-              </td>
-              <td><button (click)="pickFieldVisual(field)" class="studio-btn studio-btn--purple">انتخاب با کلیک</button></td>
-              <td><button (click)="removeMapping(i)" class="studio-btn--danger-text">حذف</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="studio-actions-row studio-row--between">
-        <button (click)="go(1)" class="studio-btn">قبلی</button>
-        <button (click)="saveFlowConfig(); go(3)" mat-flat-button class="admin-btn-primary">ذخیره و ادامه</button>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" *ngIf="step===3" class="studio-card">
-      <h2 class="studio-card__title studio-mt-3">قوانین اعتبارسنجی</h2>
-      <div class="studio-grid studio-grid--2">
-        <label *ngFor="let item of [{key:'checkRequiredFields',label:'فیلدهای الزامی'},{key:'checkPriceFormat',label:'قیمت معتبر'},{key:'checkDuplicateName',label:'نام تکراری'},{key:'checkSkuUniqueness',label:'SKU تکراری'},{key:'checkImages',label:'تصاویر'}]" class="studio-rule">
-          <input type="checkbox" [(ngModel)]="$any(rules)[item.key]" />{{ item.label }}
-        </label>
-      </div>
-      <div class="studio-field studio-mt-3">
-        <span class="studio-field__label">دسته مقصد</span>
-        <select [(ngModel)]="categoryId" class="studio-input" [disabled]="loadingCategories">
-          <option [value]="''">{{ loadingCategories ? 'در حال دریافت دسته‌ها…' : 'انتخاب دسته مقصد' }}</option>
-          <option *ngFor="let opt of categoryOptions" [value]="opt.id">{{ opt.label }}</option>
-        </select>
-        <small class="studio-meta">شناسه دسته انتخاب‌شده به‌صورت خودکار به CategoryId backend ارسال می‌شود.</small>
-      </div>
-      <div class="studio-field studio-mt-3">
-        <span class="studio-field__label">فروشنده مقصد (اختیاری برای Admin)</span>
-        <select [(ngModel)]="sellerId" class="studio-input" [disabled]="!isAdmin || loadingSellers">
-          <option [value]="''">{{ isAdmin ? (loadingSellers ? 'در حال دریافت فروشندگان…' : 'پیش‌فرض — فروشنده کاربر جاری') : 'برای ادمین فعال می‌شود' }}</option>
-          <option *ngFor="let s of sellerOptions" [value]="s.id">{{ s.companyName || s.contactName }}{{ s.city ? ' — ' + s.city : '' }}</option>
-        </select>
-        <small class="studio-meta">اگر خالی باشد backend فروشنده کاربر جاری را resolve می‌کند.</small>
-      </div>
-      <div class="studio-actions-row studio-row--between">
-        <button (click)="go(2)" class="studio-btn">قبلی</button>
-        <button (click)="validate(true)" [disabled]="!selectedCount || !categoryId || validating" mat-flat-button class="admin-btn-primary">{{ validating ? 'در حال اعتبارسنجی…' : 'اعتبارسنجی و ادامه' }}</button>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" *ngIf="step===4" class="studio-card">
-      <h2 class="studio-card__title studio-mt-3">پیش‌نمایش نهایی</h2>
-      <div *ngIf="validationSummary" class="studio-stat-grid studio-grid--4">
-        <div class="studio-stat studio-stat--gray">
-          <b class="studio-stat__value">{{ validationSummary.total }}</b>
-          <span>کل</span>
+        <div class="studio-actions-row studio-row--between">
+          <button (click)="go(1)" class="studio-btn">قبلی</button>
+          <button (click)="saveFlowConfig(); go(3)" mat-flat-button class="admin-btn-primary">ذخیره و ادامه</button>
         </div>
-        <div class="studio-stat studio-stat--green">
-          <b class="studio-stat__value" style="color:#15803d">{{ validationSummary.valid }}</b>
-          <span>معتبر</span>
+      </mat-card>
+    }
+    @if (step===3) {
+      <mat-card appearance="outlined" class="studio-card">
+        <h2 class="studio-card__title studio-mt-3">قوانین اعتبارسنجی</h2>
+        <div class="studio-grid studio-grid--2">
+          @for (item of [{key:'checkRequiredFields',label:'فیلدهای الزامی'},{key:'checkPriceFormat',label:'قیمت معتبر'},{key:'checkDuplicateName',label:'نام تکراری'},{key:'checkSkuUniqueness',label:'SKU تکراری'},{key:'checkImages',label:'تصاویر'}]; track item) {
+            <label class="studio-rule">
+              <input type="checkbox" [(ngModel)]="$any(rules)[item.key]" />{{ item.label }}
+            </label>
+          }
         </div>
-        <div class="studio-stat studio-stat--red">
-          <b class="studio-stat__value" style="color:#b91c1c">{{ validationSummary.errorCount }}</b>
-          <span>خطادار</span>
+        <div class="studio-field studio-mt-3">
+          <span class="studio-field__label">دسته مقصد</span>
+          <select [(ngModel)]="categoryId" class="studio-input" [disabled]="loadingCategories">
+            <option [value]="''">{{ loadingCategories ? 'در حال دریافت دسته‌ها…' : 'انتخاب دسته مقصد' }}</option>
+            @for (opt of categoryOptions; track opt) {
+              <option [value]="opt.id">{{ opt.label }}</option>
+            }
+          </select>
+          <small class="studio-meta">شناسه دسته انتخاب‌شده به‌صورت خودکار به CategoryId backend ارسال می‌شود.</small>
         </div>
-        <div class="studio-stat studio-stat--yellow">
-          <b class="studio-stat__value" style="color:#b45309">{{ validationSummary.warningCount }}</b>
-          <span>هشدار</span>
+        <div class="studio-field studio-mt-3">
+          <span class="studio-field__label">فروشنده مقصد (اختیاری برای Admin)</span>
+          <select [(ngModel)]="sellerId" class="studio-input" [disabled]="!isAdmin || loadingSellers">
+            <option [value]="''">{{ isAdmin ? (loadingSellers ? 'در حال دریافت فروشندگان…' : 'پیش‌فرض — فروشنده کاربر جاری') : 'برای ادمین فعال می‌شود' }}</option>
+            @for (s of sellerOptions; track s) {
+              <option [value]="s.id">{{ s.companyName || s.contactName }}{{ s.city ? ' — ' + s.city : '' }}</option>
+            }
+          </select>
+          <small class="studio-meta">اگر خالی باشد backend فروشنده کاربر جاری را resolve می‌کند.</small>
         </div>
-      </div>
-      <div class="studio-divider"></div>
-      <div *ngFor="let p of selectedProducts" class="studio-row studio-row--between">
-        <span>{{ p.title || 'بدون عنوان' }}</span>
-        <span>{{ p.price }} <small class="studio-meta">{{ p.imageUrls.length }} تصویر</small></span>
-      </div>
-      <div class="studio-actions-row studio-row--between">
-        <button (click)="go(3)" class="studio-btn">قبلی</button>
-        <button (click)="goToImport()" [disabled]="!validationSummary?.isValid" mat-flat-button class="admin-btn-primary">تایید پیش‌نمایش</button>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" *ngIf="step===5" class="studio-card">
-      <h2 class="studio-card__title studio-mt-3">اجرای ایمپورت</h2>
-      <div *ngIf="!currentJob" class="studio-empty studio-card">
-        <p class="studio-empty__text">{{ selectedCount }} محصول آماده ایمپورت است. وضعیت انتشار: پیش‌نویس</p>
-        <button (click)="startImport()" [disabled]="importing || !categoryId" mat-flat-button class="admin-btn-primary">{{ importing ? 'در حال ارسال…' : 'شروع ایمپورت' }}</button>
-      </div>
-      <div *ngIf="currentJob" class="studio-job">
-        <div class="studio-row studio-row--between">
-          <b>{{ statusLabel(currentJob.status) }}</b>
-          <span>{{ currentJob.importedProducts }} / {{ currentJob.totalProducts }}</span>
+        <div class="studio-actions-row studio-row--between">
+          <button (click)="go(2)" class="studio-btn">قبلی</button>
+          <button (click)="validate(true)" [disabled]="!selectedCount || !categoryId || validating" mat-flat-button class="admin-btn-primary">{{ validating ? 'در حال اعتبارسنجی…' : 'اعتبارسنجی و ادامه' }}</button>
         </div>
-        <div *ngIf="currentJob.status==='CompletedWithErrors'" class="studio-alert studio-alert--warn">برخی محصولات ایمپورت نشدند. جزئیات در پایین.</div>
-        <div class="studio-progress">
-          <div class="studio-progress__fill" [class.studio-progress__fill--error]="currentJob.status==='CompletedWithErrors'" [style.width.%]="progress(currentJob)"></div>
-        </div>
-        <div class="studio-stat-grid studio-grid--2">
-          <div class="studio-stat__text"><span>محصولات:</span> {{ progress(currentJob) }}%</div>
-          <div>
-            <span>تصاویر:</span> {{ currentJob.uploadedImages }} / {{ currentJob.totalImages }}
-            <b *ngIf="currentJob.failedImages" class="studio-text--danger" style="margin-left:0.375rem">({{ currentJob.failedImages }} ناموفق)</b>
+      </mat-card>
+    }
+    @if (step===4) {
+      <mat-card appearance="outlined" class="studio-card">
+        <h2 class="studio-card__title studio-mt-3">پیش‌نمایش نهایی</h2>
+        @if (validationSummary) {
+          <div class="studio-stat-grid studio-grid--4">
+            <div class="studio-stat studio-stat--gray">
+              <b class="studio-stat__value">{{ validationSummary.total }}</b>
+              <span>کل</span>
+            </div>
+            <div class="studio-stat studio-stat--green">
+              <b class="studio-stat__value" style="color:#15803d">{{ validationSummary.valid }}</b>
+              <span>معتبر</span>
+            </div>
+            <div class="studio-stat studio-stat--red">
+              <b class="studio-stat__value" style="color:#b91c1c">{{ validationSummary.errorCount }}</b>
+              <span>خطادار</span>
+            </div>
+            <div class="studio-stat studio-stat--yellow">
+              <b class="studio-stat__value" style="color:#b45309">{{ validationSummary.warningCount }}</b>
+              <span>هشدار</span>
+            </div>
           </div>
+        }
+        <div class="studio-divider"></div>
+        @for (p of selectedProducts; track p) {
+          <div class="studio-row studio-row--between">
+            <span>{{ p.title || 'بدون عنوان' }}</span>
+            <span>{{ p.price }} <small class="studio-meta">{{ p.imageUrls.length }} تصویر</small></span>
+          </div>
+        }
+        <div class="studio-actions-row studio-row--between">
+          <button (click)="go(3)" class="studio-btn">قبلی</button>
+          <button (click)="goToImport()" [disabled]="!validationSummary?.isValid" mat-flat-button class="admin-btn-primary">تایید پیش‌نمایش</button>
         </div>
-        <div *ngIf="currentJobErrors.length" class="studio-mb-3">
-          <h3 class="studio-card__title" style="font-size:1rem">محصولاتی که ایمپورت نشدند ({{ currentJobErrors.length }})</h3>
-          <ul class="studio-error-list--max">
-            <li *ngFor="let err of currentJobErrors" class="studio-error-item">
-              <div class="studio-row">
-                <span class="studio-badge studio-badge--danger">{{ stageLabel(err.stage) }}</span>
-                <a *ngIf="err.url" [href]="err.url" target="_blank" rel="noopener" class="studio-error-link studio-truncate" [title]="err.url">{{ err.url }}</a>
+      </mat-card>
+    }
+    @if (step===5) {
+      <mat-card appearance="outlined" class="studio-card">
+        <h2 class="studio-card__title studio-mt-3">اجرای ایمپورت</h2>
+        @if (!currentJob) {
+          <div class="studio-empty studio-card">
+            <p class="studio-empty__text">{{ selectedCount }} محصول آماده ایمپورت است. وضعیت انتشار: پیش‌نویس</p>
+            <button (click)="startImport()" [disabled]="importing || !categoryId" mat-flat-button class="admin-btn-primary">{{ importing ? 'در حال ارسال…' : 'شروع ایمپورت' }}</button>
+          </div>
+        }
+        @if (currentJob) {
+          <div class="studio-job">
+            <div class="studio-row studio-row--between">
+              <b>{{ statusLabel(currentJob.status) }}</b>
+              <span>{{ currentJob.importedProducts }} / {{ currentJob.totalProducts }}</span>
+            </div>
+            @if (currentJob.status==='CompletedWithErrors') {
+              <div class="studio-alert studio-alert--warn">برخی محصولات ایمپورت نشدند. جزئیات در پایین.</div>
+            }
+            <div class="studio-progress">
+              <div class="studio-progress__fill" [class.studio-progress__fill--error]="currentJob.status==='CompletedWithErrors'" [style.width.%]="progress(currentJob)"></div>
+            </div>
+            <div class="studio-stat-grid studio-grid--2">
+              <div class="studio-stat__text"><span>محصولات:</span> {{ progress(currentJob) }}%</div>
+              <div>
+                <span>تصاویر:</span> {{ currentJob.uploadedImages }} / {{ currentJob.totalImages }}
+                @if (currentJob.failedImages) {
+                  <b class="studio-text--danger" style="margin-left:0.375rem">({{ currentJob.failedImages }} ناموفق)</b>
+                }
               </div>
-              <p class="studio-error-text">{{ err.error }}</p>
-            </li>
-          </ul>
-        </div>
-        <pre *ngIf="currentJob.resultLog" class="studio-log">{{ currentJob.resultLog }}</pre>
-        <div class="studio-actions-row">
-          <button *ngIf="currentJob.status==='Failed'" (click)="retry()" mat-flat-button class="admin-btn-warning">Retry</button>
-          <button (click)="go(6)" class="studio-btn">تاریخچه</button>
-        </div>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" *ngIf="step===6" class="studio-card">
-      <div class="studio-row studio-row--between studio-mb-3">
-        <h2 class="studio-card__title">تاریخچه ایمپورت</h2>
-        <button (click)="loadHistory()" class="studio-btn">بروزرسانی</button>
-      </div>
-      <div *ngIf="loadingHistory" class="studio-empty">در حال بارگذاری…</div>
-      <div *ngIf="!loadingHistory" class="studio-tablewrap">
-        <table class="studio-table">
-          <thead>
-            <tr>
-              <th>شناسه</th>
-              <th>وضعیت</th>
-              <th>محصولات</th>
-              <th>تصاویر</th>
-              <th>تاریخ پایان</th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngFor="let job of history">
-              <tr class="studio-table__row">
-                <td class="studio-table__cell-sm">{{ job.jobId }}</td>
-                <td>
-                  <span class="studio-badge" [class]="'studio-badge--' + jobStatusBadge(job.status)">{{ statusLabel(job.status) }}</span>
-                  <b *ngIf="job.failedProducts" class="studio-text--danger" style="margin-left:0.375rem">{{ job.failedProducts }} خطا</b>
-                  <button *ngIf="historyErrors(job).length" type="button" (click)="toggleHistoryDetail(job)" class="studio-btn studio-btn--sm">جزئیات</button>
-                </td>
-                <td class="studio-table__cell-sm">{{ job.importedProducts }} / {{ job.totalProducts }}</td>
-                <td class="studio-table__cell-sm">{{ job.uploadedImages }} / {{ job.totalImages }}<b *ngIf="job.failedImages" class="studio-text--danger" style="margin-left:0.375rem">({{ job.failedImages }} ناموفق)</b></td>
-                <td class="studio-table__cell-sm">{{ job.completedAt ? (job.completedAt | date:'yyyy/MM/dd HH:mm') : '—' }}</td>
-              </tr>
-              <tr *ngIf="expandedHistoryJob === job.jobId && historyErrors(job).length" class="studio-table__row studio-table__row--error-detail">
-                <td colspan="5" class="studio-error-list--max">
-                  <ul class="studio-error-list">
-                    <li *ngFor="let err of historyErrors(job)" class="studio-error-item">
-                      <span class="studio-badge studio-badge--danger">{{ stageLabel(err.stage) }}</span>
-                      <a *ngIf="err.url" [href]="err.url" target="_blank" rel="noopener" class="studio-error-link" [title]="err.url">{{ err.url }}</a>
-                      <span class="studio-error-text">{{ err.error }}</span>
+            </div>
+            @if (currentJobErrors.length) {
+              <div class="studio-mb-3">
+                <h3 class="studio-card__title" style="font-size:1rem">محصولاتی که ایمپورت نشدند ({{ currentJobErrors.length }})</h3>
+                <ul class="studio-error-list--max">
+                  @for (err of currentJobErrors; track err) {
+                    <li class="studio-error-item">
+                      <div class="studio-row">
+                        <span class="studio-badge studio-badge--danger">{{ stageLabel(err.stage) }}</span>
+                        @if (err.url) {
+                          <a [href]="err.url" target="_blank" rel="noopener" class="studio-error-link studio-truncate" [title]="err.url">{{ err.url }}</a>
+                        }
+                      </div>
+                      <p class="studio-error-text">{{ err.error }}</p>
                     </li>
-                  </ul>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </mat-card>
-  </ng-container>
+                  }
+                </ul>
+              </div>
+            }
+            @if (currentJob.resultLog) {
+              <pre class="studio-log">{{ currentJob.resultLog }}</pre>
+            }
+            <div class="studio-actions-row">
+              @if (currentJob.status==='Failed') {
+                <button (click)="retry()" mat-flat-button class="admin-btn-warning">Retry</button>
+              }
+              <button (click)="go(6)" class="studio-btn">تاریخچه</button>
+            </div>
+          </div>
+        }
+      </mat-card>
+    }
+    @if (step===6) {
+      <mat-card appearance="outlined" class="studio-card">
+        <div class="studio-row studio-row--between studio-mb-3">
+          <h2 class="studio-card__title">تاریخچه ایمپورت</h2>
+          <button (click)="loadHistory()" class="studio-btn">بروزرسانی</button>
+        </div>
+        @if (loadingHistory) {
+          <div class="studio-empty">در حال بارگذاری…</div>
+        }
+        @if (!loadingHistory) {
+          <div class="studio-tablewrap">
+            <table class="studio-table">
+              <thead>
+                <tr>
+                  <th>شناسه</th>
+                  <th>وضعیت</th>
+                  <th>محصولات</th>
+                  <th>تصاویر</th>
+                  <th>تاریخ پایان</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (job of history; track job) {
+                  <tr class="studio-table__row">
+                    <td class="studio-table__cell-sm">{{ job.jobId }}</td>
+                    <td>
+                      <span class="studio-badge" [class]="'studio-badge--' + jobStatusBadge(job.status)">{{ statusLabel(job.status) }}</span>
+                      @if (job.failedProducts) {
+                        <b class="studio-text--danger" style="margin-left:0.375rem">{{ job.failedProducts }} خطا</b>
+                      }
+                      @if (historyErrors(job).length) {
+                        <button type="button" (click)="toggleHistoryDetail(job)" class="studio-btn studio-btn--sm">جزئیات</button>
+                      }
+                    </td>
+                    <td class="studio-table__cell-sm">{{ job.importedProducts }} / {{ job.totalProducts }}</td>
+                    <td class="studio-table__cell-sm">{{ job.uploadedImages }} / {{ job.totalImages }}@if (job.failedImages) {
+                      <b class="studio-text--danger" style="margin-left:0.375rem">({{ job.failedImages }} ناموفق)</b>
+                    }</td>
+                    <td class="studio-table__cell-sm">{{ job.completedAt ? (job.completedAt | date:'yyyy/MM/dd HH:mm') : '—' }}</td>
+                  </tr>
+                  @if (expandedHistoryJob === job.jobId && historyErrors(job).length) {
+                    <tr class="studio-table__row studio-table__row--error-detail">
+                      <td colspan="5" class="studio-error-list--max">
+                        <ul class="studio-error-list">
+                          @for (err of historyErrors(job); track err) {
+                            <li class="studio-error-item">
+                              <span class="studio-badge studio-badge--danger">{{ stageLabel(err.stage) }}</span>
+                              @if (err.url) {
+                                <a [href]="err.url" target="_blank" rel="noopener" class="studio-error-link" [title]="err.url">{{ err.url }}</a>
+                              }
+                              <span class="studio-error-text">{{ err.error }}</span>
+                            </li>
+                          }
+                        </ul>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </mat-card>
+    }
+  }
 </div>

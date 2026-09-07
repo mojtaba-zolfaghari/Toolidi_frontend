@@ -3,14 +3,18 @@
     <span class="location-field__label">{{ provinceLabel }}{{ required ? ' *' : '' }}</span>
     <select [formControlName]="provinceControl" (change)="onProvinceChange()" class="location-field__select">
       <option value="">{{ loadingProvinces ? 'در حال بارگذاری…' : 'انتخاب استان' }}</option>
-      <option *ngFor="let province of provinces" [value]="province.id">{{ province.name }}</option>
+      @for (province of provinces; track province) {
+        <option [value]="province.id">{{ province.name }}</option>
+      }
     </select>
   </label>
   <label class="location-field">
     <span class="location-field__label">{{ cityLabel }}{{ required ? ' *' : '' }}</span>
     <select [formControlName]="cityControl" (change)="onCityChange()" [disabled]="loadingCities || !group.get(provinceControl)?.value" class="location-field__select">
       <option value="">{{ loadingCities ? 'در حال بارگذاری…' : 'انتخاب شهرستان' }}</option>
-      <option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</option>
+      @for (city of cities; track city) {
+        <option [value]="city.id">{{ city.name }}</option>
+      }
     </select>
   </label>
 </div>

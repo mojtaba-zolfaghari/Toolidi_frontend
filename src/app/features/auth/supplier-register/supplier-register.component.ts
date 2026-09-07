@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
@@ -19,9 +19,11 @@ interface UploadFileState {
 }
 
 @Component({
-  selector: 'app-supplier-register',
-  templateUrl: './supplier-register.component.html',
-  styleUrls: ['./supplier-register.component.scss']
+    selector: 'app-supplier-register',
+    templateUrl: './supplier-register.component.html',
+    styleUrls: ['./supplier-register.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierRegisterComponent implements OnInit, OnDestroy {
   form: FormGroup;

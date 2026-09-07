@@ -45,66 +45,114 @@
     <section class="seller-form-panel" aria-label="فرم ثبت‌نام فروشنده">
       <div class="seller-form-topline"><span class="seller-form-eyebrow">شروع فروش</span><a routerLink="/auth/login" class="seller-login-link">قبلاً عضو هستید؟ ورود</a></div>
 
-      <div *ngIf="!submitted; else sellerSuccess" class="seller-form-content">
-        <div class="seller-form-heading"><span class="seller-form-icon">🏪</span><div><h2>فروشنده تولیدی شوید</h2><p>در چهار قدم کوتاه، ویترین کسب‌وکارتان را آماده کنید.</p></div></div>
-
-        <div class="seller-progress" aria-label="پیشرفت ثبت‌نام">
-          <div *ngFor="let step of [1,2,3,4]" class="seller-progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step"><span>{{ step }}</span><small>{{ step === 1 ? 'حساب' : step === 2 ? 'کسب‌وکار' : step === 3 ? 'کاتالوگ' : 'تأیید' }}</small></div>
-        </div>
-        <div class="seller-progress-line"><span [style.width.%]="((currentStep - 1) / 3) * 100"></span></div>
-
-        <form #stepContainer="ngForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-          <div [ngSwitch]="currentStep" class="seller-step-container">
-            <section *ngSwitchCase="1" class="seller-step" aria-labelledby="seller-account-title">
-              <div class="seller-step-heading"><span>01</span><div><h3 id="seller-account-title">حساب خودت را بساز</h3><p>این اطلاعات برای ورود و امنیت حساب استفاده می‌شود.</p></div></div>
-              <div class="seller-fields-grid">
-                <label class="seller-field seller-field-full"><span>کد ملی</span><input formControlName="nationalCode" inputmode="numeric" dir="ltr" placeholder="۱۰ رقم کد ملی"><em *ngIf="hasError('nationalCode')">کد ملی باید ۱۰ رقم باشد.</em></label>
-                <label class="seller-field"><span>نام کاربری</span><input formControlName="username" autocomplete="username" placeholder="نام کاربری فروشگاه"><em *ngIf="hasError('username')">حداقل ۳ کاراکتر وارد کنید.</em></label>
-                <label class="seller-field"><span>رمز عبور</span><input type="password" formControlName="password" autocomplete="new-password" placeholder="حداقل ۶ کاراکتر"><em *ngIf="hasError('password')">حداقل ۶ کاراکتر وارد کنید.</em></label>
-                <label class="seller-field seller-field-full"><span>تکرار رمز عبور</span><input type="password" formControlName="confirmPassword" autocomplete="new-password" placeholder="رمز عبور را دوباره وارد کنید"><em *ngIf="hasError('confirmPassword')">تکرار رمز عبور الزامی است.</em></label>
-              </div>
-            </section>
-
-            <section *ngSwitchCase="2" class="seller-step" aria-labelledby="seller-business-title">
-              <div class="seller-step-heading"><span>02</span><div><h3 id="seller-business-title">ویترین کسب‌وکارت را معرفی کن</h3><p>خریدار باید بداند از کجا و با چه مجموعه‌ای خرید می‌کند.</p></div></div>
-              <div class="seller-fields-grid">
-                <label class="seller-field seller-field-full"><span>نام فروشگاه یا شرکت</span><input formControlName="companyName" placeholder="مثلاً تولیدی گوهر جنوب"><em *ngIf="hasError('companyName')">نام فروشگاه را وارد کنید.</em></label>
-                <label class="seller-field"><span>استان</span><select formControlName="provinceId" (change)="onProvinceChange()"><option value="">انتخاب استان</option><option *ngFor="let p of apiProvinces" [value]="p.id">{{ p.name }}</option></select><em *ngIf="hasError('provinceId')">استان را انتخاب کنید.</em></label>
-                <label class="seller-field"><span>شهرستان</span><select formControlName="cityId" (change)="onCityChange()" [disabled]="loadingCities || !form.get('provinceId')?.value"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : 'انتخاب شهرستان' }}</option><option *ngFor="let c of apiCities" [value]="c.id">{{ c.name }}</option></select><em *ngIf="hasError('cityId')">شهرستان را انتخاب کنید.</em></label>
-                <div *ngIf="!registrationAllowed && registrationCheckMessage" class="seller-field seller-field-full">
-                  <div class="seller-validation-msg">⚠️ {{ registrationCheckMessage }}</div>
-                </div>
-                <label class="seller-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" dir="ltr" placeholder="09xxxxxxxxx"><em *ngIf="hasError('phone')">شماره موبایل معتبر وارد کنید.</em></label>
-                <label class="seller-field"><span>ایمیل</span><input formControlName="email" type="email" dir="ltr" placeholder="you@example.com"><em *ngIf="hasError('email')">ایمیل معتبر وارد کنید.</em></label>
-              </div>
-            </section>
-
-            <section *ngSwitchCase="3" class="seller-step" aria-labelledby="seller-catalog-title">
-              <div class="seller-step-heading"><span>03</span><div><h3 id="seller-catalog-title">کاتالوگت را آماده کن</h3><p>حوزه فعالیت و داستان کسب‌وکارت را به خریداران نشان بده.</p></div></div>
-              <div class="seller-category-grid"><button *ngFor="let category of categories" type="button" class="seller-category" [class.selected]="form.get('category')?.value === category" (click)="form.get('category')?.setValue(category)"><span>{{ category === 'زیورآلات و بدلیجات' ? '◇' : category === 'ابزار و تجهیزات معدن' ? '⚒' : category === 'لباس و پوشاک' ? '✦' : '◌' }}</span>{{ category }}</button></div>
-              <em *ngIf="hasError('category')" class="seller-inline-error">یک حوزه فعالیت را انتخاب کنید.</em>
-              <label class="seller-field seller-description"><span>معرفی کوتاه فروشگاه</span><textarea formControlName="description" rows="4" placeholder="چه محصولی ارائه می‌کنید و چه چیزی شما را متمایز می‌کند؟"></textarea><em *ngIf="hasError('description')">حداقل ۱۰ کاراکتر بنویسید.</em></label>
-              <label class="seller-check"><input type="checkbox" formControlName="acceptsReturns"><span>امکان بررسی و مرجوعی طبق قوانین فروشگاه را می‌پذیرم.</span></label>
-            </section>
-
-            <section *ngSwitchCase="4" class="seller-step" aria-labelledby="seller-review-title">
-              <div class="seller-step-heading"><span>04</span><div><h3 id="seller-review-title">آماده‌ی شروع فروش</h3><p>اطلاعات را بررسی کن و حساب فروشنده را بساز.</p></div></div>
-              <div class="seller-review-card"><div><span>فروشگاه</span><strong>{{ form.get('companyName')?.value || '—' }}</strong></div><div><span>محدوده</span><strong>{{ form.get('city')?.value || '—' }}، {{ form.get('province')?.value || '—' }}</strong></div><div><span>حوزه</span><strong>{{ form.get('category')?.value || '—' }}</strong></div><div><span>ایمیل</span><strong dir="ltr">{{ form.get('email')?.value || '—' }}</strong></div></div>
-              <label class="seller-terms"><input type="checkbox" formControlName="terms"><span>قوانین فروش، حریم خصوصی و سیاست‌های تولیدی را مطالعه کرده‌ام و می‌پذیرم.</span></label>
-              <p *ngIf="hasError('terms')" class="seller-inline-error">پذیرش قوانین برای ایجاد حساب الزامی است.</p>
-            </section>
+      @if (!submitted) {
+        <div class="seller-form-content">
+          <div class="seller-form-heading"><span class="seller-form-icon">🏪</span><div><h2>فروشنده تولیدی شوید</h2><p>در چهار قدم کوتاه، ویترین کسب‌وکارتان را آماده کنید.</p></div></div>
+          <div class="seller-progress" aria-label="پیشرفت ثبت‌نام">
+            @for (step of [1,2,3,4]; track step) {
+              <div class="seller-progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step"><span>{{ step }}</span><small>{{ step === 1 ? 'حساب' : step === 2 ? 'کسب‌وکار' : step === 3 ? 'کاتالوگ' : 'تأیید' }}</small></div>
+            }
           </div>
-
-          <div *ngIf="errorMessage" class="seller-alert" role="alert">⚠️ {{ errorMessage }}</div>
-          <div class="seller-actions"><button *ngIf="currentStep > 1" type="button" class="seller-secondary-action" (click)="previousStep()">← مرحله قبل</button><span *ngIf="currentStep === 1"></span><button *ngIf="currentStep < totalSteps" type="button" class="seller-primary-action" (click)="nextStep()">ادامه <span>←</span></button><button *ngIf="currentStep === totalSteps" type="submit" class="seller-primary-action" [disabled]="loading">{{ loading ? 'در حال ساخت حساب...' : 'ساخت حساب فروشنده' }} <span>✦</span></button></div>
-        </form>
-
-        <p class="seller-verify-note">پس از ثبت‌نام، حساب شما در حال بررسی است و لینک تأیید به ایمیل یا پیامک ارسال می‌شود.</p>
+          <div class="seller-progress-line"><span [style.width.%]="((currentStep - 1) / 3) * 100"></span></div>
+          <form #stepContainer="ngForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <div class="seller-step-container">
+              @switch (currentStep) {
+                @case (1) {
+                  <section class="seller-step" aria-labelledby="seller-account-title">
+                    <div class="seller-step-heading"><span>01</span><div><h3 id="seller-account-title">حساب خودت را بساز</h3><p>این اطلاعات برای ورود و امنیت حساب استفاده می‌شود.</p></div></div>
+                    <div class="seller-fields-grid">
+                      <label class="seller-field seller-field-full"><span>کد ملی</span><input formControlName="nationalCode" inputmode="numeric" dir="ltr" placeholder="۱۰ رقم کد ملی">@if (hasError('nationalCode')) {
+                      <em>کد ملی باید ۱۰ رقم باشد.</em>
+                    }</label>
+                    <label class="seller-field"><span>نام کاربری</span><input formControlName="username" autocomplete="username" placeholder="نام کاربری فروشگاه">@if (hasError('username')) {
+                    <em>حداقل ۳ کاراکتر وارد کنید.</em>
+                  }</label>
+                  <label class="seller-field"><span>رمز عبور</span><input type="password" formControlName="password" autocomplete="new-password" placeholder="حداقل ۶ کاراکتر">@if (hasError('password')) {
+                  <em>حداقل ۶ کاراکتر وارد کنید.</em>
+                }</label>
+                <label class="seller-field seller-field-full"><span>تکرار رمز عبور</span><input type="password" formControlName="confirmPassword" autocomplete="new-password" placeholder="رمز عبور را دوباره وارد کنید">@if (hasError('confirmPassword')) {
+                <em>تکرار رمز عبور الزامی است.</em>
+              }</label>
+            </div>
+          </section>
+        }
+        @case (2) {
+          <section class="seller-step" aria-labelledby="seller-business-title">
+            <div class="seller-step-heading"><span>02</span><div><h3 id="seller-business-title">ویترین کسب‌وکارت را معرفی کن</h3><p>خریدار باید بداند از کجا و با چه مجموعه‌ای خرید می‌کند.</p></div></div>
+            <div class="seller-fields-grid">
+              <label class="seller-field seller-field-full"><span>نام فروشگاه یا شرکت</span><input formControlName="companyName" placeholder="مثلاً تولیدی گوهر جنوب">@if (hasError('companyName')) {
+              <em>نام فروشگاه را وارد کنید.</em>
+            }</label>
+            <label class="seller-field"><span>استان</span><select formControlName="provinceId" (change)="onProvinceChange()"><option value="">انتخاب استان</option>@for (p of apiProvinces; track p) {
+            <option [value]="p.id">{{ p.name }}</option>
+          }</select>@if (hasError('provinceId')) {
+          <em>استان را انتخاب کنید.</em>
+        }</label>
+        <label class="seller-field"><span>شهرستان</span><select formControlName="cityId" (change)="onCityChange()" [disabled]="loadingCities || !form.get('provinceId')?.value"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : 'انتخاب شهرستان' }}</option>@for (c of apiCities; track c) {
+        <option [value]="c.id">{{ c.name }}</option>
+      }</select>@if (hasError('cityId')) {
+      <em>شهرستان را انتخاب کنید.</em>
+    }</label>
+    @if (!registrationAllowed && registrationCheckMessage) {
+      <div class="seller-field seller-field-full">
+        <div class="seller-validation-msg">⚠️ {{ registrationCheckMessage }}</div>
       </div>
+    }
+    <label class="seller-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" dir="ltr" placeholder="09xxxxxxxxx">@if (hasError('phone')) {
+    <em>شماره موبایل معتبر وارد کنید.</em>
+  }</label>
+  <label class="seller-field"><span>ایمیل</span><input formControlName="email" type="email" dir="ltr" placeholder="you@example.com">@if (hasError('email')) {
+  <em>ایمیل معتبر وارد کنید.</em>
+}</label>
+</div>
+</section>
+}
+@case (3) {
+  <section class="seller-step" aria-labelledby="seller-catalog-title">
+    <div class="seller-step-heading"><span>03</span><div><h3 id="seller-catalog-title">کاتالوگت را آماده کن</h3><p>حوزه فعالیت و داستان کسب‌وکارت را به خریداران نشان بده.</p></div></div>
+    <div class="seller-category-grid">@for (category of categories; track category) {
+      <button type="button" class="seller-category" [class.selected]="form.get('category')?.value === category" (click)="form.get('category')?.setValue(category)"><span>{{ category === 'زیورآلات و بدلیجات' ? '◇' : category === 'ابزار و تجهیزات معدن' ? '⚒' : category === 'لباس و پوشاک' ? '✦' : '◌' }}</span>{{ category }}</button>
+    }</div>
+    @if (hasError('category')) {
+      <em class="seller-inline-error">یک حوزه فعالیت را انتخاب کنید.</em>
+    }
+    <label class="seller-field seller-description"><span>معرفی کوتاه فروشگاه</span><textarea formControlName="description" rows="4" placeholder="چه محصولی ارائه می‌کنید و چه چیزی شما را متمایز می‌کند؟"></textarea>@if (hasError('description')) {
+    <em>حداقل ۱۰ کاراکتر بنویسید.</em>
+  }</label>
+  <label class="seller-check"><input type="checkbox" formControlName="acceptsReturns"><span>امکان بررسی و مرجوعی طبق قوانین فروشگاه را می‌پذیرم.</span></label>
+</section>
+}
+@case (4) {
+  <section class="seller-step" aria-labelledby="seller-review-title">
+    <div class="seller-step-heading"><span>04</span><div><h3 id="seller-review-title">آماده‌ی شروع فروش</h3><p>اطلاعات را بررسی کن و حساب فروشنده را بساز.</p></div></div>
+    <div class="seller-review-card"><div><span>فروشگاه</span><strong>{{ form.get('companyName')?.value || '—' }}</strong></div><div><span>محدوده</span><strong>{{ form.get('city')?.value || '—' }}، {{ form.get('province')?.value || '—' }}</strong></div><div><span>حوزه</span><strong>{{ form.get('category')?.value || '—' }}</strong></div><div><span>ایمیل</span><strong dir="ltr">{{ form.get('email')?.value || '—' }}</strong></div></div>
+    <label class="seller-terms"><input type="checkbox" formControlName="terms"><span>قوانین فروش، حریم خصوصی و سیاست‌های تولیدی را مطالعه کرده‌ام و می‌پذیرم.</span></label>
+    @if (hasError('terms')) {
+      <p class="seller-inline-error">پذیرش قوانین برای ایجاد حساب الزامی است.</p>
+    }
+  </section>
+}
+}
+</div>
+@if (errorMessage) {
+  <div class="seller-alert" role="alert">⚠️ {{ errorMessage }}</div>
+}
+<div class="seller-actions">@if (currentStep > 1) {
+  <button type="button" class="seller-secondary-action" (click)="previousStep()">← مرحله قبل</button>
+  }@if (currentStep === 1) {
+  <span></span>
+  }@if (currentStep < totalSteps) {
+  <button type="button" class="seller-primary-action" (click)="nextStep()">ادامه <span>←</span></button>
+  }@if (currentStep === totalSteps) {
+  <button type="submit" class="seller-primary-action" [disabled]="loading">{{ loading ? 'در حال ساخت حساب...' : 'ساخت حساب فروشنده' }} <span>✦</span></button>
+}</div>
+</form>
+<p class="seller-verify-note">پس از ثبت‌نام، حساب شما در حال بررسی است و لینک تأیید به ایمیل یا پیامک ارسال می‌شود.</p>
+</div>
+} @else {
+  <div class="seller-success-state"><div class="seller-success-ring">✓</div><span class="seller-form-eyebrow">حساب آماده شد</span><h2>ویترینت را روشن کن.</h2><p>{{ successMessage }}</p><div class="seller-success-steps"><span>✓ حساب ایجاد شد</span><span>✓ اطلاعات کسب‌وکار ذخیره شد</span><span>◌ ورود به پنل فروش</span></div><div class="seller-actions seller-success-actions"><button type="button" class="seller-secondary-action" (click)="startAgain()">ثبت حساب دیگر</button><button type="button" class="seller-primary-action" (click)="goToSellerPanel()">ورود به پنل فروش</button></div></div>
+}
 
-      <ng-template #sellerSuccess>
-        <div class="seller-success-state"><div class="seller-success-ring">✓</div><span class="seller-form-eyebrow">حساب آماده شد</span><h2>ویترینت را روشن کن.</h2><p>{{ successMessage }}</p><div class="seller-success-steps"><span>✓ حساب ایجاد شد</span><span>✓ اطلاعات کسب‌وکار ذخیره شد</span><span>◌ ورود به پنل فروش</span></div><div class="seller-actions seller-success-actions"><button type="button" class="seller-secondary-action" (click)="startAgain()">ثبت حساب دیگر</button><button type="button" class="seller-primary-action" (click)="goToSellerPanel()">ورود به پنل فروش</button></div></div>
-      </ng-template>
-    </section>
-  </div>
+</section>
+</div>
 </section>

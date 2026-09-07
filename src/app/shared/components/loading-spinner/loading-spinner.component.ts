@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * TASK-FE-028: Loading Spinner Component
@@ -7,23 +7,31 @@ import { Component, Input } from '@angular/core';
  * - Full-page overlay mode
  */
 @Component({
-  selector: 'app-loading-spinner',
-  template: `
+    selector: 'app-loading-spinner',
+    template: `
     <!-- Full-page overlay -->
-    <div *ngIf="overlay" class="spinner-overlay">
-      <div class="spinner-overlay__inner">
-        <div class="spinner" [ngClass]="'spinner--' + size"></div>
-        <p *ngIf="text" class="spinner-overlay__text">{{ text }}</p>
+    @if (overlay) {
+      <div class="spinner-overlay">
+        <div class="spinner-overlay__inner">
+          <div class="spinner" [ngClass]="'spinner--' + size"></div>
+          @if (text) {
+            <p class="spinner-overlay__text">{{ text }}</p>
+          }
+        </div>
       </div>
-    </div>
-
+    }
+    
     <!-- Inline spinner -->
-    <div *ngIf="!overlay" class="spinner-inline" [class.is-centered]="center">
-      <div class="spinner" [ngClass]="'spinner--' + size"></div>
-      <p *ngIf="text" class="spinner-inline__text">{{ text }}</p>
-    </div>
-  `,
-  styles: [`
+    @if (!overlay) {
+      <div class="spinner-inline" [class.is-centered]="center">
+        <div class="spinner" [ngClass]="'spinner--' + size"></div>
+        @if (text) {
+          <p class="spinner-inline__text">{{ text }}</p>
+        }
+      </div>
+    }
+    `,
+    styles: [`
     :host { display: block; }
 
     .spinner-overlay {
@@ -85,7 +93,9 @@ import { Component, Input } from '@angular/core';
       0%, 100% { opacity: 1; }
       50% { opacity: 0.55; }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class LoadingSpinnerComponent {
   @Input() size: 'sm' | 'md' | 'lg' = 'md';

@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SeoService } from '../../core/services/seo.service';
 import { fadeIn } from '../../shared/animations';
 
 /** صفحه تماس با ما */
 @Component({
-  selector: 'app-contact',
-  templateUrl: './contact.component.html',
-  animations: [fadeIn]
+    selector: 'app-contact',
+    templateUrl: './contact.component.html',
+    animations: [fadeIn],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ContactComponent implements OnInit {
   constructor(

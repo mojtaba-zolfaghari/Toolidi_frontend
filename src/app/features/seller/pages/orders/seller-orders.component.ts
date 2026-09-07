@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SellerService, SellerOrderWithProfit } from '../../../../core/services/api/seller.service';
 
 interface SellerOrder {
@@ -14,9 +14,9 @@ interface SellerOrder {
 
 /** سفارشات فروشنده با جزئیات سود — BEM + متریال (جانشین کلاس‌های Tailwind) */
 @Component({
-  selector: 'app-seller-orders',
-  styleUrls: ['./seller-orders.component.scss'],
-  template: `
+    selector: 'app-seller-orders',
+    styleUrls: ['./seller-orders.component.scss'],
+    template: `
     <section class="seller-orders" dir="rtl">
       <header class="seller-orders__header">
         <div>
@@ -25,7 +25,7 @@ interface SellerOrder {
         </div>
         <button type="button" mat-stroked-button color="primary" (click)="loadOrders()">🔄 بروزرسانی</button>
       </header>
-
+    
       <!-- کارت‌های آمار -->
       <div class="seller-orders__stats">
         <div class="seller-orders__stat">
@@ -45,64 +45,82 @@ interface SellerOrder {
           <p class="seller-orders__stat-label">سود ناخالص شما</p>
         </div>
       </div>
-
+    
       <!-- فیلتر وضعیت -->
       <div class="seller-orders__tabs" role="tablist">
-        <button type="button" *ngFor="let tab of statusTabs" (click)="activeStatus = tab.value"
-                class="seller-orders__tab" [class.seller-orders__tab--active]="activeStatus === tab.value">
-          {{ tab.label }}
-        </button>
+        @for (tab of statusTabs; track tab) {
+          <button type="button" (click)="activeStatus = tab.value"
+            class="seller-orders__tab" [class.seller-orders__tab--active]="activeStatus === tab.value">
+            {{ tab.label }}
+          </button>
+        }
       </div>
-
+    
       <!-- فهرست سفارش‌ها -->
       <div class="seller-orders__list">
-        <article *ngFor="let order of filteredOrders" class="seller-orders__item">
-          <div class="seller-orders__item-main">
-            <div class="seller-orders__item-head">
-              <span class="seller-orders__order-number">{{ order.orderNumber }}</span>
-              <span class="seller-orders__badge" [ngClass]="getStatusColor(order.status)">
-                {{ getStatusLabel(order.status) }}
-              </span>
+        @for (order of filteredOrders; track order) {
+          <article class="seller-orders__item">
+            <div class="seller-orders__item-main">
+              <div class="seller-orders__item-head">
+                <span class="seller-orders__order-number">{{ order.orderNumber }}</span>
+                <span class="seller-orders__badge" [ngClass]="getStatusColor(order.status)">
+                  {{ getStatusLabel(order.status) }}
+                </span>
+              </div>
+              <ul class="seller-orders__items">
+                @for (item of order.items; track item) {
+                  <li class="seller-orders__line">
+                    📦 {{ item.productName }} × {{ item.quantity | persianNumber }}
+                    <span class="seller-orders__line-muted">
+                      — فروش: {{ formatCurrencyShort(item.unitPrice * item.quantity) }}
+                    </span>
+                    @if (item.supplierUnitCost > 0) {
+                      <span class="seller-orders__line-cost">
+                        | خرید: {{ formatCurrencyShort(item.supplierTotalCost) }}
+                      </span>
+                    }
+                    @if (item.supplierUnitCost > 0) {
+                      <span
+                        class="seller-orders__line-profit"
+                        [class.seller-orders__line-profit--neg]="item.grossProfit <= 0">
+                        | سود: {{ formatCurrencyShort(item.grossProfit) }}
+                      </span>
+                    }
+                  </li>
+                }
+              </ul>
             </div>
-            <ul class="seller-orders__items">
-              <li *ngFor="let item of order.items" class="seller-orders__line">
-                📦 {{ item.productName }} × {{ item.quantity | persianNumber }}
-                <span class="seller-orders__line-muted">
-                  — فروش: {{ formatCurrencyShort(item.unitPrice * item.quantity) }}
-                </span>
-                <span class="seller-orders__line-cost" *ngIf="item.supplierUnitCost > 0">
-                  | خرید: {{ formatCurrencyShort(item.supplierTotalCost) }}
-                </span>
-                <span *ngIf="item.supplierUnitCost > 0"
-                      class="seller-orders__line-profit"
-                      [class.seller-orders__line-profit--neg]="item.grossProfit <= 0">
-                  | سود: {{ formatCurrencyShort(item.grossProfit) }}
-                </span>
-              </li>
-            </ul>
-          </div>
-          <div class="seller-orders__item-side">
-            <p class="seller-orders__revenue">{{ formatCurrencyShort(order.revenue) }}</p>
-            <p *ngIf="order.supplierCost > 0" class="seller-orders__profit">
-              سود: {{ formatCurrencyShort(order.profit) }}
-            </p>
-            <p class="seller-orders__date">{{ order.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}</p>
-            <button type="button" mat-flat-button class="seller-orders__chat-btn" (click)="openChat(order.orderId)">
-              💬 چت سفارش
-            </button>
-          </div>
-        </article>
+            <div class="seller-orders__item-side">
+              <p class="seller-orders__revenue">{{ formatCurrencyShort(order.revenue) }}</p>
+              @if (order.supplierCost > 0) {
+                <p class="seller-orders__profit">
+                  سود: {{ formatCurrencyShort(order.profit) }}
+                </p>
+              }
+              <p class="seller-orders__date">{{ order.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}</p>
+              <button type="button" mat-flat-button class="seller-orders__chat-btn" (click)="openChat(order.orderId)">
+                💬 چت سفارش
+              </button>
+            </div>
+          </article>
+        }
       </div>
-      <p *ngIf="!filteredOrders.length" class="seller-orders__empty">سفارشی یافت نشد</p>
+      @if (!filteredOrders.length) {
+        <p class="seller-orders__empty">سفارشی یافت نشد</p>
+      }
     </section>
-
+    
     <!-- مودال چت -->
-    <div *ngIf="chatOrderId" class="seller-orders__modal-overlay" (click)="closeChat()">
-      <div class="seller-orders__modal" (click)="$event.stopPropagation()">
-        <app-order-chat [orderId]="chatOrderId" (closed)="closeChat()"></app-order-chat>
+    @if (chatOrderId) {
+      <div class="seller-orders__modal-overlay" (click)="closeChat()">
+        <div class="seller-orders__modal" (click)="$event.stopPropagation()">
+          <app-order-chat [orderId]="chatOrderId" (closed)="closeChat()"></app-order-chat>
+        </div>
       </div>
-    </div>
-  `
+    }
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerOrdersComponent implements OnInit {
   /** سفارشات با جزئیات سود (داده داخلی) */

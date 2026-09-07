@@ -1,13 +1,15 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * Action button wrapping Material MatButton (TASK-FE-ADMIN-REDESIGN-002-MAT).
  * Variants: primary, secondary, danger, warning, success, ghost.
  */
 @Component({
-  selector: 'app-action-button',
-  templateUrl: './action-button.component.html',
-  styleUrls: ['./action-button.component.scss']
+    selector: 'app-action-button',
+    templateUrl: './action-button.component.html',
+    styleUrls: ['./action-button.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ActionButtonComponent {
   @Input() label = '';

@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'app-offline',
-  template: `
+    selector: 'app-offline',
+    template: `
     <section dir="rtl" class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div class="text-center max-w-md">
         <span class="text-6xl">📡</span>
@@ -18,7 +18,9 @@ import { Component } from '@angular/core';
         </button>
       </div>
     </section>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class OfflineComponent {
   retry(): void {

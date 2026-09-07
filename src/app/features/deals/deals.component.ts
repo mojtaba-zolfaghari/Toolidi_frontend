@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { catchError } from 'rxjs/operators';
@@ -43,9 +43,11 @@ export interface DealSupplier {
 }
 
 @Component({
-  selector: 'app-deals',
-  templateUrl: './deals.component.html',
-  styleUrls: ['./deals.component.scss']
+    selector: 'app-deals',
+    templateUrl: './deals.component.html',
+    styleUrls: ['./deals.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DealsComponent implements OnInit {
   products: DealProduct[] = [];

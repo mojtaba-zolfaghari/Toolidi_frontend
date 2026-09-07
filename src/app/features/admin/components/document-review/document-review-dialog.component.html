@@ -5,36 +5,41 @@
 
 <mat-dialog-content class="doc-review__body">
   <div class="doc-review__meta">
-    <span *ngIf="data.ownerSubtitle" class="doc-review__subtitle">{{ data.ownerSubtitle }}</span>
+    @if (data.ownerSubtitle) {
+      <span class="doc-review__subtitle">{{ data.ownerSubtitle }}</span>
+    }
     <span class="doc-review__status doc-review__status--{{ data.status }}">{{ statusLabel(data.status) }}</span>
   </div>
 
-  <div *ngFor="let doc of data.documents" class="doc-review__doc">
-    <div class="doc-review__doc-head">
-      <span class="doc-review__doc-type">{{ typeLabel(doc) }}</span>
-      <span class="doc-review__doc-file" [title]="doc.fileName">{{ doc.fileName }}</span>
-      <span class="doc-review__doc-size">{{ sizeLabel(doc) }}</span>
-      <span class="doc-review__doc-state" [class.doc-review__doc-state--ok]="doc.isVerified">
-        {{ doc.isVerified ? 'تأیید شده' : (doc.verificationNote ? 'رد شده' : 'در انتظار') }}
-      </span>
+  @for (doc of data.documents; track doc) {
+    <div class="doc-review__doc">
+      <div class="doc-review__doc-head">
+        <span class="doc-review__doc-type">{{ typeLabel(doc) }}</span>
+        <span class="doc-review__doc-file" [title]="doc.fileName">{{ doc.fileName }}</span>
+        <span class="doc-review__doc-size">{{ sizeLabel(doc) }}</span>
+        <span class="doc-review__doc-state" [class.doc-review__doc-state--ok]="doc.isVerified">
+          {{ doc.isVerified ? 'تأیید شده' : (doc.verificationNote ? 'رد شده' : 'در انتظار') }}
+        </span>
+      </div>
+      <!-- پیش‌نمایش: تصویر به‌صورت مستقیم، PDF با لینک باز کردن در تب جدید -->
+      @if (isImage(doc)) {
+        <a [href]="doc.fileUrl" target="_blank" rel="noopener" class="doc-review__preview">
+          <img [src]="doc.fileUrl" [alt]="'پیش‌نمایش ' + doc.fileName" loading="lazy" />
+        </a>
+      } @else {
+        <a [href]="doc.fileUrl" target="_blank" rel="noopener" class="doc-review__pdf">
+          <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+          <span>مشاهده فایل PDF</span>
+          <mat-icon aria-hidden="true">open_in_new</mat-icon>
+        </a>
+      }
+      @if (doc.verificationNote) {
+        <p class="doc-review__note">
+          یادداشت قبلی: {{ doc.verificationNote }}
+        </p>
+      }
     </div>
-
-    <!-- پیش‌نمایش: تصویر به‌صورت مستقیم، PDF با لینک باز کردن در تب جدید -->
-    <a *ngIf="isImage(doc); else pdfLink" [href]="doc.fileUrl" target="_blank" rel="noopener" class="doc-review__preview">
-      <img [src]="doc.fileUrl" [alt]="'پیش‌نمایش ' + doc.fileName" loading="lazy" />
-    </a>
-    <ng-template #pdfLink>
-      <a [href]="doc.fileUrl" target="_blank" rel="noopener" class="doc-review__pdf">
-        <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
-        <span>مشاهده فایل PDF</span>
-        <mat-icon aria-hidden="true">open_in_new</mat-icon>
-      </a>
-    </ng-template>
-
-    <p *ngIf="doc.verificationNote" class="doc-review__note">
-      یادداشت قبلی: {{ doc.verificationNote }}
-    </p>
-  </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="doc-review__actions">
@@ -66,8 +71,10 @@
       matInput
       rows="3"
       [(ngModel)]="note"
-      [placeholder]="decision === 'rejected' ? 'دلیل رد مدرک را بنویسید…' : 'یادداشت اختیاری'"></textarea>
-    <mat-hint *ngIf="decision === 'rejected'">برای رد مدرک، وارد کردن دلیل الزامی است.</mat-hint>
+    [placeholder]="decision === 'rejected' ? 'دلیل رد مدرک را بنویسید…' : 'یادداشت اختیاری'"></textarea>
+    @if (decision === 'rejected') {
+      <mat-hint>برای رد مدرک، وارد کردن دلیل الزامی است.</mat-hint>
+    }
   </mat-form-field>
   <div class="doc-review__confirm-row">
     <button type="button" mat-button (click)="decision = null">انصراف از تصمیم</button>

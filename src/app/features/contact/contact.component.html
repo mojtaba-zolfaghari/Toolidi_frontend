@@ -35,30 +35,38 @@
     <!-- Form -->
     <div class="mt-6 sm:mt-10">
       <form [formGroup]="form" (ngSubmit)="submit()" [@fadeIn]
-            class="bg-white rounded-2xl shadow-card p-5 sm:p-6 space-y-4 sm:space-y-5">
+        class="bg-white rounded-2xl shadow-card p-5 sm:p-6 space-y-4 sm:space-y-5">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <label class="block">
             <span class="block text-secondary font-medium mb-1 text-sm">نام</span>
             <input formControlName="name" placeholder="نام شما"
-                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            <p *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-red-500 text-xs mt-1">نام الزامی است.</p>
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <p class="text-red-500 text-xs mt-1">نام الزامی است.</p>
+            }
           </label>
           <label class="block">
             <span class="block text-secondary font-medium mb-1 text-sm">ایمیل</span>
             <input type="email" formControlName="email" placeholder="you@example.com"
-                   class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-            <p *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="text-red-500 text-xs mt-1">ایمیل معتبر وارد کنید.</p>
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
+              <p class="text-red-500 text-xs mt-1">ایمیل معتبر وارد کنید.</p>
+            }
           </label>
         </div>
         <label class="block">
           <span class="block text-secondary font-medium mb-1 text-sm">پیام</span>
           <textarea rows="4" formControlName="message" placeholder="پیام خود را بنویسید…"
-                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"></textarea>
-          <p *ngIf="form.get('message')?.invalid && form.get('message')?.touched" class="text-red-500 text-xs mt-1">پیام باید حداقل ۱۰ کاراکتر باشد.</p>
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"></textarea>
+          @if (form.get('message')?.invalid && form.get('message')?.touched) {
+            <p class="text-red-500 text-xs mt-1">پیام باید حداقل ۱۰ کاراکتر باشد.</p>
+          }
         </label>
-        <div *ngIf="submitted" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">پیام شما ثبت شد. به‌زودی با شما تماس می‌گیریم.</div>
+        @if (submitted) {
+          <div class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">پیام شما ثبت شد. به‌زودی با شما تماس می‌گیریم.</div>
+        }
         <button type="submit" [disabled]="form.invalid"
-                class="w-full sm:w-auto bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          class="w-full sm:w-auto bg-primary text-white rounded-xl px-8 py-3 font-bold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           ارسال پیام
         </button>
       </form>

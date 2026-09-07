@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Order, OrderService } from '../../core/services/api/order.service';
 
 /** صفحه فهرست سفارش‌های کاربر */
 @Component({
-  selector: 'app-orders',
-  templateUrl: './orders.component.html'
+    selector: 'app-orders',
+    templateUrl: './orders.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class OrdersComponent implements OnInit {
   orders: Order[] = [];

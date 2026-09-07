@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SupplierService, SupplierOrder } from '../../../core/services/api/supplier.service';
 import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
-  selector: 'app-supplier-orders',
-  template: `
+    selector: 'app-supplier-orders',
+    template: `
     <section class="space-y-6">
       <div class="flex items-center justify-between">
         <div>
@@ -12,72 +12,88 @@ import { SharedModule } from '../../../shared/shared.module';
           <p class="text-gray-500 mt-1">پیگیری و پردازش سفارشات فروشندگان</p>
         </div>
       </div>
-
+    
       <!-- Status Tabs -->
       <div class="flex gap-2 flex-wrap">
-        <button *ngFor="let tab of statusTabs" (click)="activeStatus = tab.value"
-                class="px-4 py-2 rounded-xl text-sm font-medium transition-all"
-                [class]="activeStatus === tab.value ? 'bg-green-600 text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
-          {{ tab.label }} ({{ getCountByStatus(tab.value) }})
-        </button>
+        @for (tab of statusTabs; track tab) {
+          <button (click)="activeStatus = tab.value"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-all"
+            [class]="activeStatus === tab.value ? 'bg-green-600 text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'">
+            {{ tab.label }} ({{ getCountByStatus(tab.value) }})
+          </button>
+        }
       </div>
-
+    
       <!-- Orders List -->
       <div class="space-y-3">
-        <div *ngFor="let order of filteredOrders" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl"
-                   [class]="order.status === 'Pending' ? 'bg-yellow-100' : order.status === 'Processing' ? 'bg-blue-100' : order.status === 'Shipped' ? 'bg-purple-100' : 'bg-green-100'">
-                {{ order.status === 'Pending' ? '⏳' : order.status === 'Processing' ? '⚙️' : order.status === 'Shipped' ? '🚚' : '✅' }}
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-secondary">{{ order.orderNumber }}</span>
-                  <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="getStatusColor(order.status)">
-                    {{ getStatusLabel(order.status) }}
-                  </span>
+        @for (order of filteredOrders; track order) {
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl"
+                  [class]="order.status === 'Pending' ? 'bg-yellow-100' : order.status === 'Processing' ? 'bg-blue-100' : order.status === 'Shipped' ? 'bg-purple-100' : 'bg-green-100'">
+                  {{ order.status === 'Pending' ? '⏳' : order.status === 'Processing' ? '⚙️' : order.status === 'Shipped' ? '🚚' : '✅' }}
                 </div>
-                <p class="text-sm text-gray-500 mt-1">{{ order.customerName }} — {{ order.productName }}</p>
-                <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                  <span>📍 {{ order.city }}</span>
-                  <span>📦 {{ order.quantity }} عدد</span>
-                  <span>💰 {{ formatCurrency(order.totalAmount) }}</span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-secondary">{{ order.orderNumber }}</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="getStatusColor(order.status)">
+                      {{ getStatusLabel(order.status) }}
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">{{ order.customerName }} — {{ order.productName }}</p>
+                  <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                    <span>📍 {{ order.city }}</span>
+                    <span>📦 {{ order.quantity }} عدد</span>
+                    <span>💰 {{ formatCurrency(order.totalAmount) }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="flex gap-2 shrink-0">
-              <button (click)="openChat(order.id)"
-                      class="rounded-lg bg-teal-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-teal-700">
-                💬 چت با فروشنده
-              </button>
-              <button *ngIf="order.status === 'Pending'" (click)="updateStatus(order, 'Processing')"
-                      class="rounded-lg bg-blue-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-blue-700">
-                شروع پردازش
-              </button>
-              <button *ngIf="order.status === 'Processing'" (click)="updateStatus(order, 'Shipped')"
-                      class="rounded-lg bg-purple-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-purple-700">
-                ارسال
-              </button>
-              <button *ngIf="order.status === 'Shipped'" (click)="updateStatus(order, 'Delivered')"
-                      class="rounded-lg bg-green-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-green-700">
-                تحویل شد
-              </button>
+              <div class="flex gap-2 shrink-0">
+                <button (click)="openChat(order.id)"
+                  class="rounded-lg bg-teal-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-teal-700">
+                  💬 چت با فروشنده
+                </button>
+                @if (order.status === 'Pending') {
+                  <button (click)="updateStatus(order, 'Processing')"
+                    class="rounded-lg bg-blue-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-blue-700">
+                    شروع پردازش
+                  </button>
+                }
+                @if (order.status === 'Processing') {
+                  <button (click)="updateStatus(order, 'Shipped')"
+                    class="rounded-lg bg-purple-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-purple-700">
+                    ارسال
+                  </button>
+                }
+                @if (order.status === 'Shipped') {
+                  <button (click)="updateStatus(order, 'Delivered')"
+                    class="rounded-lg bg-green-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-green-700">
+                    تحویل شد
+                  </button>
+                }
+              </div>
             </div>
           </div>
+        }
+      </div>
+      @if (!filteredOrders.length) {
+        <p class="text-gray-400 text-center py-12">سفارشی در این وضعیت وجود ندارد</p>
+      }
+    </section>
+    
+    <!-- Chat Modal -->
+    @if (chatOrderId) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40" (click)="closeChat()"></div>
+        <div class="relative bg-gray-50 rounded-2xl shadow-2xl w-full max-w-lg h-[70vh] p-5 flex flex-col">
+          <app-order-chat [orderId]="chatOrderId" (closed)="closeChat()"></app-order-chat>
         </div>
       </div>
-      <p *ngIf="!filteredOrders.length" class="text-gray-400 text-center py-12">سفارشی در این وضعیت وجود ندارد</p>
-    </section>
-
-    <!-- Chat Modal -->
-    <div *ngIf="chatOrderId" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40" (click)="closeChat()"></div>
-      <div class="relative bg-gray-50 rounded-2xl shadow-2xl w-full max-w-lg h-[70vh] p-5 flex flex-col">
-        <app-order-chat [orderId]="chatOrderId" (closed)="closeChat()"></app-order-chat>
-      </div>
-    </div>
-  `
+    }
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierOrdersComponent implements OnInit {
   orders: SupplierOrder[] = [];

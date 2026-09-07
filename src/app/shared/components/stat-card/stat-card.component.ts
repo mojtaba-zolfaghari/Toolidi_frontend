@@ -1,13 +1,15 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * Stat card for admin dashboard showing a metric with title, value, icon, and trend.
  * Angular Material card (TASK-FE-ADMIN-REDESIGN-001-MAT), RTL support.
  */
 @Component({
-  selector: 'app-stat-card',
-  templateUrl: './stat-card.component.html',
-  styleUrls: ['./stat-card.component.scss']
+    selector: 'app-stat-card',
+    templateUrl: './stat-card.component.html',
+    styleUrls: ['./stat-card.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class StatCardComponent {
   @Input() title = '';

@@ -87,31 +87,33 @@
       </header>
 
       <div class="role-cards-grid" [class.animate-in]="sectionVisibility['roles']">
-        <mat-card *ngFor="let role of roleCards; let i = index" class="role-card"
-                  [style.background]="role.gradient"
-                  [@slideInFromBottom]="{value: 1, params: { delay: i * 100 }}">
-          <mat-card-header class="role-card__header">
-            <mat-icon matCardAvatar class="role-card__icon">{{ role.icon }}</mat-icon>
-            <mat-card-title class="role-card__title">{{ role.title }}</mat-card-title>
-            <mat-card-subtitle class="role-card__subtitle">{{ role.subtitle }}</mat-card-subtitle>
-          </mat-card-header>
-
-          <mat-card-content class="role-card__content">
-            <ul class="role-benefits-list">
-              <li *ngFor="let benefit of role.benefits" class="role-benefit-item">
-                <mat-icon class="benefit-check" aria-hidden="true">check_circle</mat-icon>
-                <span>{{ benefit }}</span>
-              </li>
-            </ul>
-          </mat-card-content>
-
-          <mat-card-actions class="role-card__actions">
-            <a mat-raised-button color="accent" [routerLink]="role.ctaLink" class="role-card__cta">
-              {{ role.ctaText }}
-              <mat-icon aria-hidden="true">arrow_back</mat-icon>
-            </a>
-          </mat-card-actions>
-        </mat-card>
+        @for (role of roleCards; track role; let i = $index) {
+          <mat-card class="role-card"
+            [style.background]="role.gradient"
+            [@slideInFromBottom]="{value: 1, params: { delay: i * 100 }}">
+            <mat-card-header class="role-card__header">
+              <mat-icon matCardAvatar class="role-card__icon">{{ role.icon }}</mat-icon>
+              <mat-card-title class="role-card__title">{{ role.title }}</mat-card-title>
+              <mat-card-subtitle class="role-card__subtitle">{{ role.subtitle }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="role-card__content">
+              <ul class="role-benefits-list">
+                @for (benefit of role.benefits; track benefit) {
+                  <li class="role-benefit-item">
+                    <mat-icon class="benefit-check" aria-hidden="true">check_circle</mat-icon>
+                    <span>{{ benefit }}</span>
+                  </li>
+                }
+              </ul>
+            </mat-card-content>
+            <mat-card-actions class="role-card__actions">
+              <a mat-raised-button color="accent" [routerLink]="role.ctaLink" class="role-card__cta">
+                {{ role.ctaText }}
+                <mat-icon aria-hidden="true">arrow_back</mat-icon>
+              </a>
+            </mat-card-actions>
+          </mat-card>
+        }
       </div>
     </div>
   </section>
@@ -188,22 +190,28 @@
         <a routerLink="/shop" class="section-link">مشاهده همه محصولات ←</a>
       </header>
 
-      <div *ngIf="categoriesLoading" class="home-loading">
-        <app-spinner label="در حال بارگذاری دسته‌بندی‌ها…"></app-spinner>
-      </div>
+      @if (categoriesLoading) {
+        <div class="home-loading">
+          <app-spinner label="در حال بارگذاری دسته‌بندی‌ها…"></app-spinner>
+        </div>
+      }
 
-      <div *ngIf="!categoriesLoading && categories.length" class="categories__grid">
-        <a *ngFor="let cat of categories; let i = index; trackBy: trackByCategoryId"
-           [routerLink]="['/shop']" [queryParams]="{ categoryId: cat.id }"
-           class="category-card"
-           [style.background]="getCategoryGradient(i)">
-          <span class="category-card__icon" aria-hidden="true">{{ getCategoryIcon(cat.name) }}</span>
-          <span class="category-card__copy">
-            <h3>{{ cat.name }}</h3>
-            <p>مشاهده محصولات ←</p>
-          </span>
-        </a>
-      </div>
+      @if (!categoriesLoading && categories.length) {
+        <div class="categories__grid">
+          @for (cat of categories; track trackByCategoryId(i, cat); let i = $index) {
+            <a
+              [routerLink]="['/shop']" [queryParams]="{ categoryId: cat.id }"
+              class="category-card"
+              [style.background]="getCategoryGradient(i)">
+              <span class="category-card__icon" aria-hidden="true">{{ getCategoryIcon(cat.name) }}</span>
+              <span class="category-card__copy">
+                <h3>{{ cat.name }}</h3>
+                <p>مشاهده محصولات ←</p>
+              </span>
+            </a>
+          }
+        </div>
+      }
     </div>
   </section>
 
@@ -219,21 +227,29 @@
         <a routerLink="/shop" class="section-link">رفتن به فروشگاه ←</a>
       </header>
 
-      <div *ngIf="loading" class="home-loading">
-        <app-spinner label="در حال آماده‌سازی انتخاب‌های شما…"></app-spinner>
-      </div>
-
-      <div *ngIf="!loading && featuredProducts.length" class="featured-products-grid">
-        <div *ngFor="let product of featuredProducts" class="featured-product-item" [@slideUp]>
-          <span class="featured-product-badge">پرفروش</span>
-          <app-product-card [product]="product"></app-product-card>
+      @if (loading) {
+        <div class="home-loading">
+          <app-spinner label="در حال آماده‌سازی انتخاب‌های شما…"></app-spinner>
         </div>
-      </div>
+      }
 
-      <div *ngIf="!loading && !featuredProducts.length" class="home-empty">
-        <p>به‌زودی محصولات منتخب جدیدی اینجا قرار می‌گیرد.</p>
-        <a routerLink="/shop" class="section-link">مشاهده فروشگاه</a>
-      </div>
+      @if (!loading && featuredProducts.length) {
+        <div class="featured-products-grid">
+          @for (product of featuredProducts; track product) {
+            <div class="featured-product-item" [@slideUp]>
+              <span class="featured-product-badge">پرفروش</span>
+              <app-product-card [product]="product"></app-product-card>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!loading && !featuredProducts.length) {
+        <div class="home-empty">
+          <p>به‌زودی محصولات منتخب جدیدی اینجا قرار می‌گیرد.</p>
+          <a routerLink="/shop" class="section-link">مشاهده فروشگاه</a>
+        </div>
+      }
     </div>
   </section>
 
@@ -257,47 +273,54 @@
         <app-iran-map></app-iran-map>
       </div>
 
-      <div *ngIf="supplierGroups.length" class="supplier-network-shell">
-        <nav class="supplier-trade-tabs" aria-label="حوزه‌های تامین">
-          <button *ngFor="let group of supplierGroups; trackBy: trackBySupplierTrade"
-                  type="button"
-                  class="supplier-trade-tab"
-                  [class.is-active]="activeSupplierGroup?.trade === group.trade"
-                  (click)="selectSupplierTrade(group.trade)">
-            <span class="supplier-trade-icon">{{ group.icon }}</span>
-            <span class="supplier-trade-copy"><strong>{{ group.trade }}</strong><small>{{ group.suppliers.length | persianNumber }} نقطه تأمین</small></span>
-            <span class="supplier-trade-arrow" aria-hidden="true">←</span>
-          </button>
-        </nav>
-
-        <div *ngIf="activeSupplierGroup as group" class="supplier-network-content">
-          <div class="supplier-network-content-head">
-            <div>
-              <span class="supplier-section-kicker">حوزه انتخاب‌شده</span>
-              <h3>{{ group.icon }} {{ group.trade }}</h3>
-              <p>مراکز فعال این حوزه را بر اساس استان و شهر ببینید.</p>
+      @if (supplierGroups.length) {
+        <div class="supplier-network-shell">
+          <nav class="supplier-trade-tabs" aria-label="حوزه‌های تامین">
+            @for (group of supplierGroups; track trackBySupplierTrade($index, group)) {
+              <button
+                type="button"
+                class="supplier-trade-tab"
+                [class.is-active]="activeSupplierGroup?.trade === group.trade"
+                (click)="selectSupplierTrade(group.trade)">
+                <span class="supplier-trade-icon">{{ group.icon }}</span>
+                <span class="supplier-trade-copy"><strong>{{ group.trade }}</strong><small>{{ group.suppliers.length | persianNumber }} نقطه تأمین</small></span>
+                <span class="supplier-trade-arrow" aria-hidden="true">←</span>
+              </button>
+            }
+          </nav>
+          @if (activeSupplierGroup; as group) {
+            <div class="supplier-network-content">
+              <div class="supplier-network-content-head">
+                <div>
+                  <span class="supplier-section-kicker">حوزه انتخاب‌شده</span>
+                  <h3>{{ group.icon }} {{ group.trade }}</h3>
+                  <p>مراکز فعال این حوزه را بر اساس استان و شهر ببینید.</p>
+                </div>
+                <span class="supplier-network-count">{{ group.locations.length | persianNumber }} شهر · {{ group.suppliers.length | persianNumber }} تأمین‌کننده</span>
+              </div>
+              <div class="supplier-location-grid">
+                @for (location of group.locations; track trackBySupplierLocation($index, location)) {
+                  <div class="supplier-location-chip">
+                    <span class="supplier-location-pin">⌖</span>
+                    <span><strong>{{ location.city }}</strong><small>{{ location.province }}</small></span>
+                    <b>{{ location.count | persianNumber }}</b>
+                  </div>
+                }
+              </div>
+              <div class="supplier-network-footer">
+                <span><i></i> اطلاعات هویتی نمایش داده نمی‌شود</span>
+                <a routerLink="/shop" [queryParams]="{ city: activeSupplierCity }">مشاهده محصولات این شبکه ←</a>
+              </div>
             </div>
-            <span class="supplier-network-count">{{ group.locations.length | persianNumber }} شهر · {{ group.suppliers.length | persianNumber }} تأمین‌کننده</span>
-          </div>
-
-          <div class="supplier-location-grid">
-            <div *ngFor="let location of group.locations; trackBy: trackBySupplierLocation" class="supplier-location-chip">
-              <span class="supplier-location-pin">⌖</span>
-              <span><strong>{{ location.city }}</strong><small>{{ location.province }}</small></span>
-              <b>{{ location.count | persianNumber }}</b>
-            </div>
-          </div>
-
-          <div class="supplier-network-footer">
-            <span><i></i> اطلاعات هویتی نمایش داده نمی‌شود</span>
-            <a routerLink="/shop" [queryParams]="{ city: activeSupplierCity }">مشاهده محصولات این شبکه ←</a>
-          </div>
+          }
         </div>
-      </div>
+      }
 
-      <div *ngIf="!supplierGroups.length" class="supplier-network-empty">
-        <span>🏭</span><p>شبکه تأمین در حال به‌روزرسانی است.</p>
-      </div>
+      @if (!supplierGroups.length) {
+        <div class="supplier-network-empty">
+          <span>🏭</span><p>شبکه تأمین در حال به‌روزرسانی است.</p>
+        </div>
+      }
     </div>
   </section>
 
@@ -365,52 +388,60 @@
         <div class="live-stats-badge" [class.is-loading]="statsLoading">
           <span class="live-stats-dot"></span>
           <span>{{ statsLoading ? 'در حال دریافت آمار' : 'آمار زنده پلتفرم' }}</span>
-          <span *ngIf="!statsLoading" class="live-stats-time">· {{ formatStatsUpdatedAt() }}</span>
+          @if (!statsLoading) {
+            <span class="live-stats-time">· {{ formatStatsUpdatedAt() }}</span>
+          }
         </div>
       </div>
 
-      <div *ngIf="statsLoading" class="stats-grid stats-grid--four">
-        <div *ngFor="let item of [1, 2, 3, 4]" class="stats-skeleton"></div>
-      </div>
+      @if (statsLoading) {
+        <div class="stats-grid stats-grid--four">
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="stats-skeleton"></div>
+          }
+        </div>
+      }
 
-      <div *ngIf="!statsLoading" class="stats-grid stats-grid--four">
-        <article class="stats-card stats-card-sellers">
-          <div class="stats-card-topline">
-            <span class="stats-icon">🏪</span>
-            <span class="stats-trend">فعال</span>
-          </div>
-          <p class="stats-value" dir="ltr">{{ formatNumber(animatedProducers) }}</p>
-          <p class="stats-label">فروشنده فعال</p>
-          <p class="stats-caption">فروشنده‌های آماده عرضه در شبکه</p>
-        </article>
-        <article class="stats-card stats-card-agents">
-          <div class="stats-card-topline">
-            <span class="stats-icon">🚚</span>
-            <span class="stats-trend">شبکه</span>
-          </div>
-          <p class="stats-value" dir="ltr">{{ formatNumber(animatedAgents) }}</p>
-          <p class="stats-label">پیک فعال</p>
-          <p class="stats-caption">پوشش تحویل در شهرهای ایران</p>
-        </article>
-        <article class="stats-card stats-card-orders">
-          <div class="stats-card-topline">
-            <span class="stats-icon">📦</span>
-            <span class="stats-trend">تکمیل‌شده</span>
-          </div>
-          <p class="stats-value" dir="ltr">{{ formatNumber(animatedOrders) }}</p>
-          <p class="stats-label">سفارش تکمیل‌شده</p>
-          <p class="stats-caption">سفارش‌های تحویل‌شده با موفقیت</p>
-        </article>
-        <article class="stats-card stats-card-rating">
-          <div class="stats-card-topline">
-            <span class="stats-icon">★</span>
-            <span class="stats-trend">رضایت</span>
-          </div>
-          <p class="stats-value" dir="ltr">{{ animatedRating }}<span class="stats-denominator">/۵</span></p>
-          <p class="stats-label">میانگین رضایت</p>
-          <p class="stats-caption">بر اساس امتیازهای ثبت‌شده کاربران</p>
-        </article>
-      </div>
+      @if (!statsLoading) {
+        <div class="stats-grid stats-grid--four">
+          <article class="stats-card stats-card-sellers">
+            <div class="stats-card-topline">
+              <span class="stats-icon">🏪</span>
+              <span class="stats-trend">فعال</span>
+            </div>
+            <p class="stats-value" dir="ltr">{{ formatNumber(animatedProducers) }}</p>
+            <p class="stats-label">فروشنده فعال</p>
+            <p class="stats-caption">فروشنده‌های آماده عرضه در شبکه</p>
+          </article>
+          <article class="stats-card stats-card-agents">
+            <div class="stats-card-topline">
+              <span class="stats-icon">🚚</span>
+              <span class="stats-trend">شبکه</span>
+            </div>
+            <p class="stats-value" dir="ltr">{{ formatNumber(animatedAgents) }}</p>
+            <p class="stats-label">پیک فعال</p>
+            <p class="stats-caption">پوشش تحویل در شهرهای ایران</p>
+          </article>
+          <article class="stats-card stats-card-orders">
+            <div class="stats-card-topline">
+              <span class="stats-icon">📦</span>
+              <span class="stats-trend">تکمیل‌شده</span>
+            </div>
+            <p class="stats-value" dir="ltr">{{ formatNumber(animatedOrders) }}</p>
+            <p class="stats-label">سفارش تکمیل‌شده</p>
+            <p class="stats-caption">سفارش‌های تحویل‌شده با موفقیت</p>
+          </article>
+          <article class="stats-card stats-card-rating">
+            <div class="stats-card-topline">
+              <span class="stats-icon">★</span>
+              <span class="stats-trend">رضایت</span>
+            </div>
+            <p class="stats-value" dir="ltr">{{ animatedRating }}<span class="stats-denominator">/۵</span></p>
+            <p class="stats-label">میانگین رضایت</p>
+            <p class="stats-caption">بر اساس امتیازهای ثبت‌شده کاربران</p>
+          </article>
+        </div>
+      }
 
       <div class="testimonial-grid">
         <figure class="testimonial-card">

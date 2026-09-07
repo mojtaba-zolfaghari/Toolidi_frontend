@@ -40,8 +40,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "800kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "1500kb",
+                  "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -77,21 +77,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "toolidi:build:development"
+            "buildTarget": "toolidi:build:development"
           },
           "configurations": {
             "production": {
-              "browserTarget": "toolidi:build:production"
+              "buildTarget": "toolidi:build:production"
             },
             "development": {
-              "browserTarget": "toolidi:build:development"
+              "buildTarget": "toolidi:build:development"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "toolidi:build"
+            "buildTarget": "toolidi:build"
           }
         },
         "test": {
@@ -107,5 +107,31 @@
   },
   "cli": {
     "analytics": "800e1106-ddaf-426b-8ed5-a6e4f2c71ff9"
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
   }
 }

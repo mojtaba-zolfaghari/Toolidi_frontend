@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
@@ -20,11 +20,11 @@ export interface ConfirmDialogData {
  * (TASK-FE-ADMIN-REDESIGN follow-up: consistent UX).
  */
 @Component({
-  selector: 'app-confirm-dialog',
-  standalone: true,
-  imports: [NgClass, MatButtonModule, MatDialogModule],
-  templateUrl: './confirm-dialog.component.html',
-  styleUrls: ['./confirm-dialog.component.scss']
+    selector: 'app-confirm-dialog',
+    imports: [NgClass, MatButtonModule, MatDialogModule],
+    templateUrl: './confirm-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {
   constructor(

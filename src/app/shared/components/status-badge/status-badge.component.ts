@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * Status badge with color coding for admin redesign.
@@ -7,13 +7,15 @@ import { Component, Input } from '@angular/core';
  *           draft, approved, published, rejected, paid, unpaid, refunded, confirmed
  */
 @Component({
-  selector: 'app-status-badge',
-  template: `
+    selector: 'app-status-badge',
+    template: `
     <span class="status-badge" [ngClass]="'status-badge--' + (token || 'neutral')">
       <span class="status-badge__dot"></span>
       {{ displayLabel }}
     </span>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class StatusBadgeComponent {
   @Input() status = '';

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -18,8 +18,10 @@ function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
 }
 
 @Component({
-  selector: 'app-admin-discounts',
-  templateUrl: './admin-discounts.component.html'
+    selector: 'app-admin-discounts',
+    templateUrl: './admin-discounts.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminDiscountsComponent implements OnInit {
   discounts: Discount[] = [];

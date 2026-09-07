@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SellerService } from '../../../../core/services/api/seller.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-locations';
 
 @Component({
-  selector: 'app-seller-profile',
-  template: `
+    selector: 'app-seller-profile',
+    template: `
     <section class="space-y-6">
       <div>
         <h1 class="text-2xl font-extrabold text-secondary">پروفایل فروشنده 👤</h1>
         <p class="text-gray-500 mt-1">اطلاعات فروشگاه و حساب کاربری خود را مدیریت کنید</p>
       </div>
-
+    
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Summary -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
@@ -42,7 +42,7 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
             </div>
           </div>
         </div>
-
+    
         <!-- Edit Form -->
         <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h2 class="font-bold text-secondary mb-6">ویرایش اطلاعات فروشگاه</h2>
@@ -67,13 +67,17 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
               <div>
                 <label class="block text-secondary font-medium mb-1 text-sm">شهر</label>
                 <select formControlName="city" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                  @for (city of cities; track city) {
+                    <option [value]="city">{{ city }}</option>
+                  }
                 </select>
               </div>
               <div>
                 <label class="block text-secondary font-medium mb-1 text-sm">استان</label>
                 <select formControlName="province" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+                  @for (p of provinces; track p) {
+                    <option [value]="p">{{ p }}</option>
+                  }
                 </select>
               </div>
             </div>
@@ -85,7 +89,7 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
               <label class="block text-secondary font-medium mb-1 text-sm">درباره فروشگاه</label>
               <textarea formControlName="description" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"></textarea>
             </div>
-
+    
             <!-- حداقل سفارش -->
             <div class="border-t border-gray-100 pt-4 mt-2">
               <h3 class="font-bold text-secondary text-sm mb-3 flex items-center gap-2">
@@ -95,23 +99,27 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
                 <div>
                   <label class="block text-secondary font-medium mb-1 text-sm">حداقل مبلغ سفارش (تومان)</label>
                   <input type="number" formControlName="minimumOrderAmount" min="0"
-                         class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                         placeholder="مثلاً ۵۰۰,۰۰۰" />
+                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="مثلاً ۵۰۰,۰۰۰" />
                   <p class="text-xs text-gray-400 mt-1">اگر ۰ بگذارید محدودیتی نیست</p>
                 </div>
                 <div>
                   <label class="block text-secondary font-medium mb-1 text-sm">حداقل تعداد سفارش</label>
                   <input type="number" formControlName="minimumOrderQuantity" min="0"
-                         class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                         placeholder="مثلاً ۱۰" />
+                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="مثلاً ۱۰" />
                   <p class="text-xs text-gray-400 mt-1">اگر ۰ بگذارید محدودیتی نیست</p>
                 </div>
               </div>
             </div>
-
-            <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">✅ {{ successMessage }}</div>
-            <div *ngIf="errorMessage" class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">⚠️ {{ errorMessage }}</div>
-
+    
+            @if (successMessage) {
+              <div class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">✅ {{ successMessage }}</div>
+            }
+            @if (errorMessage) {
+              <div class="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">⚠️ {{ errorMessage }}</div>
+            }
+    
             <button type="submit" class="bg-primary text-white font-bold rounded-xl px-6 py-2.5 hover:bg-primary-dark transition-colors">
               ذخیره تغییرات
             </button>
@@ -119,7 +127,9 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../../shared/iran-lo
         </div>
       </div>
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerProfileComponent implements OnInit {
   form!: FormGroup;

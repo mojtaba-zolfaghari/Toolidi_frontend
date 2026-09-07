@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 import { AttributeGroup, VariationItem } from './product-management.models';
 
@@ -8,8 +8,10 @@ import { AttributeGroup, VariationItem } from './product-management.models';
  * و کاربر می‌تواند هر تنوع را ویرایش کند.
  */
 @Component({
-  selector: 'app-product-variations',
-  templateUrl: './variations.component.html'
+    selector: 'app-product-variations',
+    templateUrl: './variations.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class VariationsComponent {
   @Input() attributes: AttributeGroup[] = [];

@@ -5,8 +5,12 @@
     [actions]="headerActions"
   ></app-page-header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <!-- Summary Cards -->
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -27,63 +31,75 @@
   ></app-data-table>
 
   <!-- Create/Edit Agent Modal -->
-  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
-    <form [formGroup]="agentForm" (ngSubmit)="saveAgent()" (click)="$event.stopPropagation()"
-      class="admin-modal__card admin-modal__card--wide">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">{{ editingAgent ? 'ویرایش کارپخش' : 'افزودن کارپخش جدید' }}</h2>
-        <button type="button" mat-icon-button (click)="closeForm()" aria-label="بستن">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      <div class="admin-form-grid">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>نام کامل *</mat-label>
-          <input matInput formControlName="fullName" />
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>کد ملی (۱۰ رقم) *</mat-label>
-          <input matInput formControlName="nationalId" inputmode="numeric" maxlength="10" />
-          <mat-error *ngIf="agentForm.get('nationalId')?.touched">کد ملی باید ۱۰ رقم باشد.</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>شماره تماس *</mat-label>
-          <input matInput formControlName="phone" inputmode="tel" maxlength="11" />
-          <mat-error *ngIf="agentForm.get('phone')?.touched">شماره تماس باید با 09 شروع شود (مثل 09121234567).</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>ایمیل *</mat-label>
-          <input matInput type="email" formControlName="email" />
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>استان *</mat-label>
-          <mat-select formControlName="provinceId" (selectionChange)="onProvinceChange()">
-            <mat-option *ngFor="let province of provinces" [value]="province.id">{{ province.name }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>شهرستان *</mat-label>
-          <mat-select formControlName="cityId" (selectionChange)="onCityChange()"
-            [disabled]="loadingCities || !agentForm.get('provinceId')?.value">
-            <mat-option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>نوع وسیله نقلیه</mat-label>
-          <input matInput formControlName="vehicleType" placeholder="مثلاً موتورسیکلت" />
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>پلاک وسیله</mat-label>
-          <input matInput formControlName="vehiclePlate" />
-        </mat-form-field>
-      </div>
-      <p *ngIf="formError" class="admin-form-error">{{ formError }}</p>
-      <div class="admin-form-actions">
-        <button type="button" mat-button (click)="closeForm()">انصراف</button>
-        <button type="submit" mat-flat-button class="admin-btn-primary" [disabled]="saving">
-          {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
-        </button>
-      </div>
-    </form>
-  </div>
+  @if (formOpen) {
+    <div class="admin-modal" (click)="closeForm()">
+      <form [formGroup]="agentForm" (ngSubmit)="saveAgent()" (click)="$event.stopPropagation()"
+        class="admin-modal__card admin-modal__card--wide">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">{{ editingAgent ? 'ویرایش کارپخش' : 'افزودن کارپخش جدید' }}</h2>
+          <button type="button" mat-icon-button (click)="closeForm()" aria-label="بستن">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="admin-form-grid">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>نام کامل *</mat-label>
+            <input matInput formControlName="fullName" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>کد ملی (۱۰ رقم) *</mat-label>
+            <input matInput formControlName="nationalId" inputmode="numeric" maxlength="10" />
+            @if (agentForm.get('nationalId')?.touched) {
+              <mat-error>کد ملی باید ۱۰ رقم باشد.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>شماره تماس *</mat-label>
+            <input matInput formControlName="phone" inputmode="tel" maxlength="11" />
+            @if (agentForm.get('phone')?.touched) {
+              <mat-error>شماره تماس باید با 09 شروع شود (مثل 09121234567).</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>ایمیل *</mat-label>
+            <input matInput type="email" formControlName="email" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>استان *</mat-label>
+            <mat-select formControlName="provinceId" (selectionChange)="onProvinceChange()">
+              @for (province of provinces; track province) {
+                <mat-option [value]="province.id">{{ province.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>شهرستان *</mat-label>
+            <mat-select formControlName="cityId" (selectionChange)="onCityChange()"
+              [disabled]="loadingCities || !agentForm.get('provinceId')?.value">
+              @for (city of cities; track city) {
+                <mat-option [value]="city.id">{{ city.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>نوع وسیله نقلیه</mat-label>
+            <input matInput formControlName="vehicleType" placeholder="مثلاً موتورسیکلت" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>پلاک وسیله</mat-label>
+            <input matInput formControlName="vehiclePlate" />
+          </mat-form-field>
+        </div>
+        @if (formError) {
+          <p class="admin-form-error">{{ formError }}</p>
+        }
+        <div class="admin-form-actions">
+          <button type="button" mat-button (click)="closeForm()">انصراف</button>
+          <button type="submit" mat-flat-button class="admin-btn-primary" [disabled]="saving">
+            {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

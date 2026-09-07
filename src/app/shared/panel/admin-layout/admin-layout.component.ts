@@ -1,5 +1,5 @@
-import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -42,11 +42,11 @@ export interface NavGroup {
  * نشان چت سفارش (پیام‌های نخوانده‌ی فروشنده/تأمین‌کننده) هر ۳۰ ثانیه poll می‌شود.
 */
 @Component({
-  selector: 'app-admin-layout',
-  standalone: true,
-  imports: [NgClass, NgFor, NgIf, MatBadgeModule, MatButtonModule, MatIconModule, MatListModule, MatSidenavModule, MatToolbarModule, MatTooltipModule, RouterLink, RouterOutlet],
-  templateUrl: './admin-layout.component.html',
-  styleUrls: ['./admin-layout.component.scss']
+    selector: 'app-admin-layout',
+    imports: [NgClass, MatBadgeModule, MatButtonModule, MatIconModule, MatListModule, MatSidenavModule, MatToolbarModule, MatTooltipModule, RouterLink, RouterOutlet],
+    templateUrl: './admin-layout.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrls: ['./admin-layout.component.scss']
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
   isAdmin = false;

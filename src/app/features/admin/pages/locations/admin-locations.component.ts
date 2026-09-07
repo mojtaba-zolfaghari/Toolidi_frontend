@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -27,9 +27,11 @@ const TAB_ORDER: Tab[] = ['provinces', 'cities', 'supplier-restrictions', 'agent
  * هیچ کلاس کمکی Tailwind در قالب استفاده نشده است.
  */
 @Component({
-  selector: 'app-admin-locations',
-  templateUrl: './admin-locations.component.html',
-  styleUrls: ['./admin-locations.component.scss']
+    selector: 'app-admin-locations',
+    templateUrl: './admin-locations.component.html',
+    styleUrls: ['./admin-locations.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminLocationsComponent implements OnInit, AfterViewInit {
   // ─── Tab ──────────────────────────────────────────────────────

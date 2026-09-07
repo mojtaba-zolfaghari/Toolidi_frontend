@@ -10,98 +10,127 @@
   </div>
 
   <!-- Loading state -->
-  <div *ngIf="loading" class="data-table__state">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="data-table__state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
 
   <!-- Empty state -->
-  <div *ngIf="!loading && paginatedData.length === 0" class="data-table__state data-table__state--empty">
-    <span class="data-table__empty-icon" aria-hidden="true">{{ emptyIcon }}</span>
-    <p class="data-table__empty-text">{{ emptyMessage }}</p>
-  </div>
+  @if (!loading && paginatedData.length === 0) {
+    <div class="data-table__state data-table__state--empty">
+      <span class="data-table__empty-icon" aria-hidden="true">{{ emptyIcon }}</span>
+      <p class="data-table__empty-text">{{ emptyMessage }}</p>
+    </div>
+  }
 
   <!-- Table -->
-  <div *ngIf="!loading && paginatedData.length > 0" class="data-table__container mat-elevation-z1">
-    <div class="data-table__scroll">
-      <table mat-table [dataSource]="paginatedData" matSort matSortDirection="asc" dir="rtl"
-        (matSortChange)="onSortChange($event)">
-
-        <!-- Select column -->
-        <ng-container matColumnDef="select">
-          <th mat-header-cell *matHeaderCellDef class="data-table__cell--select">
-            <mat-checkbox [checked]="isAllSelected()" (change)="toggleAll()" aria-label="انتخاب همه" />
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <mat-checkbox [checked]="isSelected(row)" (change)="toggleRow(row)" [attr.aria-label]="'انتخاب ردیف'" />
-          </td>
-        </ng-container>
-
-        <!-- Data columns -->
-        <ng-container *ngFor="let col of columns" [matColumnDef]="col.key">
-          <th mat-header-cell *matHeaderCellDef
-            mat-sort-header
-            [disabled]="!col.sortable"
-            [style.width]="col.width"
-            [ngClass]="'data-table__cell--align-' + (col.align || 'right')">
-            {{ col.label }}
-          </th>
-          <td mat-cell *matCellDef="let row" [ngClass]="'data-table__cell--align-' + (col.align || 'right')">
-            <!-- Badge -->
-            <span *ngIf="col.type === 'badge'" class="data-table__badge" [ngClass]="getBadgeClass(row, col)">
-              {{ getBadgeLabel(row, col) }}
-            </span>
-            <!-- Image -->
-            <img *ngIf="col.type === 'image'" [src]="getCellValue(row, col)" [alt]="row.name" class="data-table__img" />
-            <!-- Currency -->
-            <span *ngIf="col.type === 'currency'" class="data-table__currency">
-              {{ getCellValue(row, col) | persianNumber }}
-              <span class="data-table__currency-unit">تومان</span>
-            </span>
-            <!-- Date -->
-            <span *ngIf="col.type === 'date'" class="data-table__date">
-              {{ getCellValue(row, col) | persianDate }}
-            </span>
-            <!-- Flag (boolean star) -->
-            <span *ngIf="col.type === 'flag'">
-              <span *ngIf="getCellValue(row, col)" class="data-table__flag data-table__flag--on">⭐</span>
-              <span *ngIf="!getCellValue(row, col)" class="data-table__flag">—</span>
-            </span>
-            <!-- Number -->
-            <span *ngIf="col.type === 'number'" class="data-table__number">
-              {{ getCellValue(row, col) | persianNumber }}
-            </span>
-            <!-- Text (default) -->
-            <span *ngIf="!col.type || col.type === 'text'" class="data-table__text">
-              {{ sanitizeDisplay(getCellValue(row, col)) || '—' }}
-            </span>
-          </td>
-        </ng-container>
-
-        <!-- Actions column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="data-table__cell--align-center">عملیات</th>
-          <td mat-cell *matCellDef="let row" class="data-table__cell--align-center">
-            <div class="data-table__actions">
-              <ng-container *ngFor="let action of actions">
-                <button *ngIf="!action.visible || action.visible(row)" mat-icon-button
-                  [ngClass]="'data-table__action--' + (action.color || 'primary')"
-                  (click)="action.click(row)" [matTooltip]="action.label">
-                  <span *ngIf="action.icon" aria-hidden="true">{{ action.icon }}</span>
-                  <span *ngIf="!action.icon" class="data-table__action-label">{{ action.label }}</span>
-                </button>
-              </ng-container>
-            </div>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="data-table__row"></tr>
-      </table>
+  @if (!loading && paginatedData.length > 0) {
+    <div class="data-table__container mat-elevation-z1">
+      <div class="data-table__scroll">
+        <table mat-table [dataSource]="paginatedData" matSort matSortDirection="asc" dir="rtl"
+          (matSortChange)="onSortChange($event)">
+          <!-- Select column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef class="data-table__cell--select">
+              <mat-checkbox [checked]="isAllSelected()" (change)="toggleAll()" aria-label="انتخاب همه" />
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox [checked]="isSelected(row)" (change)="toggleRow(row)" [attr.aria-label]="'انتخاب ردیف'" />
+            </td>
+          </ng-container>
+          <!-- Data columns -->
+          @for (col of columns; track col) {
+            <ng-container [matColumnDef]="col.key">
+              <th mat-header-cell *matHeaderCellDef
+                mat-sort-header
+                [disabled]="!col.sortable"
+                [style.width]="col.width"
+                [ngClass]="'data-table__cell--align-' + (col.align || 'right')">
+                {{ col.label }}
+              </th>
+              <td mat-cell *matCellDef="let row" [ngClass]="'data-table__cell--align-' + (col.align || 'right')">
+                <!-- Badge -->
+                @if (col.type === 'badge') {
+                  <span class="data-table__badge" [ngClass]="getBadgeClass(row, col)">
+                    {{ getBadgeLabel(row, col) }}
+                  </span>
+                }
+                <!-- Image -->
+                @if (col.type === 'image') {
+                  <img [src]="getCellValue(row, col)" [alt]="row.name" class="data-table__img" />
+                }
+                <!-- Currency -->
+                @if (col.type === 'currency') {
+                  <span class="data-table__currency">
+                    {{ getCellValue(row, col) | persianNumber }}
+                    <span class="data-table__currency-unit">تومان</span>
+                  </span>
+                }
+                <!-- Date -->
+                @if (col.type === 'date') {
+                  <span class="data-table__date">
+                    {{ getCellValue(row, col) | persianDate }}
+                  </span>
+                }
+                <!-- Flag (boolean star) -->
+                @if (col.type === 'flag') {
+                  <span>
+                    @if (getCellValue(row, col)) {
+                      <span class="data-table__flag data-table__flag--on">⭐</span>
+                    }
+                    @if (!getCellValue(row, col)) {
+                      <span class="data-table__flag">—</span>
+                    }
+                  </span>
+                }
+                <!-- Number -->
+                @if (col.type === 'number') {
+                  <span class="data-table__number">
+                    {{ getCellValue(row, col) | persianNumber }}
+                  </span>
+                }
+                <!-- Text (default) -->
+                @if (!col.type || col.type === 'text') {
+                  <span class="data-table__text">
+                    {{ sanitizeDisplay(getCellValue(row, col)) || '—' }}
+                  </span>
+                }
+              </td>
+            </ng-container>
+          }
+          <!-- Actions column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="data-table__cell--align-center">عملیات</th>
+            <td mat-cell *matCellDef="let row" class="data-table__cell--align-center">
+              <div class="data-table__actions">
+                @for (action of actions; track action) {
+                  @if (!action.visible || action.visible(row)) {
+                    <button mat-icon-button
+                      [ngClass]="'data-table__action--' + (action.color || 'primary')"
+                      (click)="action.click(row)" [matTooltip]="action.label">
+                      @if (action.icon) {
+                        <span aria-hidden="true">{{ action.icon }}</span>
+                      }
+                      @if (!action.icon) {
+                        <span class="data-table__action-label">{{ action.label }}</span>
+                      }
+                    </button>
+                  }
+                }
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="data-table__row"></tr>
+        </table>
+      </div>
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <mat-paginator [length]="totalItems || data.length" [pageSize]="pageSize"
+          [pageSizeOptions]="[pageSize]" (page)="onPageChange($event)" [showFirstLastButtons]="true" dir="rtl">
+        </mat-paginator>
+      }
     </div>
-
-    <!-- Pagination -->
-    <mat-paginator *ngIf="totalPages > 1" [length]="totalItems || data.length" [pageSize]="pageSize"
-      [pageSizeOptions]="[pageSize]" (page)="onPageChange($event)" [showFirstLastButtons]="true" dir="rtl">
-    </mat-paginator>
-  </div>
+  }
 </div>

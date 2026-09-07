@@ -11,80 +11,98 @@
     </div>
   </header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <div class="admin-page__tablewrap">
-    <div *ngIf="loading" class="admin-page__loading">در حال بارگذاری تسویه‌ها…</div>
-    <table *ngIf="!loading" class="admin-page__table">
-      <thead>
-        <tr>
-          <th>فروشنده</th>
-          <th>مبلغ</th>
-          <th>وضعیت</th>
-          <th>شروع دوره</th>
-          <th>پایان دوره</th>
-          <th>تاریخ پرداخت</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let payout of payouts">
-          <td class="admin-page__cell-strong">{{ payout.sellerName || sellerName(payout.sellerId) }}</td>
-          <td>{{ payout.amount | persianNumber }} تومان</td>
-          <td>
-            <span class="admin-badge"
+    @if (loading) {
+      <div class="admin-page__loading">در حال بارگذاری تسویه‌ها…</div>
+    }
+    @if (!loading) {
+      <table class="admin-page__table">
+        <thead>
+          <tr>
+            <th>فروشنده</th>
+            <th>مبلغ</th>
+            <th>وضعیت</th>
+            <th>شروع دوره</th>
+            <th>پایان دوره</th>
+            <th>تاریخ پرداخت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (payout of payouts; track payout) {
+            <tr>
+              <td class="admin-page__cell-strong">{{ payout.sellerName || sellerName(payout.sellerId) }}</td>
+              <td>{{ payout.amount | persianNumber }} تومان</td>
+              <td>
+                <span class="admin-badge"
                   [class.admin-badge--pending]="payout.status === 'Pending'"
                   [class.admin-badge--processing]="payout.status === 'Processing'"
                   [class.admin-badge--success]="payout.status === 'Completed'"
                   [class.admin-badge--danger]="payout.status === 'Failed'">
-              {{ statusLabel(payout.status) }}
-            </span>
-          </td>
-          <td>{{ payout.periodStart | persianDate:'yyyy/MM/dd' }}</td>
-          <td>{{ payout.periodEnd | persianDate:'yyyy/MM/dd' }}</td>
-          <td>{{ payout.payoutDate ? (payout.payoutDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-          <td>
-            <select [value]="payout.status" (change)="changeStatus(payout, $any($event.target).value)"
-                    [disabled]="busyId === payout.id || payout.status === 'Completed'"
-                    class="admin-form-grid__input admin-form-grid__input--sm">
-              <option value="Pending">در انتظار</option>
-              <option value="Processing">در حال پردازش</option>
-              <option value="Completed">تکمیل‌شده</option>
-              <option value="Failed">ناموفق</option>
-            </select>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p *ngIf="!loading && !payouts.length" class="admin-page__empty">تسویه‌ای برای نمایش وجود ندارد.</p>
+                  {{ statusLabel(payout.status) }}
+                </span>
+              </td>
+              <td>{{ payout.periodStart | persianDate:'yyyy/MM/dd' }}</td>
+              <td>{{ payout.periodEnd | persianDate:'yyyy/MM/dd' }}</td>
+              <td>{{ payout.payoutDate ? (payout.payoutDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+              <td>
+                <select [value]="payout.status" (change)="changeStatus(payout, $any($event.target).value)"
+                  [disabled]="busyId === payout.id || payout.status === 'Completed'"
+                  class="admin-form-grid__input admin-form-grid__input--sm">
+                  <option value="Pending">در انتظار</option>
+                  <option value="Processing">در حال پردازش</option>
+                  <option value="Completed">تکمیل‌شده</option>
+                  <option value="Failed">ناموفق</option>
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if (!loading && !payouts.length) {
+      <p class="admin-page__empty">تسویه‌ای برای نمایش وجود ندارد.</p>
+    }
   </div>
 
-  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
-    <form [formGroup]="form" (ngSubmit)="createPayout()" (click)="$event.stopPropagation()" class="admin-modal__card">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">ایجاد تسویه</h2>
-        <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
-      </div>
-      <p class="admin-modal__note">مبلغ تسویه بر اساس فروش، کمیسیون و هزینه‌های پرداخت‌نشده توسط سامانه محاسبه می‌شود.</p>
-      <div class="admin-form-grid admin-form-grid--stacked">
-        <label>
-          <span class="admin-form-grid__label">فروشنده *</span>
-          <select formControlName="sellerId" class="admin-form-grid__input">
-            <option value="">انتخاب فروشنده</option>
-            <option *ngFor="let seller of sellers" [value]="seller.id">{{ seller.companyName }}</option>
-          </select>
-        </label>
-        <label>
-          <span class="admin-form-grid__label">دوره تسویه *</span>
-          <input formControlName="period" type="month" class="admin-form-grid__input" />
-        </label>
-      </div>
-      <p *ngIf="formError" class="admin-alert admin-alert--error">{{ formError }}</p>
-      <div class="admin-form-actions">
-        <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
-        <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ایجاد…' : 'ایجاد تسویه' }}</button>
-      </div>
-    </form>
-  </div>
+  @if (formOpen) {
+    <div class="admin-modal" (click)="closeForm()">
+      <form [formGroup]="form" (ngSubmit)="createPayout()" (click)="$event.stopPropagation()" class="admin-modal__card">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">ایجاد تسویه</h2>
+          <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
+        </div>
+        <p class="admin-modal__note">مبلغ تسویه بر اساس فروش، کمیسیون و هزینه‌های پرداخت‌نشده توسط سامانه محاسبه می‌شود.</p>
+        <div class="admin-form-grid admin-form-grid--stacked">
+          <label>
+            <span class="admin-form-grid__label">فروشنده *</span>
+            <select formControlName="sellerId" class="admin-form-grid__input">
+              <option value="">انتخاب فروشنده</option>
+              @for (seller of sellers; track seller) {
+                <option [value]="seller.id">{{ seller.companyName }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span class="admin-form-grid__label">دوره تسویه *</span>
+            <input formControlName="period" type="month" class="admin-form-grid__input" />
+          </label>
+        </div>
+        @if (formError) {
+          <p class="admin-alert admin-alert--error">{{ formError }}</p>
+        }
+        <div class="admin-form-actions">
+          <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
+          <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ایجاد…' : 'ایجاد تسویه' }}</button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   AdminService,
@@ -21,9 +21,11 @@ interface AdminProductFilters {
 }
 
 @Component({
-  selector: 'app-admin-products',
-  templateUrl: './admin-products.component.html',
-  styleUrls: ['./admin-products.component.scss']
+    selector: 'app-admin-products',
+    templateUrl: './admin-products.component.html',
+    styleUrls: ['./admin-products.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminProductsComponent implements OnInit {
   products: AdminProduct[] = [];

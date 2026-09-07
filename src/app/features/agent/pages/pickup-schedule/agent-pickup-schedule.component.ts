@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   AgentPickupService,
@@ -7,8 +7,8 @@ import {
 } from '../../../../core/services/api/agent-pickup.service';
 
 @Component({
-  selector: 'app-agent-pickup-schedule',
-  template: `
+    selector: 'app-agent-pickup-schedule',
+    template: `
     <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
       <header class="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -25,113 +25,138 @@ import {
           </button>
         </div>
       </header>
-
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
-
+    
+      @if (errorMessage) {
+        <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+      }
+      @if (successMessage) {
+        <p class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+      }
+    
       <!-- Schedule List -->
       <div class="overflow-x-auto rounded-2xl bg-white shadow-card">
-        <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری زمان‌بندی‌ها…</div>
-
-        <table *ngIf="!loading && schedules.length" class="w-full min-w-[700px] text-right text-sm">
-          <thead>
-            <tr class="border-b bg-gray-50 text-gray-500">
-              <th class="p-4">تأمین‌کننده</th>
-              <th class="p-4">تاریخ</th>
-              <th class="p-4">بازه زمانی</th>
-              <th class="p-4">وضعیت</th>
-              <th class="p-4">عملیات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let schedule of schedules" class="border-b last:border-0 hover:bg-gray-50/70">
-              <td class="p-4 font-bold text-secondary">{{ schedule.supplierName || '—' }}</td>
-              <td class="p-4">{{ schedule.scheduledPickupDate | persianDate:'yyyy/MM/dd' }}</td>
-              <td class="p-4">{{ schedule.timeWindowStart }} - {{ schedule.timeWindowEnd }}</td>
-              <td class="p-4">
-                <span class="rounded-full px-3 py-1 text-xs font-bold"
+        @if (loading) {
+          <div class="p-12 text-center text-gray-500">در حال بارگذاری زمان‌بندی‌ها…</div>
+        }
+    
+        @if (!loading && schedules.length) {
+          <table class="w-full min-w-[700px] text-right text-sm">
+            <thead>
+              <tr class="border-b bg-gray-50 text-gray-500">
+                <th class="p-4">تأمین‌کننده</th>
+                <th class="p-4">تاریخ</th>
+                <th class="p-4">بازه زمانی</th>
+                <th class="p-4">وضعیت</th>
+                <th class="p-4">عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (schedule of schedules; track schedule) {
+                <tr class="border-b last:border-0 hover:bg-gray-50/70">
+                  <td class="p-4 font-bold text-secondary">{{ schedule.supplierName || '—' }}</td>
+                  <td class="p-4">{{ schedule.scheduledPickupDate | persianDate:'yyyy/MM/dd' }}</td>
+                  <td class="p-4">{{ schedule.timeWindowStart }} - {{ schedule.timeWindowEnd }}</td>
+                  <td class="p-4">
+                    <span class="rounded-full px-3 py-1 text-xs font-bold"
                       [ngClass]="getStatusColor(schedule.status)">
-                  {{ getStatusLabel(schedule.status) }}
-                </span>
-              </td>
-              <td class="p-4">
-                <div class="flex gap-2">
-                  <button *ngIf="schedule.status === 'Scheduled'" type="button" (click)="updateStatus(schedule, 'InTransit')"
+                      {{ getStatusLabel(schedule.status) }}
+                    </span>
+                  </td>
+                  <td class="p-4">
+                    <div class="flex gap-2">
+                      @if (schedule.status === 'Scheduled') {
+                        <button type="button" (click)="updateStatus(schedule, 'InTransit')"
                           class="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-600">
-                    در مسیر
-                  </button>
-                  <button *ngIf="schedule.status === 'InTransit'" type="button" (click)="updateStatus(schedule, 'Completed')"
+                          در مسیر
+                        </button>
+                      }
+                      @if (schedule.status === 'InTransit') {
+                        <button type="button" (click)="updateStatus(schedule, 'Completed')"
                           class="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-600">
-                    تکمیل
-                  </button>
-                  <button *ngIf="schedule.status === 'Scheduled'" type="button" (click)="updateStatus(schedule, 'Cancelled')"
+                          تکمیل
+                        </button>
+                      }
+                      @if (schedule.status === 'Scheduled') {
+                        <button type="button" (click)="updateStatus(schedule, 'Cancelled')"
                           class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50">
-                    لغو
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p *ngIf="!loading && !schedules.length" class="p-10 text-center text-gray-400">
-          هیچ زمان‌بندی تحویلی ثبت نشده است.
-        </p>
+                          لغو
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+    
+        @if (!loading && !schedules.length) {
+          <p class="p-10 text-center text-gray-400">
+            هیچ زمان‌بندی تحویلی ثبت نشده است.
+          </p>
+        }
       </div>
-
+    
       <!-- Create Schedule Modal -->
-      <div *ngIf="formOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeForm()">
-        <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-secondary">زمان‌بندی جدید تحویل</h2>
-            <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
-          </div>
-
-          <div class="mt-5 space-y-4">
-            <label>
-              <span class="mb-1 block text-sm font-medium text-secondary">تأمین‌کننده *</span>
-              <select formControlName="supplierId" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 bg-white" [disabled]="suppliersLoading">
-                <option value="">انتخاب تأمین‌کننده</option>
-                <option *ngFor="let s of suppliers" [value]="s.id">{{ s.name }}{{ s.city ? ' — ' + s.city : '' }}</option>
-              </select>
-              <span *ngIf="suppliersLoading" class="text-xs text-gray-400">در حال بارگذاری تأمین‌کنندگان…</span>
-            </label>
-
-            <label>
-              <span class="mb-1 block text-sm font-medium text-secondary">تاریخ تحویل * (شمسی)</span>
-              <app-persian-date-picker placeholder="انتخاب تاریخ تحویل" (dateSelected)="onJalaliDateSelected($event)"></app-persian-date-picker>
-              <input formControlName="scheduledPickupDate" type="hidden" />
-              <span *ngIf="jalaliDateDisplay" class="mt-1 text-xs text-gray-500">{{ jalaliDateDisplay }}</span>
-            </label>
-
-            <div class="grid grid-cols-2 gap-4">
+      @if (formOpen) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeForm()">
+          <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold text-secondary">زمان‌بندی جدید تحویل</h2>
+              <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
+            </div>
+            <div class="mt-5 space-y-4">
               <label>
-                <span class="mb-1 block text-sm font-medium text-secondary">شروع بازه *</span>
-                <input formControlName="timeWindowStart" type="time" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                <span class="mb-1 block text-sm font-medium text-secondary">تأمین‌کننده *</span>
+                <select formControlName="supplierId" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 bg-white" [disabled]="suppliersLoading">
+                  <option value="">انتخاب تأمین‌کننده</option>
+                  @for (s of suppliers; track s) {
+                    <option [value]="s.id">{{ s.name }}{{ s.city ? ' — ' + s.city : '' }}</option>
+                  }
+                </select>
+                @if (suppliersLoading) {
+                  <span class="text-xs text-gray-400">در حال بارگذاری تأمین‌کنندگان…</span>
+                }
               </label>
               <label>
-                <span class="mb-1 block text-sm font-medium text-secondary">پایان بازه *</span>
-                <input formControlName="timeWindowEnd" type="time" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                <span class="mb-1 block text-sm font-medium text-secondary">تاریخ تحویل * (شمسی)</span>
+                <app-persian-date-picker placeholder="انتخاب تاریخ تحویل" (dateSelected)="onJalaliDateSelected($event)"></app-persian-date-picker>
+                <input formControlName="scheduledPickupDate" type="hidden" />
+                @if (jalaliDateDisplay) {
+                  <span class="mt-1 text-xs text-gray-500">{{ jalaliDateDisplay }}</span>
+                }
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <label>
+                  <span class="mb-1 block text-sm font-medium text-secondary">شروع بازه *</span>
+                  <input formControlName="timeWindowStart" type="time" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                </label>
+                <label>
+                  <span class="mb-1 block text-sm font-medium text-secondary">پایان بازه *</span>
+                  <input formControlName="timeWindowEnd" type="time" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                </label>
+              </div>
+              <label>
+                <span class="mb-1 block text-sm font-medium text-secondary">یادداشت (اختیاری)</span>
+                <textarea formControlName="notes" rows="2" class="w-full rounded-xl border border-gray-300 px-4 py-2.5"></textarea>
               </label>
             </div>
-
-            <label>
-              <span class="mb-1 block text-sm font-medium text-secondary">یادداشت (اختیاری)</span>
-              <textarea formControlName="notes" rows="2" class="w-full rounded-xl border border-gray-300 px-4 py-2.5"></textarea>
-            </label>
-          </div>
-
-          <p *ngIf="formError" class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ formError }}</p>
-          <div class="mt-5 flex justify-end gap-3">
-            <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
-            <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white disabled:opacity-50">
-              {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
-            </button>
-          </div>
-        </form>
-      </div>
+            @if (formError) {
+              <p class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ formError }}</p>
+            }
+            <div class="mt-5 flex justify-end gap-3">
+              <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+              <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white disabled:opacity-50">
+                {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AgentPickupScheduleComponent implements OnInit {
   schedules: PickupSchedule[] = [];

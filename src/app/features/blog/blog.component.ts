@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Subject } from 'rxjs';
@@ -36,9 +36,11 @@ const GRID_COLS_BY_MEDIA: Record<'mobile' | 'tablet' | 'desktop', number> = {
  * شامل: پست ویژه، دسته‌بندی‌ها، شبکه ریسپانسیو کارت‌های Material، صفحه‌بندی MatPaginator
  */
 @Component({
-  selector: 'app-blog',
-  templateUrl: './blog.component.html',
-  styleUrls: ['./blog.component.scss']
+    selector: 'app-blog',
+    templateUrl: './blog.component.html',
+    styleUrls: ['./blog.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class BlogComponent implements OnInit, OnDestroy {
   posts: BlogPost[] = [];

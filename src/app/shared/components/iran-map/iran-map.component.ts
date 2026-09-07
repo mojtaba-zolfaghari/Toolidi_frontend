@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { PublicService } from '../../../core/services/api/public.service';
 
 interface ProvinceData {
@@ -9,8 +9,8 @@ interface ProvinceData {
 }
 
 @Component({
-  selector: 'app-iran-map',
-  template: `
+    selector: 'app-iran-map',
+    template: `
     <div class="province-network">
       <!-- Header -->
       <div class="pn-header">
@@ -51,67 +51,79 @@ interface ProvinceData {
           </div>
         </div>
       </div>
-
+    
       <!-- Province Grid -->
       <div class="pn-grid">
-        <div *ngFor="let p of provinces; let i = index; trackBy: trackByName"
-             class="pn-card"
-             [class.pn-card-top3]="p.rank <= 3"
-             [style.animation-delay]="(i * 40) + 'ms'">
-          <!-- Rank badge -->
-          <div class="pn-card-rank" [class]="'rank-' + p.rank" *ngIf="p.rank <= 3">
-            {{ p.rank === 1 ? '🥇' : p.rank === 2 ? '🥈' : '🥉' }}
+        @for (p of provinces; track trackByName(i, p); let i = $index) {
+          <div
+            class="pn-card"
+            [class.pn-card-top3]="p.rank <= 3"
+            [style.animation-delay]="(i * 40) + 'ms'">
+            <!-- Rank badge -->
+            @if (p.rank <= 3) {
+              <div class="pn-card-rank" [class]="'rank-' + p.rank">
+                {{ p.rank === 1 ? '🥇' : p.rank === 2 ? '🥈' : '🥉' }}
+              </div>
+            }
+            @if (p.rank > 3) {
+              <div class="pn-card-rank rank-n">
+                {{ p.rank }}
+              </div>
+            }
+            <!-- Province name -->
+            <h3 class="pn-card-name">{{ p.name }}</h3>
+            <!-- Seller count bar -->
+            <div class="pn-card-bar-wrap">
+              <div class="pn-card-bar" [style.width.%]="getBarWidth(p)"></div>
+            </div>
+            <!-- Stats -->
+            <div class="pn-card-stats">
+              <span class="pn-card-count">
+                <strong>{{ p.sellerCount | persianNumber }}</strong>
+                تولیدکننده
+              </span>
+            </div>
+            <!-- Trades chips -->
+            <div class="pn-card-trades">
+              @for (trade of p.trades.slice(0, 3); track trade) {
+                <span class="pn-trade-chip">
+                  {{ trade }}
+                </span>
+              }
+              @if (p.trades.length > 3) {
+                <span class="pn-trade-more">
+                  +{{ p.trades.length - 3 }}
+                </span>
+              }
+            </div>
           </div>
-          <div class="pn-card-rank rank-n" *ngIf="p.rank > 3">
-            {{ p.rank }}
-          </div>
-
-          <!-- Province name -->
-          <h3 class="pn-card-name">{{ p.name }}</h3>
-
-          <!-- Seller count bar -->
-          <div class="pn-card-bar-wrap">
-            <div class="pn-card-bar" [style.width.%]="getBarWidth(p)"></div>
-          </div>
-
-          <!-- Stats -->
-          <div class="pn-card-stats">
-            <span class="pn-card-count">
-              <strong>{{ p.sellerCount | persianNumber }}</strong>
-              تولیدکننده
-            </span>
-          </div>
-
-          <!-- Trades chips -->
-          <div class="pn-card-trades">
-            <span *ngFor="let trade of p.trades.slice(0, 3)" class="pn-trade-chip">
-              {{ trade }}
-            </span>
-            <span *ngIf="p.trades.length > 3" class="pn-trade-more">
-              +{{ p.trades.length - 3 }}
-            </span>
-          </div>
-        </div>
+        }
       </div>
-
+    
       <!-- Empty state -->
-      <div *ngIf="!loading && !provinces.length" class="pn-empty">
-        <span class="pn-empty-icon">📍</span>
-        <p>در حال بارگذاری اطلاعات شبکه تأمین…</p>
-      </div>
-
-      <!-- Loading skeleton -->
-      <div *ngIf="loading" class="pn-grid">
-        <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="pn-card pn-skeleton">
-          <div class="sk-rank"></div>
-          <div class="sk-name"></div>
-          <div class="sk-bar"></div>
-          <div class="sk-text"></div>
+      @if (!loading && !provinces.length) {
+        <div class="pn-empty">
+          <span class="pn-empty-icon">📍</span>
+          <p>در حال بارگذاری اطلاعات شبکه تأمین…</p>
         </div>
-      </div>
+      }
+    
+      <!-- Loading skeleton -->
+      @if (loading) {
+        <div class="pn-grid">
+          @for (s of [1,2,3,4,5,6,7,8]; track s) {
+            <div class="pn-card pn-skeleton">
+              <div class="sk-rank"></div>
+              <div class="sk-name"></div>
+              <div class="sk-bar"></div>
+              <div class="sk-text"></div>
+            </div>
+          }
+        </div>
+      }
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     .province-network {
       width: 100%;
     }
@@ -361,7 +373,9 @@ interface ProvinceData {
     @media (max-width: 400px) {
       .pn-grid { grid-template-columns: 1fr; }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class IranMapComponent implements OnInit, OnDestroy {
   provinces: ProvinceData[] = [];

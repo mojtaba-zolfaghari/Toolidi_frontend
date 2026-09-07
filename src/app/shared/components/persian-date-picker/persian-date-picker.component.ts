@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 // ═══════════════════════════════════════════════════════════════════
 // Jalali (Persian) calendar math — jalaali-js algorithm (MIT),
@@ -135,73 +135,81 @@ function pad2(n: number): string {
  * - `gregorianChange` → `2026-09-02` (date mode) or `2026-09` (month mode)
  */
 @Component({
-  selector: 'app-persian-date-picker',
-  template: `
+    selector: 'app-persian-date-picker',
+    template: `
     <div class="relative inline-block">
       <button
         type="button"
         (click)="toggle()"
         class="mt-1 flex w-full items-center justify-between gap-2 rounded-xl border border-gray-300 bg-white px-3 py-2 text-right text-sm focus:border-primary focus:outline-none"
-      >
+        >
         <span [class.text-gray-400]="!displayValue">{{ displayValue || placeholder }}</span>
         <span aria-hidden="true">📅</span>
       </button>
-
-      <div
-        *ngIf="open"
-        (click)="$event.stopPropagation()"
-        class="absolute z-50 mt-2 w-72 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl"
-      >
-        <!-- Header -->
-        <div class="mb-3 flex items-center justify-between">
-          <button type="button" (click)="changeYear(-1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">»</button>
-          <button type="button" (click)="changeMonth(-1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">›</button>
-          <span class="font-bold text-secondary">{{ yearLabel }}</span>
-          <button type="button" (click)="changeMonth(1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">‹</button>
-          <button type="button" (click)="changeYear(1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">«</button>
-        </div>
-
-        <!-- Month mode: grid of 12 months -->
-        <div *ngIf="mode === 'month'" class="grid grid-cols-3 gap-2">
-          <button
-            *ngFor="let m of monthNames; let i = index"
-            type="button"
-            (click)="selectMonth(i + 1)"
-            class="rounded-lg border border-gray-100 py-2 text-sm hover:border-primary hover:text-primary"
-            [class.border-primary!]="i + 1 === month && isCurrentYear"
+    
+      @if (open) {
+        <div
+          (click)="$event.stopPropagation()"
+          class="absolute z-50 mt-2 w-72 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl"
           >
-            {{ m }}
-          </button>
-        </div>
-
-        <!-- Date mode: day grid -->
-        <ng-container *ngIf="mode === 'date'">
-          <div class="mb-1 grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-500">
-            <span *ngFor="let w of weekDays">{{ w }}</span>
+          <!-- Header -->
+          <div class="mb-3 flex items-center justify-between">
+            <button type="button" (click)="changeYear(-1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">»</button>
+            <button type="button" (click)="changeMonth(-1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">›</button>
+            <span class="font-bold text-secondary">{{ yearLabel }}</span>
+            <button type="button" (click)="changeMonth(1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">‹</button>
+            <button type="button" (click)="changeYear(1)" class="rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-100">«</button>
           </div>
-          <div class="grid grid-cols-7 gap-1">
-            <span *ngFor="let blank of blanks" class="text-center text-sm leading-8"></span>
-            <button
-              *ngFor="let day of daysOfMonth"
-              type="button"
-              (click)="selectDay(day)"
-              class="rounded-lg text-center text-sm leading-8 transition-colors hover:bg-primary hover:text-white"
-              [class.bg-primary!]="day === selectedDay && month === selectedMonth && year === selectedYear"
-              [class.font-bold]="day === todayJd && month === todayJm && year === todayJy"
-              [class.rounded-full]="day === todayJd && month === todayJm && year === todayJy"
-            >
-              {{ day }}
-            </button>
+          <!-- Month mode: grid of 12 months -->
+          @if (mode === 'month') {
+            <div class="grid grid-cols-3 gap-2">
+              @for (m of monthNames; track m; let i = $index) {
+                <button
+                  type="button"
+                  (click)="selectMonth(i + 1)"
+                  class="rounded-lg border border-gray-100 py-2 text-sm hover:border-primary hover:text-primary"
+                  [class.border-primary!]="i + 1 === month && isCurrentYear"
+                  >
+                  {{ m }}
+                </button>
+              }
+            </div>
+          }
+          <!-- Date mode: day grid -->
+          @if (mode === 'date') {
+            <div class="mb-1 grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-500">
+              @for (w of weekDays; track w) {
+                <span>{{ w }}</span>
+              }
+            </div>
+            <div class="grid grid-cols-7 gap-1">
+              @for (blank of blanks; track blank) {
+                <span class="text-center text-sm leading-8"></span>
+              }
+              @for (day of daysOfMonth; track day) {
+                <button
+                  type="button"
+                  (click)="selectDay(day)"
+                  class="rounded-lg text-center text-sm leading-8 transition-colors hover:bg-primary hover:text-white"
+                  [class.bg-primary!]="day === selectedDay && month === selectedMonth && year === selectedYear"
+                  [class.font-bold]="day === todayJd && month === todayJm && year === todayJy"
+                  [class.rounded-full]="day === todayJd && month === todayJm && year === todayJy"
+                  >
+                  {{ day }}
+                </button>
+              }
+            </div>
+          }
+          <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-2">
+            <button type="button" (click)="goToday()" class="text-xs text-primary hover:underline">امروز</button>
+            <button type="button" (click)="open = false" class="text-xs text-gray-500 hover:underline">بستن</button>
           </div>
-        </ng-container>
-
-        <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-2">
-          <button type="button" (click)="goToday()" class="text-xs text-primary hover:underline">امروز</button>
-          <button type="button" (click)="open = false" class="text-xs text-gray-500 hover:underline">بستن</button>
         </div>
-      </div>
+      }
     </div>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PersianDatePickerComponent {
   @Input() placeholder = 'انتخاب تاریخ';

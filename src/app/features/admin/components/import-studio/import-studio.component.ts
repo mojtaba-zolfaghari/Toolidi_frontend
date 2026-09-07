@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { interval, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -9,7 +9,11 @@ import { AdminSeller, AdminService } from '../../../../core/services/api/admin.s
 import { AuthStateService } from '../../../../core/services/auth-state.service';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
-@Component({ selector: 'app-import-studio', templateUrl: './import-studio.component.html', styleUrls: ['./import-studio.component.scss'] })
+@Component({
+    selector: 'app-import-studio', templateUrl: './import-studio.component.html', styleUrls: ['./import-studio.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
+})
 export class ImportStudioComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   flows: ImportFlow[] = []; selectedFlow: ImportFlow | null = null; history: ImportJobStatus[] = []; loadingHistory = false;

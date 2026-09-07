@@ -1,43 +1,59 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'app-skeleton',
-  template: `
+    selector: 'app-skeleton',
+    template: `
     <div class="animate-pulse" [class]="containerClass">
       <!-- Text skeleton -->
-      <div *ngIf="type === 'text'" class="space-y-2">
-        <div *ngFor="let i of linesArray" class="rounded bg-gray-200"
-             [style.height.px]="height"
-             [style.width]="i === linesArray.length - 1 ? lastLineWidth : '100%'"></div>
-      </div>
-
+      @if (type === 'text') {
+        <div class="space-y-2">
+          @for (i of linesArray; track i) {
+            <div class="rounded bg-gray-200"
+              [style.height.px]="height"
+            [style.width]="i === linesArray.length - 1 ? lastLineWidth : '100%'"></div>
+          }
+        </div>
+      }
+    
       <!-- Card skeleton -->
-      <div *ngIf="type === 'card'" class="rounded-2xl bg-white p-4 shadow-sm">
-        <div class="rounded-xl bg-gray-200" [style.height.px]="imageHeight"></div>
-        <div class="mt-4 space-y-2">
-          <div class="h-4 w-3/4 rounded bg-gray-200"></div>
-          <div class="h-3 w-1/2 rounded bg-gray-200"></div>
-          <div class="h-3 w-1/3 rounded bg-gray-200"></div>
+      @if (type === 'card') {
+        <div class="rounded-2xl bg-white p-4 shadow-sm">
+          <div class="rounded-xl bg-gray-200" [style.height.px]="imageHeight"></div>
+          <div class="mt-4 space-y-2">
+            <div class="h-4 w-3/4 rounded bg-gray-200"></div>
+            <div class="h-3 w-1/2 rounded bg-gray-200"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200"></div>
+          </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Table skeleton -->
-      <div *ngIf="type === 'table'" class="space-y-3">
-        <div *ngFor="let r of rowsArray" class="flex gap-4">
-          <div class="h-4 flex-1 rounded bg-gray-200" *ngFor="let c of columnsArray"></div>
+      @if (type === 'table') {
+        <div class="space-y-3">
+          @for (r of rowsArray; track r) {
+            <div class="flex gap-4">
+              @for (c of columnsArray; track c) {
+                <div class="h-4 flex-1 rounded bg-gray-200"></div>
+              }
+            </div>
+          }
         </div>
-      </div>
-
+      }
+    
       <!-- Circle skeleton -->
-      <div *ngIf="type === 'circle'" class="rounded-full bg-gray-200 animate-pulse"
-           [style.width.px]="size" [style.height.px]="size"></div>
+      @if (type === 'circle') {
+        <div class="rounded-full bg-gray-200 animate-pulse"
+        [style.width.px]="size" [style.height.px]="size"></div>
+      }
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: block; }
     .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SkeletonComponent {
   @Input() type: 'text' | 'card' | 'table' | 'circle' = 'text';
@@ -56,12 +72,16 @@ export class SkeletonComponent {
 }
 
 @Component({
-  selector: 'app-skeleton-product-grid',
-  template: `
+    selector: 'app-skeleton-product-grid',
+    template: `
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <app-skeleton *ngFor="let i of skeletonArray" type="card" [imageHeight]="160"></app-skeleton>
+      @for (i of skeletonArray; track i) {
+        <app-skeleton type="card" [imageHeight]="160"></app-skeleton>
+      }
     </div>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SkeletonProductGridComponent {
   @Input() count = 8;
@@ -69,13 +89,15 @@ export class SkeletonProductGridComponent {
 }
 
 @Component({
-  selector: 'app-skeleton-table',
-  template: `
+    selector: 'app-skeleton-table',
+    template: `
     <div class="rounded-2xl bg-white p-6 shadow-sm">
       <div class="h-6 w-48 rounded bg-gray-200 mb-6 animate-pulse"></div>
       <app-skeleton type="table" [rows]="rows" [columns]="5"></app-skeleton>
     </div>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SkeletonTableComponent {
   @Input() rows = 8;

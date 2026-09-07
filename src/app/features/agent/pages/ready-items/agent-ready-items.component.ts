@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { AgentPickupService, ReadyItem } from '../../../../core/services/api/agent-pickup.service';
 
 @Component({
-  selector: 'app-agent-ready-items',
-  template: `
+    selector: 'app-agent-ready-items',
+    template: `
     <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
       <header class="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -16,46 +16,58 @@ import { AgentPickupService, ReadyItem } from '../../../../core/services/api/age
           بازخوانی
         </button>
       </header>
-
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-
+    
+      @if (errorMessage) {
+        <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+      }
+    
       <div class="overflow-x-auto rounded-2xl bg-white shadow-card">
-        <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری آیتم‌ها…</div>
-
-        <table *ngIf="!loading && readyItems.length" class="w-full min-w-[760px] text-right text-sm">
-          <thead>
-            <tr class="border-b bg-gray-50 text-gray-500">
-              <th class="p-4">شماره سفارش</th>
-              <th class="p-4">تأمین‌کننده</th>
-              <th class="p-4">محصول</th>
-              <th class="p-4">تعداد</th>
-              <th class="p-4">تاریخ آماده</th>
-              <th class="p-4">وضعیت</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of readyItems" class="border-b last:border-0 hover:bg-gray-50/70">
-              <td class="p-4 font-mono text-xs text-secondary">#{{ item.orderNumber }}</td>
-              <td class="p-4">
-                <div class="font-bold text-secondary">{{ item.supplierName }}</div>
-                <div class="text-xs text-gray-500">{{ item.supplierLocation }}</div>
-              </td>
-              <td class="p-4 text-secondary">{{ item.productName }}</td>
-              <td class="p-4">{{ item.quantity | persianNumber }}</td>
-              <td class="p-4">{{ item.estimatedReadyDate ? (item.estimatedReadyDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-              <td class="p-4">
-                <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">آماده تحویل</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p *ngIf="!loading && !readyItems.length" class="p-10 text-center text-gray-400">
-          هیچ آیتم آماده‌ای برای تحویل وجود ندارد.
-        </p>
+        @if (loading) {
+          <div class="p-12 text-center text-gray-500">در حال بارگذاری آیتم‌ها…</div>
+        }
+    
+        @if (!loading && readyItems.length) {
+          <table class="w-full min-w-[760px] text-right text-sm">
+            <thead>
+              <tr class="border-b bg-gray-50 text-gray-500">
+                <th class="p-4">شماره سفارش</th>
+                <th class="p-4">تأمین‌کننده</th>
+                <th class="p-4">محصول</th>
+                <th class="p-4">تعداد</th>
+                <th class="p-4">تاریخ آماده</th>
+                <th class="p-4">وضعیت</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of readyItems; track item) {
+                <tr class="border-b last:border-0 hover:bg-gray-50/70">
+                  <td class="p-4 font-mono text-xs text-secondary">#{{ item.orderNumber }}</td>
+                  <td class="p-4">
+                    <div class="font-bold text-secondary">{{ item.supplierName }}</div>
+                    <div class="text-xs text-gray-500">{{ item.supplierLocation }}</div>
+                  </td>
+                  <td class="p-4 text-secondary">{{ item.productName }}</td>
+                  <td class="p-4">{{ item.quantity | persianNumber }}</td>
+                  <td class="p-4">{{ item.estimatedReadyDate ? (item.estimatedReadyDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+                  <td class="p-4">
+                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">آماده تحویل</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+    
+        @if (!loading && !readyItems.length) {
+          <p class="p-10 text-center text-gray-400">
+            هیچ آیتم آماده‌ای برای تحویل وجود ندارد.
+          </p>
+        }
       </div>
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AgentReadyItemsComponent implements OnInit {
   readyItems: ReadyItem[] = [];

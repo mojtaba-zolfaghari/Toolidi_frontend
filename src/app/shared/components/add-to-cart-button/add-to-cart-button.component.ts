@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * وضعیت‌های دکمه افزودن به سبد خرید.
@@ -18,9 +18,11 @@ export type CartButtonState = 'idle' | 'adding' | 'success';
  * - Fly-to-cart particle
  */
 @Component({
-  selector: 'app-add-to-cart-button',
-  templateUrl: './add-to-cart-button.component.html',
-  styleUrls: ['./add-to-cart-button.component.scss']
+    selector: 'app-add-to-cart-button',
+    templateUrl: './add-to-cart-button.component.html',
+    styleUrls: ['./add-to-cart-button.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AddToCartButtonComponent {
   /** آیا دکمه غیرفعال باشد (مثلاً ناموجود) */

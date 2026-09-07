@@ -2,101 +2,102 @@
 <section class="bd-page">
 
   <!-- ═══ لودینگ ═══ -->
-  <div *ngIf="loading" class="bd-state">
-    <mat-progress-spinner mode="indeterminate" [diameter]="44" />
-    <p class="bd-state__text">در حال بارگذاری مطلب…</p>
-  </div>
+  @if (loading) {
+    <div class="bd-state">
+      <mat-progress-spinner mode="indeterminate" [diameter]="44" />
+      <p class="bd-state__text">در حال بارگذاری مطلب…</p>
+    </div>
+  }
 
   <!-- ═══ خطا ═══ -->
-  <div *ngIf="!loading && errorMessage" class="bd-state">
-    <span class="bd-state__emoji">😔</span>
-    <h2 class="bd-state__title">مشکلی پیش آمد</h2>
-    <p class="bd-state__text">{{ errorMessage }}</p>
-    <a mat-button color="primary" routerLink="/blog">
-      <mat-icon [inline]="true">arrow_forward</mat-icon>
-      بازگشت به وبلاگ
-    </a>
-  </div>
-
-  <!-- ═══ محتوا ═══ -->
-  <article *ngIf="!loading && post">
-
-    <!-- هدر تصویر -->
-    <div class="bd-hero">
-      <img *ngIf="post.featuredImage"
-           [src]="post.featuredImage" [alt]="post.title"
-           loading="lazy"
-           width="800" height="450" />
-      <div *ngIf="!post.featuredImage" class="bd-hero__placeholder">✦</div>
-      <div class="bd-hero__shade"></div>
-
-      <!-- دکمه بازگشت روی تصویر -->
-      <a mat-stroked-button class="bd-hero__back" routerLink="/blog">
+  @if (!loading && errorMessage) {
+    <div class="bd-state">
+      <span class="bd-state__emoji">😔</span>
+      <h2 class="bd-state__title">مشکلی پیش آمد</h2>
+      <p class="bd-state__text">{{ errorMessage }}</p>
+      <a mat-button color="primary" routerLink="/blog">
         <mat-icon [inline]="true">arrow_forward</mat-icon>
-        بازگشت
+        بازگشت به وبلاگ
       </a>
     </div>
+  }
 
-    <!-- محتوای مقاله -->
-    <div class="bd-body-wrap">
-      <mat-card class="bd-card">
-        <mat-card-content class="bd-card__content">
-
-          <!-- عنوان -->
-          <h1 class="bd-title">{{ post.title }}</h1>
-
-          <!-- متا -->
-          <div class="bd-meta">
-            <div class="bd-meta__author">
-              <span class="bd-meta__avatar">T</span>
-              <span class="bd-meta__name">تیم تولیدی</span>
-            </div>
-            <span class="bd-meta__sep">·</span>
-            <span>{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
-            <span class="bd-meta__sep">·</span>
-            <span class="bd-meta__views">
-              <mat-icon [inline]="true">visibility</mat-icon>
-              {{ (post.viewCount || 0) | persianNumber }} بازدید
-            </span>
-          </div>
-
-          <mat-divider class="bd-divider" />
-
-          <!-- خلاصه -->
-          <div *ngIf="post.shortDescription" class="bd-summary">
-            💡 {{ post.shortDescription }}
-          </div>
-
-          <!-- بدنه مقاله -->
-          <div class="blog-content" [innerHTML]="post.content"></div>
-
-          <mat-divider class="bd-divider" />
-
-          <!-- اشتراک‌گذاری -->
-          <div class="bd-share">
-            <p class="bd-share__label">اشتراک‌گذاری این مطلب</p>
-            <div class="bd-share__row">
-              <button type="button" class="share-btn share-btn--telegram" title="تلگرام">
-                📱 تلگرام
-              </button>
-              <button type="button" class="share-btn share-btn--whatsapp" title="واتساپ">
-                💬 واتساپ
-              </button>
-              <button type="button" class="share-btn share-btn--copy" title="کپی لینک">
-                🔗 کپی لینک
-              </button>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- لینک بازگشت -->
-      <div class="bd-back-row">
-        <a mat-raised-button color="primary" routerLink="/blog">
+  <!-- ═══ محتوا ═══ -->
+  @if (!loading && post) {
+    <article>
+      <!-- هدر تصویر -->
+      <div class="bd-hero">
+        @if (post.featuredImage) {
+          <img
+            [src]="post.featuredImage" [alt]="post.title"
+            loading="lazy"
+            width="800" height="450" />
+        }
+        @if (!post.featuredImage) {
+          <div class="bd-hero__placeholder">✦</div>
+        }
+        <div class="bd-hero__shade"></div>
+        <!-- دکمه بازگشت روی تصویر -->
+        <a mat-stroked-button class="bd-hero__back" routerLink="/blog">
           <mat-icon [inline]="true">arrow_forward</mat-icon>
-          مشاهده سایر مقالات
+          بازگشت
         </a>
       </div>
-    </div>
-  </article>
+      <!-- محتوای مقاله -->
+      <div class="bd-body-wrap">
+        <mat-card class="bd-card">
+          <mat-card-content class="bd-card__content">
+            <!-- عنوان -->
+            <h1 class="bd-title">{{ post.title }}</h1>
+            <!-- متا -->
+            <div class="bd-meta">
+              <div class="bd-meta__author">
+                <span class="bd-meta__avatar">T</span>
+                <span class="bd-meta__name">تیم تولیدی</span>
+              </div>
+              <span class="bd-meta__sep">·</span>
+              <span>{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
+              <span class="bd-meta__sep">·</span>
+              <span class="bd-meta__views">
+                <mat-icon [inline]="true">visibility</mat-icon>
+                {{ (post.viewCount || 0) | persianNumber }} بازدید
+              </span>
+            </div>
+            <mat-divider class="bd-divider" />
+            <!-- خلاصه -->
+            @if (post.shortDescription) {
+              <div class="bd-summary">
+                💡 {{ post.shortDescription }}
+              </div>
+            }
+            <!-- بدنه مقاله -->
+            <div class="blog-content" [innerHTML]="post.content"></div>
+            <mat-divider class="bd-divider" />
+            <!-- اشتراک‌گذاری -->
+            <div class="bd-share">
+              <p class="bd-share__label">اشتراک‌گذاری این مطلب</p>
+              <div class="bd-share__row">
+                <button type="button" class="share-btn share-btn--telegram" title="تلگرام">
+                  📱 تلگرام
+                </button>
+                <button type="button" class="share-btn share-btn--whatsapp" title="واتساپ">
+                  💬 واتساپ
+                </button>
+                <button type="button" class="share-btn share-btn--copy" title="کپی لینک">
+                  🔗 کپی لینک
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <!-- لینک بازگشت -->
+        <div class="bd-back-row">
+          <a mat-raised-button color="primary" routerLink="/blog">
+            <mat-icon [inline]="true">arrow_forward</mat-icon>
+            مشاهده سایر مقالات
+          </a>
+        </div>
+      </div>
+    </article>
+  }
 </section>

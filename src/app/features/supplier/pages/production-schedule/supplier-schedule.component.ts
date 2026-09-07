@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
@@ -7,8 +7,8 @@ import {
 } from '../../../../core/services/api/supplier-production.service';
 
 @Component({
-  selector: 'app-supplier-schedule',
-  template: `
+    selector: 'app-supplier-schedule',
+    template: `
     <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
       <!-- Header -->
       <header class="flex flex-wrap items-center justify-between gap-4">
@@ -21,62 +21,80 @@ import {
           بازخوانی
         </button>
       </header>
-
+    
       <!-- Messages -->
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
-
+      @if (errorMessage) {
+        <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+      }
+      @if (successMessage) {
+        <p class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+      }
+    
       <!-- Schedule List -->
       <div class="overflow-x-auto rounded-2xl bg-white shadow-card">
-        <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری زمان‌بندی‌ها…</div>
-
-        <table *ngIf="!loading && schedules.length" class="w-full min-w-[800px] text-right text-sm">
-          <thead>
-            <tr class="border-b bg-gray-50 text-gray-500">
-              <th class="p-4">شناسه آیتم</th>
-              <th class="p-4">وضعیت</th>
-              <th class="p-4">تاریخ شروع</th>
-              <th class="p-4">تاریخ پایان</th>
-              <th class="p-4">تاریخ آماده</th>
-              <th class="p-4">یادداشت</th>
-              <th class="p-4">عملیات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let schedule of schedules" class="border-b last:border-0 hover:bg-gray-50/70">
-              <td class="p-4 font-bold text-secondary">{{ schedule.orderItemId | slice:0:8 }}…</td>
-              <td class="p-4">
-                <span class="rounded-full px-3 py-1 text-xs font-bold"
+        @if (loading) {
+          <div class="p-12 text-center text-gray-500">در حال بارگذاری زمان‌بندی‌ها…</div>
+        }
+    
+        @if (!loading && schedules.length) {
+          <table class="w-full min-w-[800px] text-right text-sm">
+            <thead>
+              <tr class="border-b bg-gray-50 text-gray-500">
+                <th class="p-4">شناسه آیتم</th>
+                <th class="p-4">وضعیت</th>
+                <th class="p-4">تاریخ شروع</th>
+                <th class="p-4">تاریخ پایان</th>
+                <th class="p-4">تاریخ آماده</th>
+                <th class="p-4">یادداشت</th>
+                <th class="p-4">عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (schedule of schedules; track schedule) {
+                <tr class="border-b last:border-0 hover:bg-gray-50/70">
+                  <td class="p-4 font-bold text-secondary">{{ schedule.orderItemId | slice:0:8 }}…</td>
+                  <td class="p-4">
+                    <span class="rounded-full px-3 py-1 text-xs font-bold"
                       [ngClass]="getStatusColor(schedule.status)">
-                  {{ getStatusLabel(schedule.status) }}
-                </span>
-              </td>
-              <td class="p-4">{{ schedule.productionStartDate ? (schedule.productionStartDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-              <td class="p-4">{{ schedule.productionEndDate ? (schedule.productionEndDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-              <td class="p-4">{{ schedule.estimatedReadyDate ? (schedule.estimatedReadyDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-              <td class="p-4 text-gray-500 max-w-[120px] truncate">{{ schedule.notes || '—' }}</td>
-              <td class="p-4">
-                <div class="flex gap-2">
-                  <button *ngIf="schedule.status === 'NotStarted'" type="button" (click)="updateStatus(schedule, 'InProgress')"
+                      {{ getStatusLabel(schedule.status) }}
+                    </span>
+                  </td>
+                  <td class="p-4">{{ schedule.productionStartDate ? (schedule.productionStartDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+                  <td class="p-4">{{ schedule.productionEndDate ? (schedule.productionEndDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+                  <td class="p-4">{{ schedule.estimatedReadyDate ? (schedule.estimatedReadyDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+                  <td class="p-4 text-gray-500 max-w-[120px] truncate">{{ schedule.notes || '—' }}</td>
+                  <td class="p-4">
+                    <div class="flex gap-2">
+                      @if (schedule.status === 'NotStarted') {
+                        <button type="button" (click)="updateStatus(schedule, 'InProgress')"
                           class="rounded-lg bg-blue-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-600">
-                    شروع تولید
-                  </button>
-                  <button *ngIf="schedule.status === 'InProgress'" type="button" (click)="updateStatus(schedule, 'Completed')"
+                          شروع تولید
+                        </button>
+                      }
+                      @if (schedule.status === 'InProgress') {
+                        <button type="button" (click)="updateStatus(schedule, 'Completed')"
                           class="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-600">
-                    تکمیل تولید
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <p *ngIf="!loading && !schedules.length" class="p-10 text-center text-gray-400">
-          هیچ زمان‌بندی تولیدی ثبت نشده است.
-        </p>
+                          تکمیل تولید
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+    
+        @if (!loading && !schedules.length) {
+          <p class="p-10 text-center text-gray-400">
+            هیچ زمان‌بندی تولیدی ثبت نشده است.
+          </p>
+        }
       </div>
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierScheduleComponent implements OnInit {
   schedules: ProductionSchedule[] = [];

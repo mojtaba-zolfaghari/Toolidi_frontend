@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
@@ -8,8 +8,8 @@ import {
 } from '../../../../core/services/api/supplier-production.service';
 
 @Component({
-  selector: 'app-supplier-capacity',
-  template: `
+    selector: 'app-supplier-capacity',
+    template: `
     <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
       <!-- Header -->
       <header class="flex flex-wrap items-center justify-between gap-4">
@@ -27,127 +27,157 @@ import {
           </button>
         </div>
       </header>
-
+    
       <!-- Messages -->
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
-
+      @if (errorMessage) {
+        <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+      }
+      @if (successMessage) {
+        <p class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+      }
+    
       <!-- Conflict Warning -->
-      <p *ngIf="conflictWarning" class="rounded-xl bg-yellow-50 px-4 py-3 text-sm text-yellow-700 flex items-center gap-2">
-        <span>⚠️</span> {{ conflictWarning }}
-      </p>
-
+      @if (conflictWarning) {
+        <p class="rounded-xl bg-yellow-50 px-4 py-3 text-sm text-yellow-700 flex items-center gap-2">
+          <span>⚠️</span> {{ conflictWarning }}
+        </p>
+      }
+    
       <!-- Capacity List -->
       <div class="overflow-x-auto rounded-2xl bg-white shadow-card">
-        <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری ظرفیت‌ها…</div>
-
-        <div *ngIf="!loading && capacities.length" class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div *ngFor="let cap of capacities" class="rounded-xl border border-gray-200 p-5 transition-shadow hover:shadow-md">
-            <div class="mb-3 flex items-center justify-between">
-              <span class="text-2xl">🏭</span>
-              <span class="rounded-full px-3 py-1 text-xs font-bold"
+        @if (loading) {
+          <div class="p-12 text-center text-gray-500">در حال بارگذاری ظرفیت‌ها…</div>
+        }
+    
+        @if (!loading && capacities.length) {
+          <div class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+            @for (cap of capacities; track cap) {
+              <div class="rounded-xl border border-gray-200 p-5 transition-shadow hover:shadow-md">
+                <div class="mb-3 flex items-center justify-between">
+                  <span class="text-2xl">🏭</span>
+                  <span class="rounded-full px-3 py-1 text-xs font-bold"
                     [class.bg-green-50]="cap.isActive"
                     [class.text-green-700]="cap.isActive"
                     [class.bg-red-50]="!cap.isActive"
                     [class.text-red-700]="!cap.isActive">
-                {{ cap.isActive ? 'فعال' : 'غیرفعال' }}
-              </span>
-            </div>
-            <p class="text-2xl font-extrabold text-secondary">{{ cap.dailyCapacity | persianNumber }} <span class="text-sm font-normal text-gray-500">{{ cap.unit }}</span></p>
-            <p class="mt-1 text-xs text-gray-400">ظرفیت روزانه</p>
-            <div class="mt-3 space-y-1 text-xs text-gray-500">
-              <p *ngIf="cap.effectiveFrom">از: {{ cap.effectiveFrom | persianDate:'yyyy/MM/dd' }}</p>
-              <p *ngIf="cap.effectiveTo">تا: {{ cap.effectiveTo | persianDate:'yyyy/MM/dd' }}</p>
-              <p *ngIf="!cap.effectiveFrom && !cap.effectiveTo">بدون محدوده تاریخ</p>
-            </div>
-            <div class="mt-4 flex gap-2">
-              <button type="button" (click)="editForm(cap)" class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-bold text-primary hover:bg-gray-50">ویرایش</button>
-              <button type="button" (click)="confirmDelete(cap)" class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50">حذف</button>
-            </div>
+                    {{ cap.isActive ? 'فعال' : 'غیرفعال' }}
+                  </span>
+                </div>
+                <p class="text-2xl font-extrabold text-secondary">{{ cap.dailyCapacity | persianNumber }} <span class="text-sm font-normal text-gray-500">{{ cap.unit }}</span></p>
+                <p class="mt-1 text-xs text-gray-400">ظرفیت روزانه</p>
+                <div class="mt-3 space-y-1 text-xs text-gray-500">
+                  @if (cap.effectiveFrom) {
+                    <p>از: {{ cap.effectiveFrom | persianDate:'yyyy/MM/dd' }}</p>
+                  }
+                  @if (cap.effectiveTo) {
+                    <p>تا: {{ cap.effectiveTo | persianDate:'yyyy/MM/dd' }}</p>
+                  }
+                  @if (!cap.effectiveFrom && !cap.effectiveTo) {
+                    <p>بدون محدوده تاریخ</p>
+                  }
+                </div>
+                <div class="mt-4 flex gap-2">
+                  <button type="button" (click)="editForm(cap)" class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-bold text-primary hover:bg-gray-50">ویرایش</button>
+                  <button type="button" (click)="confirmDelete(cap)" class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50">حذف</button>
+                </div>
+              </div>
+            }
           </div>
-        </div>
-
-        <p *ngIf="!loading && !capacities.length" class="p-10 text-center text-gray-400">
-          هنوز ظرفیت تولیدی ثبت نشده است.
-        </p>
-      </div>
-
-      <!-- Capacity Form Modal -->
-      <div *ngIf="formOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeForm()">
-        <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-secondary">{{ editingId ? 'ویرایش ظرفیت' : 'افزودن ظرفیت جدید' }}</h2>
-            <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
-          </div>
-
-          <div class="mt-5 space-y-4">
-            <label>
-              <span class="mb-1 block text-sm font-medium text-secondary">ظرفیت روزانه *</span>
-              <input formControlName="dailyCapacity" type="number" min="1" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="مثلاً 100" />
-            </label>
-
-            <label>
-              <span class="mb-1 block text-sm font-medium text-secondary">واحد *</span>
-              <select formControlName="unit" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
-                <option value="units">واحد</option>
-                <option value="kg">کیلوگرم</option>
-                <option value="meter">متر</option>
-                <option value="box">جعبه</option>
-              </select>
-            </label>
-
-            <div class="grid grid-cols-2 gap-4">
-              <label>
-                <span class="mb-1 block text-sm font-medium text-secondary">تاریخ شروع (اختیاری)</span>
-                <input formControlName="effectiveFrom" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-              </label>
-              <label>
-                <span class="mb-1 block text-sm font-medium text-secondary">تاریخ پایان (اختیاری)</span>
-                <input formControlName="effectiveTo" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-              </label>
-            </div>
-
-            <p *ngIf="rangeWarning" class="rounded-xl bg-yellow-50 px-4 py-2 text-xs text-yellow-700 flex items-center gap-2">
-              <span>⚠️</span> {{ rangeWarning }}
-            </p>
-          </div>
-
-          <p *ngIf="formError" class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ formError }}</p>
-
-          <div class="mt-5 flex justify-end gap-3">
-            <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
-            <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white disabled:opacity-50">
-              {{ saving ? 'در حال ذخیره…' : (editingId ? 'به‌روزرسانی' : 'ذخیره') }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Delete Confirmation Modal -->
-      <div *ngIf="deleteOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeDelete()">
-        <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
-          <div class="flex items-center gap-3">
-            <span class="text-3xl">🗑️</span>
-            <h2 class="text-xl font-bold text-secondary">حذف ظرفیت</h2>
-          </div>
-          <p class="mt-3 text-sm text-gray-600">آیا از حذف این ظرفیت اطمینان دارید؟ این عمل قابل بازگشت است (حذف نرم).</p>
-          <p class="mt-2 text-sm font-bold text-secondary" *ngIf="deletingCap">
-            {{ deletingCap.dailyCapacity }} {{ deletingCap.unit }}
-            <span *ngIf="deletingCap.effectiveFrom || deletingCap.effectiveTo">
-              ({{ deletingCap.effectiveFrom | persianDate:'yyyy/MM/dd' }} تا {{ deletingCap.effectiveTo | persianDate:'yyyy/MM/dd' }})
-            </span>
+        }
+    
+        @if (!loading && !capacities.length) {
+          <p class="p-10 text-center text-gray-400">
+            هنوز ظرفیت تولیدی ثبت نشده است.
           </p>
-          <p *ngIf="deleteError" class="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ deleteError }}</p>
-          <div class="mt-5 flex justify-end gap-3">
-            <button type="button" (click)="closeDelete()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
-            <button type="button" (click)="executeDelete()" [disabled]="deleting" class="rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white disabled:opacity-50">
-              {{ deleting ? 'در حال حذف…' : 'حذف' }}
-            </button>
+        }
+      </div>
+    
+      <!-- Capacity Form Modal -->
+      @if (formOpen) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeForm()">
+          <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold text-secondary">{{ editingId ? 'ویرایش ظرفیت' : 'افزودن ظرفیت جدید' }}</h2>
+              <button type="button" (click)="closeForm()" class="text-2xl text-gray-400">×</button>
+            </div>
+            <div class="mt-5 space-y-4">
+              <label>
+                <span class="mb-1 block text-sm font-medium text-secondary">ظرفیت روزانه *</span>
+                <input formControlName="dailyCapacity" type="number" min="1" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="مثلاً 100" />
+              </label>
+              <label>
+                <span class="mb-1 block text-sm font-medium text-secondary">واحد *</span>
+                <select formControlName="unit" class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5">
+                  <option value="units">واحد</option>
+                  <option value="kg">کیلوگرم</option>
+                  <option value="meter">متر</option>
+                  <option value="box">جعبه</option>
+                </select>
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <label>
+                  <span class="mb-1 block text-sm font-medium text-secondary">تاریخ شروع (اختیاری)</span>
+                  <input formControlName="effectiveFrom" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                </label>
+                <label>
+                  <span class="mb-1 block text-sm font-medium text-secondary">تاریخ پایان (اختیاری)</span>
+                  <input formControlName="effectiveTo" type="date" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                </label>
+              </div>
+              @if (rangeWarning) {
+                <p class="rounded-xl bg-yellow-50 px-4 py-2 text-xs text-yellow-700 flex items-center gap-2">
+                  <span>⚠️</span> {{ rangeWarning }}
+                </p>
+              }
+            </div>
+            @if (formError) {
+              <p class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ formError }}</p>
+            }
+            <div class="mt-5 flex justify-end gap-3">
+              <button type="button" (click)="closeForm()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+              <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white disabled:opacity-50">
+                {{ saving ? 'در حال ذخیره…' : (editingId ? 'به‌روزرسانی' : 'ذخیره') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    
+      <!-- Delete Confirmation Modal -->
+      @if (deleteOpen) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeDelete()">
+          <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">🗑️</span>
+              <h2 class="text-xl font-bold text-secondary">حذف ظرفیت</h2>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">آیا از حذف این ظرفیت اطمینان دارید؟ این عمل قابل بازگشت است (حذف نرم).</p>
+            @if (deletingCap) {
+              <p class="mt-2 text-sm font-bold text-secondary">
+                {{ deletingCap.dailyCapacity }} {{ deletingCap.unit }}
+                @if (deletingCap.effectiveFrom || deletingCap.effectiveTo) {
+                  <span>
+                    ({{ deletingCap.effectiveFrom | persianDate:'yyyy/MM/dd' }} تا {{ deletingCap.effectiveTo | persianDate:'yyyy/MM/dd' }})
+                  </span>
+                }
+              </p>
+            }
+            @if (deleteError) {
+              <p class="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ deleteError }}</p>
+            }
+            <div class="mt-5 flex justify-end gap-3">
+              <button type="button" (click)="closeDelete()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+              <button type="button" (click)="executeDelete()" [disabled]="deleting" class="rounded-xl bg-red-600 px-6 py-2.5 font-bold text-white disabled:opacity-50">
+                {{ deleting ? 'در حال حذف…' : 'حذف' }}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      }
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierCapacityComponent implements OnInit {
   capacities: ProductionCapacity[] = [];

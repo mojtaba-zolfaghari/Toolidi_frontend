@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ApiService } from '../../core/services/api.service';
 
 /** اطلاعات یک روش ارسال */
@@ -44,9 +44,11 @@ interface ShippingResponse {
  * با زمان تحویل، هزینه و جزئیات هر روش.
  */
 @Component({
-  selector: 'app-shipping',
-  templateUrl: './shipping.component.html',
-  styleUrls: ['./shipping.component.scss']
+    selector: 'app-shipping',
+    templateUrl: './shipping.component.html',
+    styleUrls: ['./shipping.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ShippingComponent implements OnInit {
   data: ShippingResponse | null = null;

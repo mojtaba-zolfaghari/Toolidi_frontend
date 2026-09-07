@@ -1,44 +1,45 @@
-<nav *ngIf="totalPages > 1" class="mt-8 flex items-center justify-center gap-1.5" aria-label="صفحه‌بندی">
-  <button
-    type="button"
-    (click)="first()"
-    [disabled]="!hasPrev"
-    class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
-    aria-label="اولین صفحه">«</button>
-
-  <button
-    type="button"
-    (click)="goTo(page - 1)"
-    [disabled]="!hasPrev"
-    class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
-    aria-label="صفحه قبلی">‹</button>
-
-  <ng-container *ngFor="let item of pages">
-    <span *ngIf="item === '…'" class="px-1 text-gray-400">…</span>
+@if (totalPages > 1) {
+  <nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="صفحه‌بندی">
     <button
-      *ngIf="item !== '…'"
       type="button"
-      (click)="goTo(item)"
-      [class.bg-primary]="item === page"
-      [class.text-white]="item === page"
-      [class.border-primary]="item === page"
-      class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-sm font-medium text-secondary transition-colors hover:bg-gray-50"
-      [attr.aria-current]="item === page ? 'page' : null">
-      {{ item }}
-    </button>
-  </ng-container>
-
-  <button
-    type="button"
-    (click)="goTo(page + 1)"
-    [disabled]="!hasNext"
-    class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
+      (click)="first()"
+      [disabled]="!hasPrev"
+      class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
+    aria-label="اولین صفحه">«</button>
+    <button
+      type="button"
+      (click)="goTo(page - 1)"
+      [disabled]="!hasPrev"
+      class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
+    aria-label="صفحه قبلی">‹</button>
+    @for (item of pages; track item) {
+      @if (item === '…') {
+        <span class="px-1 text-gray-400">…</span>
+      }
+      @if (item !== '…') {
+        <button
+          type="button"
+          (click)="goTo(item)"
+          [class.bg-primary]="item === page"
+          [class.text-white]="item === page"
+          [class.border-primary]="item === page"
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-sm font-medium text-secondary transition-colors hover:bg-gray-50"
+          [attr.aria-current]="item === page ? 'page' : null">
+          {{ item }}
+        </button>
+      }
+    }
+    <button
+      type="button"
+      (click)="goTo(page + 1)"
+      [disabled]="!hasNext"
+      class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
     aria-label="صفحه بعدی">›</button>
-
-  <button
-    type="button"
-    (click)="last()"
-    [disabled]="!hasNext"
-    class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
+    <button
+      type="button"
+      (click)="last()"
+      [disabled]="!hasNext"
+      class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 text-secondary transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-50"
     aria-label="آخرین صفحه">»</button>
-</nav>
+  </nav>
+}

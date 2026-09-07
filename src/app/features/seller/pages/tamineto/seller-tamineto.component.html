@@ -4,159 +4,181 @@
     subtitle="اتصال به Tamineto و وارد کردن محصولات"
   ></app-page-header>
 
-  <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+  }
 
   <!-- Loading -->
-  <div *ngIf="loading" class="rounded-2xl bg-white p-12 shadow-card text-center">
-    <div class="animate-spin inline-block h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
-    <p class="mt-3 text-gray-500">در حال بارگذاری…</p>
-  </div>
+  @if (loading) {
+    <div class="rounded-2xl bg-white p-12 shadow-card text-center">
+      <div class="animate-spin inline-block h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+      <p class="mt-3 text-gray-500">در حال بارگذاری…</p>
+    </div>
+  }
 
   <!-- Not Connected -->
-  <div *ngIf="!loading && (!connection || !connection.isConnected)" class="rounded-2xl bg-white p-8 shadow-card">
-    <div class="text-center">
-      <span class="text-6xl block mb-4">🔗</span>
-      <h2 class="text-2xl font-bold text-secondary mb-2">اتصال به Tamineto</h2>
-      <p class="text-gray-500 mb-6">برای وارد کردن محصولات از Tamineto، ابتدا باید به پلتفرم متصل شوید.</p>
-
-      <div class="max-w-md mx-auto">
-        <label class="block text-sm font-bold text-secondary mb-2">کد اتصال</label>
-        <input
-          type="text"
-          [(ngModel)]="connectionCode"
-          placeholder="کد یک‌بارمصرف Tamineto را وارد کنید"
-          class="w-full rounded-xl border border-gray-200 px-4 py-3 text-center text-lg tracking-wider"
-          (keyup.enter)="connect()"
-        />
-        <button
-          (click)="connect()"
-          [disabled]="connecting || !connectionCode.trim()"
-          class="mt-4 w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-        >
-          {{ connecting ? 'در حال اتصال…' : '🔌 اتصال به Tamineto' }}
-        </button>
-      </div>
-
-      <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3 text-right">
-        <div class="rounded-xl bg-blue-50 p-4">
-          <span class="text-2xl">📦</span>
-          <h3 class="font-bold text-secondary mt-2">وارد کردن محصولات</h3>
-          <p class="text-xs text-gray-500 mt-1">هزاران محصول پوشاک را به فروشگاهتان اضافه کنید</p>
+  @if (!loading && (!connection || !connection.isConnected)) {
+    <div class="rounded-2xl bg-white p-8 shadow-card">
+      <div class="text-center">
+        <span class="text-6xl block mb-4">🔗</span>
+        <h2 class="text-2xl font-bold text-secondary mb-2">اتصال به Tamineto</h2>
+        <p class="text-gray-500 mb-6">برای وارد کردن محصولات از Tamineto، ابتدا باید به پلتفرم متصل شوید.</p>
+        <div class="max-w-md mx-auto">
+          <label class="block text-sm font-bold text-secondary mb-2">کد اتصال</label>
+          <input
+            type="text"
+            [(ngModel)]="connectionCode"
+            placeholder="کد یک‌بارمصرف Tamineto را وارد کنید"
+            class="w-full rounded-xl border border-gray-200 px-4 py-3 text-center text-lg tracking-wider"
+            (keyup.enter)="connect()"
+            />
+          <button
+            (click)="connect()"
+            [disabled]="connecting || !connectionCode.trim()"
+            class="mt-4 w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+            {{ connecting ? 'در حال اتصال…' : '🔌 اتصال به Tamineto' }}
+          </button>
         </div>
-        <div class="rounded-xl bg-green-50 p-4">
-          <span class="text-2xl">🔄</span>
-          <h3 class="font-bold text-secondary mt-2">همگام‌سازی خودکار</h3>
-          <p class="text-xs text-gray-500 mt-1">قیمت و موجودی به‌صورت خودکار آپدیت می‌شود</p>
-        </div>
-        <div class="rounded-xl bg-purple-50 p-4">
-          <span class="text-2xl">🛒</span>
-          <h3 class="font-bold text-secondary mt-2">اعلام سفارش</h3>
-          <p class="text-xs text-gray-500 mt-1">سفارشات به Tamineto اطلاع داده می‌شود</p>
+        <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3 text-right">
+          <div class="rounded-xl bg-blue-50 p-4">
+            <span class="text-2xl">📦</span>
+            <h3 class="font-bold text-secondary mt-2">وارد کردن محصولات</h3>
+            <p class="text-xs text-gray-500 mt-1">هزاران محصول پوشاک را به فروشگاهتان اضافه کنید</p>
+          </div>
+          <div class="rounded-xl bg-green-50 p-4">
+            <span class="text-2xl">🔄</span>
+            <h3 class="font-bold text-secondary mt-2">همگام‌سازی خودکار</h3>
+            <p class="text-xs text-gray-500 mt-1">قیمت و موجودی به‌صورت خودکار آپدیت می‌شود</p>
+          </div>
+          <div class="rounded-xl bg-purple-50 p-4">
+            <span class="text-2xl">🛒</span>
+            <h3 class="font-bold text-secondary mt-2">اعلام سفارش</h3>
+            <p class="text-xs text-gray-500 mt-1">سفارشات به Tamineto اطلاع داده می‌شود</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- Connected -->
-  <div *ngIf="!loading && connection?.isConnected">
-    <!-- Connection Status -->
-    <div class="rounded-2xl bg-green-50 border border-green-200 p-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl">✅</span>
-        <div>
-          <p class="font-bold text-green-800">متصل به Tamineto</p>
-          <p class="text-xs text-green-600">{{ connection?.siteName }} — آخرین همگام‌سازی: {{ connection?.lastSyncAt || 'هرگز' }}</p>
+  @if (!loading && connection?.isConnected) {
+    <div>
+      <!-- Connection Status -->
+      <div class="rounded-2xl bg-green-50 border border-green-200 p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">✅</span>
+          <div>
+            <p class="font-bold text-green-800">متصل به Tamineto</p>
+            <p class="text-xs text-green-600">{{ connection?.siteName }} — آخرین همگام‌سازی: {{ connection?.lastSyncAt || 'هرگز' }}</p>
+          </div>
         </div>
+        <button (click)="disconnect()" class="rounded-xl border border-red-300 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50">قطع اتصال</button>
       </div>
-      <button (click)="disconnect()" class="rounded-xl border border-red-300 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50">قطع اتصال</button>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex gap-2 border-b border-gray-200">
-      <button (click)="activeTab = 'import'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors"
-        [class.border-primary]="activeTab === 'import'" [class.text-primary]="activeTab === 'import'"
+      <!-- Tabs -->
+      <div class="flex gap-2 border-b border-gray-200">
+        <button (click)="activeTab = 'import'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors"
+          [class.border-primary]="activeTab === 'import'" [class.text-primary]="activeTab === 'import'"
         [class.text-gray-400]="activeTab !== 'import'">📦 وارد کردن محصول</button>
-      <button (click)="activeTab = 'products'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors"
-        [class.border-primary]="activeTab === 'products'" [class.text-primary]="activeTab === 'products'"
+        <button (click)="activeTab = 'products'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors"
+          [class.border-primary]="activeTab === 'products'" [class.text-primary]="activeTab === 'products'"
         [class.text-gray-400]="activeTab !== 'products'">📋 لاگ محصولات</button>
-      <button (click)="activeTab = 'orders'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors"
-        [class.border-primary]="activeTab === 'orders'" [class.text-primary]="activeTab === 'orders'"
+        <button (click)="activeTab = 'orders'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors"
+          [class.border-primary]="activeTab === 'orders'" [class.text-primary]="activeTab === 'orders'"
         [class.text-gray-400]="activeTab !== 'orders'">🛒 لاگ سفارشات</button>
-    </div>
-
-    <!-- Import Tab -->
-    <div *ngIf="activeTab === 'import'" class="rounded-2xl bg-white p-6 shadow-card space-y-6">
-      <h3 class="text-lg font-bold text-secondary">وارد کردن محصول جدید</h3>
-
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <label class="block text-sm font-bold text-secondary mb-1">شناسه محصول در Tamineto *</label>
-          <input type="text" [(ngModel)]="importProductId" placeholder="مثال: TMN-12345" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-secondary mb-1">نام محصول *</label>
-          <input type="text" [(ngModel)]="importProductName" placeholder="نام محصول" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-secondary mb-1">SKU (اختیاری)</label>
-          <input type="text" [(ngModel)]="importProductSku" placeholder="کد کالا" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-secondary mb-1">قیمت (تومان)</label>
-          <input type="number" [(ngModel)]="importProductPrice" placeholder="0" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
-        </div>
       </div>
-
-      <button (click)="importProduct()" [disabled]="importing" class="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50">
-        {{ importing ? 'در حال وارد کردن…' : '📦 وارد کردن محصول' }}
-      </button>
-
-      <hr class="border-gray-100" />
-
-      <h3 class="text-lg font-bold text-secondary">وارد کردن دسته‌ای (JSON)</h3>
-      <textarea [(ngModel)]="batchItems" rows="6" placeholder='[{"taminetoProductId": "123", "productName": "پیراهن مردانه", "price": 450000}]'
-        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono" dir="ltr"></textarea>
-      <button (click)="batchImport()" [disabled]="batchImporting" class="rounded-xl bg-purple-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-purple-700 disabled:opacity-50">
-        {{ batchImporting ? 'در حال وارد کردن…' : '📦 وارد کردن دسته‌ای' }}
-      </button>
+      <!-- Import Tab -->
+      @if (activeTab === 'import') {
+        <div class="rounded-2xl bg-white p-6 shadow-card space-y-6">
+          <h3 class="text-lg font-bold text-secondary">وارد کردن محصول جدید</h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="block text-sm font-bold text-secondary mb-1">شناسه محصول در Tamineto *</label>
+              <input type="text" [(ngModel)]="importProductId" placeholder="مثال: TMN-12345" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-secondary mb-1">نام محصول *</label>
+              <input type="text" [(ngModel)]="importProductName" placeholder="نام محصول" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-secondary mb-1">SKU (اختیاری)</label>
+              <input type="text" [(ngModel)]="importProductSku" placeholder="کد کالا" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-secondary mb-1">قیمت (تومان)</label>
+              <input type="number" [(ngModel)]="importProductPrice" placeholder="0" class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm" />
+            </div>
+          </div>
+          <button (click)="importProduct()" [disabled]="importing" class="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50">
+            {{ importing ? 'در حال وارد کردن…' : '📦 وارد کردن محصول' }}
+          </button>
+          <hr class="border-gray-100" />
+          <h3 class="text-lg font-bold text-secondary">وارد کردن دسته‌ای (JSON)</h3>
+          <textarea [(ngModel)]="batchItems" rows="6" placeholder='[{"taminetoProductId": "123", "productName": "پیراهن مردانه", "price": 450000}]'
+          class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono" dir="ltr"></textarea>
+          <button (click)="batchImport()" [disabled]="batchImporting" class="rounded-xl bg-purple-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-purple-700 disabled:opacity-50">
+            {{ batchImporting ? 'در حال وارد کردن…' : '📦 وارد کردن دسته‌ای' }}
+          </button>
+        </div>
+      }
+      <!-- Product Logs Tab -->
+      @if (activeTab === 'products') {
+        <div class="rounded-2xl bg-white p-6 shadow-card">
+          <h3 class="text-lg font-bold text-secondary mb-4">تاریخچه وارد کردن محصولات</h3>
+          @if (productLogsLoading) {
+            <div class="text-center py-8 text-gray-500">در حال بارگذاری…</div>
+          }
+          @if (!productLogsLoading && productLogs.length === 0) {
+            <div class="text-center py-8 text-gray-400">هنوز محصولی وارد نشده است.</div>
+          }
+          @if (!productLogsLoading && productLogs.length > 0) {
+            <table class="w-full text-sm">
+              <thead><tr class="border-b text-gray-500"><th class="p-3 text-right">نام محصول</th><th class="p-3">شناسه</th><th class="p-3">عملیات</th><th class="p-3">وضعیت</th><th class="p-3">تاریخ</th></tr></thead>
+              <tbody>
+                @for (log of productLogs; track log) {
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 font-bold text-secondary">{{ log.productName }}</td>
+                    <td class="p-3 text-gray-500" dir="ltr">{{ log.taminetoProductId }}</td>
+                    <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">{{ log.operationType }}</span></td>
+                    <td class="p-3"><span class="text-xs px-2 py-1 rounded-full" [ngClass]="log.status === 'Success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ log.status }}</span></td>
+                    <td class="p-3 text-gray-400 text-xs">{{ log.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
+      <!-- Order Logs Tab -->
+      @if (activeTab === 'orders') {
+        <div class="rounded-2xl bg-white p-6 shadow-card">
+          <h3 class="text-lg font-bold text-secondary mb-4">تاریخچه اعلان سفارشات</h3>
+          @if (orderLogsLoading) {
+            <div class="text-center py-8 text-gray-500">در حال بارگذاری…</div>
+          }
+          @if (!orderLogsLoading && orderLogs.length === 0) {
+            <div class="text-center py-8 text-gray-400">هنوز سفارشی ارسال نشده است.</div>
+          }
+          @if (!orderLogsLoading && orderLogs.length > 0) {
+            <table class="w-full text-sm">
+              <thead><tr class="border-b text-gray-500"><th class="p-3 text-right">شماره سفارش</th><th class="p-3">رویداد</th><th class="p-3">وضعیت</th><th class="p-3">تاریخ ارسال</th></tr></thead>
+              <tbody>
+                @for (log of orderLogs; track log) {
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 font-bold text-secondary">{{ log.orderNumber }}</td>
+                    <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700">{{ log.eventType }}</span></td>
+                    <td class="p-3"><span class="text-xs px-2 py-1 rounded-full" [ngClass]="log.status === 'Sent' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ log.status }}</span></td>
+                    <td class="p-3 text-gray-400 text-xs">{{ (log.sentAt || log.createdAt) | persianDate:'yyyy/MM/dd HH:mm' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
     </div>
-
-    <!-- Product Logs Tab -->
-    <div *ngIf="activeTab === 'products'" class="rounded-2xl bg-white p-6 shadow-card">
-      <h3 class="text-lg font-bold text-secondary mb-4">تاریخچه وارد کردن محصولات</h3>
-      <div *ngIf="productLogsLoading" class="text-center py-8 text-gray-500">در حال بارگذاری…</div>
-      <div *ngIf="!productLogsLoading && productLogs.length === 0" class="text-center py-8 text-gray-400">هنوز محصولی وارد نشده است.</div>
-      <table *ngIf="!productLogsLoading && productLogs.length > 0" class="w-full text-sm">
-        <thead><tr class="border-b text-gray-500"><th class="p-3 text-right">نام محصول</th><th class="p-3">شناسه</th><th class="p-3">عملیات</th><th class="p-3">وضعیت</th><th class="p-3">تاریخ</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let log of productLogs" class="border-b hover:bg-gray-50">
-            <td class="p-3 font-bold text-secondary">{{ log.productName }}</td>
-            <td class="p-3 text-gray-500" dir="ltr">{{ log.taminetoProductId }}</td>
-            <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">{{ log.operationType }}</span></td>
-            <td class="p-3"><span class="text-xs px-2 py-1 rounded-full" [ngClass]="log.status === 'Success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ log.status }}</span></td>
-            <td class="p-3 text-gray-400 text-xs">{{ log.createdAt | persianDate:'yyyy/MM/dd HH:mm' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Order Logs Tab -->
-    <div *ngIf="activeTab === 'orders'" class="rounded-2xl bg-white p-6 shadow-card">
-      <h3 class="text-lg font-bold text-secondary mb-4">تاریخچه اعلان سفارشات</h3>
-      <div *ngIf="orderLogsLoading" class="text-center py-8 text-gray-500">در حال بارگذاری…</div>
-      <div *ngIf="!orderLogsLoading && orderLogs.length === 0" class="text-center py-8 text-gray-400">هنوز سفارشی ارسال نشده است.</div>
-      <table *ngIf="!orderLogsLoading && orderLogs.length > 0" class="w-full text-sm">
-        <thead><tr class="border-b text-gray-500"><th class="p-3 text-right">شماره سفارش</th><th class="p-3">رویداد</th><th class="p-3">وضعیت</th><th class="p-3">تاریخ ارسال</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let log of orderLogs" class="border-b hover:bg-gray-50">
-            <td class="p-3 font-bold text-secondary">{{ log.orderNumber }}</td>
-            <td class="p-3"><span class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700">{{ log.eventType }}</span></td>
-            <td class="p-3"><span class="text-xs px-2 py-1 rounded-full" [ngClass]="log.status === 'Sent' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ log.status }}</span></td>
-            <td class="p-3 text-gray-400 text-xs">{{ (log.sentAt || log.createdAt) | persianDate:'yyyy/MM/dd HH:mm' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  }
 </section>
