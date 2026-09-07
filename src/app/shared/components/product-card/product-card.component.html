@@ -1,12 +1,18 @@
 <a class="product-card" [routerLink]="['/product', 'slug', product.slug || product.id]">
   <!-- تصویر محصول -->
   <div class="product-card-image">
-    <img *ngIf="primaryImageUrl" [src]="primaryImageUrl" [attr.srcset]="imageSrcset" [alt]="product.name" loading="lazy" width="400" height="300" class="product-card-image-source" />
-    <span *ngIf="!primaryImageUrl" class="product-card-image-fallback" aria-hidden="true">🛍️</span>
+    @if (primaryImageUrl) {
+      <img [src]="primaryImageUrl" [attr.srcset]="imageSrcset" [alt]="product.name" loading="lazy" width="400" height="300" class="product-card-image-source" />
+    }
+    @if (!primaryImageUrl) {
+      <span class="product-card-image-fallback" aria-hidden="true">🛍️</span>
+    }
 
-    <span *ngIf="discountPercent > 0" class="product-discount-badge">
-      {{ discountPercent | persianNumber }}٪ تخفیف
-    </span>
+    @if (discountPercent > 0) {
+      <span class="product-discount-badge">
+        {{ discountPercent | persianNumber }}٪ تخفیف
+      </span>
+    }
 
     <app-add-to-cart-button
       (click)="$event.preventDefault(); $event.stopPropagation()"
@@ -23,11 +29,12 @@
     <h3 class="product-card-name">{{ product.name }}</h3>
 
     <div class="product-card-rating">
-      <span
-        *ngFor="let star of [1, 2, 3, 4, 5]"
-        class="product-card-star"
-        [class.product-card-star--on]="star <= (product.ratingAverage ?? 0)"
+      @for (star of [1, 2, 3, 4, 5]; track star) {
+        <span
+          class="product-card-star"
+          [class.product-card-star--on]="star <= (product.ratingAverage ?? 0)"
         [class.product-card-star--off]="star > (product.ratingAverage ?? 0)">★</span>
+      }
       <span class="product-card-rating-count">({{ product.ratingCount | persianNumber }})</span>
     </div>
 
@@ -35,25 +42,31 @@
     <div class="product-card-prices">
       <div class="product-card-price-row">
         <span class="product-card-price">{{ product.unitPrice | persianNumber }} تومان</span>
-        <span *ngIf="discountPercent > 0" class="product-card-compare">
-          {{ product.comparePrice | persianNumber }} تومان
-        </span>
+        @if (discountPercent > 0) {
+          <span class="product-card-compare">
+            {{ product.comparePrice | persianNumber }} تومان
+          </span>
+        }
       </div>
-      <span *ngIf="discountAmount > 0" class="product-saving-label">
-        صرفه‌جویی {{ discountAmount | persianNumber }} تومان
-      </span>
+      @if (discountAmount > 0) {
+        <span class="product-saving-label">
+          صرفه‌جویی {{ discountAmount | persianNumber }} تومان
+        </span>
+      }
     </div>
 
     <!-- زمان ارسال با tooltip -->
-    <div class="product-delivery-row" *ngIf="product.sellerCity || product.cityDeliveryDays || product.nationwideDeliveryDays">
-      <span class="delivery-chip" [attr.title]="'تحویل در شهر ' + sellerCityDisplay + ': ' + ((product.cityDeliveryDays || 1) | persianNumber) + ' روز کاری'" [attr.aria-label]="'تحویل در شهر ' + sellerCityDisplay + ': ' + ((product.cityDeliveryDays || 1) | persianNumber) + ' روز کاری'">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-5.2 7-11A7 7 0 1 0 5 10c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.2"/></svg>
-        <span>{{ sellerCityDisplay }} · {{ (product.cityDeliveryDays || 1) | persianNumber }} روز</span>
-      </span>
-      <span class="delivery-chip" [attr.title]="'تحویل به سراسر کشور: ' + (product.nationwideDeliveryDays || 3) + ' روز کاری'" [attr.aria-label]="'تحویل به سراسر کشور: ' + (product.nationwideDeliveryDays || 3) + ' روز کاری'">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v10H3zM14 10h3l4 4v3h-7z"/><circle cx="7" cy="19" r="1.7"/><circle cx="18" cy="19" r="1.7"/></svg>
-        <span>ایران · {{ (product.nationwideDeliveryDays || 3) | persianNumber }} روز</span>
-      </span>
-    </div>
+    @if (product.sellerCity || product.cityDeliveryDays || product.nationwideDeliveryDays) {
+      <div class="product-delivery-row">
+        <span class="delivery-chip" [attr.title]="'تحویل در شهر ' + sellerCityDisplay + ': ' + ((product.cityDeliveryDays || 1) | persianNumber) + ' روز کاری'" [attr.aria-label]="'تحویل در شهر ' + sellerCityDisplay + ': ' + ((product.cityDeliveryDays || 1) | persianNumber) + ' روز کاری'">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-5.2 7-11A7 7 0 1 0 5 10c0 5.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.2"/></svg>
+          <span>{{ sellerCityDisplay }} · {{ (product.cityDeliveryDays || 1) | persianNumber }} روز</span>
+        </span>
+        <span class="delivery-chip" [attr.title]="'تحویل به سراسر کشور: ' + (product.nationwideDeliveryDays || 3) + ' روز کاری'" [attr.aria-label]="'تحویل به سراسر کشور: ' + (product.nationwideDeliveryDays || 3) + ' روز کاری'">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v10H3zM14 10h3l4 4v3h-7z"/><circle cx="7" cy="19" r="1.7"/><circle cx="18" cy="19" r="1.7"/></svg>
+          <span>ایران · {{ (product.nationwideDeliveryDays || 3) | persianNumber }} روز</span>
+        </span>
+      </div>
+    }
   </div>
 </a>

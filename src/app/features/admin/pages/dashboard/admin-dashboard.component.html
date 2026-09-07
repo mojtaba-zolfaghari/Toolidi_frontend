@@ -8,116 +8,140 @@
   ></app-page-header>
 
   <!-- Error -->
-  <p *ngIf="error" class="dashboard-error">{{ error }}</p>
+  @if (error) {
+    <p class="dashboard-error">{{ error }}</p>
+  }
 
   <!-- Loading -->
-  <div *ngIf="loading" class="dashboard-stat-grid">
-    <div *ngFor="let i of [1,2,3,4,5]" class="dashboard-skeleton"></div>
-  </div>
+  @if (loading) {
+    <div class="dashboard-stat-grid">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="dashboard-skeleton"></div>
+      }
+    </div>
+  }
 
-  <ng-container *ngIf="!loading">
-
+  @if (!loading) {
     <!-- Stat Cards -->
     <div class="dashboard-stat-grid">
-      <app-stat-card
-        *ngFor="let card of statCards"
-        [title]="card.label"
-        [value]="card.value"
-        [icon]="card.icon"
-        [trend]="card.trend || 'neutral'"
-        [trendValue]="card.trendValue || ''"
-        [color]="card.color || 'primary'"
-      ></app-stat-card>
+      @for (card of statCards; track card) {
+        <app-stat-card
+          [title]="card.label"
+          [value]="card.value"
+          [icon]="card.icon"
+          [trend]="card.trend || 'neutral'"
+          [trendValue]="card.trendValue || ''"
+          [color]="card.color || 'primary'"
+        ></app-stat-card>
+      }
     </div>
-
     <!-- Quick Actions -->
     <mat-card appearance="outlined" class="dashboard-card">
       <h2 class="dashboard-card__title">دسترسی سریع</h2>
       <div class="dashboard-quick">
-        <a *ngFor="let action of quickActions" [routerLink]="action.link" class="dashboard-quick__item">
-          <mat-icon class="dashboard-quick__icon">{{ action.matIcon }}</mat-icon>
-          <span class="dashboard-quick__label">{{ action.label }}</span>
-        </a>
+        @for (action of quickActions; track action) {
+          <a [routerLink]="action.link" class="dashboard-quick__item">
+            <mat-icon class="dashboard-quick__icon">{{ action.matIcon }}</mat-icon>
+            <span class="dashboard-quick__label">{{ action.label }}</span>
+          </a>
+        }
       </div>
     </mat-card>
-
     <!-- Sales Charts -->
     <div class="dashboard-charts-grid">
       <mat-card appearance="outlined" class="dashboard-card">
         <h3 class="dashboard-card__title">فروش روزانه</h3>
         <p class="dashboard-card__caption">۷ روز اخیر</p>
-        <app-bar-chart *ngIf="dashboardData.dailySales?.length"
-          [data]="dashboardData.dailySales" color="#6C3FC5" ariaLabel="نمودار فروش روزانه"
-        ></app-bar-chart>
-        <p *ngIf="!dashboardData.dailySales?.length" class="dashboard-card__empty">داده‌ای موجود نیست</p>
+        @if (dashboardData.dailySales?.length) {
+          <app-bar-chart
+            [data]="dashboardData.dailySales" color="#6C3FC5" ariaLabel="نمودار فروش روزانه"
+          ></app-bar-chart>
+        }
+        @if (!dashboardData.dailySales?.length) {
+          <p class="dashboard-card__empty">داده‌ای موجود نیست</p>
+        }
       </mat-card>
-
       <mat-card appearance="outlined" class="dashboard-card">
         <h3 class="dashboard-card__title">فروش هفتگی</h3>
         <p class="dashboard-card__caption">۴ هفته اخیر</p>
-        <app-bar-chart *ngIf="dashboardData.weeklySales?.length"
-          [data]="dashboardData.weeklySales" color="#22c55e" ariaLabel="نمودار فروش هفتگی"
-        ></app-bar-chart>
-        <p *ngIf="!dashboardData.weeklySales?.length" class="dashboard-card__empty">داده‌ای موجود نیست</p>
+        @if (dashboardData.weeklySales?.length) {
+          <app-bar-chart
+            [data]="dashboardData.weeklySales" color="#22c55e" ariaLabel="نمودار فروش هفتگی"
+          ></app-bar-chart>
+        }
+        @if (!dashboardData.weeklySales?.length) {
+          <p class="dashboard-card__empty">داده‌ای موجود نیست</p>
+        }
       </mat-card>
-
       <mat-card appearance="outlined" class="dashboard-card">
         <h3 class="dashboard-card__title">فروش ماهانه</h3>
         <p class="dashboard-card__caption">۶ ماه اخیر</p>
-        <app-bar-chart *ngIf="dashboardData.monthlySales?.length"
-          [data]="dashboardData.monthlySales" color="#f59e0b" ariaLabel="نمودار فروش ماهانه"
-        ></app-bar-chart>
-        <p *ngIf="!dashboardData.monthlySales?.length" class="dashboard-card__empty">داده‌ای موجود نیست</p>
+        @if (dashboardData.monthlySales?.length) {
+          <app-bar-chart
+            [data]="dashboardData.monthlySales" color="#f59e0b" ariaLabel="نمودار فروش ماهانه"
+          ></app-bar-chart>
+        }
+        @if (!dashboardData.monthlySales?.length) {
+          <p class="dashboard-card__empty">داده‌ای موجود نیست</p>
+        }
       </mat-card>
     </div>
-
     <!-- Recent Orders + Low Stock -->
     <div class="dashboard-charts-grid">
-
       <!-- Recent Orders -->
       <mat-card appearance="outlined" class="dashboard-card lg:col-span-2">
         <div class="dashboard-card__row">
           <h2 class="dashboard-card__title">آخرین سفارشات</h2>
           <a routerLink="/admin/products" class="dashboard-card__link">مشاهده همه</a>
         </div>
-        <div *ngIf="dashboardData.recentOrders?.length" class="dashboard-orders">
-          <div *ngFor="let order of dashboardData.recentOrders" class="dashboard-orders__item">
-            <div class="dashboard-orders__text">
-              <p class="dashboard-orders__number">{{ order.orderNumber }}</p>
-              <p class="dashboard-orders__date">{{ order.createdAt | persianDate }}</p>
-            </div>
-            <span class="dashboard-orders__amount">
-              {{ order.totalAmount | persianNumber }}
-              <span class="dashboard-orders__unit">تومان</span>
-            </span>
-            <app-status-badge [status]="order.status"></app-status-badge>
+        @if (dashboardData.recentOrders?.length) {
+          <div class="dashboard-orders">
+            @for (order of dashboardData.recentOrders; track order) {
+              <div class="dashboard-orders__item">
+                <div class="dashboard-orders__text">
+                  <p class="dashboard-orders__number">{{ order.orderNumber }}</p>
+                  <p class="dashboard-orders__date">{{ order.createdAt | persianDate }}</p>
+                </div>
+                <span class="dashboard-orders__amount">
+                  {{ order.totalAmount | persianNumber }}
+                  <span class="dashboard-orders__unit">تومان</span>
+                </span>
+                <app-status-badge [status]="order.status"></app-status-badge>
+              </div>
+            }
           </div>
-        </div>
-        <p *ngIf="!dashboardData.recentOrders?.length" class="dashboard-card__empty">
-          <span class="dashboard-card__empty-icon">📦</span>
-          سفارشی موجود نیست
-        </p>
+        }
+        @if (!dashboardData.recentOrders?.length) {
+          <p class="dashboard-card__empty">
+            <span class="dashboard-card__empty-icon">📦</span>
+            سفارشی موجود نیست
+          </p>
+        }
       </mat-card>
-
       <!-- Low Stock Alerts -->
       <mat-card appearance="outlined" class="dashboard-card">
         <h2 class="dashboard-card__title">هشدار کم موجودی</h2>
-        <div *ngIf="dashboardData.lowStockAlerts?.length" class="dashboard-alerts">
-          <div *ngFor="let alert of dashboardData.lowStockAlerts" class="dashboard-alerts__item">
-            <div class="dashboard-alerts__icon">⚠️</div>
-            <div class="dashboard-alerts__text">
-              <p class="dashboard-alerts__name">{{ alert.productName }}</p>
-              <p class="dashboard-alerts__sku">SKU: {{ alert.sku }}</p>
-            </div>
-            <span class="dashboard-alerts__count">{{ alert.stockQuantity }}</span>
+        @if (dashboardData.lowStockAlerts?.length) {
+          <div class="dashboard-alerts">
+            @for (alert of dashboardData.lowStockAlerts; track alert) {
+              <div class="dashboard-alerts__item">
+                <div class="dashboard-alerts__icon">⚠️</div>
+                <div class="dashboard-alerts__text">
+                  <p class="dashboard-alerts__name">{{ alert.productName }}</p>
+                  <p class="dashboard-alerts__sku">SKU: {{ alert.sku }}</p>
+                </div>
+                <span class="dashboard-alerts__count">{{ alert.stockQuantity }}</span>
+              </div>
+            }
           </div>
-        </div>
-        <p *ngIf="!dashboardData.lowStockAlerts?.length" class="dashboard-card__empty">
-          <span class="dashboard-card__empty-icon">✅</span>
-          هیچ هشداری نیست
-        </p>
+        }
+        @if (!dashboardData.lowStockAlerts?.length) {
+          <p class="dashboard-card__empty">
+            <span class="dashboard-card__empty-icon">✅</span>
+            هیچ هشداری نیست
+          </p>
+        }
       </mat-card>
     </div>
-
-  </ng-container>
+  }
 </section>

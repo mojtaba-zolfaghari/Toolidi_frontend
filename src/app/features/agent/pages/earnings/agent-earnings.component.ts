@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
@@ -9,8 +9,8 @@ import {
 } from '../../../../core/services/api/agent-pickup.service';
 
 @Component({
-  selector: 'app-agent-earnings',
-  template: `
+    selector: 'app-agent-earnings',
+    template: `
     <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
       <header class="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -29,13 +29,19 @@ import {
           </button>
         </div>
       </header>
-
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
-
-      <div *ngIf="loading" class="rounded-2xl bg-white p-12 text-center text-gray-500 shadow-card">در حال بارگذاری اطلاعات مالی…</div>
-
-      <ng-container *ngIf="!loading">
+    
+      @if (errorMessage) {
+        <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+      }
+      @if (successMessage) {
+        <p class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+      }
+    
+      @if (loading) {
+        <div class="rounded-2xl bg-white p-12 text-center text-gray-500 shadow-card">در حال بارگذاری اطلاعات مالی…</div>
+      }
+    
+      @if (!loading) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <div class="rounded-2xl bg-gradient-to-br from-secondary to-secondary-light p-5 text-white shadow-card">
             <span class="text-sm text-white/70">درآمد کل</span>
@@ -57,7 +63,6 @@ import {
             <span class="mt-1 block text-xs text-white/60">{{ summary?.availablePickupCount ?? 0 }} کمیسیون آماده</span>
           </div>
         </div>
-
         <!-- Commission History -->
         <div class="overflow-x-auto rounded-2xl bg-white p-6 shadow-card">
           <h2 class="mb-5 text-xl font-bold text-secondary">تاریخچه کمیسیون‌ها</h2>
@@ -73,25 +78,28 @@ import {
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let commission of commissions" class="border-b last:border-0 hover:bg-gray-50/70">
-                <td class="p-3">{{ commission.createdAt | persianDate:'yyyy/MM/dd' }}</td>
-                <td class="p-3 text-secondary">{{ commission.notes || '—' }}</td>
-                <td class="p-3">{{ commission.earnings | persianNumber }} تومان</td>
-                <td class="p-3">{{ commission.commissionRate | persianNumber:0:2 }}٪</td>
-                <td class="p-3 font-bold text-green-700">{{ commission.commissionAmount | persianNumber }} تومان</td>
-                <td class="p-3">
-                  <span class="rounded-full px-3 py-1 text-xs font-bold"
-                    [class.bg-green-100]="commission.isPaid" [class.text-green-700]="commission.isPaid"
-                    [class.bg-orange-100]="!commission.isPaid" [class.text-orange-700]="!commission.isPaid">
-                    {{ commission.isPaid ? 'پرداخت‌شده' : 'در انتظار' }}
-                  </span>
-                </td>
-              </tr>
+              @for (commission of commissions; track commission) {
+                <tr class="border-b last:border-0 hover:bg-gray-50/70">
+                  <td class="p-3">{{ commission.createdAt | persianDate:'yyyy/MM/dd' }}</td>
+                  <td class="p-3 text-secondary">{{ commission.notes || '—' }}</td>
+                  <td class="p-3">{{ commission.earnings | persianNumber }} تومان</td>
+                  <td class="p-3">{{ commission.commissionRate | persianNumber:0:2 }}٪</td>
+                  <td class="p-3 font-bold text-green-700">{{ commission.commissionAmount | persianNumber }} تومان</td>
+                  <td class="p-3">
+                    <span class="rounded-full px-3 py-1 text-xs font-bold"
+                      [class.bg-green-100]="commission.isPaid" [class.text-green-700]="commission.isPaid"
+                      [class.bg-orange-100]="!commission.isPaid" [class.text-orange-700]="!commission.isPaid">
+                      {{ commission.isPaid ? 'پرداخت‌شده' : 'در انتظار' }}
+                    </span>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
-          <p *ngIf="!commissions.length" class="py-8 text-center text-gray-400">کمیسیونی برای نمایش وجود ندارد.</p>
+          @if (!commissions.length) {
+            <p class="py-8 text-center text-gray-400">کمیسیونی برای نمایش وجود ندارد.</p>
+          }
         </div>
-
         <!-- Payout History -->
         <div class="overflow-x-auto rounded-2xl bg-white p-6 shadow-card">
           <h2 class="mb-5 text-xl font-bold text-secondary">تاریخچه برداشت‌ها</h2>
@@ -105,61 +113,73 @@ import {
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let payout of payouts" class="border-b last:border-0 hover:bg-gray-50/70">
-                <td class="p-3">{{ payout.createdAt | persianDate:'yyyy/MM/dd' }}</td>
-                <td class="p-3 font-bold text-secondary">{{ payout.amount | persianNumber }} تومان</td>
-                <td class="p-3">
-                  <span class="rounded-full px-3 py-1 text-xs font-bold"
-                    [class.bg-green-100]="payout.status === 'Completed'" [class.text-green-700]="payout.status === 'Completed'"
-                    [class.bg-orange-100]="payout.status === 'Requested' || payout.status === 'Pending'" [class.text-orange-700]="payout.status === 'Requested' || payout.status === 'Pending'"
-                    [class.bg-red-100]="payout.status === 'Failed' || payout.status === 'Cancelled'" [class.text-red-700]="payout.status === 'Failed' || payout.status === 'Cancelled'">
-                    {{ payoutStatus(payout.status) }}
-                  </span>
-                </td>
-                <td class="p-3 text-gray-500">{{ payout.notes || '—' }}</td>
-              </tr>
+              @for (payout of payouts; track payout) {
+                <tr class="border-b last:border-0 hover:bg-gray-50/70">
+                  <td class="p-3">{{ payout.createdAt | persianDate:'yyyy/MM/dd' }}</td>
+                  <td class="p-3 font-bold text-secondary">{{ payout.amount | persianNumber }} تومان</td>
+                  <td class="p-3">
+                    <span class="rounded-full px-3 py-1 text-xs font-bold"
+                      [class.bg-green-100]="payout.status === 'Completed'" [class.text-green-700]="payout.status === 'Completed'"
+                      [class.bg-orange-100]="payout.status === 'Requested' || payout.status === 'Pending'" [class.text-orange-700]="payout.status === 'Requested' || payout.status === 'Pending'"
+                      [class.bg-red-100]="payout.status === 'Failed' || payout.status === 'Cancelled'" [class.text-red-700]="payout.status === 'Failed' || payout.status === 'Cancelled'">
+                      {{ payoutStatus(payout.status) }}
+                    </span>
+                  </td>
+                  <td class="p-3 text-gray-500">{{ payout.notes || '—' }}</td>
+                </tr>
+              }
             </tbody>
           </table>
-          <p *ngIf="!payouts.length" class="py-8 text-center text-gray-400">برداشتی ثبت نشده است.</p>
+          @if (!payouts.length) {
+            <p class="py-8 text-center text-gray-400">برداشتی ثبت نشده است.</p>
+          }
         </div>
-      </ng-container>
-
+      }
+    
       <!-- Withdrawal Modal -->
-      <div *ngIf="formOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeWithdrawal()">
-        <form [formGroup]="form" (ngSubmit)="requestWithdrawal()" (click)="$event.stopPropagation()"
-          class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-secondary">درخواست برداشت وجه</h2>
-            <button type="button" (click)="closeWithdrawal()" class="text-2xl text-gray-400">×</button>
-          </div>
-          <div class="mt-5 space-y-4">
-            <label class="block">
-              <span class="mb-1 block text-sm font-medium text-secondary">مبلغ برداشت *</span>
-              <input formControlName="amount" type="number" min="1" [max]="summary?.availableForWithdrawal ?? null"
-                class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
-              <small class="mt-1 block text-xs text-gray-400">
-                حداکثر قابل برداشت: {{ summary?.availableForWithdrawal ?? 0 | persianNumber }} تومان
-              </small>
-              <small *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid" class="text-red-600">
-                مبلغ باید معتبر و کمتر از موجودی قابل برداشت باشد.
-              </small>
-            </label>
-            <label class="block">
-              <span class="mb-1 block text-sm font-medium text-secondary">شماره حساب / شبا *</span>
-              <input formControlName="bankAccount" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="IR… یا شماره حساب" />
-            </label>
-          </div>
-          <p *ngIf="formError" class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ formError }}</p>
-          <div class="mt-5 flex justify-end gap-3">
-            <button type="button" (click)="closeWithdrawal()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
-            <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white disabled:opacity-50">
-              {{ saving ? 'در حال ارسال…' : 'ثبت درخواست' }}
-            </button>
-          </div>
-        </form>
-      </div>
+      @if (formOpen) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-secondary/50 p-4" (click)="closeWithdrawal()">
+          <form [formGroup]="form" (ngSubmit)="requestWithdrawal()" (click)="$event.stopPropagation()"
+            class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold text-secondary">درخواست برداشت وجه</h2>
+              <button type="button" (click)="closeWithdrawal()" class="text-2xl text-gray-400">×</button>
+            </div>
+            <div class="mt-5 space-y-4">
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-secondary">مبلغ برداشت *</span>
+                <input formControlName="amount" type="number" min="1" [max]="summary?.availableForWithdrawal ?? null"
+                  class="w-full rounded-xl border border-gray-300 px-4 py-2.5" />
+                <small class="mt-1 block text-xs text-gray-400">
+                  حداکثر قابل برداشت: {{ summary?.availableForWithdrawal ?? 0 | persianNumber }} تومان
+                </small>
+                @if (form.get('amount')?.touched && form.get('amount')?.invalid) {
+                  <small class="text-red-600">
+                    مبلغ باید معتبر و کمتر از موجودی قابل برداشت باشد.
+                  </small>
+                }
+              </label>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-secondary">شماره حساب / شبا *</span>
+                <input formControlName="bankAccount" class="w-full rounded-xl border border-gray-300 px-4 py-2.5" placeholder="IR… یا شماره حساب" />
+              </label>
+            </div>
+            @if (formError) {
+              <p class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ formError }}</p>
+            }
+            <div class="mt-5 flex justify-end gap-3">
+              <button type="button" (click)="closeWithdrawal()" class="rounded-xl border border-gray-300 px-5 py-2.5">انصراف</button>
+              <button type="submit" [disabled]="saving" class="rounded-xl bg-primary px-6 py-2.5 font-bold text-white disabled:opacity-50">
+                {{ saving ? 'در حال ارسال…' : 'ثبت درخواست' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AgentEarningsComponent implements OnInit {
   summary: AgentEarningsSummary | null = null;

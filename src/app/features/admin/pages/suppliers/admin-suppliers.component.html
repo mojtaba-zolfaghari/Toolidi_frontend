@@ -5,8 +5,12 @@
     [actions]="headerActions"
   ></app-page-header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <!-- Summary Cards -->
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -36,87 +40,102 @@
   ></app-data-table>
 
   <!-- Add / Edit / View Dialog -->
-  <div *ngIf="isDialogOpen" class="admin-modal" (click)="closeDialog()">
-    <div class="admin-modal__card admin-modal__card--wide" (click)="$event.stopPropagation()">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">
-          {{ dialogMode === 'add' ? 'افزودن تولیدکننده' : dialogMode === 'edit' ? 'ویرایش تولیدکننده' : 'مشاهده تولیدکننده' }}
-        </h2>
-        <button type="button" mat-icon-button (click)="closeDialog()" aria-label="بستن">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <!-- View mode -->
-      <div *ngIf="dialogMode === 'view' && selectedSupplier" class="admin-modal__grid admin-modal__grid--wide">
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">نام شرکت</p>
-          <p class="admin-modal__value">{{ selectedSupplier.name }}</p>
+  @if (isDialogOpen) {
+    <div class="admin-modal" (click)="closeDialog()">
+      <div class="admin-modal__card admin-modal__card--wide" (click)="$event.stopPropagation()">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">
+            {{ dialogMode === 'add' ? 'افزودن تولیدکننده' : dialogMode === 'edit' ? 'ویرایش تولیدکننده' : 'مشاهده تولیدکننده' }}
+          </h2>
+          <button type="button" mat-icon-button (click)="closeDialog()" aria-label="بستن">
+            <mat-icon>close</mat-icon>
+          </button>
         </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">وضعیت</p>
-          <app-status-badge [status]="selectedSupplier.isActive ? 'active' : 'inactive'"></app-status-badge>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">اطلاعات تماس</p>
-          <p class="admin-modal__value">{{ selectedSupplier.contactInfo || '—' }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">موقعیت</p>
-          <p class="admin-modal__value">{{ selectedSupplier.location || '—' }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">تاریخ ثبت</p>
-          <p class="admin-modal__value">{{ selectedSupplier.createdAt | persianDate }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">آخرین به‌روزرسانی</p>
-          <p class="admin-modal__value">{{ selectedSupplier.updatedAt | persianDate }}</p>
-        </div>
-      </div>
-      <div *ngIf="dialogMode === 'view'" class="admin-form-actions">
-        <button mat-button (click)="closeDialog()">بستن</button>
-      </div>
-
-      <!-- Add / Edit form -->
-      <form *ngIf="dialogMode !== 'view'" [formGroup]="supplierForm" (ngSubmit)="saveSupplier()" class="admin-form-grid admin-form-grid--mt">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
-          <mat-label>نام شرکت / تولیدکننده *</mat-label>
-          <input matInput formControlName="name" />
-          <mat-error *ngIf="invalid('name')">نام الزامی است</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>اطلاعات تماس *</mat-label>
-          <input matInput formControlName="contactInfo" placeholder="تلفن یا ایمیل" />
-          <mat-error *ngIf="invalid('contactInfo')">اطلاعات تماس الزامی است</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>استان *</mat-label>
-          <mat-select formControlName="provinceId" (selectionChange)="onProvinceChange()">
-            <mat-option *ngFor="let province of provinces" [value]="province.id">{{ province.name }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>شهرستان *</mat-label>
-          <mat-select formControlName="cityId" (selectionChange)="onCityChange()"
-            [disabled]="loadingCities || !supplierForm.get('provinceId')?.value">
-            <mat-option *ngIf="loadingCities" [disabled]="true">در حال بارگذاری…</mat-option>
-            <mat-option *ngFor="let city of cities" [value]="city.id">{{ city.name }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </form>
-
-      <p *ngIf="dialogMode !== 'view' && errorMessage" class="admin-form-error">{{ errorMessage }}</p>
-
-      <div *ngIf="dialogMode !== 'view'" class="admin-form-actions">
-        <button type="button" mat-button (click)="closeDialog()">انصراف</button>
-        <button type="button" mat-flat-button class="admin-btn-primary" [disabled]="saving" (click)="saveSupplier()">
-          {{ saving ? 'در حال ذخیره…' : (dialogMode === 'add' ? 'ثبت تولیدکننده' : 'ذخیره تغییرات') }}
-        </button>
+        <!-- View mode -->
+        @if (dialogMode === 'view' && selectedSupplier) {
+          <div class="admin-modal__grid admin-modal__grid--wide">
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">نام شرکت</p>
+              <p class="admin-modal__value">{{ selectedSupplier.name }}</p>
+            </div>
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">وضعیت</p>
+              <app-status-badge [status]="selectedSupplier.isActive ? 'active' : 'inactive'"></app-status-badge>
+            </div>
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">اطلاعات تماس</p>
+              <p class="admin-modal__value">{{ selectedSupplier.contactInfo || '—' }}</p>
+            </div>
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">موقعیت</p>
+              <p class="admin-modal__value">{{ selectedSupplier.location || '—' }}</p>
+            </div>
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">تاریخ ثبت</p>
+              <p class="admin-modal__value">{{ selectedSupplier.createdAt | persianDate }}</p>
+            </div>
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">آخرین به‌روزرسانی</p>
+              <p class="admin-modal__value">{{ selectedSupplier.updatedAt | persianDate }}</p>
+            </div>
+          </div>
+        }
+        @if (dialogMode === 'view') {
+          <div class="admin-form-actions">
+            <button mat-button (click)="closeDialog()">بستن</button>
+          </div>
+        }
+        <!-- Add / Edit form -->
+        @if (dialogMode !== 'view') {
+          <form [formGroup]="supplierForm" (ngSubmit)="saveSupplier()" class="admin-form-grid admin-form-grid--mt">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-form-grid__full">
+              <mat-label>نام شرکت / تولیدکننده *</mat-label>
+              <input matInput formControlName="name" />
+              @if (invalid('name')) {
+                <mat-error>نام الزامی است</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>اطلاعات تماس *</mat-label>
+              <input matInput formControlName="contactInfo" placeholder="تلفن یا ایمیل" />
+              @if (invalid('contactInfo')) {
+                <mat-error>اطلاعات تماس الزامی است</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>استان *</mat-label>
+              <mat-select formControlName="provinceId" (selectionChange)="onProvinceChange()">
+                @for (province of provinces; track province) {
+                  <mat-option [value]="province.id">{{ province.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>شهرستان *</mat-label>
+              <mat-select formControlName="cityId" (selectionChange)="onCityChange()"
+                [disabled]="loadingCities || !supplierForm.get('provinceId')?.value">
+                @if (loadingCities) {
+                  <mat-option [disabled]="true">در حال بارگذاری…</mat-option>
+                }
+                @for (city of cities; track city) {
+                  <mat-option [value]="city.id">{{ city.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </form>
+        }
+        @if (dialogMode !== 'view' && errorMessage) {
+          <p class="admin-form-error">{{ errorMessage }}</p>
+        }
+        @if (dialogMode !== 'view') {
+          <div class="admin-form-actions">
+            <button type="button" mat-button (click)="closeDialog()">انصراف</button>
+            <button type="button" mat-flat-button class="admin-btn-primary" [disabled]="saving" (click)="saveSupplier()">
+              {{ saving ? 'در حال ذخیره…' : (dialogMode === 'add' ? 'ثبت تولیدکننده' : 'ذخیره تغییرات') }}
+            </button>
+          </div>
+        }
       </div>
     </div>
-  </div>
+  }
 </section>

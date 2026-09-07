@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AdminService, AdminDashboardData } from '../../../../core/services/api/admin.service';
 import { BarChartDatum } from '../../../../shared/components/bar-chart/bar-chart.component';
 
@@ -12,9 +12,11 @@ interface StatCard {
 }
 
 @Component({
-  selector: 'app-admin-dashboard',
-  templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.scss']
+    selector: 'app-admin-dashboard',
+    templateUrl: './admin-dashboard.component.html',
+    styleUrls: ['./admin-dashboard.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminDashboardComponent implements OnInit {
   loading = true;

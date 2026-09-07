@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,10 +9,10 @@ import { OrderChatService, OrderChatMessage } from '../../../core/services/api/o
  * در پنل فروشنده و پنل تأمین‌کننده به صورت یک modal یا بخش داخلی استفاده می‌شود.
  */
 @Component({
-  selector: 'app-order-chat',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-order-chat',
+    imports: [CommonModule, FormsModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    template: `
     <div class="flex flex-col h-full min-h-[420px]">
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-3">
@@ -22,43 +22,51 @@ import { OrderChatService, OrderChatMessage } from '../../../core/services/api/o
             {{ orderNumber ? 'سفارش ' + orderNumber : 'در حال بارگذاری…' }}
           </p>
         </div>
-        <button *ngIf="closable" (click)="closed.emit()" class="text-gray-400 hover:text-gray-600 text-xl leading-none px-2">×</button>
+        @if (closable) {
+          <button (click)="closed.emit()" class="text-gray-400 hover:text-gray-600 text-xl leading-none px-2">×</button>
+        }
       </div>
-
+    
       <!-- Messages -->
       <div class="flex-1 overflow-y-auto space-y-2 px-1" #scrollHost>
-        <div *ngFor="let msg of messages"
-             class="flex"
-             [class.justify-end]="msg.isMine"
-             [class.justify-start]="!msg.isMine">
-          <div class="max-w-[75%] rounded-2xl px-3.5 py-2 shadow-sm"
-               [class]="msg.isMine ? 'bg-primary text-white' : 'bg-white border border-gray-100 text-secondary'">
-            <p class="text-[11px] opacity-70 mb-0.5">
-              {{ roleLabel(msg.senderRole) }} · {{ msg.createdAt | date:'HH:mm' }}
-            </p>
-            <p class="text-sm whitespace-pre-wrap break-words">{{ msg.body }}</p>
+        @for (msg of messages; track msg) {
+          <div
+            class="flex"
+            [class.justify-end]="msg.isMine"
+            [class.justify-start]="!msg.isMine">
+            <div class="max-w-[75%] rounded-2xl px-3.5 py-2 shadow-sm"
+              [class]="msg.isMine ? 'bg-primary text-white' : 'bg-white border border-gray-100 text-secondary'">
+              <p class="text-[11px] opacity-70 mb-0.5">
+                {{ roleLabel(msg.senderRole) }} · {{ msg.createdAt | date:'HH:mm' }}
+              </p>
+              <p class="text-sm whitespace-pre-wrap break-words">{{ msg.body }}</p>
+            </div>
           </div>
-        </div>
-
-        <p *ngIf="!loading && !messages.length" class="text-gray-400 text-center py-10 text-sm">
-          هنوز پیامی رد و بدل نشده — اولین پیام را بفرستید.
-        </p>
-        <p *ngIf="error" class="text-red-500 text-center py-6 text-sm">{{ error }}</p>
+        }
+    
+        @if (!loading && !messages.length) {
+          <p class="text-gray-400 text-center py-10 text-sm">
+            هنوز پیامی رد و بدل نشده — اولین پیام را بفرستید.
+          </p>
+        }
+        @if (error) {
+          <p class="text-red-500 text-center py-6 text-sm">{{ error }}</p>
+        }
       </div>
-
+    
       <!-- Composer -->
       <div class="flex gap-2 mt-3 pt-3 border-t border-gray-100">
         <input type="text" [(ngModel)]="draft" (keyup.enter)="send()"
-               [disabled]="sending"
-               placeholder="پیام خود را بنویسید…"
-               class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          [disabled]="sending"
+          placeholder="پیام خود را بنویسید…"
+          class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
         <button (click)="send()" [disabled]="sending || !draft.trim()"
-                class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white hover:opacity-90 disabled:opacity-40">
+          class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white hover:opacity-90 disabled:opacity-40">
           {{ sending ? '…' : 'ارسال' }}
         </button>
       </div>
     </div>
-  `
+    `
 })
 export class OrderChatComponent implements OnInit, OnChanges {
   /** شناسه سفارشی که گفتگوی آن نمایش داده می‌شود */

@@ -23,7 +23,9 @@
         <mat-error>رمز عبور باید حداقل ۶ کاراکتر باشد.</mat-error>
       </mat-form-field>
 
-      <div *ngIf="errorMessage" class="login-alert login-alert--error">{{ errorMessage }}</div>
+      @if (errorMessage) {
+        <div class="login-alert login-alert--error">{{ errorMessage }}</div>
+      }
 
       <div class="login-options">
         <mat-checkbox formControlName="rememberMe">مرا به خاطر بسپار</mat-checkbox>

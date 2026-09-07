@@ -4,8 +4,12 @@
     subtitle="مدیریت نقش و وضعیت دسترسی کاربران"
   ></app-page-header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <!-- Summary Cards -->
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -26,14 +30,18 @@
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-filters__select">
       <mat-label>نقش</mat-label>
       <mat-select [value]="filterRole" (selectionChange)="filterRole = $event.value; loadUsers()">
-        <mat-option *ngFor="let opt of roleFilterOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+        @for (opt of roleFilterOptions; track opt) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="admin-filters__select">
       <mat-label>وضعیت</mat-label>
       <mat-select [value]="filterStatus" (selectionChange)="filterStatus = $event.value; loadUsers()">
-        <mat-option *ngFor="let opt of statusFilterOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+        @for (opt of statusFilterOptions; track opt) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
   </mat-card>
@@ -53,132 +61,163 @@
   ></app-data-table>
 
   <!-- User Detail Modal: tabbed, role-aware -->
-  <div *ngIf="selectedUser" class="admin-modal" (click)="closeUserDetail()">
-    <mat-card appearance="outlined" class="admin-modal__card admin-modal__card--wide" (click)="$event.stopPropagation()">
-      <div class="admin-modal__header">
-        <div>
-          <h2 class="admin-modal__title">{{ selectedUser.username }}</h2>
-          <p class="admin-modal__subtitle">{{ getRoleLabel(selectedUser.roleName) }} · {{ selectedUser.isActive ? 'فعال' : 'غیرفعال' }}</p>
+  @if (selectedUser) {
+    <div class="admin-modal" (click)="closeUserDetail()">
+      <mat-card appearance="outlined" class="admin-modal__card admin-modal__card--wide" (click)="$event.stopPropagation()">
+        <div class="admin-modal__header">
+          <div>
+            <h2 class="admin-modal__title">{{ selectedUser.username }}</h2>
+            <p class="admin-modal__subtitle">{{ getRoleLabel(selectedUser.roleName) }} · {{ selectedUser.isActive ? 'فعال' : 'غیرفعال' }}</p>
+          </div>
+          <button mat-icon-button (click)="closeUserDetail()" aria-label="بستن">
+            <mat-icon>close</mat-icon>
+          </button>
         </div>
-        <button mat-icon-button (click)="closeUserDetail()" aria-label="بستن">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <!-- تب‌ها -->
-      <nav class="admin-modal__tabs">
-        <button type="button" (click)="selectDetailTab('info')" [class.active]="detailTab === 'info'">اطلاعات</button>
-        <button type="button" (click)="selectDetailTab('orders')" [class.active]="detailTab === 'orders'">
-          سفارش‌ها <span class="admin-modal__tab-hint">({{ detailOrdersTotal }})</span>
-        </button>
-        <button type="button" (click)="selectDetailTab('addresses')" [class.active]="detailTab === 'addresses'">
-          آدرس‌ها <span *ngIf="detailAddresses.length" class="admin-modal__tab-hint">({{ detailAddresses.length }})</span>
+        <!-- تب‌ها -->
+        <nav class="admin-modal__tabs">
+          <button type="button" (click)="selectDetailTab('info')" [class.active]="detailTab === 'info'">اطلاعات</button>
+          <button type="button" (click)="selectDetailTab('orders')" [class.active]="detailTab === 'orders'">
+            سفارش‌ها <span class="admin-modal__tab-hint">({{ detailOrdersTotal }})</span>
+          </button>
+          <button type="button" (click)="selectDetailTab('addresses')" [class.active]="detailTab === 'addresses'">
+            آدرس‌ها @if (detailAddresses.length) {
+            <span class="admin-modal__tab-hint">({{ detailAddresses.length }})</span>
+          }
         </button>
       </nav>
-
       <!-- اطلاعات -->
-      <div *ngIf="detailTab === 'info'" class="admin-modal__grid">
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">نام کاربری</p>
-          <p class="admin-modal__value">{{ selectedUser.username }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">کد ملی</p>
-          <p class="admin-modal__value" dir="ltr">{{ selectedUser.nationalCode || '—' }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">ایمیل</p>
-          <p class="admin-modal__value" dir="ltr">{{ selectedUser.email || '—' }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">موبایل</p>
-          <p class="admin-modal__value" dir="ltr">{{ selectedUser.mobileNumber || '—' }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">نقش</p>
-          <p class="admin-modal__value">{{ getRoleLabel(selectedUser.roleName) }}</p>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">وضعیت</p>
-          <app-status-badge [status]="selectedUser.isActive ? 'active' : 'inactive'"></app-status-badge>
-        </div>
-        <div class="admin-modal__field">
-          <p class="admin-modal__label">تاریخ عضویت</p>
-          <p class="admin-modal__value">{{ selectedUser.createdAt | persianDate:'yyyy/MM/dd' }}</p>
-        </div>
-        <div *ngIf="selectedUser.lastLoginAt" class="admin-modal__field">
-          <p class="admin-modal__label">آخرین ورود</p>
-          <p class="admin-modal__value">{{ selectedUser.lastLoginAt | persianDate:'yyyy/MM/dd HH:mm' }}</p>
-        </div>
-      </div>
-
-      <!-- سفارش‌ها -->
-      <div *ngIf="detailTab === 'orders'" class="admin-modal__list">
-        <p *ngIf="detailOrdersError" class="admin-alert admin-alert--error">{{ detailOrdersError }}</p>
-        <div *ngIf="detailOrdersLoading" class="admin-modal__loading">در حال بارگذاری سفارش‌ها…</div>
-        <p *ngIf="!detailOrdersLoading && !detailOrdersError && detailOrders.length === 0" class="admin-modal__empty">
-          این کاربر تاکنون سفارشی ثبت نکرده است.
-        </p>
-        <ng-container *ngIf="!detailOrdersLoading && detailOrders.length > 0">
-          <table class="admin-modal__table">
-            <thead>
-              <tr>
-                <th>شماره سفارش</th>
-                <th>وضعیت</th>
-                <th>پرداخت</th>
-                <th>اقلام</th>
-                <th>مبلغ کل</th>
-                <th>تاریخ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let order of detailOrders">
-                <td dir="ltr">#{{ order.orderNumber }}</td>
-                <td><span class="admin-modal__pill">{{ orderStatusLabel(order.status) }}</span></td>
-                <td>
-                  <span class="admin-modal__pill" [class.admin-modal__pill--ok]="order.isPaid">{{ paymentStatusLabel(order.paymentStatus) }}</span>
-                </td>
-                <td>{{ order.itemCount }}</td>
-                <td>{{ order.grandTotal | persianNumber }} تومان</td>
-                <td>{{ order.createdAt | persianDate:'yyyy/MM/dd' }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="admin-modal__pager" *ngIf="detailOrdersTotal > 5">
-            <button mat-button [disabled]="detailOrdersPage <= 1" (click)="changeDetailOrdersPage(-1)">قبلی</button>
-            <span>صفحه {{ detailOrdersPage }} از {{ ((detailOrdersTotal + 4) / 5) | persianNumber }}</span>
-            <button mat-button [disabled]="detailOrdersPage >= ((detailOrdersTotal + 4) / 5)" (click)="changeDetailOrdersPage(1)">بعدی</button>
+      @if (detailTab === 'info') {
+        <div class="admin-modal__grid">
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">نام کاربری</p>
+            <p class="admin-modal__value">{{ selectedUser.username }}</p>
           </div>
-          <p class="admin-modal__note">نقش کاربر: {{ getRoleLabel(selectedUser.roleName) }} — گزارش‌های اختصاصی نقش در نسخه‌های بعد تکمیل می‌شود.</p>
-        </ng-container>
-      </div>
-
-      <!-- آدرس‌ها -->
-      <div *ngIf="detailTab === 'addresses'" class="admin-modal__list">
-        <p *ngIf="detailAddressesError" class="admin-alert admin-alert--error">{{ detailAddressesError }}</p>
-        <div *ngIf="detailAddressesLoading" class="admin-modal__loading">در حال بارگذاری آدرس‌ها…</div>
-        <p *ngIf="!detailAddressesLoading && !detailAddressesError && detailAddresses.length === 0" class="admin-modal__empty">
-          آدرسی برای این کاربر ثبت نشده است.
-        </p>
-        <div class="admin-modal__addresses">
-          <div *ngFor="let addr of detailAddresses" class="admin-modal__address">
-            <div class="admin-modal__address-head">
-              <strong>{{ addr.addressType || 'آدرس' }}</strong>
-              <span *ngIf="addr.isDefault" class="admin-modal__pill admin-modal__pill--ok">پیش‌فرض</span>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">کد ملی</p>
+            <p class="admin-modal__value" dir="ltr">{{ selectedUser.nationalCode || '—' }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">ایمیل</p>
+            <p class="admin-modal__value" dir="ltr">{{ selectedUser.email || '—' }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">موبایل</p>
+            <p class="admin-modal__value" dir="ltr">{{ selectedUser.mobileNumber || '—' }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">نقش</p>
+            <p class="admin-modal__value">{{ getRoleLabel(selectedUser.roleName) }}</p>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">وضعیت</p>
+            <app-status-badge [status]="selectedUser.isActive ? 'active' : 'inactive'"></app-status-badge>
+          </div>
+          <div class="admin-modal__field">
+            <p class="admin-modal__label">تاریخ عضویت</p>
+            <p class="admin-modal__value">{{ selectedUser.createdAt | persianDate:'yyyy/MM/dd' }}</p>
+          </div>
+          @if (selectedUser.lastLoginAt) {
+            <div class="admin-modal__field">
+              <p class="admin-modal__label">آخرین ورود</p>
+              <p class="admin-modal__value">{{ selectedUser.lastLoginAt | persianDate:'yyyy/MM/dd HH:mm' }}</p>
             </div>
-            <p dir="rtl">{{ addr.addressLine }}</p>
-            <p class="admin-modal__address-meta">
-              {{ addr.state }} / {{ addr.city }}
-              <span *ngIf="addr.postalCode" dir="ltr">· {{ addr.postalCode }}</span>
-              <span *ngIf="addr.phoneNumber" dir="ltr">· {{ addr.phoneNumber }}</span>
+          }
+        </div>
+      }
+      <!-- سفارش‌ها -->
+      @if (detailTab === 'orders') {
+        <div class="admin-modal__list">
+          @if (detailOrdersError) {
+            <p class="admin-alert admin-alert--error">{{ detailOrdersError }}</p>
+          }
+          @if (detailOrdersLoading) {
+            <div class="admin-modal__loading">در حال بارگذاری سفارش‌ها…</div>
+          }
+          @if (!detailOrdersLoading && !detailOrdersError && detailOrders.length === 0) {
+            <p class="admin-modal__empty">
+              این کاربر تاکنون سفارشی ثبت نکرده است.
             </p>
+          }
+          @if (!detailOrdersLoading && detailOrders.length > 0) {
+            <table class="admin-modal__table">
+              <thead>
+                <tr>
+                  <th>شماره سفارش</th>
+                  <th>وضعیت</th>
+                  <th>پرداخت</th>
+                  <th>اقلام</th>
+                  <th>مبلغ کل</th>
+                  <th>تاریخ</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of detailOrders; track order) {
+                  <tr>
+                    <td dir="ltr">#{{ order.orderNumber }}</td>
+                    <td><span class="admin-modal__pill">{{ orderStatusLabel(order.status) }}</span></td>
+                    <td>
+                      <span class="admin-modal__pill" [class.admin-modal__pill--ok]="order.isPaid">{{ paymentStatusLabel(order.paymentStatus) }}</span>
+                    </td>
+                    <td>{{ order.itemCount }}</td>
+                    <td>{{ order.grandTotal | persianNumber }} تومان</td>
+                    <td>{{ order.createdAt | persianDate:'yyyy/MM/dd' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            @if (detailOrdersTotal > 5) {
+              <div class="admin-modal__pager">
+                <button mat-button [disabled]="detailOrdersPage <= 1" (click)="changeDetailOrdersPage(-1)">قبلی</button>
+                <span>صفحه {{ detailOrdersPage }} از {{ ((detailOrdersTotal + 4) / 5) | persianNumber }}</span>
+                <button mat-button [disabled]="detailOrdersPage >= ((detailOrdersTotal + 4) / 5)" (click)="changeDetailOrdersPage(1)">بعدی</button>
+              </div>
+            }
+            <p class="admin-modal__note">نقش کاربر: {{ getRoleLabel(selectedUser.roleName) }} — گزارش‌های اختصاصی نقش در نسخه‌های بعد تکمیل می‌شود.</p>
+          }
+        </div>
+      }
+      <!-- آدرس‌ها -->
+      @if (detailTab === 'addresses') {
+        <div class="admin-modal__list">
+          @if (detailAddressesError) {
+            <p class="admin-alert admin-alert--error">{{ detailAddressesError }}</p>
+          }
+          @if (detailAddressesLoading) {
+            <div class="admin-modal__loading">در حال بارگذاری آدرس‌ها…</div>
+          }
+          @if (!detailAddressesLoading && !detailAddressesError && detailAddresses.length === 0) {
+            <p class="admin-modal__empty">
+              آدرسی برای این کاربر ثبت نشده است.
+            </p>
+          }
+          <div class="admin-modal__addresses">
+            @for (addr of detailAddresses; track addr) {
+              <div class="admin-modal__address">
+                <div class="admin-modal__address-head">
+                  <strong>{{ addr.addressType || 'آدرس' }}</strong>
+                  @if (addr.isDefault) {
+                    <span class="admin-modal__pill admin-modal__pill--ok">پیش‌فرض</span>
+                  }
+                </div>
+                <p dir="rtl">{{ addr.addressLine }}</p>
+                <p class="admin-modal__address-meta">
+                  {{ addr.state }} / {{ addr.city }}
+                  @if (addr.postalCode) {
+                    <span dir="ltr">· {{ addr.postalCode }}</span>
+                  }
+                  @if (addr.phoneNumber) {
+                    <span dir="ltr">· {{ addr.phoneNumber }}</span>
+                  }
+                </p>
+              </div>
+            }
           </div>
         </div>
-      </div>
-
+      }
       <div class="admin-modal__footer">
         <button mat-button (click)="closeUserDetail()">بستن</button>
       </div>
     </mat-card>
   </div>
+}
 </section>

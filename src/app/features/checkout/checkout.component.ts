@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -30,10 +30,12 @@ export type CheckoutStep = 1 | 2 | 3;
 
 /** صفحه تسویه‌حساب؛ ویزارد ۳ مرحله‌ای آدرس، ارسال و پرداخت */
 @Component({
-  selector: 'app-checkout',
-  templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.scss'],
-  animations: [fadeIn, scaleUp]
+    selector: 'app-checkout',
+    templateUrl: './checkout.component.html',
+    styleUrls: ['./checkout.component.scss'],
+    animations: [fadeIn, scaleUp],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class CheckoutComponent implements OnInit {
   step: CheckoutStep = 1;

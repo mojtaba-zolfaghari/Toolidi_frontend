@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SeoService } from '../../core/services/seo.service';
 import { Router } from '@angular/router';
 
@@ -52,9 +52,11 @@ export interface GuestCartDisplayItem {
  * تغذیه می‌شود و آیتم‌ها را بر اساس فروشنده گروه می‌کند.
  */
 @Component({
-  selector: 'app-cart',
-  templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.scss']
+    selector: 'app-cart',
+    templateUrl: './cart.component.html',
+    styleUrls: ['./cart.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class CartComponent implements OnInit {
   constructor(

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -9,8 +9,10 @@ import { Result } from '../../../../core/models/api-response.model';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 @Component({
-  selector: 'app-admin-commission-rules',
-  templateUrl: './admin-commission-rules.component.html'
+    selector: 'app-admin-commission-rules',
+    templateUrl: './admin-commission-rules.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminCommissionRulesComponent implements OnInit {
   rules: CommissionRule[] = [];

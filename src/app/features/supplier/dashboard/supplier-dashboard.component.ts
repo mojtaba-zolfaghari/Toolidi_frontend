@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SupplierService, SupplierDashboard, SupplierOrder } from '../../../core/services/api/supplier.service';
 
 @Component({
-  selector: 'app-supplier-dashboard',
-  templateUrl: './supplier-dashboard.component.html',
-  styleUrls: ['./supplier-dashboard.component.scss']
+    selector: 'app-supplier-dashboard',
+    templateUrl: './supplier-dashboard.component.html',
+    styleUrls: ['./supplier-dashboard.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierDashboardComponent implements OnInit {
   dashboard: SupplierDashboard | null = null;

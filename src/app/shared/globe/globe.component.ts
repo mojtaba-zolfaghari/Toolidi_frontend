@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import { PublicService } from '../../core/services/api/public.service';
 import { IRAN_MAP_CITIES } from '../iran-locations';
@@ -17,19 +17,21 @@ interface GlobeOrder {
 }
 
 @Component({
-  selector: 'app-globe',
-  template: `
+    selector: 'app-globe',
+    template: `
     <div class="globe-container">
       <div class="globe-header">
         <div class="globe-title">
           <span class="pulse-dot"></span>
           <span class="title-text">سفارشات فعال روی نقشه</span>
         </div>
-        <div class="globe-stats" *ngIf="stats">
-          <span class="stat-item">{{ stats.activeOrders }} سفارش فعال</span>
-          <span class="stat-sep">|</span>
-          <span class="stat-item">{{ stats.totalOrders }} مسیر کل</span>
-        </div>
+        @if (stats) {
+          <div class="globe-stats">
+            <span class="stat-item">{{ stats.activeOrders }} سفارش فعال</span>
+            <span class="stat-sep">|</span>
+            <span class="stat-item">{{ stats.totalOrders }} مسیر کل</span>
+          </div>
+        }
       </div>
       <div class="globe-body">
         <div class="globe-canvas-wrap">
@@ -41,28 +43,34 @@ interface GlobeOrder {
             <span>لاگ زنده سفارشات</span>
           </div>
           <div class="log-list" #logList>
-            <div *ngFor="let order of visibleOrders; let i = index"
-                 class="log-item"
-                 [class.log-new]="i === 0"
-                 [style.animation-delay]="(i * 50) + 'ms'">
-              <div class="log-status" [ngClass]="'status-' + order.status.toLowerCase()">
-                {{ getStatusIcon(order.status) }}
+            @for (order of visibleOrders; track order; let i = $index) {
+              <div
+                class="log-item"
+                [class.log-new]="i === 0"
+                [style.animation-delay]="(i * 50) + 'ms'">
+                <div class="log-status" [ngClass]="'status-' + order.status.toLowerCase()">
+                  {{ getStatusIcon(order.status) }}
+                </div>
+                <div class="log-details">
+                  <span class="log-route">{{ order.from }} → {{ order.to }}</span>
+                  @if (order.product) {
+                    <span class="log-product">{{ order.product }}</span>
+                  }
+                </div>
+                <span class="log-time">{{ getTimeAgo(order.createdAt) }}</span>
               </div>
-              <div class="log-details">
-                <span class="log-route">{{ order.from }} → {{ order.to }}</span>
-                <span class="log-product" *ngIf="order.product">{{ order.product }}</span>
+            }
+            @if (loading || !visibleOrders.length) {
+              <div class="log-empty">
+                <span>{{ loading ? 'در حال دریافت سفارش‌های فعال…' : 'سفارش فعالی برای نمایش وجود ندارد.' }}</span>
               </div>
-              <span class="log-time">{{ getTimeAgo(order.createdAt) }}</span>
-            </div>
-            <div *ngIf="loading || !visibleOrders.length" class="log-empty">
-              <span>{{ loading ? 'در حال دریافت سفارش‌های فعال…' : 'سفارش فعالی برای نمایش وجود ندارد.' }}</span>
-            </div>
+            }
           </div>
         </div>
       </div>
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     .globe-container {
       width: 100%;
       border-radius: 1.5rem;
@@ -244,7 +252,9 @@ interface GlobeOrder {
         max-height: 250px;
       }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class GlobeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('globeCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;

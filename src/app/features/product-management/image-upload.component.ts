@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 import { LocalImage } from './product-management.models';
 
@@ -7,8 +7,10 @@ import { LocalImage } from './product-management.models';
  * فایل‌ها به base64 تبدیل شده و به عنوان داده‌ی تصویر در اختیار فرم قرار می‌گیرند.
  */
 @Component({
-  selector: 'app-image-upload',
-  templateUrl: './image-upload.component.html'
+    selector: 'app-image-upload',
+    templateUrl: './image-upload.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ImageUploadComponent {
   @Input() disabled = false;

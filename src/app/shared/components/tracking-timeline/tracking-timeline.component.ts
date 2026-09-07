@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 /** Timeline step definition */
 export interface TimelineStep {
@@ -11,39 +11,50 @@ export interface TimelineStep {
 }
 
 @Component({
-  selector: 'app-tracking-timeline',
-  template: `
+    selector: 'app-tracking-timeline',
+    template: `
     <div class="timeline">
       <!-- Vertical line -->
       <div class="timeline__line" aria-hidden="true"></div>
-
+    
       <div class="timeline__steps">
-        <div *ngFor="let step of steps; let last = last" class="timeline__row">
-          <!-- Circle indicator -->
-          <div class="timeline__dot"
-               [class.timeline__dot--completed]="step.completed"
-               [class.timeline__dot--current]="step.current && !step.completed"
-               [class.timeline__dot--pending]="!step.completed && !step.current">
-            <span *ngIf="step.completed">✓</span>
-            <span *ngIf="step.current && !step.completed">{{ step.icon }}</span>
-            <span *ngIf="!step.completed && !step.current">{{ step.icon }}</span>
+        @for (step of steps; track step; let last = $last) {
+          <div class="timeline__row">
+            <!-- Circle indicator -->
+            <div class="timeline__dot"
+              [class.timeline__dot--completed]="step.completed"
+              [class.timeline__dot--current]="step.current && !step.completed"
+              [class.timeline__dot--pending]="!step.completed && !step.current">
+              @if (step.completed) {
+                <span>✓</span>
+              }
+              @if (step.current && !step.completed) {
+                <span>{{ step.icon }}</span>
+              }
+              @if (!step.completed && !step.current) {
+                <span>{{ step.icon }}</span>
+              }
+            </div>
+            <!-- Content -->
+            <div class="timeline__content" [class.is-muted]="!step.completed && !step.current">
+              <p class="timeline__label"
+                [class.timeline__label--completed]="step.completed"
+                [class.timeline__label--current]="step.current && !step.completed">
+                {{ step.label }}
+              </p>
+              @if (step.date) {
+                <p class="timeline__date">{{ step.date }}</p>
+              }
+              @if (step.current && !step.completed) {
+                <p class="timeline__current-hint">وضعیت فعلی</p>
+              }
+            </div>
           </div>
-
-          <!-- Content -->
-          <div class="timeline__content" [class.is-muted]="!step.completed && !step.current">
-            <p class="timeline__label"
-               [class.timeline__label--completed]="step.completed"
-               [class.timeline__label--current]="step.current && !step.completed">
-              {{ step.label }}
-            </p>
-            <p *ngIf="step.date" class="timeline__date">{{ step.date }}</p>
-            <p *ngIf="step.current && !step.completed" class="timeline__current-hint">وضعیت فعلی</p>
-          </div>
-        </div>
+        }
       </div>
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: block; }
 
     .timeline {
@@ -137,7 +148,9 @@ export interface TimelineStep {
       font-size: 0.75rem;
       font-weight: 500;
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class TrackingTimelineComponent {
   @Input() steps: TimelineStep[] = [];

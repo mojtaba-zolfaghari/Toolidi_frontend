@@ -57,91 +57,148 @@
         <a routerLink="/auth/login" class="agent-login-link">قبلاً عضو هستید؟ ورود</a>
       </div>
 
-      <div *ngIf="!submitted; else successState" class="agent-form-content">
-        <div class="agent-form-heading">
-          <span class="form-icon">🏍</span>
-          <div>
-            <h2>پیک شهری تولیدی شوید</h2>
-            <p>در چند قدم ساده، درخواست عضویت خود را ارسال کنید.</p>
+      @if (!submitted) {
+        <div class="agent-form-content">
+          <div class="agent-form-heading">
+            <span class="form-icon">🏍</span>
+            <div>
+              <h2>پیک شهری تولیدی شوید</h2>
+              <p>در چند قدم ساده، درخواست عضویت خود را ارسال کنید.</p>
+            </div>
           </div>
+          <div class="agent-progress" aria-label="پیشرفت ثبت‌نام">
+            @for (step of [1, 2, 3, 4]; track step) {
+              <div class="progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step">
+                <span>{{ step }}</span>
+                <small>{{ step === 1 ? 'هویت' : step === 2 ? 'محدوده' : step === 3 ? 'وسیله' : 'تأیید' }}</small>
+              </div>
+            }
+          </div>
+          <div class="progress-line"><span [style.width.%]="((currentStep - 1) / 3) * 100"></span></div>
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <div class="agent-step-container">
+              @switch (currentStep) {
+                @case (1) {
+                  <section class="agent-step" aria-labelledby="identity-title">
+                    <div class="step-heading"><span>01</span><div><h3 id="identity-title">اول خودت را معرفی کن</h3><p>اطلاعات برای بررسی اولیه و تماس با شما استفاده می‌شود.</p></div></div>
+                    <div class="agent-fields-grid">
+                      <label class="agent-field field-full"><span>نام و نام خانوادگی</span><input formControlName="fullName" placeholder="مثلاً علی رضایی" autocomplete="name">@if (hasError('fullName')) {
+                      <em>نام کامل را وارد کنید.</em>
+                    }</label>
+                    <label class="agent-field"><span>کد ملی</span><input formControlName="nationalId" inputmode="numeric" placeholder="۱۰ رقم" dir="ltr" autocomplete="off">@if (hasError('nationalId')) {
+                    <em>کد ملی باید ۱۰ رقم باشد.</em>
+                  }</label>
+                  <label class="agent-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" dir="ltr" autocomplete="tel">@if (hasError('phone')) {
+                  <em>شماره موبایل معتبر وارد کنید.</em>
+                }</label>
+                <label class="agent-field field-full"><span>ایمیل</span><input formControlName="email" type="email" placeholder="you@example.com" dir="ltr" autocomplete="email">@if (hasError('email')) {
+                <em>ایمیل معتبر وارد کنید.</em>
+              }</label>
+            </div>
+          </section>
+        }
+        @case (2) {
+          <section class="agent-step" aria-labelledby="zone-title">
+            <div class="step-heading"><span>02</span><div><h3 id="zone-title">محدوده حرکتت را مشخص کن</h3><p>سفارش‌های نزدیک‌تر، پیشنهادهای دقیق‌تری می‌سازند.</p></div></div>
+            <div class="agent-zone-card"><span class="zone-pulse">⌖</span><div><strong>پایگاه فعالیت شما</strong><small>شهر و استان اصلی برای تخصیص سفارش</small></div><span class="zone-live">LIVE</span></div>
+            <div class="agent-fields-grid">
+              <label class="agent-field"><span>استان</span><select formControlName="province" (change)="onProvinceChange()"><option value="">انتخاب استان</option>@if (!useApiData) {
+              @for (p of staticProvinces; track p) {
+                <option [value]="p">{{ p }}</option>
+              }
+              }@if (useApiData) {
+              @for (p of apiProvinces; track p) {
+                <option [value]="p.name">{{ p.name }}</option>
+              }
+            }</select>@if (hasError('province')) {
+            <em>استان را انتخاب کنید.</em>
+          }</label>
+          <label class="agent-field"><span>شهر</span><select formControlName="city" (change)="onCityChange()"><option value="">انتخاب شهر</option>@if (!useApiData) {
+          @for (c of staticCities; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+          }@if (useApiData) {
+          @for (c of apiCities; track c) {
+            <option [value]="c.name">{{ c.name }}</option>
+          }
+        }</select>@if (hasError('city')) {
+        <em>شهر را انتخاب کنید.</em>
+        }@if (loadingCities) {
+        <small class="text-xs text-gray-400">در حال بارگذاری شهرها…</small>
+      }</label>
+      @if (!registrationAllowed && registrationCheckMessage) {
+        <div class="agent-field field-full">
+          <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">⚠️ {{ registrationCheckMessage }}</div>
         </div>
-
-        <div class="agent-progress" aria-label="پیشرفت ثبت‌نام">
-          <div *ngFor="let step of [1, 2, 3, 4]" class="progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step">
-            <span>{{ step }}</span>
-            <small>{{ step === 1 ? 'هویت' : step === 2 ? 'محدوده' : step === 3 ? 'وسیله' : 'تأیید' }}</small>
-          </div>
-        </div>
-        <div class="progress-line"><span [style.width.%]="((currentStep - 1) / 3) * 100"></span></div>
-
-        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-          <div [ngSwitch]="currentStep" class="agent-step-container">
-            <section *ngSwitchCase="1" class="agent-step" aria-labelledby="identity-title">
-              <div class="step-heading"><span>01</span><div><h3 id="identity-title">اول خودت را معرفی کن</h3><p>اطلاعات برای بررسی اولیه و تماس با شما استفاده می‌شود.</p></div></div>
-              <div class="agent-fields-grid">
-                <label class="agent-field field-full"><span>نام و نام خانوادگی</span><input formControlName="fullName" placeholder="مثلاً علی رضایی" autocomplete="name"><em *ngIf="hasError('fullName')">نام کامل را وارد کنید.</em></label>
-                <label class="agent-field"><span>کد ملی</span><input formControlName="nationalId" inputmode="numeric" placeholder="۱۰ رقم" dir="ltr" autocomplete="off"><em *ngIf="hasError('nationalId')">کد ملی باید ۱۰ رقم باشد.</em></label>
-                <label class="agent-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" dir="ltr" autocomplete="tel"><em *ngIf="hasError('phone')">شماره موبایل معتبر وارد کنید.</em></label>
-                <label class="agent-field field-full"><span>ایمیل</span><input formControlName="email" type="email" placeholder="you@example.com" dir="ltr" autocomplete="email"><em *ngIf="hasError('email')">ایمیل معتبر وارد کنید.</em></label>
-              </div>
-            </section>
-
-            <section *ngSwitchCase="2" class="agent-step" aria-labelledby="zone-title">
-              <div class="step-heading"><span>02</span><div><h3 id="zone-title">محدوده حرکتت را مشخص کن</h3><p>سفارش‌های نزدیک‌تر، پیشنهادهای دقیق‌تری می‌سازند.</p></div></div>
-              <div class="agent-zone-card"><span class="zone-pulse">⌖</span><div><strong>پایگاه فعالیت شما</strong><small>شهر و استان اصلی برای تخصیص سفارش</small></div><span class="zone-live">LIVE</span></div>
-              <div class="agent-fields-grid">
-                <label class="agent-field"><span>استان</span><select formControlName="province" (change)="onProvinceChange()"><option value="">انتخاب استان</option><ng-container *ngIf="!useApiData"><option *ngFor="let p of staticProvinces" [value]="p">{{ p }}</option></ng-container><ng-container *ngIf="useApiData"><option *ngFor="let p of apiProvinces" [value]="p.name">{{ p.name }}</option></ng-container></select><em *ngIf="hasError('province')">استان را انتخاب کنید.</em></label>
-                <label class="agent-field"><span>شهر</span><select formControlName="city" (change)="onCityChange()"><option value="">انتخاب شهر</option><ng-container *ngIf="!useApiData"><option *ngFor="let c of staticCities" [value]="c">{{ c }}</option></ng-container><ng-container *ngIf="useApiData"><option *ngFor="let c of apiCities" [value]="c.name">{{ c.name }}</option></ng-container></select><em *ngIf="hasError('city')">شهر را انتخاب کنید.</em><small *ngIf="loadingCities" class="text-xs text-gray-400">در حال بارگذاری شهرها…</small></label>
-                <div *ngIf="!registrationAllowed && registrationCheckMessage" class="agent-field field-full">
-                  <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">⚠️ {{ registrationCheckMessage }}</div>
-                </div>
-              </div>
-            </section>
-
-            <section *ngSwitchCase="3" class="agent-step" aria-labelledby="vehicle-title">
-              <div class="step-heading"><span>03</span><div><h3 id="vehicle-title">ابزار حرکتت چیست؟</h3><p>نوع وسیله و ظرفیت روزانه، پیشنهاد سفارش را هوشمند می‌کند.</p></div></div>
-              <div class="vehicle-options">
-                <button *ngFor="let vehicle of vehicleTypes" type="button" class="vehicle-option" [class.selected]="form.get('vehicleType')?.value === vehicle" (click)="form.get('vehicleType')?.setValue(vehicle)"><span>{{ vehicle === 'موتورسیکلت' ? '🏍' : vehicle === 'خودرو سواری' ? '🚗' : vehicle === 'وانت' ? '🛻' : '🚚' }}</span><small>{{ vehicle }}</small></button>
-              </div>
-              <div class="agent-fields-grid">
-                <label class="agent-field"><span>پلاک وسیله</span><input formControlName="vehiclePlate" placeholder="مثلاً ۱۲۳ الف ۴۵" dir="rtl"><em *ngIf="hasError('vehiclePlate')">پلاک را وارد کنید.</em></label>
-                <label class="agent-field"><span>حداکثر سفارش هم‌زمان</span><input formControlName="maxConcurrentOrders" type="number" min="1" max="100" dir="ltr"><em *ngIf="hasError('maxConcurrentOrders')">ظرفیت باید بین ۱ تا ۱۰۰ باشد.</em></label>
-              </div>
-            </section>
-
-            <section *ngSwitchCase="4" class="agent-step" aria-labelledby="review-title">
-              <div class="step-heading"><span>04</span><div><h3 id="review-title">یک قدم تا شروع</h3><p>درخواست شما پس از بررسی اطلاعات فعال می‌شود.</p></div></div>
-              <div class="review-card">
-                <div><span>نام</span><strong>{{ form.get('fullName')?.value || '—' }}</strong></div>
-                <div><span>محدوده</span><strong>{{ form.get('city')?.value || '—' }}، {{ form.get('province')?.value || '—' }}</strong></div>
-                <div><span>وسیله</span><strong>{{ form.get('vehicleType')?.value || '—' }}</strong></div>
-                <div><span>ظرفیت</span><strong>{{ form.get('maxConcurrentOrders')?.value || 0 }} سفارش</strong></div>
-              </div>
-              <label class="terms-check"><input type="checkbox" formControlName="terms"><span>قوانین همکاری، حریم خصوصی و مسئولیت تحویل امن را مطالعه کرده‌ام و می‌پذیرم.</span></label>
-              <p *ngIf="hasError('terms')" class="form-error">برای ارسال درخواست، پذیرش قوانین الزامی است.</p>
-            </section>
-          </div>
-
-          <div *ngIf="errorMessage" class="agent-alert error">⚠️ {{ errorMessage }}</div>
-          <div class="agent-actions">
-            <button *ngIf="currentStep > 1" type="button" class="secondary-action" (click)="previousStep()">← مرحله قبل</button>
-            <span *ngIf="currentStep === 1"></span>
-            <button *ngIf="currentStep < totalSteps" type="button" class="primary-action" (click)="nextStep()">ادامه <span>←</span></button>
-            <button *ngIf="currentStep === totalSteps" type="submit" class="primary-action submit-action" [disabled]="loading">{{ loading ? 'در حال ارسال...' : 'ارسال درخواست عضویت' }} <span>✦</span></button>
-          </div>
-        </form>
-      </div>
-
-      <ng-template #successState>
-        <div class="agent-success-state">
-          <div class="success-ring"><span>✓</span></div>
-          <span class="agent-form-eyebrow">درخواست دریافت شد</span>
-          <h2>مسیرت آماده‌ی شروع است.</h2>
-          <p>{{ successMessage }}</p>
-          <div class="success-steps"><span>✓ اطلاعات ثبت شد</span><span>◌ بررسی مدارک</span><span>◌ فعال‌سازی حساب</span></div>
-          <div class="agent-actions success-actions"><button type="button" class="secondary-action" (click)="startAgain()">ثبت درخواست جدید</button><button type="button" class="primary-action" (click)="goToLogin()">ورود به تولیدی</button></div>
-        </div>
-      </ng-template>
-    </section>
+      }
+    </div>
+  </section>
+}
+@case (3) {
+  <section class="agent-step" aria-labelledby="vehicle-title">
+    <div class="step-heading"><span>03</span><div><h3 id="vehicle-title">ابزار حرکتت چیست؟</h3><p>نوع وسیله و ظرفیت روزانه، پیشنهاد سفارش را هوشمند می‌کند.</p></div></div>
+    <div class="vehicle-options">
+      @for (vehicle of vehicleTypes; track vehicle) {
+        <button type="button" class="vehicle-option" [class.selected]="form.get('vehicleType')?.value === vehicle" (click)="form.get('vehicleType')?.setValue(vehicle)"><span>{{ vehicle === 'موتورسیکلت' ? '🏍' : vehicle === 'خودرو سواری' ? '🚗' : vehicle === 'وانت' ? '🛻' : '🚚' }}</span><small>{{ vehicle }}</small></button>
+      }
+    </div>
+    <div class="agent-fields-grid">
+      <label class="agent-field"><span>پلاک وسیله</span><input formControlName="vehiclePlate" placeholder="مثلاً ۱۲۳ الف ۴۵" dir="rtl">@if (hasError('vehiclePlate')) {
+      <em>پلاک را وارد کنید.</em>
+    }</label>
+    <label class="agent-field"><span>حداکثر سفارش هم‌زمان</span><input formControlName="maxConcurrentOrders" type="number" min="1" max="100" dir="ltr">@if (hasError('maxConcurrentOrders')) {
+    <em>ظرفیت باید بین ۱ تا ۱۰۰ باشد.</em>
+  }</label>
+</div>
+</section>
+}
+@case (4) {
+  <section class="agent-step" aria-labelledby="review-title">
+    <div class="step-heading"><span>04</span><div><h3 id="review-title">یک قدم تا شروع</h3><p>درخواست شما پس از بررسی اطلاعات فعال می‌شود.</p></div></div>
+    <div class="review-card">
+      <div><span>نام</span><strong>{{ form.get('fullName')?.value || '—' }}</strong></div>
+      <div><span>محدوده</span><strong>{{ form.get('city')?.value || '—' }}، {{ form.get('province')?.value || '—' }}</strong></div>
+      <div><span>وسیله</span><strong>{{ form.get('vehicleType')?.value || '—' }}</strong></div>
+      <div><span>ظرفیت</span><strong>{{ form.get('maxConcurrentOrders')?.value || 0 }} سفارش</strong></div>
+    </div>
+    <label class="terms-check"><input type="checkbox" formControlName="terms"><span>قوانین همکاری، حریم خصوصی و مسئولیت تحویل امن را مطالعه کرده‌ام و می‌پذیرم.</span></label>
+    @if (hasError('terms')) {
+      <p class="form-error">برای ارسال درخواست، پذیرش قوانین الزامی است.</p>
+    }
+  </section>
+}
+}
+</div>
+@if (errorMessage) {
+  <div class="agent-alert error">⚠️ {{ errorMessage }}</div>
+}
+<div class="agent-actions">
+  @if (currentStep > 1) {
+    <button type="button" class="secondary-action" (click)="previousStep()">← مرحله قبل</button>
+  }
+  @if (currentStep === 1) {
+    <span></span>
+  }
+  @if (currentStep < totalSteps) {
+    <button type="button" class="primary-action" (click)="nextStep()">ادامه <span>←</span></button>
+  }
+  @if (currentStep === totalSteps) {
+    <button type="submit" class="primary-action submit-action" [disabled]="loading">{{ loading ? 'در حال ارسال...' : 'ارسال درخواست عضویت' }} <span>✦</span></button>
+  }
+</div>
+</form>
+</div>
+} @else {
+  <div class="agent-success-state">
+    <div class="success-ring"><span>✓</span></div>
+    <span class="agent-form-eyebrow">درخواست دریافت شد</span>
+    <h2>مسیرت آماده‌ی شروع است.</h2>
+    <p>{{ successMessage }}</p>
+    <div class="success-steps"><span>✓ اطلاعات ثبت شد</span><span>◌ بررسی مدارک</span><span>◌ فعال‌سازی حساب</span></div>
+    <div class="agent-actions success-actions"><button type="button" class="secondary-action" (click)="startAgain()">ثبت درخواست جدید</button><button type="button" class="primary-action" (click)="goToLogin()">ورود به تولیدی</button></div>
   </div>
+}
+
+</section>
+</div>
 </section>

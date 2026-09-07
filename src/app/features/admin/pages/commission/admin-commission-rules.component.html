@@ -8,95 +8,117 @@
     <button mat-flat-button type="button" (click)="openCreate()" class="admin-btn-primary">افزودن قانون کمیسیون</button>
   </header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <div class="admin-page__tablewrap">
-    <div *ngIf="loading" class="admin-page__loading">در حال بارگذاری قوانین…</div>
-    <table *ngIf="!loading" class="admin-page__table">
-      <thead>
-        <tr>
-          <th>فروشنده</th>
-          <th>دسته‌بندی</th>
-          <th>محصول</th>
-          <th>نرخ (%)</th>
-          <th>مبلغ ثابت</th>
-          <th>شروع</th>
-          <th>پایان</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let rule of rules">
-          <td class="admin-page__cell-strong">{{ sellerName(rule.sellerId) }}</td>
-          <td>{{ categoryName(rule.categoryId) }}</td>
-          <td>{{ productName(rule.productId) }}</td>
-          <td>{{ rule.commissionRate | persianNumber:0:2 }}٪</td>
-          <td>{{ rule.fixedAmount ?? 0 | persianNumber }} تومان</td>
-          <td>{{ rule.startDate ? (rule.startDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-          <td>{{ rule.endDate ? (rule.endDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
-          <td>
-            <div class="admin-page__actions">
-              <button type="button" (click)="openEdit(rule)" class="admin-page__link admin-page__link--primary">ویرایش</button>
-              <button type="button" (click)="remove(rule)" class="admin-page__link admin-page__link--danger">حذف</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p *ngIf="!loading && !rules.length" class="admin-page__empty">قانونی برای نمایش وجود ندارد.</p>
+    @if (loading) {
+      <div class="admin-page__loading">در حال بارگذاری قوانین…</div>
+    }
+    @if (!loading) {
+      <table class="admin-page__table">
+        <thead>
+          <tr>
+            <th>فروشنده</th>
+            <th>دسته‌بندی</th>
+            <th>محصول</th>
+            <th>نرخ (%)</th>
+            <th>مبلغ ثابت</th>
+            <th>شروع</th>
+            <th>پایان</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (rule of rules; track rule) {
+            <tr>
+              <td class="admin-page__cell-strong">{{ sellerName(rule.sellerId) }}</td>
+              <td>{{ categoryName(rule.categoryId) }}</td>
+              <td>{{ productName(rule.productId) }}</td>
+              <td>{{ rule.commissionRate | persianNumber:0:2 }}٪</td>
+              <td>{{ rule.fixedAmount ?? 0 | persianNumber }} تومان</td>
+              <td>{{ rule.startDate ? (rule.startDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+              <td>{{ rule.endDate ? (rule.endDate | persianDate:'yyyy/MM/dd') : '—' }}</td>
+              <td>
+                <div class="admin-page__actions">
+                  <button type="button" (click)="openEdit(rule)" class="admin-page__link admin-page__link--primary">ویرایش</button>
+                  <button type="button" (click)="remove(rule)" class="admin-page__link admin-page__link--danger">حذف</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if (!loading && !rules.length) {
+      <p class="admin-page__empty">قانونی برای نمایش وجود ندارد.</p>
+    }
   </div>
 
-  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
-    <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card admin-modal__card--wide">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">{{ editingId ? 'ویرایش قانون کمیسیون' : 'افزودن قانون کمیسیون' }}</h2>
-        <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
-      </div>
-      <div class="admin-form-grid">
-        <label>
-          <span class="admin-form-grid__label">فروشنده *</span>
-          <select formControlName="sellerId" class="admin-form-grid__input">
-            <option value="">انتخاب فروشنده</option>
-            <option *ngFor="let seller of sellers" [value]="seller.id">{{ seller.companyName }}</option>
-          </select>
-        </label>
-        <label>
-          <span class="admin-form-grid__label">دسته‌بندی</span>
-          <select formControlName="categoryId" class="admin-form-grid__input">
-            <option value="">همه دسته‌بندی‌ها</option>
-            <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
-          </select>
-        </label>
-        <div class="admin-form-grid__full">
-          <label class="admin-form-grid__label">محصول</label>
-          <select formControlName="productId" class="admin-form-grid__input">
-            <option value="">همه محصولات</option>
-            <option *ngFor="let product of products" [value]="product.id">{{ product.name }} — {{ product.sku }}</option>
-          </select>
+  @if (formOpen) {
+    <div class="admin-modal" (click)="closeForm()">
+      <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card admin-modal__card--wide">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">{{ editingId ? 'ویرایش قانون کمیسیون' : 'افزودن قانون کمیسیون' }}</h2>
+          <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
         </div>
-        <label>
-          <span class="admin-form-grid__label">نرخ کمیسیون (%) *</span>
-          <input formControlName="commissionRate" type="number" min="0" max="100" class="admin-form-grid__input" />
-        </label>
-        <label>
-          <span class="admin-form-grid__label">مبلغ ثابت</span>
-          <input formControlName="fixedAmount" type="number" min="0" class="admin-form-grid__input" />
-        </label>
-        <label>
-          <span class="admin-form-grid__label">تاریخ شروع</span>
-          <input formControlName="startDate" type="date" class="admin-form-grid__input" />
-        </label>
-        <label>
-          <span class="admin-form-grid__label">تاریخ پایان</span>
-          <input formControlName="endDate" type="date" class="admin-form-grid__input" />
-        </label>
-      </div>
-      <p *ngIf="formError" class="admin-alert admin-alert--error">{{ formError }}</p>
-      <div class="admin-form-actions">
-        <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
-        <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره' }}</button>
-      </div>
-    </form>
-  </div>
+        <div class="admin-form-grid">
+          <label>
+            <span class="admin-form-grid__label">فروشنده *</span>
+            <select formControlName="sellerId" class="admin-form-grid__input">
+              <option value="">انتخاب فروشنده</option>
+              @for (seller of sellers; track seller) {
+                <option [value]="seller.id">{{ seller.companyName }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span class="admin-form-grid__label">دسته‌بندی</span>
+            <select formControlName="categoryId" class="admin-form-grid__input">
+              <option value="">همه دسته‌بندی‌ها</option>
+              @for (category of categories; track category) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </label>
+          <div class="admin-form-grid__full">
+            <label class="admin-form-grid__label">محصول</label>
+            <select formControlName="productId" class="admin-form-grid__input">
+              <option value="">همه محصولات</option>
+              @for (product of products; track product) {
+                <option [value]="product.id">{{ product.name }} — {{ product.sku }}</option>
+              }
+            </select>
+          </div>
+          <label>
+            <span class="admin-form-grid__label">نرخ کمیسیون (%) *</span>
+            <input formControlName="commissionRate" type="number" min="0" max="100" class="admin-form-grid__input" />
+          </label>
+          <label>
+            <span class="admin-form-grid__label">مبلغ ثابت</span>
+            <input formControlName="fixedAmount" type="number" min="0" class="admin-form-grid__input" />
+          </label>
+          <label>
+            <span class="admin-form-grid__label">تاریخ شروع</span>
+            <input formControlName="startDate" type="date" class="admin-form-grid__input" />
+          </label>
+          <label>
+            <span class="admin-form-grid__label">تاریخ پایان</span>
+            <input formControlName="endDate" type="date" class="admin-form-grid__input" />
+          </label>
+        </div>
+        @if (formError) {
+          <p class="admin-alert admin-alert--error">{{ formError }}</p>
+        }
+        <div class="admin-form-actions">
+          <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
+          <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ذخیره…' : 'ذخیره' }}</button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

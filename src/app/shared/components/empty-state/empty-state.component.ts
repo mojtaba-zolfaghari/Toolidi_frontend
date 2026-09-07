@@ -1,18 +1,20 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'app-empty-state',
-  template: `
+    selector: 'app-empty-state',
+    template: `
     <div class="empty-state">
       <div class="empty-state__icon" aria-hidden="true">{{ icon }}</div>
       <h3 class="empty-state__title">{{ title }}</h3>
       <p class="empty-state__message">{{ message }}</p>
-      <button *ngIf="actionLabel" type="button" (click)="action.emit()" class="empty-state__action">
-        {{ actionLabel }}
-      </button>
+      @if (actionLabel) {
+        <button type="button" (click)="action.emit()" class="empty-state__action">
+          {{ actionLabel }}
+        </button>
+      }
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: block; }
 
     .empty-state {
@@ -59,7 +61,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
     .empty-state__action:hover {
       background: #5b32a8;
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EmptyStateComponent {
   @Input() icon = '📭';
@@ -70,8 +74,8 @@ export class EmptyStateComponent {
 }
 
 @Component({
-  selector: 'app-empty-cart',
-  template: `
+    selector: 'app-empty-cart',
+    template: `
     <app-empty-state
       icon="🛒"
       title="سبد خرید خالی است"
@@ -79,15 +83,17 @@ export class EmptyStateComponent {
       actionLabel="مشاهده محصولات"
       (action)="onNavigate.emit()">
     </app-empty-state>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EmptyCartComponent {
   @Output() onNavigate = new EventEmitter<void>();
 }
 
 @Component({
-  selector: 'app-empty-orders',
-  template: `
+    selector: 'app-empty-orders',
+    template: `
     <app-empty-state
       icon="📦"
       title="هنوز سفارشی ثبت نکرده‌اید"
@@ -95,15 +101,17 @@ export class EmptyCartComponent {
       actionLabel="مشاهده محصولات"
       (action)="onNavigate.emit()">
     </app-empty-state>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EmptyOrdersComponent {
   @Output() onNavigate = new EventEmitter<void>();
 }
 
 @Component({
-  selector: 'app-empty-search',
-  template: `
+    selector: 'app-empty-search',
+    template: `
     <app-empty-state
       icon="🔍"
       [title]="'نتیجه‌ای برای «' + query + '» یافت نشد'"
@@ -111,7 +119,9 @@ export class EmptyOrdersComponent {
       actionLabel="پاک کردن جستجو"
       (action)="onClear.emit()">
     </app-empty-state>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class EmptySearchComponent {
   @Input() query = '';

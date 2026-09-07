@@ -7,27 +7,31 @@
         <button type="button" (click)="mobileFilterOpen = !mobileFilterOpen" class="shop-filter-toggle">
           <svg xmlns="http://www.w3.org/2000/svg" class="shop-filter-toggle__icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
           فیلتر
-          <span *ngIf="activeFilterChips.length" class="shop-filter-toggle__count">{{ activeFilterChips.length | persianNumber }}</span>
+          @if (activeFilterChips.length) {
+            <span class="shop-filter-toggle__count">{{ activeFilterChips.length | persianNumber }}</span>
+          }
         </button>
       </div>
     </div>
 
     <div class="shop-layout">
       <!-- Mobile filter overlay -->
-      <div *ngIf="mobileFilterOpen" class="shop-filter-overlay">
-        <div class="shop-filter-overlay__backdrop" (click)="mobileFilterOpen = false"></div>
-        <aside class="shop-filter-drawer animate-slide-in-right">
-          <div class="shop-filter-drawer__head">
-            <h3 class="shop-filter-drawer__title">فیلترها</h3>
-            <button type="button" (click)="mobileFilterOpen = false" class="shop-filter-drawer__close" aria-label="بستن فیلترها">
-              <svg xmlns="http://www.w3.org/2000/svg" class="shop-filter-drawer__close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div class="shop-filter-drawer__body">
-            <ng-container *ngTemplateOutlet="filterPanel"></ng-container>
-          </div>
-        </aside>
-      </div>
+      @if (mobileFilterOpen) {
+        <div class="shop-filter-overlay">
+          <div class="shop-filter-overlay__backdrop" (click)="mobileFilterOpen = false"></div>
+          <aside class="shop-filter-drawer animate-slide-in-right">
+            <div class="shop-filter-drawer__head">
+              <h3 class="shop-filter-drawer__title">فیلترها</h3>
+              <button type="button" (click)="mobileFilterOpen = false" class="shop-filter-drawer__close" aria-label="بستن فیلترها">
+                <svg xmlns="http://www.w3.org/2000/svg" class="shop-filter-drawer__close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="shop-filter-drawer__body">
+              <ng-container *ngTemplateOutlet="filterPanel"></ng-container>
+            </div>
+          </aside>
+        </div>
+      }
 
       <!-- Desktop sidebar -->
       <aside class="shop-sidebar">
@@ -47,66 +51,81 @@
           <div class="shop-sortbar__controls">
             <label class="shop-sortbar__label" for="sortSelect">مرتب‌سازی:</label>
             <select id="sortSelect" [value]="filters.sort" (change)="changeSort($any($event.target).value)" class="shop-select shop-select--compact">
-              <option *ngFor="let option of sortOptions" [value]="option[0]">{{ option[1] }}</option>
+              @for (option of sortOptions; track option) {
+                <option [value]="option[0]">{{ option[1] }}</option>
+              }
             </select>
           </div>
         </div>
 
         <!-- Active filter chips -->
-        <div *ngIf="activeFilterChips.length" class="shop-chips">
-          <button type="button" *ngFor="let chip of activeFilterChips"
-                  class="shop-chip" (click)="chip.clear()"
-                  [attr.aria-label]="'حذف فیلتر ' + chip.label">
-            {{ chip.label }}
-            <svg xmlns="http://www.w3.org/2000/svg" class="shop-chip__x" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-          <button type="button" (click)="clearFilters()" class="shop-chip shop-chip--clear">پاک‌کردن همه</button>
-        </div>
+        @if (activeFilterChips.length) {
+          <div class="shop-chips">
+            @for (chip of activeFilterChips; track chip) {
+              <button type="button"
+                class="shop-chip" (click)="chip.clear()"
+                [attr.aria-label]="'حذف فیلتر ' + chip.label">
+                {{ chip.label }}
+                <svg xmlns="http://www.w3.org/2000/svg" class="shop-chip__x" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            }
+            <button type="button" (click)="clearFilters()" class="shop-chip shop-chip--clear">پاک‌کردن همه</button>
+          </div>
+        }
 
         <!-- Skeleton (initial load) -->
-        <app-skeleton-product-grid *ngIf="initialLoading" [count]="8"></app-skeleton-product-grid>
+        @if (initialLoading) {
+          <app-skeleton-product-grid [count]="8"></app-skeleton-product-grid>
+        }
 
         <!-- Error state -->
-        <app-empty-state *ngIf="!initialLoading && loadError"
-                         icon="📡"
-                         title="خطا در بارگذاری محصولات"
-                         message="ارتباط با سرور برقرار نشد. دوباره تلاش کنید."
-                         actionLabel="تلاش مجدد"
-                         (action)="retry()">
-        </app-empty-state>
+        @if (!initialLoading && loadError) {
+          <app-empty-state
+            icon="📡"
+            title="خطا در بارگذاری محصولات"
+            message="ارتباط با سرور برقرار نشد. دوباره تلاش کنید."
+            actionLabel="تلاش مجدد"
+            (action)="retry()">
+          </app-empty-state>
+        }
 
         <!-- Empty state -->
-        <app-empty-state *ngIf="!initialLoading && !loadError && !loading && !products.length"
-                         icon="🔍"
-                         title="محصولی یافت نشد"
-                         message="با تغییر فیلترها یا عبارت جستجو دوباره امتحان کنید."
-                         actionLabel="پاک‌کردن فیلترها"
-                         (action)="clearFilters()">
-        </app-empty-state>
+        @if (!initialLoading && !loadError && !loading && !products.length) {
+          <app-empty-state
+            icon="🔍"
+            title="محصولی یافت نشد"
+            message="با تغییر فیلترها یا عبارت جستجو دوباره امتحان کنید."
+            actionLabel="پاک‌کردن فیلترها"
+            (action)="clearFilters()">
+          </app-empty-state>
+        }
 
         <!-- Results grid -->
-        <ng-container *ngIf="!initialLoading && !loadError">
+        @if (!initialLoading && !loadError) {
           <div class="shop-results">
             <div class="shop-product-grid" [class.is-refreshing]="loading">
-              <app-product-card *ngFor="let product of products; trackBy: trackByProductId"
-                                [product]="product" [@slideUp]></app-product-card>
+              @for (product of products; track trackByProductId($index, product)) {
+                <app-product-card
+                [product]="product" [@slideUp]></app-product-card>
+              }
             </div>
-
-            <div *ngIf="loading" class="shop-loading-overlay" aria-live="polite" aria-label="در حال به‌روزرسانی محصولات">
-              <div class="shop-loading-pill">
-                <span class="shop-loading-dot"></span>
-                <span>در حال به‌روزرسانی محصولات</span>
+            @if (loading) {
+              <div class="shop-loading-overlay" aria-live="polite" aria-label="در حال به‌روزرسانی محصولات">
+                <div class="shop-loading-pill">
+                  <span class="shop-loading-dot"></span>
+                  <span>در حال به‌روزرسانی محصولات</span>
+                </div>
               </div>
-            </div>
+            }
           </div>
-
-          <app-pagination
-            *ngIf="!loading && products.length"
-            [page]="filters.page"
-            [totalPages]="totalPages"
-            (pageChange)="onPageChange($event)">
-          </app-pagination>
-        </ng-container>
+          @if (!loading && products.length) {
+            <app-pagination
+              [page]="filters.page"
+              [totalPages]="totalPages"
+              (pageChange)="onPageChange($event)">
+            </app-pagination>
+          }
+        }
       </div>
     </div>
   </div>
@@ -119,9 +138,9 @@
     <h3 class="shop-filter__title">جستجو</h3>
     <div class="shop-filter__row">
       <input #searchInput type="text" [value]="filters.search"
-             (input)="onSearchInput(searchInput.value)"
-             (keyup.enter)="submitSearch(searchInput.value)"
-             placeholder="جستجوی محصول…" class="shop-input" />
+        (input)="onSearchInput(searchInput.value)"
+        (keyup.enter)="submitSearch(searchInput.value)"
+        placeholder="جستجوی محصول…" class="shop-input" />
       <button type="button" (click)="submitSearch(searchInput.value)" class="shop-btn shop-btn--primary shop-btn--shrink">جستجو</button>
     </div>
   </div>
@@ -131,21 +150,25 @@
     <ul class="shop-cat-list">
       <li>
         <button type="button" (click)="selectCategory(null); mobileFilterOpen = false"
-                class="shop-cat-btn"
-                [class.is-active]="!filters.categoryId">
+          class="shop-cat-btn"
+          [class.is-active]="!filters.categoryId">
           همه محصولات
         </button>
       </li>
       <ng-container *ngTemplateOutlet="tree; context: { nodes: categories, level: 0 }"></ng-container>
     </ul>
-    <p *ngIf="!categories.length" class="shop-filter__hint">دسته‌بندی‌ای موجود نیست.</p>
+    @if (!categories.length) {
+      <p class="shop-filter__hint">دسته‌بندی‌ای موجود نیست.</p>
+    }
   </div>
   <!-- City -->
   <div class="shop-filter">
     <h3 class="shop-filter__title">شهر تأمین</h3>
     <select [value]="filters.city || ''" (change)="selectCity($any($event.target).value || null); mobileFilterOpen = false" class="shop-select">
       <option value="">همه شهرها</option>
-      <option *ngFor="let item of cities" [value]="item.city">{{ item.city }} ({{ item.productCount | persianNumber }})</option>
+      @for (item of cities; track item) {
+        <option [value]="item.city">{{ item.city }} ({{ item.productCount | persianNumber }})</option>
+      }
     </select>
   </div>
   <!-- Price -->
@@ -168,17 +191,19 @@
 
 <!-- Category tree template -->
 <ng-template #tree let-nodes="nodes" let-level="level">
-  <ng-container *ngFor="let cat of nodes">
+  @for (cat of nodes; track cat) {
     <li>
       <button type="button" (click)="selectCategory(cat.id); mobileFilterOpen = false"
-              class="shop-cat-btn"
-              [style.padding-right.px]="8 + level * 14"
-              [class.is-active]="filters.categoryId === cat.id">
+        class="shop-cat-btn"
+        [style.padding-right.px]="8 + level * 14"
+        [class.is-active]="filters.categoryId === cat.id">
         {{ cat.name }}
       </button>
-      <ul *ngIf="cat.children && cat.children.length" class="shop-cat-list">
-        <ng-container *ngTemplateOutlet="tree; context: { nodes: cat.children, level: level + 1 }"></ng-container>
-      </ul>
+      @if (cat.children && cat.children.length) {
+        <ul class="shop-cat-list">
+          <ng-container *ngTemplateOutlet="tree; context: { nodes: cat.children, level: level + 1 }"></ng-container>
+        </ul>
+      }
     </li>
-  </ng-container>
+  }
 </ng-template>

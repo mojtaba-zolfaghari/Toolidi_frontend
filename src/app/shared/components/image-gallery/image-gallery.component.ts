@@ -1,33 +1,47 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'app-image-gallery',
-  template: `
+    selector: 'app-image-gallery',
+    template: `
     <div class="gallery">
       <!-- Main image -->
       <div class="gallery__main" (click)="toggleZoom()">
-        <img *ngIf="images.length" [src]="images[selectedIndex]?.url || images[selectedIndex]"
-             class="gallery__img"
-             [style.transform]="zoomed ? 'scale(2)' : 'scale(1)'"
-             [style.transformOrigin]="zoomOrigin" alt="">
-        <div *ngIf="!images.length" class="gallery__empty">📷</div>
-        <button *ngIf="images.length > 1" type="button" (click)="$event.stopPropagation(); prev()"
-                class="gallery__nav gallery__nav--prev" aria-label="تصویر قبلی">→</button>
-        <button *ngIf="images.length > 1" type="button" (click)="$event.stopPropagation(); next()"
-                class="gallery__nav gallery__nav--next" aria-label="تصویر بعدی">←</button>
-        <span *ngIf="zoomed" class="gallery__zoom-hint">برای بستن کلیک کنید</span>
+        @if (images.length) {
+          <img [src]="images[selectedIndex]?.url || images[selectedIndex]"
+            class="gallery__img"
+            [style.transform]="zoomed ? 'scale(2)' : 'scale(1)'"
+            [style.transformOrigin]="zoomOrigin" alt="">
+        }
+        @if (!images.length) {
+          <div class="gallery__empty">📷</div>
+        }
+        @if (images.length > 1) {
+          <button type="button" (click)="$event.stopPropagation(); prev()"
+          class="gallery__nav gallery__nav--prev" aria-label="تصویر قبلی">→</button>
+        }
+        @if (images.length > 1) {
+          <button type="button" (click)="$event.stopPropagation(); next()"
+          class="gallery__nav gallery__nav--next" aria-label="تصویر بعدی">←</button>
+        }
+        @if (zoomed) {
+          <span class="gallery__zoom-hint">برای بستن کلیک کنید</span>
+        }
       </div>
       <!-- Thumbnails -->
-      <div *ngIf="images.length > 1" class="gallery__thumbs">
-        <button *ngFor="let img of images; let i = index" type="button" (click)="selectedIndex = i"
-                class="gallery__thumb"
-                [class.is-active]="i === selectedIndex">
-          <img [src]="img?.url || img" class="gallery__thumb-img" alt="">
-        </button>
-      </div>
+      @if (images.length > 1) {
+        <div class="gallery__thumbs">
+          @for (img of images; track img; let i = $index) {
+            <button type="button" (click)="selectedIndex = i"
+              class="gallery__thumb"
+              [class.is-active]="i === selectedIndex">
+              <img [src]="img?.url || img" class="gallery__thumb-img" alt="">
+            </button>
+          }
+        </div>
+      }
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: block; }
 
     .gallery {
@@ -126,7 +140,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       height: 100%;
       object-fit: cover;
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ImageGalleryComponent {
   @Input() images: any[] = [];

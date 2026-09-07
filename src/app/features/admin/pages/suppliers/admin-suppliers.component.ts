@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
@@ -15,9 +15,11 @@ import { LocationService, Province, City } from '../../../../core/services/api/l
  * فهرست، افزودن، ویرایش، مشاهده و حذف تأمین‌کننده از طریق SupplierController.
  */
 @Component({
-  selector: 'app-admin-suppliers',
-  templateUrl: './admin-suppliers.component.html',
-  styleUrls: ['./admin-suppliers.component.scss']
+    selector: 'app-admin-suppliers',
+    templateUrl: './admin-suppliers.component.html',
+    styleUrls: ['./admin-suppliers.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminSuppliersComponent implements OnInit {
   suppliers: AdminSupplier[] = [];

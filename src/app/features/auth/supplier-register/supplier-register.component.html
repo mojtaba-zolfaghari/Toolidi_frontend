@@ -45,104 +45,148 @@
     <section class="supplier-form-panel" aria-label="فرم ثبتنام تولیدکننده">
       <div class="supplier-form-topline"><span class="supplier-form-eyebrow">شروع تولید</span><a routerLink="/auth/login" class="supplier-login-link">قبلاً عضو هستید؟ ورود</a></div>
 
-      <div *ngIf="!submitted; else supplierSuccess" class="supplier-form-content">
-        <div class="supplier-form-heading"><span class="supplier-form-icon">🏭</span><div><h2>تأمینکننده تولیدی شوید</h2><p>در چهار مرحله کوتاه، کارخانهدار حرفهای شوید.</p></div></div>
-
-        <div class="supplier-progress" aria-label="پیشرفت ثبتنام">
-          <div *ngFor="let step of [1,2,3]" class="supplier-progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step"><span>{{ step }}</span><small>{{ step === 1 ? 'حساب' : step === 2 ? 'شرکت' : 'تأیید' }}</small></div>
-        </div>
-        <div class="supplier-progress-line"><span [style.width.%]="((currentStep - 1) / 2) * 100"></span></div>
-
-        <form #stepContainer="ngForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-          <div [ngSwitch]="currentStep" class="supplier-step-container">
-
-            <!-- Step 1: حساب -->
-            <section *ngSwitchCase="1" class="supplier-step" aria-labelledby="supplier-account-title">
-              <div class="supplier-step-heading"><span>01</span><div><h3 id="supplier-account-title">حساب خودت را بساز</h3><p>این اطلاعات برای ورود و امنیت حساب استفاده میشود.</p></div></div>
-              <div class="supplier-fields-grid">
-                <label class="supplier-field supplier-field-full"><span>کد ملی</span><input formControlName="nationalCode" inputmode="numeric" dir="ltr" placeholder="۱۰ رقم کد ملی"><em *ngIf="hasError('nationalCode')">کد ملی باید ۱۰ رقم باشد.</em></label>
-                <label class="supplier-field"><span>نام کاربری</span><input formControlName="username" autocomplete="username" placeholder="نام کاربری"><em *ngIf="hasError('username')">حداقل ۳ کاراکتر.</em></label>
-                <label class="supplier-field"><span>رمز عبور</span><input type="password" formControlName="password" autocomplete="new-password" placeholder="حداقل ۶ کاراکتر"><em *ngIf="hasError('password')">حداقل ۶ کاراکتر.</em></label>
-                <label class="supplier-field supplier-field-full"><span>تکرار رمز عبور</span><input type="password" formControlName="confirmPassword" autocomplete="new-password" placeholder="تکرار رمز عبور"><em *ngIf="hasError('confirmPassword')">تکرار رمز الزامی است.</em></label>
-              </div>
-            </section>
-
-            <!-- Step 2: شرکت و تماس -->
-            <section *ngSwitchCase="2" class="supplier-step" aria-labelledby="supplier-company-title">
-              <div class="supplier-step-heading"><span>02</span><div><h3 id="supplier-company-title">اطلاعات شرکت و تماس</h3><p>خریدار باید بداند از کجا و با چه ظرفیتی سفارش میگیرد.</p></div></div>
-              <div class="supplier-fields-grid">
-                <label class="supplier-field supplier-field-full"><span>نام شرکت / کارخانه</span><input formControlName="companyName" placeholder="مثلاً تولیدی گوهر جنوب"><em *ngIf="hasError('companyName')">نام شرکت را وارد کنید.</em></label>
-                <label class="supplier-field"><span>استان</span><select formControlName="provinceId" (change)="onProvinceChange()"><option value="">انتخاب استان</option><option *ngFor="let p of apiProvinces" [value]="p.id">{{ p.name }}</option></select><em *ngIf="hasError('provinceId')">استان را انتخاب کنید.</em></label>
-                <label class="supplier-field"><span>شهرستان</span><select formControlName="cityId" (change)="onCityChange()" [disabled]="loadingCities || !form.get('provinceId')?.value"><option value="">{{ loadingCities ? 'در حال بارگذاری...' : 'انتخاب شهرستان' }}</option><option *ngFor="let c of apiCities" [value]="c.id">{{ c.name }}</option></select><em *ngIf="hasError('cityId')">شهرستان را انتخاب کنید.</em></label>
-                <div *ngIf="!registrationAllowed && registrationCheckMessage" class="supplier-validation-msg">
-                  <div>⚠️ {{ registrationCheckMessage }}</div>
-                </div>
-                <label class="supplier-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" dir="ltr" placeholder="09xxxxxxxxx"><em *ngIf="hasError('phone')">شماره موبایل معتبر وارد کنید.</em></label>
-                <label class="supplier-field"><span>ایمیل</span><input formControlName="email" type="email" dir="ltr" placeholder="you@example.com"><em *ngIf="hasError('email')">ایمیل معتبر وارد کنید.</em></label>
-                <label class="supplier-field supplier-field-full"><span>آدرس</span><input formControlName="address" placeholder="آدرس کامل شرکت"><em *ngIf="hasError('address')">آدرس را وارد کنید.</em></label>
-              </div>
-            </section>
-
-            <!-- Step 3: مدارک + ارسال -->
-            <section *ngSwitchCase="3" class="supplier-step" aria-labelledby="supplier-docs-title">
-              <div class="supplier-step-heading"><span>03</span><div><h3 id="supplier-docs-title">آپلود مدارک و آمادهسازی</h3><p>مدارک هویتی یا تجاری خود را آپلود کنید. بررسی مدارک پس از ثبت انجام میشود.</p></div></div>
-
-              <div class="supplier-docs-area">
-                <div class="supplier-file-dropzone" #dropZone>
-                  <input type="file" #fileInput id="supplier-doc-files" multiple accept=".pdf,.jpg,.jpeg,.png" class="supplier-file-input"
-                         (change)="onFilesSelected(fileInput.files)" />
-                  <label for="supplier-doc-files" class="supplier-dropzone-label">
-                    <span class="supplier-dropzone-icon">📎</span>
-                    <span class="supplier-dropzone-text">فایل‌های خود را اینجا رها کنید یا کلیک کنید</span>
-                    <span class="supplier-dropzone-hint">PDF، JPG یا PNG — حداکثر ۵ مگابایت</span>
-                  </label>
-                </div>
-
-                <div *ngIf="supplierUploadingFiles.length" class="supplier-upload-progress-row">
-                  <div *ngFor="let f of supplierUploadingFiles" class="upload-item">
-                    <span class="upload-name">{{ f.file.name }}</span>
-                    <div class="upload-bar"><div class="upload-fill" [style.width.%]="f.progress || 0"></div></div>
-                    <span class="upload-pct">{{ f.progress }}٪</span>
-                    <span *ngIf="f.error" class="upload-err">{{ f.error }}</span>
-                    <span *ngIf="!f.error && f.progress === 100" class="upload-ok">✓ بارگذاری شد</span>
-                  </div>
-                </div>
-              </div>
-
-              <label class="supplier-check"><input type="checkbox" formControlName="acceptsReturns"><span>قوانین بازگشت کالا و مرجوعی را مطالعه کرده و میپذیرم.</span></label>
-            </section>
-
+      @if (!submitted) {
+        <div class="supplier-form-content">
+          <div class="supplier-form-heading"><span class="supplier-form-icon">🏭</span><div><h2>تأمینکننده تولیدی شوید</h2><p>در چهار مرحله کوتاه، کارخانهدار حرفهای شوید.</p></div></div>
+          <div class="supplier-progress" aria-label="پیشرفت ثبتنام">
+            @for (step of [1,2,3]; track step) {
+              <div class="supplier-progress-step" [class.active]="currentStep >= step" [class.current]="currentStep === step"><span>{{ step }}</span><small>{{ step === 1 ? 'حساب' : step === 2 ? 'شرکت' : 'تأیید' }}</small></div>
+            }
           </div>
-
-          <div *ngIf="errorMessage" class="supplier-alert" role="alert">⚠️ {{ errorMessage }}</div>
-          <div class="supplier-actions">
-            <button *ngIf="currentStep > 1" type="button" class="supplier-secondary-action" (click)="prevStep()">← مرحله قبل</button>
-            <span *ngIf="currentStep === 1"></span>
-            <button *ngIf="currentStep < totalSteps" type="button" class="supplier-primary-action" (click)="nextStep()">ادامه <span>←</span></button>
-            <button *ngIf="currentStep === totalSteps" type="submit" class="supplier-primary-action" [disabled]="loading">{{ loading ? 'در حال ثبتنام...' : 'ثبتنام تأمینکننده' }} <span>✦</span></button>
-          </div>
-        </form>
-
-        <p class="supplier-verify-note">پس از ثبتنام، حساب شما در حال بررسی است و لینک تأیید به ایمیل یا پیامک ارسال میشود.</p>
+          <div class="supplier-progress-line"><span [style.width.%]="((currentStep - 1) / 2) * 100"></span></div>
+          <form #stepContainer="ngForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <div class="supplier-step-container">
+              @switch (currentStep) {
+                <!-- Step 1: حساب -->
+                @case (1) {
+                  <section class="supplier-step" aria-labelledby="supplier-account-title">
+                    <div class="supplier-step-heading"><span>01</span><div><h3 id="supplier-account-title">حساب خودت را بساز</h3><p>این اطلاعات برای ورود و امنیت حساب استفاده میشود.</p></div></div>
+                    <div class="supplier-fields-grid">
+                      <label class="supplier-field supplier-field-full"><span>کد ملی</span><input formControlName="nationalCode" inputmode="numeric" dir="ltr" placeholder="۱۰ رقم کد ملی">@if (hasError('nationalCode')) {
+                      <em>کد ملی باید ۱۰ رقم باشد.</em>
+                    }</label>
+                    <label class="supplier-field"><span>نام کاربری</span><input formControlName="username" autocomplete="username" placeholder="نام کاربری">@if (hasError('username')) {
+                    <em>حداقل ۳ کاراکتر.</em>
+                  }</label>
+                  <label class="supplier-field"><span>رمز عبور</span><input type="password" formControlName="password" autocomplete="new-password" placeholder="حداقل ۶ کاراکتر">@if (hasError('password')) {
+                  <em>حداقل ۶ کاراکتر.</em>
+                }</label>
+                <label class="supplier-field supplier-field-full"><span>تکرار رمز عبور</span><input type="password" formControlName="confirmPassword" autocomplete="new-password" placeholder="تکرار رمز عبور">@if (hasError('confirmPassword')) {
+                <em>تکرار رمز الزامی است.</em>
+              }</label>
+            </div>
+          </section>
+        }
+        <!-- Step 2: شرکت و تماس -->
+        @case (2) {
+          <section class="supplier-step" aria-labelledby="supplier-company-title">
+            <div class="supplier-step-heading"><span>02</span><div><h3 id="supplier-company-title">اطلاعات شرکت و تماس</h3><p>خریدار باید بداند از کجا و با چه ظرفیتی سفارش میگیرد.</p></div></div>
+            <div class="supplier-fields-grid">
+              <label class="supplier-field supplier-field-full"><span>نام شرکت / کارخانه</span><input formControlName="companyName" placeholder="مثلاً تولیدی گوهر جنوب">@if (hasError('companyName')) {
+              <em>نام شرکت را وارد کنید.</em>
+            }</label>
+            <label class="supplier-field"><span>استان</span><select formControlName="provinceId" (change)="onProvinceChange()"><option value="">انتخاب استان</option>@for (p of apiProvinces; track p) {
+            <option [value]="p.id">{{ p.name }}</option>
+          }</select>@if (hasError('provinceId')) {
+          <em>استان را انتخاب کنید.</em>
+        }</label>
+        <label class="supplier-field"><span>شهرستان</span><select formControlName="cityId" (change)="onCityChange()" [disabled]="loadingCities || !form.get('provinceId')?.value"><option value="">{{ loadingCities ? 'در حال بارگذاری...' : 'انتخاب شهرستان' }}</option>@for (c of apiCities; track c) {
+        <option [value]="c.id">{{ c.name }}</option>
+      }</select>@if (hasError('cityId')) {
+      <em>شهرستان را انتخاب کنید.</em>
+    }</label>
+    @if (!registrationAllowed && registrationCheckMessage) {
+      <div class="supplier-validation-msg">
+        <div>⚠️ {{ registrationCheckMessage }}</div>
       </div>
-
-      <ng-template #supplierSuccess>
-        <div class="supplier-success-state">
-          <div class="supplier-success-ring">✓</div>
-          <span class="supplier-form-eyebrow">حساب آماده شد</span>
-          <h2>کارخانهدار شدید.</h2>
-          <p>{{ successMessage }}</p>
-          <div class="supplier-success-steps">
-            <span>✓ حساب ایجاد شد</span>
-            <span>✓ اطلاعات شرکت ذخیره شد</span>
-            <span>◌ ورود به پنل تأمینکننده</span>
-          </div>
-          <div class="supplier-actions supplier-success-actions">
-            <button type="button" class="supplier-secondary-action" (click)="startAgain()">ثبت حساب دیگر</button>
-            <button type="button" class="supplier-primary-action" (click)="goToSupplierPanel()">ورود به پنل تأمینکننده</button>
-          </div>
+    }
+    <label class="supplier-field"><span>شماره موبایل</span><input formControlName="phone" type="tel" inputmode="tel" dir="ltr" placeholder="09xxxxxxxxx">@if (hasError('phone')) {
+    <em>شماره موبایل معتبر وارد کنید.</em>
+  }</label>
+  <label class="supplier-field"><span>ایمیل</span><input formControlName="email" type="email" dir="ltr" placeholder="you@example.com">@if (hasError('email')) {
+  <em>ایمیل معتبر وارد کنید.</em>
+}</label>
+<label class="supplier-field supplier-field-full"><span>آدرس</span><input formControlName="address" placeholder="آدرس کامل شرکت">@if (hasError('address')) {
+<em>آدرس را وارد کنید.</em>
+}</label>
+</div>
+</section>
+}
+<!-- Step 3: مدارک + ارسال -->
+@case (3) {
+  <section class="supplier-step" aria-labelledby="supplier-docs-title">
+    <div class="supplier-step-heading"><span>03</span><div><h3 id="supplier-docs-title">آپلود مدارک و آمادهسازی</h3><p>مدارک هویتی یا تجاری خود را آپلود کنید. بررسی مدارک پس از ثبت انجام میشود.</p></div></div>
+    <div class="supplier-docs-area">
+      <div class="supplier-file-dropzone" #dropZone>
+        <input type="file" #fileInput id="supplier-doc-files" multiple accept=".pdf,.jpg,.jpeg,.png" class="supplier-file-input"
+          (change)="onFilesSelected(fileInput.files)" />
+        <label for="supplier-doc-files" class="supplier-dropzone-label">
+          <span class="supplier-dropzone-icon">📎</span>
+          <span class="supplier-dropzone-text">فایل‌های خود را اینجا رها کنید یا کلیک کنید</span>
+          <span class="supplier-dropzone-hint">PDF، JPG یا PNG — حداکثر ۵ مگابایت</span>
+        </label>
+      </div>
+      @if (supplierUploadingFiles.length) {
+        <div class="supplier-upload-progress-row">
+          @for (f of supplierUploadingFiles; track f) {
+            <div class="upload-item">
+              <span class="upload-name">{{ f.file.name }}</span>
+              <div class="upload-bar"><div class="upload-fill" [style.width.%]="f.progress || 0"></div></div>
+              <span class="upload-pct">{{ f.progress }}٪</span>
+              @if (f.error) {
+                <span class="upload-err">{{ f.error }}</span>
+              }
+              @if (!f.error && f.progress === 100) {
+                <span class="upload-ok">✓ بارگذاری شد</span>
+              }
+            </div>
+          }
         </div>
-      </ng-template>
-    </section>
+      }
+    </div>
+    <label class="supplier-check"><input type="checkbox" formControlName="acceptsReturns"><span>قوانین بازگشت کالا و مرجوعی را مطالعه کرده و میپذیرم.</span></label>
+  </section>
+}
+}
+</div>
+@if (errorMessage) {
+  <div class="supplier-alert" role="alert">⚠️ {{ errorMessage }}</div>
+}
+<div class="supplier-actions">
+  @if (currentStep > 1) {
+    <button type="button" class="supplier-secondary-action" (click)="prevStep()">← مرحله قبل</button>
+  }
+  @if (currentStep === 1) {
+    <span></span>
+  }
+  @if (currentStep < totalSteps) {
+    <button type="button" class="supplier-primary-action" (click)="nextStep()">ادامه <span>←</span></button>
+  }
+  @if (currentStep === totalSteps) {
+    <button type="submit" class="supplier-primary-action" [disabled]="loading">{{ loading ? 'در حال ثبتنام...' : 'ثبتنام تأمینکننده' }} <span>✦</span></button>
+  }
+</div>
+</form>
+<p class="supplier-verify-note">پس از ثبتنام، حساب شما در حال بررسی است و لینک تأیید به ایمیل یا پیامک ارسال میشود.</p>
+</div>
+} @else {
+  <div class="supplier-success-state">
+    <div class="supplier-success-ring">✓</div>
+    <span class="supplier-form-eyebrow">حساب آماده شد</span>
+    <h2>کارخانهدار شدید.</h2>
+    <p>{{ successMessage }}</p>
+    <div class="supplier-success-steps">
+      <span>✓ حساب ایجاد شد</span>
+      <span>✓ اطلاعات شرکت ذخیره شد</span>
+      <span>◌ ورود به پنل تأمینکننده</span>
+    </div>
+    <div class="supplier-actions supplier-success-actions">
+      <button type="button" class="supplier-secondary-action" (click)="startAgain()">ثبت حساب دیگر</button>
+      <button type="button" class="supplier-primary-action" (click)="goToSupplierPanel()">ورود به پنل تأمینکننده</button>
+    </div>
   </div>
+}
+
+</section>
+</div>
 </section>

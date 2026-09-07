@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -19,9 +19,11 @@ import { BuyerProfileApiService, BuyerProfileSubmitData } from './buyer-profile-
  * - Angular Material + BEM، بدون Tailwind
  */
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+    selector: 'app-register',
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class RegisterComponent implements OnInit, OnDestroy {
   form: FormGroup;

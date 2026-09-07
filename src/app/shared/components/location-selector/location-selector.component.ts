@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { ControlContainer, FormGroup } from '@angular/forms';
 import { LocationService, Province, City } from '../../../core/services/api/location.service';
 
 @Component({
-  selector: 'app-location-selector',
-  templateUrl: './location-selector.component.html',
-  styles: [`
+    selector: 'app-location-selector',
+    templateUrl: './location-selector.component.html',
+    styles: [`
     :host { display: block; }
 
     .location-grid {
@@ -52,7 +52,9 @@ import { LocationService, Province, City } from '../../../core/services/api/loca
         cursor: not-allowed;
       }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class LocationSelectorComponent implements OnInit {
   @Input() formGroup?: FormGroup;

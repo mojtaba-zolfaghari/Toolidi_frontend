@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -23,9 +23,11 @@ type ProductSaveMode = 'draft' | 'approval' | 'publish' | 'save';
 
 /** فرم چندمرحله‌ای ایجاد/ویرایش محصول */
 @Component({
-  selector: 'app-product-form',
-  templateUrl: './product-form.component.html',
-  animations: [fadeIn]
+    selector: 'app-product-form',
+    templateUrl: './product-form.component.html',
+    animations: [fadeIn],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ProductFormComponent implements OnInit, AfterViewInit {
   @ViewChild(ImageUploadComponent) imageUpload!: ImageUploadComponent;

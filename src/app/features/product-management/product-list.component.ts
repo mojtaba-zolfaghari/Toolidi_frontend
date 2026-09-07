@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AdminProduct, AdminSeller, AdminService } from '../../core/services/api/admin.service';
@@ -18,8 +18,10 @@ const STATUS_OPTIONS = [
 
 /** صفحه فهرست محصولات برای مدیر و فروشنده */
 @Component({
-  selector: 'app-product-list',
-  templateUrl: './product-list.component.html'
+    selector: 'app-product-list',
+    templateUrl: './product-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ProductListComponent implements OnInit {
   isAdmin = false;

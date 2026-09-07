@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AdminSeller, AdminService, CreateSellerData, SellerDocument, SellerReport } from '../../../../core/services/api/admin.service';
@@ -9,8 +9,10 @@ import { ConfirmService } from '../../../../shared/services/confirm.service';
 type DetailTab = 'info' | 'orders' | 'products' | 'reports' | 'documents';
 
 @Component({
-  selector: 'app-admin-sellers',
-  templateUrl: './admin-sellers.component.html'
+    selector: 'app-admin-sellers',
+    templateUrl: './admin-sellers.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminSellersComponent implements OnInit {
   headerActions = [

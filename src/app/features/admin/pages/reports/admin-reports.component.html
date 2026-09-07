@@ -4,7 +4,9 @@
     subtitle="بررسی فروش روزانه، ماهانه و عملکرد فروشندگان"
   ></app-page-header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
 
   <!-- Daily & Monthly Reports -->
   <div class="admin-page__grid--wide">
@@ -18,13 +20,17 @@
           <app-persian-date-picker mode="date" placeholder="انتخاب تاریخ" [value]="dailyDate" (gregorianChange)="onDailyDateChange($event)"></app-persian-date-picker>
         </label>
       </div>
-      <div *ngIf="dailyLoading" class="dashboard-card__loading">در حال دریافت گزارش…</div>
-      <div *ngIf="!dailyLoading" class="dashboard-card__stat-grid">
-        <app-stat-card title="کل سفارش‌ها" [value]="dailyReport?.totalOrders ?? 0" icon="📦" color="primary"></app-stat-card>
-        <app-stat-card title="کل فروش" [value]="dailyReport?.totalSales ?? 0" icon="💰" color="success"></app-stat-card>
-        <app-stat-card title="کل تخفیف" [value]="dailyReport?.totalDiscount ?? 0" icon="🏷️" color="warning"></app-stat-card>
-        <app-stat-card title="فروش خالص" [value]="dailyReport?.netSales ?? 0" icon="✅" color="info"></app-stat-card>
-      </div>
+      @if (dailyLoading) {
+        <div class="dashboard-card__loading">در حال دریافت گزارش…</div>
+      }
+      @if (!dailyLoading) {
+        <div class="dashboard-card__stat-grid">
+          <app-stat-card title="کل سفارش‌ها" [value]="dailyReport?.totalOrders ?? 0" icon="📦" color="primary"></app-stat-card>
+          <app-stat-card title="کل فروش" [value]="dailyReport?.totalSales ?? 0" icon="💰" color="success"></app-stat-card>
+          <app-stat-card title="کل تخفیف" [value]="dailyReport?.totalDiscount ?? 0" icon="🏷️" color="warning"></app-stat-card>
+          <app-stat-card title="فروش خالص" [value]="dailyReport?.netSales ?? 0" icon="✅" color="info"></app-stat-card>
+        </div>
+      }
     </mat-card>
 
     <mat-card appearance="outlined" class="dashboard-card">
@@ -37,21 +43,29 @@
           <app-persian-date-picker mode="month" placeholder="انتخاب ماه" [value]="monthlyMonth" (gregorianChange)="onMonthlyDateChange($event)"></app-persian-date-picker>
         </label>
       </div>
-      <div *ngIf="monthlyLoading" class="dashboard-card__loading">در حال دریافت گزارش…</div>
-      <div *ngIf="!monthlyLoading" class="dashboard-card__stat-grid">
-        <app-stat-card title="کل سفارش‌ها" [value]="monthlyReport?.totalOrders ?? 0" icon="📦" color="primary"></app-stat-card>
-        <app-stat-card title="کل فروش" [value]="monthlyReport?.totalSales ?? 0" icon="💰" color="success"></app-stat-card>
-        <app-stat-card title="کل تخفیف" [value]="monthlyReport?.totalDiscount ?? 0" icon="🏷️" color="warning"></app-stat-card>
-        <app-stat-card title="فروش خالص" [value]="monthlyReport?.netSales ?? 0" icon="✅" color="info"></app-stat-card>
-      </div>
+      @if (monthlyLoading) {
+        <div class="dashboard-card__loading">در حال دریافت گزارش…</div>
+      }
+      @if (!monthlyLoading) {
+        <div class="dashboard-card__stat-grid">
+          <app-stat-card title="کل سفارش‌ها" [value]="monthlyReport?.totalOrders ?? 0" icon="📦" color="primary"></app-stat-card>
+          <app-stat-card title="کل فروش" [value]="monthlyReport?.totalSales ?? 0" icon="💰" color="success"></app-stat-card>
+          <app-stat-card title="کل تخفیف" [value]="monthlyReport?.totalDiscount ?? 0" icon="🏷️" color="warning"></app-stat-card>
+          <app-stat-card title="فروش خالص" [value]="monthlyReport?.netSales ?? 0" icon="✅" color="info"></app-stat-card>
+        </div>
+      }
     </mat-card>
   </div>
 
   <!-- Sales Trend Chart -->
   <mat-card appearance="outlined" class="dashboard-card">
     <h2 class="dashboard-card__title">روند فروش</h2>
-    <app-bar-chart *ngIf="salesTrendChart.length" [data]="salesTrendChart"></app-bar-chart>
-    <p *ngIf="!salesTrendChart.length" class="dashboard-card__empty">روندی برای نمایش وجود ندارد.</p>
+    @if (salesTrendChart.length) {
+      <app-bar-chart [data]="salesTrendChart"></app-bar-chart>
+    }
+    @if (!salesTrendChart.length) {
+      <p class="dashboard-card__empty">روندی برای نمایش وجود ندارد.</p>
+    }
   </mat-card>
 
   <!-- Seller Performance -->
@@ -64,39 +78,51 @@
       <div class="seller-filter">
         <input [(ngModel)]="sellerSearch" placeholder="جستجوی فروشنده…" class="seller-filter__search" />
         <div class="seller-filter__chips">
-          <button type="button" *ngFor="let seller of filteredSellers" (click)="toggleSeller(seller.id)"
-                  [class.seller-filter__chip--active]="selectedSellerIds.includes(seller.id)"
-                  class="seller-filter__chip">{{ seller.companyName }}</button>
-          <button type="button" *ngIf="selectedSellerIds.length" (click)="clearSellerSelection()"
-                  class="seller-filter__chip seller-filter__chip--danger">پاک کردن انتخاب</button>
+          @for (seller of filteredSellers; track seller) {
+            <button type="button" (click)="toggleSeller(seller.id)"
+              [class.seller-filter__chip--active]="selectedSellerIds.includes(seller.id)"
+            class="seller-filter__chip">{{ seller.companyName }}</button>
+          }
+          @if (selectedSellerIds.length) {
+            <button type="button" (click)="clearSellerSelection()"
+            class="seller-filter__chip seller-filter__chip--danger">پاک کردن انتخاب</button>
+          }
         </div>
         <button type="button" (click)="loadSellerPerformance()" class="admin-btn-outline">🔄 بازخوانی</button>
       </div>
     </div>
-    <div *ngIf="performanceLoading" class="dashboard-card__loading">در حال دریافت گزارش…</div>
-    <div *ngIf="!performanceLoading" class="dashboard-card__tablewrap">
-      <table class="dashboard-card__table">
-        <thead><tr>
-          <th>فروشنده</th>
-          <th>تعداد سفارش</th>
-          <th>فروش</th>
-          <th>کمیسیون</th>
-          <th>میانگین سفارش</th>
-          <th>فروش خالص</th>
-        </tr></thead>
-        <tbody>
-          <tr *ngFor="let seller of performance">
-            <td>{{ seller.companyName }}</td>
-            <td>{{ seller.totalOrders | persianNumber }}</td>
-            <td>{{ seller.totalSales | persianNumber }} تومان</td>
-            <td>{{ seller.totalCommission ?? 0 | persianNumber }} تومان</td>
-            <td>{{ seller.averageOrderValue ?? 0 | persianNumber }} تومان</td>
-            <td class="dashboard-card__net">{{ seller.netSales | persianNumber }} تومان</td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="!performance.length" class="dashboard-card__empty">داده‌ای برای نمایش وجود ندارد.</p>
-    </div>
+    @if (performanceLoading) {
+      <div class="dashboard-card__loading">در حال دریافت گزارش…</div>
+    }
+    @if (!performanceLoading) {
+      <div class="dashboard-card__tablewrap">
+        <table class="dashboard-card__table">
+          <thead><tr>
+            <th>فروشنده</th>
+            <th>تعداد سفارش</th>
+            <th>فروش</th>
+            <th>کمیسیون</th>
+            <th>میانگین سفارش</th>
+            <th>فروش خالص</th>
+          </tr></thead>
+          <tbody>
+            @for (seller of performance; track seller) {
+              <tr>
+                <td>{{ seller.companyName }}</td>
+                <td>{{ seller.totalOrders | persianNumber }}</td>
+                <td>{{ seller.totalSales | persianNumber }} تومان</td>
+                <td>{{ seller.totalCommission ?? 0 | persianNumber }} تومان</td>
+                <td>{{ seller.averageOrderValue ?? 0 | persianNumber }} تومان</td>
+                <td class="dashboard-card__net">{{ seller.netSales | persianNumber }} تومان</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (!performance.length) {
+          <p class="dashboard-card__empty">داده‌ای برای نمایش وجود ندارد.</p>
+        }
+      </div>
+    }
   </mat-card>
 
   <!-- Top Products -->
@@ -108,30 +134,40 @@
       </div>
       <button (click)="loadTopProducts()" class="admin-btn-outline">🔄 بازخوانی</button>
     </div>
-    <div *ngIf="topProductsLoading" class="dashboard-card__loading">در حال دریافت گزارش…</div>
-    <div *ngIf="!topProductsLoading" class="dashboard-card__body">
-      <app-bar-chart *ngIf="topProductsChart.length" [data]="topProductsChart"></app-bar-chart>
-      <div class="dashboard-card__tablewrap">
-        <table class="dashboard-card__table">
-          <thead><tr>
-            <th>ردیف</th>
-            <th>محصول</th>
-            <th>فروشنده</th>
-            <th>تعداد فروش</th>
-            <th>مبلغ فروش</th>
-          </tr></thead>
-          <tbody>
-            <tr *ngFor="let product of topProducts; let i = index">
-              <td>{{ i + 1 }}</td>
-              <td class="dashboard-card__cell-strong">{{ product.productName }}</td>
-              <td>{{ product.sellerName || '—' }}</td>
-              <td>{{ product.quantitySold ?? 0 | persianNumber }}</td>
-              <td class="dashboard-card__cell-primary">{{ product.salesAmount | persianNumber }} تومان</td>
-            </tr>
-          </tbody>
-        </table>
-        <p *ngIf="!topProducts.length" class="dashboard-card__empty">داده‌ای برای نمایش وجود ندارد.</p>
+    @if (topProductsLoading) {
+      <div class="dashboard-card__loading">در حال دریافت گزارش…</div>
+    }
+    @if (!topProductsLoading) {
+      <div class="dashboard-card__body">
+        @if (topProductsChart.length) {
+          <app-bar-chart [data]="topProductsChart"></app-bar-chart>
+        }
+        <div class="dashboard-card__tablewrap">
+          <table class="dashboard-card__table">
+            <thead><tr>
+              <th>ردیف</th>
+              <th>محصول</th>
+              <th>فروشنده</th>
+              <th>تعداد فروش</th>
+              <th>مبلغ فروش</th>
+            </tr></thead>
+            <tbody>
+              @for (product of topProducts; track product; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td class="dashboard-card__cell-strong">{{ product.productName }}</td>
+                  <td>{{ product.sellerName || '—' }}</td>
+                  <td>{{ product.quantitySold ?? 0 | persianNumber }}</td>
+                  <td class="dashboard-card__cell-primary">{{ product.salesAmount | persianNumber }} تومان</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (!topProducts.length) {
+            <p class="dashboard-card__empty">داده‌ای برای نمایش وجود ندارد.</p>
+          }
+        </div>
       </div>
-    </div>
+    }
   </mat-card>
 </section>

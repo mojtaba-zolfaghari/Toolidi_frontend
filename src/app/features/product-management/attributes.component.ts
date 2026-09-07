@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 
 import { AttributeGroup } from './product-management.models';
 
@@ -8,8 +8,10 @@ import { AttributeGroup } from './product-management.models';
  * یک تصویر نمونه (swatch) انتخاب نماید.
  */
 @Component({
-  selector: 'app-product-attributes',
-  templateUrl: './attributes.component.html'
+    selector: 'app-product-attributes',
+    templateUrl: './attributes.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AttributesComponent {
   @Output() attributesChange = new EventEmitter<AttributeGroup[]>();

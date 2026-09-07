@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CartService } from '../../../core/services/api/cart.service';
@@ -7,9 +7,11 @@ import { ACCESS_TOKEN_KEY } from '../../../core/interceptors/token.interceptor';
 
 /** دکمه شناور دسترسی سریع به سبد خرید. */
 @Component({
-  selector: 'app-floating-cart',
-  templateUrl: './floating-cart.component.html',
-  styleUrls: ['./floating-cart.component.scss']
+    selector: 'app-floating-cart',
+    templateUrl: './floating-cart.component.html',
+    styleUrls: ['./floating-cart.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class FloatingCartComponent implements OnInit, OnDestroy {
   itemCount = 0;

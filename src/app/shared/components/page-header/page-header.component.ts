@@ -1,13 +1,15 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * Page header with title, subtitle, and action buttons.
  * Angular Material buttons (TASK-FE-ADMIN-REDESIGN-001-MAT), RTL support.
  */
 @Component({
-  selector: 'app-page-header',
-  templateUrl: './page-header.component.html',
-  styleUrls: ['./page-header.component.scss']
+    selector: 'app-page-header',
+    templateUrl: './page-header.component.html',
+    styleUrls: ['./page-header.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PageHeaderComponent {
   @Input() title = '';

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, catchError, of } from 'rxjs';
 import { CategoryService, CategoryTreeNode } from '../../core/services/api/category.service';
@@ -13,8 +13,8 @@ export interface MegaMenuGroup {
 }
 
 @Component({
-  selector: 'app-mega-menu',
-  template: `
+    selector: 'app-mega-menu',
+    template: `
     <div class="mega-menu-root" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
       <button
         type="button"
@@ -31,85 +31,86 @@ export interface MegaMenuGroup {
           <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
         </svg>
       </button>
-
-      <section *ngIf="isOpen" class="mega-menu-panel" (click)="$event.stopPropagation()" aria-label="دسته‌بندی محصولات">
-        <div class="mega-menu-heading">
-          <div>
-            <span class="mega-menu-eyebrow">انتخاب حوزه</span>
-            <h3>از دسته‌های اصلی شروع کنید</h3>
-          </div>
-          <span class="mega-menu-count">{{ menuGroups.length | persianNumber }} حوزه فعال</span>
-        </div>
-
-        <div class="mega-menu-content" *ngIf="menuGroups.length; else emptyMenu">
-          <nav class="mega-menu-groups" aria-label="دسته‌های اصلی">
-            <a
-              *ngFor="let group of menuGroups; let i = index"
-              [routerLink]="['/shop']"
-              [queryParams]="{ categoryId: group.id }"
-              class="mega-menu-group"
-              [class.mega-menu-group-active]="activeGroupIndex === i"
-              [style.--group-color]="group.color"
-              (mouseenter)="setActiveGroup(i)"
-              (focus)="setActiveGroup(i)"
-              (click)="onGroupTap(i, $event)">
-              <span class="mega-menu-group-icon">{{ group.icon }}</span>
-              <span class="mega-menu-group-copy">
-                <strong>{{ group.title }}</strong>
-                <small>{{ group.children.length ? (group.children.length + ' زیر‌دسته') : 'مشاهده محصولات' }}</small>
-              </span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="mega-menu-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/>
-              </svg>
-            </a>
-          </nav>
-
-          <div class="mega-menu-submenu" *ngIf="activeGroup as group">
-            <div class="mega-menu-submenu-header" [style.--group-color]="group.color">
-              <span class="mega-menu-submenu-icon">{{ group.icon }}</span>
-              <div>
-                <span class="mega-menu-eyebrow">زیر‌دسته‌های حوزه</span>
-                <h4>{{ group.title }}</h4>
-              </div>
+    
+      @if (isOpen) {
+        <section class="mega-menu-panel" (click)="$event.stopPropagation()" aria-label="دسته‌بندی محصولات">
+          <div class="mega-menu-heading">
+            <div>
+              <span class="mega-menu-eyebrow">انتخاب حوزه</span>
+              <h3>از دسته‌های اصلی شروع کنید</h3>
             </div>
-
-            <div *ngIf="group.children.length; else noChildren" class="mega-menu-children">
-              <a
-                *ngFor="let child of group.children"
-                [routerLink]="['/shop']"
-                [queryParams]="{ categoryId: child.id }"
-                class="mega-menu-child"
-                (click)="closeMenu()">
-                <span class="mega-menu-child-dot" [style.background]="group.color"></span>
-                <span>{{ child.name }}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="mega-menu-child-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/>
-                </svg>
-              </a>
-            </div>
-
-            <ng-template #noChildren>
-              <div class="mega-menu-no-children">محصولات این حوزه را مشاهده کنید.</div>
-            </ng-template>
-
-            <a [routerLink]="['/shop']" [queryParams]="{ categoryId: group.id }" class="mega-menu-all-link" (click)="closeMenu()">
-              مشاهده همه محصولات {{ group.title }} <span>←</span>
-            </a>
+            <span class="mega-menu-count">{{ menuGroups.length | persianNumber }} حوزه فعال</span>
           </div>
-        </div>
-
-        <ng-template #emptyMenu>
-          <div class="mega-menu-empty">دسته‌بندی‌ها در حال بارگذاری هستند.</div>
-        </ng-template>
-
-        <div class="mega-menu-footer">
-          <a routerLink="/shop" (click)="closeMenu()">مشاهده همه محصولات ←</a>
-          <div><span>💎 {{ totalProducts | persianNumber }}+ محصول</span><span>🏭 {{ totalSellers | persianNumber }}+ تأمین‌کننده</span></div>
-        </div>
-      </section>
+          @if (menuGroups.length) {
+            <div class="mega-menu-content">
+              <nav class="mega-menu-groups" aria-label="دسته‌های اصلی">
+                @for (group of menuGroups; track group; let i = $index) {
+                  <a
+                    [routerLink]="['/shop']"
+                    [queryParams]="{ categoryId: group.id }"
+                    class="mega-menu-group"
+                    [class.mega-menu-group-active]="activeGroupIndex === i"
+                    [style.--group-color]="group.color"
+                    (mouseenter)="setActiveGroup(i)"
+                    (focus)="setActiveGroup(i)"
+                    (click)="onGroupTap(i, $event)">
+                    <span class="mega-menu-group-icon">{{ group.icon }}</span>
+                    <span class="mega-menu-group-copy">
+                      <strong>{{ group.title }}</strong>
+                      <small>{{ group.children.length ? (group.children.length + ' زیر‌دسته') : 'مشاهده محصولات' }}</small>
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mega-menu-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/>
+                    </svg>
+                  </a>
+                }
+              </nav>
+              @if (activeGroup; as group) {
+                <div class="mega-menu-submenu">
+                  <div class="mega-menu-submenu-header" [style.--group-color]="group.color">
+                    <span class="mega-menu-submenu-icon">{{ group.icon }}</span>
+                    <div>
+                      <span class="mega-menu-eyebrow">زیر‌دسته‌های حوزه</span>
+                      <h4>{{ group.title }}</h4>
+                    </div>
+                  </div>
+                  @if (group.children.length) {
+                    <div class="mega-menu-children">
+                      @for (child of group.children; track child) {
+                        <a
+                          [routerLink]="['/shop']"
+                          [queryParams]="{ categoryId: child.id }"
+                          class="mega-menu-child"
+                          (click)="closeMenu()">
+                          <span class="mega-menu-child-dot" [style.background]="group.color"></span>
+                          <span>{{ child.name }}</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="mega-menu-child-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/>
+                          </svg>
+                        </a>
+                      }
+                    </div>
+                  } @else {
+                    <div class="mega-menu-no-children">محصولات این حوزه را مشاهده کنید.</div>
+                  }
+                  <a [routerLink]="['/shop']" [queryParams]="{ categoryId: group.id }" class="mega-menu-all-link" (click)="closeMenu()">
+                    مشاهده همه محصولات {{ group.title }} <span>←</span>
+                  </a>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="mega-menu-empty">دسته‌بندی‌ها در حال بارگذاری هستند.</div>
+          }
+          <div class="mega-menu-footer">
+            <a routerLink="/shop" (click)="closeMenu()">مشاهده همه محصولات ←</a>
+            <div><span>💎 {{ totalProducts | persianNumber }}+ محصول</span><span>🏭 {{ totalSellers | persianNumber }}+ تأمین‌کننده</span></div>
+          </div>
+        </section>
+      }
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: inline-block; }
 
     .mega-menu-root { position: relative; }
@@ -180,7 +181,9 @@ export interface MegaMenuGroup {
       .mega-menu-children { grid-template-columns: 1fr; }
       .mega-menu-footer { align-items: flex-start; flex-direction: column; }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class MegaMenuComponent implements OnInit, OnDestroy {
   isOpen = false;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   SupplierProductionService,
@@ -9,8 +9,8 @@ import {
 import { OrderService } from '../../../../core/services/api/order.service';
 
 @Component({
-  selector: 'app-supplier-production-schedule',
-  template: `
+    selector: 'app-supplier-production-schedule',
+    template: `
     <section dir="rtl" class="mx-auto max-w-7xl space-y-6">
       <header class="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -20,51 +20,65 @@ import { OrderService } from '../../../../core/services/api/order.service';
         </div>
         <button type="button" (click)="load()" class="rounded-xl border border-primary px-4 py-2 text-sm font-bold text-primary hover:bg-bg-muted">بازخوانی</button>
       </header>
-
-      <p *ngIf="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
-
+    
+      @if (errorMessage) {
+        <p class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errorMessage }}</p>
+      }
+      @if (successMessage) {
+        <p class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">{{ successMessage }}</p>
+      }
+    
       <!-- Schedule Table -->
       <div class="overflow-x-auto rounded-2xl bg-white shadow-card">
-        <div *ngIf="loading" class="p-12 text-center text-gray-500">در حال بارگذاری…</div>
-        <table *ngIf="!loading && items.length" class="w-full min-w-[900px] text-right text-sm">
-          <thead>
-            <tr class="border-b bg-gray-50 text-gray-500">
-              <th class="p-4">شناسه آیتم</th>
-              <th class="p-4">نام محصول</th>
-              <th class="p-4">تعداد</th>
-              <th class="p-4">وضعیت</th>
-              <th class="p-4">تاریخ شروع تولید</th>
-              <th class="p-4">تاریخ پایان تولید</th>
-              <th class="p-4">عملیات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of items" class="border-b last:border-0 hover:bg-gray-50/70">
-              <td class="p-4 font-bold text-secondary">{{ item.id | slice:0:8 }}…</td>
-              <td class="p-4">{{ item.productName || '—' }}</td>
-              <td class="p-4">{{ item.quantity }}</td>
-              <td class="p-4">
-                <span class="rounded-full px-3 py-1 text-xs font-bold" [ngClass]="getStatusColor(getScheduleStatus(item.id))">
-                  {{ getStatusLabel(getScheduleStatus(item.id)) }}
-                </span>
-              </td>
-              <td class="p-4">
-                <input type="date" [value]="getStartDate(item.id)" (change)="setStartDate(item.id, $event)" class="rounded-lg border border-gray-300 px-2 py-1 text-sm" />
-              </td>
-              <td class="p-4">
-                <input type="date" [value]="getEndDate(item.id)" (change)="setEndDate(item.id, $event)" class="rounded-lg border border-gray-300 px-2 py-1 text-sm" />
-              </td>
-              <td class="p-4">
-                <button (click)="saveSchedule(item.id)" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700">ذخیره</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p *ngIf="!loading && !items.length" class="p-10 text-center text-gray-400">هیچ آیتم سفارشی برای این تأمین‌کننده وجود ندارد.</p>
+        @if (loading) {
+          <div class="p-12 text-center text-gray-500">در حال بارگذاری…</div>
+        }
+        @if (!loading && items.length) {
+          <table class="w-full min-w-[900px] text-right text-sm">
+            <thead>
+              <tr class="border-b bg-gray-50 text-gray-500">
+                <th class="p-4">شناسه آیتم</th>
+                <th class="p-4">نام محصول</th>
+                <th class="p-4">تعداد</th>
+                <th class="p-4">وضعیت</th>
+                <th class="p-4">تاریخ شروع تولید</th>
+                <th class="p-4">تاریخ پایان تولید</th>
+                <th class="p-4">عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of items; track item) {
+                <tr class="border-b last:border-0 hover:bg-gray-50/70">
+                  <td class="p-4 font-bold text-secondary">{{ item.id | slice:0:8 }}…</td>
+                  <td class="p-4">{{ item.productName || '—' }}</td>
+                  <td class="p-4">{{ item.quantity }}</td>
+                  <td class="p-4">
+                    <span class="rounded-full px-3 py-1 text-xs font-bold" [ngClass]="getStatusColor(getScheduleStatus(item.id))">
+                      {{ getStatusLabel(getScheduleStatus(item.id)) }}
+                    </span>
+                  </td>
+                  <td class="p-4">
+                    <input type="date" [value]="getStartDate(item.id)" (change)="setStartDate(item.id, $event)" class="rounded-lg border border-gray-300 px-2 py-1 text-sm" />
+                  </td>
+                  <td class="p-4">
+                    <input type="date" [value]="getEndDate(item.id)" (change)="setEndDate(item.id, $event)" class="rounded-lg border border-gray-300 px-2 py-1 text-sm" />
+                  </td>
+                  <td class="p-4">
+                    <button (click)="saveSchedule(item.id)" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700">ذخیره</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        @if (!loading && !items.length) {
+          <p class="p-10 text-center text-gray-400">هیچ آیتم سفارشی برای این تأمین‌کننده وجود ندارد.</p>
+        }
       </div>
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierProductionScheduleComponent implements OnInit {
   items: OrderItem[] = [];

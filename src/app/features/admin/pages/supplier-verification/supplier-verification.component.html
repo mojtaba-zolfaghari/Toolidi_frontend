@@ -7,7 +7,9 @@
     [actions]="headerActions">
   </app-page-header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
 
   <!-- Status filter -->
   <mat-card appearance="outlined" class="sup-card">
@@ -25,67 +27,63 @@
       <span class="sup-count">{{ filteredData.length }} تولیدکننده</span>
     </div>
 
-    <div *ngIf="loading" class="sup-loading">
-      <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
-    </div>
+    @if (loading) {
+      <div class="sup-loading">
+        <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    }
 
-    <div *ngIf="!loading" class="sup-table-wrap">
-      <table mat-table [dataSource]="filteredData" matSort class="sup-table mat-elevation-z0">
-
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>تولیدکننده</th>
-          <td mat-cell *matCellDef="let row" class="sup-cell-strong">{{ row.name }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="contactInfo">
-          <th mat-header-cell *matHeaderCellDef>اطلاعات تماس</th>
-          <td mat-cell *matCellDef="let row" dir="ltr">{{ row.contactInfo || '—' }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="location">
-          <th mat-header-cell *matHeaderCellDef>موقعیت</th>
-          <td mat-cell *matCellDef="let row">{{ row.location || '—' }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="docStatus">
-          <th mat-header-cell *matHeaderCellDef>وضعیت مدارک</th>
-          <td mat-cell *matCellDef="let row">
-            <span class="sup-status sup-status--{{ row.docStatus }}">{{ row.statusLabel }}</span>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>عملیات</th>
-          <td mat-cell *matCellDef="let row">
-            <button
-              type="button"
-              mat-stroked-button
-              color="primary"
-              [disabled]="busySupplierId === row.id || row.docStatus === 'none'"
-              (click)="openReview(row)">
-              <mat-icon aria-hidden="true">fact_check</mat-icon>
-              بازبینی
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="sup-row"></tr>
-
-        <tr *matNoDataRow class="mat-mdc-row">
-          <td class="mat-mdc-cell" [attr.colspan]="displayedColumns.length">
-            <app-empty-state
-              icon="📭"
-              title="تولیدکننده‌ای یافت نشد"
+    @if (!loading) {
+      <div class="sup-table-wrap">
+        <table mat-table [dataSource]="filteredData" matSort class="sup-table mat-elevation-z0">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>تولیدکننده</th>
+            <td mat-cell *matCellDef="let row" class="sup-cell-strong">{{ row.name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="contactInfo">
+            <th mat-header-cell *matHeaderCellDef>اطلاعات تماس</th>
+            <td mat-cell *matCellDef="let row" dir="ltr">{{ row.contactInfo || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="location">
+            <th mat-header-cell *matHeaderCellDef>موقعیت</th>
+            <td mat-cell *matCellDef="let row">{{ row.location || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="docStatus">
+            <th mat-header-cell *matHeaderCellDef>وضعیت مدارک</th>
+            <td mat-cell *matCellDef="let row">
+              <span class="sup-status sup-status--{{ row.docStatus }}">{{ row.statusLabel }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>عملیات</th>
+            <td mat-cell *matCellDef="let row">
+              <button
+                type="button"
+                mat-stroked-button
+                color="primary"
+                [disabled]="busySupplierId === row.id || row.docStatus === 'none'"
+                (click)="openReview(row)">
+                <mat-icon aria-hidden="true">fact_check</mat-icon>
+                بازبینی
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="sup-row"></tr>
+          <tr *matNoDataRow class="mat-mdc-row">
+            <td class="mat-mdc-cell" [attr.colspan]="displayedColumns.length">
+              <app-empty-state
+                icon="📭"
+                title="تولیدکننده‌ای یافت نشد"
               message="هیچ تولیدکننده‌ای با این فیلتر وضعیت وجود ندارد."></app-empty-state>
-          </td>
-        </tr>
-      </table>
-
-      <mat-paginator
-        [pageSize]="10"
-        [pageSizeOptions]="[10, 25, 50]"
+            </td>
+          </tr>
+        </table>
+        <mat-paginator
+          [pageSize]="10"
+          [pageSizeOptions]="[10, 25, 50]"
         showFirstLastButtons></mat-paginator>
-    </div>
+      </div>
+    }
   </mat-card>
 </section>

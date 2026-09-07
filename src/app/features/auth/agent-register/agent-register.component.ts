@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
@@ -8,9 +8,11 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
 
 /** صفحه ثبت‌نام پیک شهری برای پیوستن به شبکه توزیع تولیدی. */
 @Component({
-  selector: 'app-agent-register',
-  templateUrl: './agent-register.component.html',
-  styleUrls: ['./agent-register.component.scss']
+    selector: 'app-agent-register',
+    templateUrl: './agent-register.component.html',
+    styleUrls: ['./agent-register.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AgentRegisterComponent implements OnInit {
   form: FormGroup;

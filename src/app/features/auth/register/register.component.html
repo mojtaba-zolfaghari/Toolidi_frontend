@@ -50,7 +50,9 @@
             <span class="input-icon">◎</span>
             <input id="identifier" type="text" formControlName="identifier" inputmode="email" autocomplete="username" placeholder="مثلاً ۰۹۱۲۱۲۳۴۵۶۷ یا شما@example.com" />
           </div>
-          <p *ngIf="form.get('identifier')?.invalid && form.get('identifier')?.touched" class="field-error">شماره موبایل یا ایمیل معتبر وارد کنید.</p>
+          @if (form.get('identifier')?.invalid && form.get('identifier')?.touched) {
+            <p class="field-error">شماره موبایل یا ایمیل معتبر وارد کنید.</p>
+          }
         </div>
 
         <div class="field-group">
@@ -59,7 +61,9 @@
             <span class="input-icon">◇</span>
             <input id="password" type="password" formControlName="password" autocomplete="new-password" placeholder="یک رمز عبور امن انتخاب کنید" />
           </div>
-          <p *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="field-error">رمز عبور باید حداقل ۶ کاراکتر باشد.</p>
+          @if (form.get('password')?.invalid && form.get('password')?.touched) {
+            <p class="field-error">رمز عبور باید حداقل ۶ کاراکتر باشد.</p>
+          }
         </div>
 
         <div class="field-group">
@@ -78,10 +82,16 @@
           </div>
         </div>
 
-        <div *ngIf="errorMessage" class="form-message form-message-error" role="alert">{{ errorMessage }}</div>
-        <div *ngIf="successMessage" class="form-message form-message-success" role="status">{{ successMessage }}</div>
+        @if (errorMessage) {
+          <div class="form-message form-message-error" role="alert">{{ errorMessage }}</div>
+        }
+        @if (successMessage) {
+          <div class="form-message form-message-success" role="status">{{ successMessage }}</div>
+        }
 
-        <div *ngIf="automaticVerificationNotice" class="form-message form-message-info" role="status">{{ automaticVerificationNotice }}</div>
+        @if (automaticVerificationNotice) {
+          <div class="form-message form-message-info" role="status">{{ automaticVerificationNotice }}</div>
+        }
 
         <button type="submit" class="quick-submit" [disabled]="form.invalid || loading">
           <span>{{ loading ? 'در حال ساخت حساب…' : 'شروع خرید در تولیدی' }}</span>

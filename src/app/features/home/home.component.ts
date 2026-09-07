@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription, forkJoin, timer } from 'rxjs';
 import { take, finalize, catchError } from 'rxjs/operators';
 
@@ -76,10 +76,12 @@ import { IRAN_PROVINCES, IRAN_CITIES, IRAN_VIEWBOX } from '../../shared/iran-map
 import { IRAN_LOCATIONS, IRAN_MAP_CONNECTIONS } from '../../shared/iran-locations';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
-  animations: [fadeIn, slideUp, staggerList, zoomIn, fadeSlideUp, slideFromRight, slideFromLeft, slideInFromBottom]
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    animations: [fadeIn, slideUp, staggerList, zoomIn, fadeSlideUp, slideFromRight, slideFromLeft, slideInFromBottom],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   /* ── Data State ── */

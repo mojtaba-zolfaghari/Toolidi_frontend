@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator } from '@angular/material/paginator';
@@ -36,9 +36,11 @@ interface SupplierVerificationRow extends AdminSupplier {
  * جدول تولیدکنندگان + وضعیت مدارک؛ مدال پیش‌نمایش و تأیید/رد هر مدرک.
  */
 @Component({
-  selector: 'app-supplier-verification',
-  templateUrl: './supplier-verification.component.html',
-  styleUrls: ['./supplier-verification.component.scss']
+    selector: 'app-supplier-verification',
+    templateUrl: './supplier-verification.component.html',
+    styleUrls: ['./supplier-verification.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierVerificationComponent implements OnInit {
   headerActions = [

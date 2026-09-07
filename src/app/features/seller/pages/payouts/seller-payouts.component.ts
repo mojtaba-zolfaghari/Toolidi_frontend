@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { FinancialService, FinancialTransaction, WalletSummary } from '../../../../core/services/api/financial.service';
 
 /** کیف پول و تسویه فروشنده — BEM + متریال (جانشین کلاس‌های Tailwind) */
 @Component({
-  selector: 'app-seller-payouts',
-  styleUrls: ['./seller-payouts.component.scss'],
-  template: `
+    selector: 'app-seller-payouts',
+    styleUrls: ['./seller-payouts.component.scss'],
+    template: `
     <section class="payouts" dir="rtl">
       <header class="payouts__header">
         <div>
@@ -20,13 +20,19 @@ import { FinancialService, FinancialTransaction, WalletSummary } from '../../../
           <button type="button" mat-stroked-button color="primary" (click)="load()">بازخوانی</button>
         </div>
       </header>
-
-      <p *ngIf="errorMessage" class="payouts__alert payouts__alert--error">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="payouts__alert payouts__alert--success">{{ successMessage }}</p>
-
-      <div *ngIf="loading" class="payouts__loading">در حال بارگذاری اطلاعات مالی…</div>
-
-      <ng-container *ngIf="!loading">
+    
+      @if (errorMessage) {
+        <p class="payouts__alert payouts__alert--error">{{ errorMessage }}</p>
+      }
+      @if (successMessage) {
+        <p class="payouts__alert payouts__alert--success">{{ successMessage }}</p>
+      }
+    
+      @if (loading) {
+        <div class="payouts__loading">در حال بارگذاری اطلاعات مالی…</div>
+      }
+    
+      @if (!loading) {
         <div class="payouts__cards">
           <div class="payouts__card payouts__card--primary">
             <span class="payouts__card-label">موجودی کل</span>
@@ -45,7 +51,6 @@ import { FinancialService, FinancialTransaction, WalletSummary } from '../../../
             <strong class="payouts__card-value">{{ wallet?.availableForWithdrawal ?? 0 | persianNumber }} تومان</strong>
           </div>
         </div>
-
         <div class="payouts__table-card">
           <h2 class="payouts__section-title">تاریخچه تراکنش‌ها</h2>
           <div class="payouts__table-wrap">
@@ -54,51 +59,63 @@ import { FinancialService, FinancialTransaction, WalletSummary } from '../../../
                 <tr><th>تاریخ</th><th>نوع</th><th>شرح</th><th>مبلغ</th><th>وضعیت</th></tr>
               </thead>
               <tbody>
-                <tr *ngFor="let transaction of transactions">
-                  <td>{{ transaction.date | persianDate:'yyyy/MM/dd HH:mm' }}</td>
-                  <td>{{ transactionType(transaction.type) }}</td>
-                  <td>{{ transaction.description || '—' }}</td>
-                  <td class="payouts__amount" [class.payouts__amount--neg]="transaction.amount < 0">
-                    {{ transaction.amount | persianNumber }} تومان
-                  </td>
-                  <td><span class="payouts__status-chip">{{ transactionStatus(transaction.status) }}</span></td>
-                </tr>
+                @for (transaction of transactions; track transaction) {
+                  <tr>
+                    <td>{{ transaction.date | persianDate:'yyyy/MM/dd HH:mm' }}</td>
+                    <td>{{ transactionType(transaction.type) }}</td>
+                    <td>{{ transaction.description || '—' }}</td>
+                    <td class="payouts__amount" [class.payouts__amount--neg]="transaction.amount < 0">
+                      {{ transaction.amount | persianNumber }} تومان
+                    </td>
+                    <td><span class="payouts__status-chip">{{ transactionStatus(transaction.status) }}</span></td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
-          <p *ngIf="!transactions.length" class="payouts__empty">تراکنشی برای نمایش وجود ندارد.</p>
+          @if (!transactions.length) {
+            <p class="payouts__empty">تراکنشی برای نمایش وجود ندارد.</p>
+          }
         </div>
-      </ng-container>
-
+      }
+    
       <!-- مودال درخواست برداشت -->
-      <div *ngIf="formOpen" class="payouts__modal-overlay" (click)="closeWithdrawal()">
-        <form [formGroup]="form" (ngSubmit)="requestWithdrawal()" (click)="$event.stopPropagation()" class="payouts__modal">
-          <div class="payouts__modal-head">
-            <h2 class="payouts__modal-title">درخواست برداشت وجه</h2>
-            <button type="button" class="payouts__modal-close" (click)="closeWithdrawal()" aria-label="بستن">×</button>
-          </div>
-          <label class="payouts__field">
-            <span class="payouts__field-label">مبلغ برداشت *</span>
-            <input formControlName="amount" type="number" min="1" [max]="wallet?.availableForWithdrawal ?? null" class="payouts__input" />
-            <small *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid" class="payouts__field-error">
-              مبلغ باید معتبر و کمتر از موجودی قابل برداشت باشد.
-            </small>
-          </label>
-          <label class="payouts__field">
-            <span class="payouts__field-label">شماره حساب/شبا *</span>
-            <input formControlName="bankAccount" class="payouts__input" placeholder="IR… یا شماره حساب" />
-          </label>
-          <p *ngIf="formError" class="payouts__alert payouts__alert--error">{{ formError }}</p>
-          <div class="payouts__modal-actions">
-            <button type="button" mat-stroked-button (click)="closeWithdrawal()">انصراف</button>
-            <button type="submit" mat-flat-button color="primary" [disabled]="saving">
-              {{ saving ? 'در حال ارسال…' : 'ثبت درخواست' }}
-            </button>
-          </div>
-        </form>
-      </div>
+      @if (formOpen) {
+        <div class="payouts__modal-overlay" (click)="closeWithdrawal()">
+          <form [formGroup]="form" (ngSubmit)="requestWithdrawal()" (click)="$event.stopPropagation()" class="payouts__modal">
+            <div class="payouts__modal-head">
+              <h2 class="payouts__modal-title">درخواست برداشت وجه</h2>
+              <button type="button" class="payouts__modal-close" (click)="closeWithdrawal()" aria-label="بستن">×</button>
+            </div>
+            <label class="payouts__field">
+              <span class="payouts__field-label">مبلغ برداشت *</span>
+              <input formControlName="amount" type="number" min="1" [max]="wallet?.availableForWithdrawal ?? null" class="payouts__input" />
+              @if (form.get('amount')?.touched && form.get('amount')?.invalid) {
+                <small class="payouts__field-error">
+                  مبلغ باید معتبر و کمتر از موجودی قابل برداشت باشد.
+                </small>
+              }
+            </label>
+            <label class="payouts__field">
+              <span class="payouts__field-label">شماره حساب/شبا *</span>
+              <input formControlName="bankAccount" class="payouts__input" placeholder="IR… یا شماره حساب" />
+            </label>
+            @if (formError) {
+              <p class="payouts__alert payouts__alert--error">{{ formError }}</p>
+            }
+            <div class="payouts__modal-actions">
+              <button type="button" mat-stroked-button (click)="closeWithdrawal()">انصراف</button>
+              <button type="submit" mat-flat-button color="primary" [disabled]="saving">
+                {{ saving ? 'در حال ارسال…' : 'ثبت درخواست' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerPayoutsComponent implements OnInit {
   wallet: WalletSummary | null = null;

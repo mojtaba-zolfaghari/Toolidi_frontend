@@ -4,14 +4,20 @@
       <div class="stat-card__text">
         <p class="stat-card__title">{{ title }}</p>
         <p class="stat-card__value">{{ value }}</p>
-        <p *ngIf="subtitle" class="stat-card__subtitle">{{ subtitle }}</p>
+        @if (subtitle) {
+          <p class="stat-card__subtitle">{{ subtitle }}</p>
+        }
       </div>
-      <div *ngIf="icon" class="stat-card__icon" [ngClass]="'stat-card__icon--' + color" aria-hidden="true">{{ icon }}</div>
+      @if (icon) {
+        <div class="stat-card__icon" [ngClass]="'stat-card__icon--' + color" aria-hidden="true">{{ icon }}</div>
+      }
     </div>
-    <div *ngIf="trendValue" class="stat-card__trend">
-      <span class="stat-card__trend-chip" [ngClass]="'stat-card__trend-chip--' + trend">
-        {{ trendIcon }} {{ trendValue }}
-      </span>
-    </div>
+    @if (trendValue) {
+      <div class="stat-card__trend">
+        <span class="stat-card__trend-chip" [ngClass]="'stat-card__trend-chip--' + trend">
+          {{ trendIcon }} {{ trendValue }}
+        </span>
+      </div>
+    }
   </mat-card-content>
 </mat-card>

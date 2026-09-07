@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * اسپینر بارگذاری با انیمیشن نبض (pulse).
  * برای نمایش حالت‌های در حال بارگذاری در سراسر برنامه استفاده می‌شود.
  */
 @Component({
-  selector: 'app-spinner',
-  template: `
+    selector: 'app-spinner',
+    template: `
     <div class="flex flex-col items-center justify-center gap-3 py-10" role="status" aria-live="polite">
       <span class="relative flex h-12 w-12">
         <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-25"></span>
@@ -15,7 +15,9 @@ import { Component } from '@angular/core';
       </span>
       <span class="text-sm text-gray-400">{{ label }}</span>
     </div>
-  `
+  `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SpinnerComponent {
   /** متن نمایشی زیر اسپینر */

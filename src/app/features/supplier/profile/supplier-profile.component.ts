@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SupplierService } from '../../../core/services/api/supplier.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
 
 @Component({
-  selector: 'app-supplier-profile',
-  template: `
+    selector: 'app-supplier-profile',
+    template: `
     <section class="space-y-6">
       <div>
         <h1 class="text-2xl font-extrabold text-secondary">پروفایل و تنظیمات ⚙️</h1>
         <p class="text-gray-500 mt-1">اطلاعات شرکت و تنظیمات تأمین خود را مدیریت کنید</p>
       </div>
-
+    
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Card -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center">
@@ -40,7 +40,7 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
             </div>
           </div>
         </div>
-
+    
         <!-- Edit Form -->
         <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h2 class="font-bold text-secondary mb-6">ویرایش اطلاعات شرکت</h2>
@@ -61,13 +61,17 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
               <div>
                 <label class="block text-secondary font-medium mb-1 text-sm">شهر</label>
                 <select formControlName="city" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-green-500/30">
-                  <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                  @for (city of cities; track city) {
+                    <option [value]="city">{{ city }}</option>
+                  }
                 </select>
               </div>
               <div>
                 <label class="block text-secondary font-medium mb-1 text-sm">استان</label>
                 <select formControlName="province" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-green-500/30">
-                  <option *ngFor="let p of provinces" [value]="p">{{ p }}</option>
+                  @for (p of provinces; track p) {
+                    <option [value]="p">{{ p }}</option>
+                  }
                 </select>
               </div>
               <div>
@@ -83,9 +87,11 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
               <label class="block text-secondary font-medium mb-1 text-sm">درباره شرکت</label>
               <textarea formControlName="description" rows="3" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500/30 resize-none"></textarea>
             </div>
-
-            <div *ngIf="successMessage" class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">✅ {{ successMessage }}</div>
-
+    
+            @if (successMessage) {
+              <div class="bg-green-50 text-green-600 rounded-xl px-4 py-3 text-sm">✅ {{ successMessage }}</div>
+            }
+    
             <button type="submit" class="bg-green-600 text-white font-bold rounded-xl px-6 py-2.5 hover:bg-green-700 transition-colors">
               ذخیره تغییرات
             </button>
@@ -93,7 +99,9 @@ import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locat
         </div>
       </div>
     </section>
-  `
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierProfileComponent implements OnInit {
   form!: FormGroup;

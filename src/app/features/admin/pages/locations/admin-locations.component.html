@@ -8,8 +8,12 @@
   </app-page-header>
 
   <!-- Messages -->
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <!-- Tabs -->
   <mat-tab-group
@@ -24,63 +28,61 @@
     <mat-tab label="استان‌ها">
       <mat-card appearance="outlined" class="loc-card">
         <mat-card-content>
-          <div *ngIf="loading" class="loc-loading">
-            <mat-spinner diameter="36"></mat-spinner>
-            <span>در حال بارگذاری استان‌ها…</span>
-          </div>
+          @if (loading) {
+            <div class="loc-loading">
+              <mat-spinner diameter="36"></mat-spinner>
+              <span>در حال بارگذاری استان‌ها…</span>
+            </div>
+          }
 
-          <div *ngIf="!loading" class="loc-table-wrap">
-            <table mat-table [dataSource]="provincesDataSource" matSort #provinceSort="matSort" class="loc-table mat-elevation-z0">
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>نام</th>
-                <td mat-cell *matCellDef="let province" class="loc-cell-strong">{{ province.name }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="code">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>کد</th>
-                <td mat-cell *matCellDef="let province">{{ province.code }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="isActive">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>وضعیت</th>
-                <td mat-cell *matCellDef="let province">
-                  <mat-chip-set>
-                    <mat-chip [class.loc-chip--inactive]="!province.isActive">
-                      {{ province.isActive ? 'فعال' : 'غیرفعال' }}
-                    </mat-chip>
-                  </mat-chip-set>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>عملیات</th>
-                <td mat-cell *matCellDef="let province">
-                  <button type="button" mat-icon-button matTooltip="ویرایش" (click)="openProvinceForm(province)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button type="button" mat-icon-button matTooltip="شهرهای این استان" (click)="viewCitiesForProvince(province)">
-                    <mat-icon>location_city</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="provinceColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: provinceColumns"></tr>
-
-              <tr class="mat-mdc-row" *matNoDataRow>
-                <td class="mat-mdc-cell loc-empty" [attr.colspan]="provinceColumns.length">
-                  استانی برای نمایش وجود ندارد.
-                </td>
-              </tr>
-            </table>
-
-            <mat-paginator #provincePaginator
-              [length]="provinces.length"
-              [pageSize]="provincePageSize"
-              [pageSizeOptions]="[5, 10, 25]"
-              (page)="onProvincePage()">
-            </mat-paginator>
-          </div>
+          @if (!loading) {
+            <div class="loc-table-wrap">
+              <table mat-table [dataSource]="provincesDataSource" matSort #provinceSort="matSort" class="loc-table mat-elevation-z0">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>نام</th>
+                  <td mat-cell *matCellDef="let province" class="loc-cell-strong">{{ province.name }}</td>
+                </ng-container>
+                <ng-container matColumnDef="code">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>کد</th>
+                  <td mat-cell *matCellDef="let province">{{ province.code }}</td>
+                </ng-container>
+                <ng-container matColumnDef="isActive">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>وضعیت</th>
+                  <td mat-cell *matCellDef="let province">
+                    <mat-chip-set>
+                      <mat-chip [class.loc-chip--inactive]="!province.isActive">
+                        {{ province.isActive ? 'فعال' : 'غیرفعال' }}
+                      </mat-chip>
+                    </mat-chip-set>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>عملیات</th>
+                  <td mat-cell *matCellDef="let province">
+                    <button type="button" mat-icon-button matTooltip="ویرایش" (click)="openProvinceForm(province)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button type="button" mat-icon-button matTooltip="شهرهای این استان" (click)="viewCitiesForProvince(province)">
+                      <mat-icon>location_city</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="provinceColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: provinceColumns"></tr>
+                <tr class="mat-mdc-row" *matNoDataRow>
+                  <td class="mat-mdc-cell loc-empty" [attr.colspan]="provinceColumns.length">
+                    استانی برای نمایش وجود ندارد.
+                  </td>
+                </tr>
+              </table>
+              <mat-paginator #provincePaginator
+                [length]="provinces.length"
+                [pageSize]="provincePageSize"
+                [pageSizeOptions]="[5, 10, 25]"
+                (page)="onProvincePage()">
+              </mat-paginator>
+            </div>
+          }
         </mat-card-content>
       </mat-card>
     </mat-tab>
@@ -97,70 +99,69 @@
               <mat-label>فیلتر بر اساس استان</mat-label>
               <mat-select [value]="cityFilterProvinceId" (selectionChange)="filterCitiesByProvince($event.value)">
                 <mat-option value="">همه استان‌ها</mat-option>
-                <mat-option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</mat-option>
+                @for (p of provinces; track p) {
+                  <mat-option [value]="p.id">{{ p.name }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
 
-          <div *ngIf="loadingCities" class="loc-loading">
-            <mat-spinner diameter="36"></mat-spinner>
-            <span>در حال بارگذاری شهرها…</span>
-          </div>
+          @if (loadingCities) {
+            <div class="loc-loading">
+              <mat-spinner diameter="36"></mat-spinner>
+              <span>در حال بارگذاری شهرها…</span>
+            </div>
+          }
 
-          <div *ngIf="!loadingCities" class="loc-table-wrap">
-            <table mat-table [dataSource]="citiesDataSource" matSort #citySort="matSort" class="loc-table mat-elevation-z0">
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>نام</th>
-                <td mat-cell *matCellDef="let city" class="loc-cell-strong">{{ city.name }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="code">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>کد</th>
-                <td mat-cell *matCellDef="let city">{{ city.code }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="province">
-                <th mat-header-cell *matHeaderCellDef>استان</th>
-                <td mat-cell *matCellDef="let city" class="loc-cell-muted">{{ getProvinceName(city.provinceId) }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="isActive">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>وضعیت</th>
-                <td mat-cell *matCellDef="let city">
-                  <mat-chip-set>
-                    <mat-chip [class.loc-chip--inactive]="!city.isActive">
-                      {{ city.isActive ? 'فعال' : 'غیرفعال' }}
-                    </mat-chip>
-                  </mat-chip-set>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>عملیات</th>
-                <td mat-cell *matCellDef="let city">
-                  <button type="button" mat-icon-button matTooltip="ویرایش" (click)="openCityForm(city)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="cityColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: cityColumns"></tr>
-
-              <tr class="mat-mdc-row" *matNoDataRow>
-                <td class="mat-mdc-cell loc-empty" [attr.colspan]="cityColumns.length">
-                  شهری برای نمایش وجود ندارد.
-                </td>
-              </tr>
-            </table>
-
-            <mat-paginator #cityPaginator
-              [length]="filteredCities.length"
-              [pageSize]="cityPageSize"
-              [pageSizeOptions]="[10, 25, 50]"
-              (page)="onCityPage()">
-            </mat-paginator>
-          </div>
+          @if (!loadingCities) {
+            <div class="loc-table-wrap">
+              <table mat-table [dataSource]="citiesDataSource" matSort #citySort="matSort" class="loc-table mat-elevation-z0">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>نام</th>
+                  <td mat-cell *matCellDef="let city" class="loc-cell-strong">{{ city.name }}</td>
+                </ng-container>
+                <ng-container matColumnDef="code">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>کد</th>
+                  <td mat-cell *matCellDef="let city">{{ city.code }}</td>
+                </ng-container>
+                <ng-container matColumnDef="province">
+                  <th mat-header-cell *matHeaderCellDef>استان</th>
+                  <td mat-cell *matCellDef="let city" class="loc-cell-muted">{{ getProvinceName(city.provinceId) }}</td>
+                </ng-container>
+                <ng-container matColumnDef="isActive">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>وضعیت</th>
+                  <td mat-cell *matCellDef="let city">
+                    <mat-chip-set>
+                      <mat-chip [class.loc-chip--inactive]="!city.isActive">
+                        {{ city.isActive ? 'فعال' : 'غیرفعال' }}
+                      </mat-chip>
+                    </mat-chip-set>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>عملیات</th>
+                  <td mat-cell *matCellDef="let city">
+                    <button type="button" mat-icon-button matTooltip="ویرایش" (click)="openCityForm(city)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="cityColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: cityColumns"></tr>
+                <tr class="mat-mdc-row" *matNoDataRow>
+                  <td class="mat-mdc-cell loc-empty" [attr.colspan]="cityColumns.length">
+                    شهری برای نمایش وجود ندارد.
+                  </td>
+                </tr>
+              </table>
+              <mat-paginator #cityPaginator
+                [length]="filteredCities.length"
+                [pageSize]="cityPageSize"
+                [pageSizeOptions]="[10, 25, 50]"
+                (page)="onCityPage()">
+              </mat-paginator>
+            </div>
+          }
         </mat-card-content>
       </mat-card>
     </mat-tab>
@@ -182,17 +183,23 @@
               <mat-label>استان</mat-label>
               <mat-select [(ngModel)]="supplierRestriction.provinceId" name="supplierProvince" (selectionChange)="onSupplierProvinceChange()">
                 <mat-option value="">انتخاب استان</mat-option>
-                <mat-option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</mat-option>
+                @for (p of provinces; track p) {
+                  <mat-option [value]="p.id">{{ p.name }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="loc-filter" *ngIf="supplierRestriction.provinceId">
-              <mat-label>شهر (اختیاری)</mat-label>
-              <mat-select [(ngModel)]="supplierRestriction.cityId" name="supplierCity">
-                <mat-option value="">همه شهرهای استان</mat-option>
-                <mat-option *ngFor="let c of supplierCities" [value]="c.id">{{ c.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            @if (supplierRestriction.provinceId) {
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="loc-filter">
+                <mat-label>شهر (اختیاری)</mat-label>
+                <mat-select [(ngModel)]="supplierRestriction.cityId" name="supplierCity">
+                  <mat-option value="">همه شهرهای استان</mat-option>
+                  @for (c of supplierCities; track c) {
+                    <mat-option [value]="c.id">{{ c.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
 
             <button type="button" mat-flat-button color="primary" [disabled]="!supplierRestriction.provinceId" (click)="addSupplierRestriction()">
               <mat-icon>add</mat-icon>
@@ -200,39 +207,42 @@
             </button>
           </div>
 
-          <div *ngIf="loadingSupplierRestrictions" class="loc-loading">
-            <mat-spinner diameter="36"></mat-spinner>
-            <span>در حال بارگذاری…</span>
-          </div>
+          @if (loadingSupplierRestrictions) {
+            <div class="loc-loading">
+              <mat-spinner diameter="36"></mat-spinner>
+              <span>در حال بارگذاری…</span>
+            </div>
+          }
 
-          <table *ngIf="!loadingSupplierRestrictions && supplierRestrictions.length"
-                 mat-table [dataSource]="supplierRestrictions" class="loc-table mat-elevation-z0">
-            <ng-container matColumnDef="provinceName">
-              <th mat-header-cell *matHeaderCellDef>استان</th>
-              <td mat-cell *matCellDef="let r" class="loc-cell-strong">{{ r.provinceName || '—' }}</td>
-            </ng-container>
+          @if (!loadingSupplierRestrictions && supplierRestrictions.length) {
+            <table
+              mat-table [dataSource]="supplierRestrictions" class="loc-table mat-elevation-z0">
+              <ng-container matColumnDef="provinceName">
+                <th mat-header-cell *matHeaderCellDef>استان</th>
+                <td mat-cell *matCellDef="let r" class="loc-cell-strong">{{ r.provinceName || '—' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="cityName">
+                <th mat-header-cell *matHeaderCellDef>شهر</th>
+                <td mat-cell *matCellDef="let r">{{ r.cityName || 'همه شهرها' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>عملیات</th>
+                <td mat-cell *matCellDef="let r">
+                  <button type="button" mat-icon-button matTooltip="حذف" (click)="removeSupplierRestriction(r)">
+                    <mat-icon class="loc-icon-danger">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="restrictionColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: restrictionColumns"></tr>
+            </table>
+          }
 
-            <ng-container matColumnDef="cityName">
-              <th mat-header-cell *matHeaderCellDef>شهر</th>
-              <td mat-cell *matCellDef="let r">{{ r.cityName || 'همه شهرها' }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>عملیات</th>
-              <td mat-cell *matCellDef="let r">
-                <button type="button" mat-icon-button matTooltip="حذف" (click)="removeSupplierRestriction(r)">
-                  <mat-icon class="loc-icon-danger">delete</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="restrictionColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: restrictionColumns"></tr>
-          </table>
-
-          <p *ngIf="!loadingSupplierRestrictions && !supplierRestrictions.length" class="loc-empty loc-empty--panel">
-            هیچ محدودیتی ثبت نشده — ثبت‌نام فروشنده برای تمام شهرها فعال است.
-          </p>
+          @if (!loadingSupplierRestrictions && !supplierRestrictions.length) {
+            <p class="loc-empty loc-empty--panel">
+              هیچ محدودیتی ثبت نشده — ثبت‌نام فروشنده برای تمام شهرها فعال است.
+            </p>
+          }
         </mat-card-content>
       </mat-card>
     </mat-tab>
@@ -253,17 +263,23 @@
               <mat-label>استان</mat-label>
               <mat-select [(ngModel)]="agentRestriction.provinceId" name="agentProvince" (selectionChange)="onAgentProvinceChange()">
                 <mat-option value="">انتخاب استان</mat-option>
-                <mat-option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</mat-option>
+                @for (p of provinces; track p) {
+                  <mat-option [value]="p.id">{{ p.name }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="loc-filter" *ngIf="agentRestriction.provinceId">
-              <mat-label>شهر (اختیاری)</mat-label>
-              <mat-select [(ngModel)]="agentRestriction.cityId" name="agentCity">
-                <mat-option value="">همه شهرهای استان</mat-option>
-                <mat-option *ngFor="let c of agentCities" [value]="c.id">{{ c.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            @if (agentRestriction.provinceId) {
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="loc-filter">
+                <mat-label>شهر (اختیاری)</mat-label>
+                <mat-select [(ngModel)]="agentRestriction.cityId" name="agentCity">
+                  <mat-option value="">همه شهرهای استان</mat-option>
+                  @for (c of agentCities; track c) {
+                    <mat-option [value]="c.id">{{ c.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
 
             <button type="button" mat-flat-button color="primary" [disabled]="!agentRestriction.provinceId" (click)="addAgentRestriction()">
               <mat-icon>add</mat-icon>
@@ -271,39 +287,42 @@
             </button>
           </div>
 
-          <div *ngIf="loadingAgentRestrictions" class="loc-loading">
-            <mat-spinner diameter="36"></mat-spinner>
-            <span>در حال بارگذاری…</span>
-          </div>
+          @if (loadingAgentRestrictions) {
+            <div class="loc-loading">
+              <mat-spinner diameter="36"></mat-spinner>
+              <span>در حال بارگذاری…</span>
+            </div>
+          }
 
-          <table *ngIf="!loadingAgentRestrictions && agentRestrictions.length"
-                 mat-table [dataSource]="agentRestrictions" class="loc-table mat-elevation-z0">
-            <ng-container matColumnDef="provinceName">
-              <th mat-header-cell *matHeaderCellDef>استان</th>
-              <td mat-cell *matCellDef="let r" class="loc-cell-strong">{{ r.provinceName || '—' }}</td>
-            </ng-container>
+          @if (!loadingAgentRestrictions && agentRestrictions.length) {
+            <table
+              mat-table [dataSource]="agentRestrictions" class="loc-table mat-elevation-z0">
+              <ng-container matColumnDef="provinceName">
+                <th mat-header-cell *matHeaderCellDef>استان</th>
+                <td mat-cell *matCellDef="let r" class="loc-cell-strong">{{ r.provinceName || '—' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="cityName">
+                <th mat-header-cell *matHeaderCellDef>شهر</th>
+                <td mat-cell *matCellDef="let r">{{ r.cityName || 'همه شهرها' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>عملیات</th>
+                <td mat-cell *matCellDef="let r">
+                  <button type="button" mat-icon-button matTooltip="حذف" (click)="removeAgentRestriction(r)">
+                    <mat-icon class="loc-icon-danger">delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="restrictionColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: restrictionColumns"></tr>
+            </table>
+          }
 
-            <ng-container matColumnDef="cityName">
-              <th mat-header-cell *matHeaderCellDef>شهر</th>
-              <td mat-cell *matCellDef="let r">{{ r.cityName || 'همه شهرها' }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>عملیات</th>
-              <td mat-cell *matCellDef="let r">
-                <button type="button" mat-icon-button matTooltip="حذف" (click)="removeAgentRestriction(r)">
-                  <mat-icon class="loc-icon-danger">delete</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="restrictionColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: restrictionColumns"></tr>
-          </table>
-
-          <p *ngIf="!loadingAgentRestrictions && !agentRestrictions.length" class="loc-empty loc-empty--panel">
-            هیچ محدودیتی ثبت نشده — ثبت‌نام کارپخش برای تمام شهرها فعال است.
-          </p>
+          @if (!loadingAgentRestrictions && !agentRestrictions.length) {
+            <p class="loc-empty loc-empty--panel">
+              هیچ محدودیتی ثبت نشده — ثبت‌نام کارپخش برای تمام شهرها فعال است.
+            </p>
+          }
         </mat-card-content>
       </mat-card>
     </mat-tab>
@@ -312,87 +331,96 @@
   <!-- ═════════════════════════════════════════════════════════════ -->
   <!-- Province Form Modal                                         -->
   <!-- ═════════════════════════════════════════════════════════════ -->
-  <div *ngIf="provinceFormOpen" class="admin-modal" (click)="closeProvinceForm()">
-    <form [formGroup]="provinceForm" (ngSubmit)="saveProvince()" (click)="$event.stopPropagation()" class="admin-modal__card">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">{{ editingProvinceId ? 'ویرایش استان' : 'افزودن استان جدید' }}</h2>
-        <button type="button" mat-icon-button (click)="closeProvinceForm()" aria-label="بستن">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="loc-form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>نام استان</mat-label>
-          <input matInput formControlName="name" placeholder="مثلاً تهران" />
-          <mat-error *ngIf="provinceForm.get('name')?.hasError('required')">نام استان الزامی است.</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>کد استان</mat-label>
-          <input matInput formControlName="code" placeholder="مثلاً 01" maxlength="10" />
-          <mat-error *ngIf="provinceForm.get('code')?.hasError('required')">کد استان الزامی است.</mat-error>
-        </mat-form-field>
-
-        <mat-checkbox formControlName="isActive" class="loc-checkbox">فعال</mat-checkbox>
-      </div>
-
-      <p *ngIf="formError" class="admin-alert admin-alert--error">{{ formError }}</p>
-
-      <div class="loc-modal-actions">
-        <button type="button" mat-stroked-button (click)="closeProvinceForm()">انصراف</button>
-        <button type="submit" mat-flat-button color="primary" [disabled]="saving">
-          {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
-        </button>
-      </div>
-    </form>
-  </div>
+  @if (provinceFormOpen) {
+    <div class="admin-modal" (click)="closeProvinceForm()">
+      <form [formGroup]="provinceForm" (ngSubmit)="saveProvince()" (click)="$event.stopPropagation()" class="admin-modal__card">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">{{ editingProvinceId ? 'ویرایش استان' : 'افزودن استان جدید' }}</h2>
+          <button type="button" mat-icon-button (click)="closeProvinceForm()" aria-label="بستن">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="loc-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>نام استان</mat-label>
+            <input matInput formControlName="name" placeholder="مثلاً تهران" />
+            @if (provinceForm.get('name')?.hasError('required')) {
+              <mat-error>نام استان الزامی است.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>کد استان</mat-label>
+            <input matInput formControlName="code" placeholder="مثلاً 01" maxlength="10" />
+            @if (provinceForm.get('code')?.hasError('required')) {
+              <mat-error>کد استان الزامی است.</mat-error>
+            }
+          </mat-form-field>
+          <mat-checkbox formControlName="isActive" class="loc-checkbox">فعال</mat-checkbox>
+        </div>
+        @if (formError) {
+          <p class="admin-alert admin-alert--error">{{ formError }}</p>
+        }
+        <div class="loc-modal-actions">
+          <button type="button" mat-stroked-button (click)="closeProvinceForm()">انصراف</button>
+          <button type="submit" mat-flat-button color="primary" [disabled]="saving">
+            {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
 
   <!-- ═════════════════════════════════════════════════════════════ -->
   <!-- City Form Modal                                             -->
   <!-- ═════════════════════════════════════════════════════════════ -->
-  <div *ngIf="cityFormOpen" class="admin-modal" (click)="closeCityForm()">
-    <form [formGroup]="cityForm" (ngSubmit)="saveCity()" (click)="$event.stopPropagation()" class="admin-modal__card">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">{{ editingCityId ? 'ویرایش شهر' : 'افزودن شهر جدید' }}</h2>
-        <button type="button" mat-icon-button (click)="closeCityForm()" aria-label="بستن">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-
-      <div class="loc-form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>استان</mat-label>
-          <mat-select formControlName="provinceId">
-            <mat-option value="">انتخاب استان</mat-option>
-            <mat-option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</mat-option>
-          </mat-select>
-          <mat-error *ngIf="cityForm.get('provinceId')?.hasError('required')">انتخاب استان الزامی است.</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>نام شهر</mat-label>
-          <input matInput formControlName="name" placeholder="مثلاً تهران" />
-          <mat-error *ngIf="cityForm.get('name')?.hasError('required')">نام شهر الزامی است.</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>کد شهر</mat-label>
-          <input matInput formControlName="code" placeholder="مثلاً 01" maxlength="10" />
-          <mat-error *ngIf="cityForm.get('code')?.hasError('required')">کد شهر الزامی است.</mat-error>
-        </mat-form-field>
-
-        <mat-checkbox formControlName="isActive" class="loc-checkbox">فعال</mat-checkbox>
-      </div>
-
-      <p *ngIf="formError" class="admin-alert admin-alert--error">{{ formError }}</p>
-
-      <div class="loc-modal-actions">
-        <button type="button" mat-stroked-button (click)="closeCityForm()">انصراف</button>
-        <button type="submit" mat-flat-button color="primary" [disabled]="saving">
-          {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
-        </button>
-      </div>
-    </form>
-  </div>
+  @if (cityFormOpen) {
+    <div class="admin-modal" (click)="closeCityForm()">
+      <form [formGroup]="cityForm" (ngSubmit)="saveCity()" (click)="$event.stopPropagation()" class="admin-modal__card">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">{{ editingCityId ? 'ویرایش شهر' : 'افزودن شهر جدید' }}</h2>
+          <button type="button" mat-icon-button (click)="closeCityForm()" aria-label="بستن">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="loc-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>استان</mat-label>
+            <mat-select formControlName="provinceId">
+              <mat-option value="">انتخاب استان</mat-option>
+              @for (p of provinces; track p) {
+                <mat-option [value]="p.id">{{ p.name }}</mat-option>
+              }
+            </mat-select>
+            @if (cityForm.get('provinceId')?.hasError('required')) {
+              <mat-error>انتخاب استان الزامی است.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>نام شهر</mat-label>
+            <input matInput formControlName="name" placeholder="مثلاً تهران" />
+            @if (cityForm.get('name')?.hasError('required')) {
+              <mat-error>نام شهر الزامی است.</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>کد شهر</mat-label>
+            <input matInput formControlName="code" placeholder="مثلاً 01" maxlength="10" />
+            @if (cityForm.get('code')?.hasError('required')) {
+              <mat-error>کد شهر الزامی است.</mat-error>
+            }
+          </mat-form-field>
+          <mat-checkbox formControlName="isActive" class="loc-checkbox">فعال</mat-checkbox>
+        </div>
+        @if (formError) {
+          <p class="admin-alert admin-alert--error">{{ formError }}</p>
+        }
+        <div class="loc-modal-actions">
+          <button type="button" mat-stroked-button (click)="closeCityForm()">انصراف</button>
+          <button type="submit" mat-flat-button color="primary" [disabled]="saving">
+            {{ saving ? 'در حال ذخیره…' : 'ذخیره' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

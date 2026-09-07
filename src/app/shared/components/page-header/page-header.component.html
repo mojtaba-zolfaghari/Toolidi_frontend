@@ -1,25 +1,41 @@
 <ng-container>
   <!-- Breadcrumbs -->
-  <nav *ngIf="breadcrumbs.length" class="page-header__breadcrumbs" aria-label="breadcrumb">
-    <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
-      <a *ngIf="crumb.link && !last" [routerLink]="crumb.link" class="page-header__crumb-link">{{ crumb.label }}</a>
-      <span *ngIf="!crumb.link || last" [class.page-header__crumb-current]="last">{{ crumb.label }}</span>
-      <span *ngIf="!last" class="page-header__crumb-sep">/</span>
-    </ng-container>
-  </nav>
+  @if (breadcrumbs.length) {
+    <nav class="page-header__breadcrumbs" aria-label="breadcrumb">
+      @for (crumb of breadcrumbs; track crumb; let last = $last) {
+        @if (crumb.link && !last) {
+          <a [routerLink]="crumb.link" class="page-header__crumb-link">{{ crumb.label }}</a>
+        }
+        @if (!crumb.link || last) {
+          <span [class.page-header__crumb-current]="last">{{ crumb.label }}</span>
+        }
+        @if (!last) {
+          <span class="page-header__crumb-sep">/</span>
+        }
+      }
+    </nav>
+  }
 
   <div class="page-header__row">
     <div>
       <h1 class="page-header__title">{{ title }}</h1>
-      <p *ngIf="subtitle" class="page-header__subtitle">{{ subtitle }}</p>
+      @if (subtitle) {
+        <p class="page-header__subtitle">{{ subtitle }}</p>
+      }
     </div>
-    <div *ngIf="actions.length" class="page-header__actions">
-      <button *ngFor="let action of actions" mat-stroked-button
-        class="page-header__action" [ngClass]="'page-header__action--' + (action.color || 'primary')"
-        (click)="action.click()">
-        <span *ngIf="action.icon" class="page-header__action-icon" aria-hidden="true">{{ action.icon }}</span>
-        {{ action.label }}
-      </button>
-    </div>
+    @if (actions.length) {
+      <div class="page-header__actions">
+        @for (action of actions; track action) {
+          <button mat-stroked-button
+            class="page-header__action" [ngClass]="'page-header__action--' + (action.color || 'primary')"
+            (click)="action.click()">
+            @if (action.icon) {
+              <span class="page-header__action-icon" aria-hidden="true">{{ action.icon }}</span>
+            }
+            {{ action.label }}
+          </button>
+        }
+      </div>
+    }
   </div>
 </ng-container>

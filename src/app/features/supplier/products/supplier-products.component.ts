@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SupplierService, SupplierProduct, SupplierProductPricing } from '../../../core/services/api/supplier.service';
 
 @Component({
-  selector: 'app-supplier-products',
-  template: `
+    selector: 'app-supplier-products',
+    template: `
     <section class="space-y-6">
       <div class="flex items-center justify-between">
         <div>
@@ -14,14 +14,16 @@ import { SupplierService, SupplierProduct, SupplierProductPricing } from '../../
           + افزودن محصول
         </button>
       </div>
-
+    
       <!-- Filters -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-wrap gap-3">
         <input type="text" placeholder="جستجوی محصول..." [(ngModel)]="searchTerm"
-               class="flex-1 min-w-[200px] border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+          class="flex-1 min-w-[200px] border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
         <select [(ngModel)]="filterCategory" class="border border-gray-200 rounded-xl px-4 py-2.5 bg-white">
           <option value="">همه دسته‌بندی‌ها</option>
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
         </select>
         <select [(ngModel)]="filterStatus" class="border border-gray-200 rounded-xl px-4 py-2.5 bg-white">
           <option value="">همه وضعیت‌ها</option>
@@ -29,7 +31,7 @@ import { SupplierService, SupplierProduct, SupplierProductPricing } from '../../
           <option value="inactive">غیرفعال</option>
         </select>
       </div>
-
+    
       <!-- Products Table -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
@@ -46,80 +48,96 @@ import { SupplierService, SupplierProduct, SupplierProductPricing } from '../../
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let product of filteredProducts" class="border-t hover:bg-gray-50 transition-colors">
-                <td class="p-4">
-                  <div class="flex items-center gap-3">
-                    <img *ngIf="product.imageUrl" [src]="product.imageUrl" class="w-10 h-10 rounded-lg object-cover" alt="" />
-                    <span class="font-medium text-secondary">{{ product.name }}</span>
-                  </div>
-                </td>
-                <td class="p-4 font-mono text-xs text-gray-500">{{ product.sku }}</td>
-                <td class="p-4">
-                  <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{{ product.categoryName }}</span>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-green-600">{{ getPricing(product.id)?.supplyPrice ?? product.price | persianNumber }} تومان</div>
-                  <div *ngIf="getPricing(product.id)" class="text-[11px] text-gray-400 mt-0.5">
-                    قیمت سایت: {{ getPricing(product.id)!.suggestedSitePrice | persianNumber }} تومان
-                  </div>
-                </td>
-                <td class="p-4">
-                  <span [class]="(getPricing(product.id)?.availableQuantity ?? product.stockQuantity) > 10 ? 'text-green-600' : (getPricing(product.id)?.availableQuantity ?? product.stockQuantity) > 0 ? 'text-yellow-600' : 'text-red-600'">
-                    {{ getPricing(product.id)?.availableQuantity ?? product.stockQuantity }}
-                  </span>
-                </td>
-                <td class="p-4">
-                  <span class="text-xs px-2 py-1 rounded-full" [class]="product.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
-                    {{ product.isActive ? 'فعال' : 'غیرفعال' }}
-                  </span>
-                </td>
-                <td class="p-4">
-                  <div class="flex gap-2">
-                    <button (click)="startEdit(product)" class="text-blue-600 hover:underline text-xs">ثبت قیمت</button>
-                  </div>
-                </td>
-              </tr>
+              @for (product of filteredProducts; track product) {
+                <tr class="border-t hover:bg-gray-50 transition-colors">
+                  <td class="p-4">
+                    <div class="flex items-center gap-3">
+                      @if (product.imageUrl) {
+                        <img [src]="product.imageUrl" class="w-10 h-10 rounded-lg object-cover" alt="" />
+                      }
+                      <span class="font-medium text-secondary">{{ product.name }}</span>
+                    </div>
+                  </td>
+                  <td class="p-4 font-mono text-xs text-gray-500">{{ product.sku }}</td>
+                  <td class="p-4">
+                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{{ product.categoryName }}</span>
+                  </td>
+                  <td class="p-4">
+                    <div class="font-bold text-green-600">{{ getPricing(product.id)?.supplyPrice ?? product.price | persianNumber }} تومان</div>
+                    @if (getPricing(product.id)) {
+                      <div class="text-[11px] text-gray-400 mt-0.5">
+                        قیمت سایت: {{ getPricing(product.id)!.suggestedSitePrice | persianNumber }} تومان
+                      </div>
+                    }
+                  </td>
+                  <td class="p-4">
+                    <span [class]="(getPricing(product.id)?.availableQuantity ?? product.stockQuantity) > 10 ? 'text-green-600' : (getPricing(product.id)?.availableQuantity ?? product.stockQuantity) > 0 ? 'text-yellow-600' : 'text-red-600'">
+                      {{ getPricing(product.id)?.availableQuantity ?? product.stockQuantity }}
+                    </span>
+                  </td>
+                  <td class="p-4">
+                    <span class="text-xs px-2 py-1 rounded-full" [class]="product.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
+                      {{ product.isActive ? 'فعال' : 'غیرفعال' }}
+                    </span>
+                  </td>
+                  <td class="p-4">
+                    <div class="flex gap-2">
+                      <button (click)="startEdit(product)" class="text-blue-600 hover:underline text-xs">ثبت قیمت</button>
+                    </div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-        <p *ngIf="!filteredProducts.length" class="text-gray-400 text-center py-12">محصولی یافت نشد</p>
+        @if (!filteredProducts.length) {
+          <p class="text-gray-400 text-center py-12">محصولی یافت نشد</p>
+        }
       </div>
     </section>
-
+    
     <!-- Pricing Modal -->
-    <div *ngIf="editing" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/40" (click)="cancelEdit()"></div>
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
-        <h3 class="font-bold text-secondary">ثبت قیمت تأمین — {{ editing.name }}</h3>
-        <label class="block">
-          <span class="text-xs text-gray-500">قیمت شما (تومان)</span>
-          <input type="number" [(ngModel)]="editSupplyPrice"
-                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
-        </label>
-        <label class="block">
-          <span class="text-xs text-gray-500">موجودی قابل تأمین</span>
-          <input type="number" [(ngModel)]="editQuantity"
-                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
-        </label>
-        <label class="block">
-          <span class="text-xs text-gray-500">زمان آماده‌سازی (ساعت)</span>
-          <input type="number" [(ngModel)]="editLeadTime"
-                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
-        </label>
-        <p *ngIf="suggestedPrice" class="text-xs bg-blue-50 text-blue-700 rounded-xl p-3">
-          قیمت پیشنهادی سایت با حاشیه سود و تعدیل مالیات: {{ suggestedPrice | persianNumber }} تومان
-        </p>
-        <p *ngIf="editError" class="text-xs text-red-500">{{ editError }}</p>
-        <div class="flex gap-2 justify-end">
-          <button (click)="cancelEdit()" class="px-4 py-2 text-sm rounded-xl border border-gray-200 text-gray-600">انصراف</button>
-          <button (click)="savePricing()" [disabled]="saving"
-                  class="px-5 py-2 text-sm rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 disabled:opacity-40">
-            {{ saving ? 'در حال ذخیره…' : 'ذخیره قیمت' }}
-          </button>
+    @if (editing) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40" (click)="cancelEdit()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+          <h3 class="font-bold text-secondary">ثبت قیمت تأمین — {{ editing.name }}</h3>
+          <label class="block">
+            <span class="text-xs text-gray-500">قیمت شما (تومان)</span>
+            <input type="number" [(ngModel)]="editSupplyPrice"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+          </label>
+          <label class="block">
+            <span class="text-xs text-gray-500">موجودی قابل تأمین</span>
+            <input type="number" [(ngModel)]="editQuantity"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+          </label>
+          <label class="block">
+            <span class="text-xs text-gray-500">زمان آماده‌سازی (ساعت)</span>
+            <input type="number" [(ngModel)]="editLeadTime"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500/30" />
+          </label>
+          @if (suggestedPrice) {
+            <p class="text-xs bg-blue-50 text-blue-700 rounded-xl p-3">
+              قیمت پیشنهادی سایت با حاشیه سود و تعدیل مالیات: {{ suggestedPrice | persianNumber }} تومان
+            </p>
+          }
+          @if (editError) {
+            <p class="text-xs text-red-500">{{ editError }}</p>
+          }
+          <div class="flex gap-2 justify-end">
+            <button (click)="cancelEdit()" class="px-4 py-2 text-sm rounded-xl border border-gray-200 text-gray-600">انصراف</button>
+            <button (click)="savePricing()" [disabled]="saving"
+              class="px-5 py-2 text-sm rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 disabled:opacity-40">
+              {{ saving ? 'در حال ذخیره…' : 'ذخیره قیمت' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `
+    }
+    `,
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SupplierProductsComponent implements OnInit {
   products: SupplierProduct[] = [];

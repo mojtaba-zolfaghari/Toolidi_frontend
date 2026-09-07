@@ -1,18 +1,22 @@
 <section class="product-detail">
   <div class="product-detail__shell">
-    <div *ngIf="loading" class="product-detail__loading">
-      <app-spinner label="در حال بارگذاری محصول…"></app-spinner>
-    </div>
+    @if (loading) {
+      <div class="product-detail__loading">
+        <app-spinner label="در حال بارگذاری محصول…"></app-spinner>
+      </div>
+    }
 
-    <div *ngIf="errorMessage && !loading" class="product-detail__error">
-      <p class="product-detail__error-text">{{ errorMessage }}</p>
-      <a routerLink="/shop" mat-flat-button class="product-detail__back-btn">
-        بازگشت به فروشگاه
-        <mat-icon aria-hidden="true">arrow_back</mat-icon>
-      </a>
-    </div>
+    @if (errorMessage && !loading) {
+      <div class="product-detail__error">
+        <p class="product-detail__error-text">{{ errorMessage }}</p>
+        <a routerLink="/shop" mat-flat-button class="product-detail__back-btn">
+          بازگشت به فروشگاه
+          <mat-icon aria-hidden="true">arrow_back</mat-icon>
+        </a>
+      </div>
+    }
 
-    <ng-container *ngIf="!loading && product">
+    @if (!loading && product) {
       <!-- Breadcrumb -->
       <nav class="product-detail__breadcrumb" aria-label="مسیر breadcrumb">
         <a routerLink="/" class="product-detail__breadcrumb-link">خانه</a>
@@ -21,7 +25,6 @@
         <mat-icon class="product-detail__breadcrumb-sep" aria-hidden="true">chevron_right</mat-icon>
         <span class="product-detail__breadcrumb-current">{{ product.name }}</span>
       </nav>
-
       <div class="product-detail__grid">
         <!-- Image gallery -->
         <div class="product-detail__gallery">
@@ -29,66 +32,80 @@
             [@imageSwap]="activeImageIndex"
             class="product-detail__hero-image"
             [class.product-detail__hero-image--no-gallery]="!hasGallery">
-            <img
-              *ngIf="hasGallery"
-              [src]="galleryImages[activeImageIndex]"
-              [alt]="product.name"
-              class="product-detail__hero-img"
-              loading="lazy"
-            />
-            <span *ngIf="!hasGallery" class="product-detail__hero-fallback" aria-hidden="true">🛍️</span>
+            @if (hasGallery) {
+              <img
+                [src]="galleryImages[activeImageIndex]"
+                [alt]="product.name"
+                class="product-detail__hero-img"
+                loading="lazy"
+                />
+            }
+            @if (!hasGallery) {
+              <span class="product-detail__hero-fallback" aria-hidden="true">🛍️</span>
+            }
           </div>
-
-          <div *ngIf="galleryImages.length > 1" class="product-detail__thumbs">
-            <button
-              *ngFor="let image of galleryImages; let i = index"
-              type="button"
-              (click)="selectImage(i)"
-              class="product-detail__thumb"
-              [class.product-detail__thumb--active]="i === activeImageIndex"
-              [attr.aria-label]="'تصویر ' + (i + 1) + ' از ' + product.name">
-              <img [src]="image" [alt]="product.name + ' ' + (i + 1)" class="product-detail__thumb-img" />
-            </button>
-          </div>
+          @if (galleryImages.length > 1) {
+            <div class="product-detail__thumbs">
+              @for (image of galleryImages; track image; let i = $index) {
+                <button
+                  type="button"
+                  (click)="selectImage(i)"
+                  class="product-detail__thumb"
+                  [class.product-detail__thumb--active]="i === activeImageIndex"
+                  [attr.aria-label]="'تصویر ' + (i + 1) + ' از ' + product.name">
+                  <img [src]="image" [alt]="product.name + ' ' + (i + 1)" class="product-detail__thumb-img" />
+                </button>
+              }
+            </div>
+          }
         </div>
-
         <!-- Product info -->
         <div class="product-detail__info" [@slideUp]>
           <div class="product-detail__badges">
-            <span *ngIf="product.isFeatured" class="product-detail__badge product-detail__badge--featured">منتخب</span>
-            <span *ngIf="product.isNewArrival" class="product-detail__badge product-detail__badge--new">تازه‌وارد</span>
-            <span *ngIf="product.isBestSeller" class="product-detail__badge product-detail__badge--best">پرفروش</span>
+            @if (product.isFeatured) {
+              <span class="product-detail__badge product-detail__badge--featured">منتخب</span>
+            }
+            @if (product.isNewArrival) {
+              <span class="product-detail__badge product-detail__badge--new">تازه‌وارد</span>
+            }
+            @if (product.isBestSeller) {
+              <span class="product-detail__badge product-detail__badge--best">پرفروش</span>
+            }
           </div>
-
           <h1 class="product-detail__title">{{ product.name }}</h1>
-          <p *ngIf="product.categoryName" class="product-detail__category">دسته‌بندی: {{ product.categoryName }}</p>
-
+          @if (product.categoryName) {
+            <p class="product-detail__category">دسته‌بندی: {{ product.categoryName }}</p>
+          }
           <!-- Rating -->
           <div class="product-detail__rating">
-            <span *ngFor="let star of [1, 2, 3, 4, 5]" class="product-detail__star"
-                  [class.product-detail__star--on]="star <= (product.ratingAverage ?? 0)"
-                  [class.product-detail__star--off]="star > (product.ratingAverage ?? 0)"
-                  aria-hidden="true">★</span>
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <span class="product-detail__star"
+                [class.product-detail__star--on]="star <= (product.ratingAverage ?? 0)"
+                [class.product-detail__star--off]="star > (product.ratingAverage ?? 0)"
+              aria-hidden="true">★</span>
+            }
             <span class="product-detail__rating-meta">
               ({{ product.ratingCount | persianNumber }} نظر)
             </span>
             <span class="product-detail__stock-badge" [class]="stockStatus.cssClass">{{ stockStatus.text }}</span>
           </div>
-
           <!-- Price + discount -->
           <div class="product-detail__price-block">
             <div class="product-detail__price-row">
               <span class="product-detail__price">{{ effectivePrice | persianNumber }} تومان</span>
-              <span *ngIf="discountPercent > 0" class="product-detail__discount-badge">
-                {{ discountPercent | persianNumber }}٪ تخفیف
-              </span>
+              @if (discountPercent > 0) {
+                <span class="product-detail__discount-badge">
+                  {{ discountPercent | persianNumber }}٪ تخفیف
+                </span>
+              }
             </div>
-            <div *ngIf="discountPercent > 0" class="product-detail__price-compare">
-              <span class="product-detail__compare-strike">قیمت قبل: {{ product.comparePrice | persianNumber }} تومان</span>
-              <span class="product-detail__saving">{{ discountAmount | persianNumber }} تومان کمتر</span>
-            </div>
+            @if (discountPercent > 0) {
+              <div class="product-detail__price-compare">
+                <span class="product-detail__compare-strike">قیمت قبل: {{ product.comparePrice | persianNumber }} تومان</span>
+                <span class="product-detail__saving">{{ discountAmount | persianNumber }} تومان کمتر</span>
+              </div>
+            }
           </div>
-
           <!-- Delivery estimates -->
           <section class="product-detail__delivery" aria-label="زمان‌بندی هوشمند ارسال محصول">
             <div class="product-detail__delivery-head">
@@ -98,7 +115,6 @@
                 <p class="product-detail__delivery-sub">محاسبه‌شده از زمان تولید، تحویل فروشنده و حمل</p>
               </div>
             </div>
-
             <!-- خط زمان: تولید → تحویل به پست → ارسال -->
             <div class="product-detail__timeline">
               <div class="product-detail__timeline-step" [class.product-detail__timeline-step--dim]="productionLeadDays === 0">
@@ -119,7 +135,6 @@
                 <b class="product-detail__timeline-value">{{ deliveryInfo.nationwideDays | persianNumber }} روز</b>
               </div>
             </div>
-
             <div class="product-detail__delivery-options">
               <div
                 class="product-detail__delivery-option"
@@ -142,25 +157,26 @@
               </div>
             </div>
           </section>
-
           <p class="product-detail__short-desc">
             {{ product.shortDescription || 'توضیح کوتاهی برای این محصول ثبت نشده است.' }}
           </p>
-
           <!-- Variation selector -->
-          <div *ngIf="variations.length" class="product-detail__variation">
-            <label class="product-detail__variation-label" for="variationSelect">انتخاب تنوع</label>
-            <select
-              id="variationSelect"
-              [value]="selectedVariationId"
-              (change)="onVariationChange($any($event.target).value)"
-              class="product-detail__variation-select">
-              <option *ngFor="let variation of variations" [value]="variation.id">
-                {{ variation.displayName }} — {{ (product.unitPrice + variation.priceAdjustment) | persianNumber }} تومان
-              </option>
-            </select>
-          </div>
-
+          @if (variations.length) {
+            <div class="product-detail__variation">
+              <label class="product-detail__variation-label" for="variationSelect">انتخاب تنوع</label>
+              <select
+                id="variationSelect"
+                [value]="selectedVariationId"
+                (change)="onVariationChange($any($event.target).value)"
+                class="product-detail__variation-select">
+                @for (variation of variations; track variation) {
+                  <option [value]="variation.id">
+                    {{ variation.displayName }} — {{ (product.unitPrice + variation.priceAdjustment) | persianNumber }} تومان
+                  </option>
+                }
+              </select>
+            </div>
+          }
           <!-- Quantity + Add to cart -->
           <div class="product-detail__actions">
             <div class="product-detail__qty-row">
@@ -175,7 +191,6 @@
                 </button>
               </div>
             </div>
-
             <div class="product-detail__action-row">
               <app-add-to-cart-button
                 (addToCart)="addToCart()"
@@ -184,7 +199,6 @@
                 size="lg"
                 [fullWidth]="true">
               </app-add-to-cart-button>
-
               <div class="product-detail__quick-actions">
                 <button type="button" class="product-detail__quick-btn" title="افزودن به علاقه‌مندی" aria-label="افزودن به علاقه‌مندی">
                   <svg xmlns="http://www.w3.org/2000/svg" class="product-detail__quick-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
@@ -197,155 +211,177 @@
                 </button>
               </div>
             </div>
-
-            <p *ngIf="!stockStatus.inStock" class="product-detail__out-of-stock">
-              ❌ این محصول در حال حاضر موجود نیست
-            </p>
+            @if (!stockStatus.inStock) {
+              <p class="product-detail__out-of-stock">
+                ❌ این محصول در حال حاضر موجود نیست
+              </p>
+            }
           </div>
         </div>
       </div>
-
       <!-- Supplier Info -->
-      <section *ngIf="supplierStats" class="product-detail__suppliers">
-        <div class="product-detail__suppliers-head">
-          <span class="product-detail__suppliers-icon" aria-hidden="true">🏭</span>
-          <div>
-            <h3 class="product-detail__suppliers-title">تأمین‌کنندگان این دسته‌بندی</h3>
-            <p class="product-detail__suppliers-sub">تعداد تأمین‌کنندگان فعال در شهرهای مختلف</p>
+      @if (supplierStats) {
+        <section class="product-detail__suppliers">
+          <div class="product-detail__suppliers-head">
+            <span class="product-detail__suppliers-icon" aria-hidden="true">🏭</span>
+            <div>
+              <h3 class="product-detail__suppliers-title">تأمین‌کنندگان این دسته‌بندی</h3>
+              <p class="product-detail__suppliers-sub">تعداد تأمین‌کنندگان فعال در شهرهای مختلف</p>
+            </div>
           </div>
-        </div>
-        <div class="product-detail__suppliers-stats">
-          <div class="product-detail__suppliers-stat">
-            <p class="product-detail__suppliers-stat-value">{{ supplierStats.totalSuppliers }}</p>
-            <p class="product-detail__suppliers-stat-label">تأمین‌کننده</p>
+          <div class="product-detail__suppliers-stats">
+            <div class="product-detail__suppliers-stat">
+              <p class="product-detail__suppliers-stat-value">{{ supplierStats.totalSuppliers }}</p>
+              <p class="product-detail__suppliers-stat-label">تأمین‌کننده</p>
+            </div>
+            <div class="product-detail__suppliers-stat">
+              <p class="product-detail__suppliers-stat-value">{{ supplierStats.citiesCount | persianNumber }}</p>
+              <p class="product-detail__suppliers-stat-label">شهر</p>
+            </div>
+            <div class="product-detail__suppliers-stat">
+              <p class="product-detail__suppliers-stat-value">{{ relatedProducts.length + 1 }}</p>
+              <p class="product-detail__suppliers-stat-label">محصول</p>
+            </div>
           </div>
-          <div class="product-detail__suppliers-stat">
-            <p class="product-detail__suppliers-stat-value">{{ supplierStats.citiesCount | persianNumber }}</p>
-            <p class="product-detail__suppliers-stat-label">شهر</p>
-          </div>
-          <div class="product-detail__suppliers-stat">
-            <p class="product-detail__suppliers-stat-value">{{ relatedProducts.length + 1 }}</p>
-            <p class="product-detail__suppliers-stat-label">محصول</p>
-          </div>
-        </div>
-        <ul class="product-detail__suppliers-cities">
-          <li *ngFor="let city of supplierStats.cities" class="product-detail__suppliers-city">
-            <span class="product-detail__suppliers-city-dot" aria-hidden="true"></span>
-            <span class="product-detail__suppliers-city-name">{{ city.city }}</span>
-            <span class="product-detail__suppliers-city-count">{{ city.count | persianNumber }} تأمین‌کننده</span>
-          </li>
-        </ul>
-      </section>
-
+          <ul class="product-detail__suppliers-cities">
+            @for (city of supplierStats.cities; track city) {
+              <li class="product-detail__suppliers-city">
+                <span class="product-detail__suppliers-city-dot" aria-hidden="true"></span>
+                <span class="product-detail__suppliers-city-name">{{ city.city }}</span>
+                <span class="product-detail__suppliers-city-count">{{ city.count | persianNumber }} تأمین‌کننده</span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
       <!-- Tabs -->
       <section class="product-detail__tabs-section">
         <div class="product-detail__tabs" role="tablist">
           <button type="button" (click)="activeTab = 'description'"
-                  class="product-detail__tab"
-                  [class.product-detail__tab--active]="activeTab === 'description'"
-                  [attr.aria-selected]="activeTab === 'description'">توضیحات</button>
+            class="product-detail__tab"
+            [class.product-detail__tab--active]="activeTab === 'description'"
+          [attr.aria-selected]="activeTab === 'description'">توضیحات</button>
           <button type="button" (click)="activeTab = 'specs'"
-                  class="product-detail__tab"
-                  [class.product-detail__tab--active]="activeTab === 'specs'"
-                  [attr.aria-selected]="activeTab === 'specs'">مشخصات فنی</button>
+            class="product-detail__tab"
+            [class.product-detail__tab--active]="activeTab === 'specs'"
+          [attr.aria-selected]="activeTab === 'specs'">مشخصات فنی</button>
           <button type="button" (click)="activeTab = 'reviews'"
-                  class="product-detail__tab"
-                  [class.product-detail__tab--active]="activeTab === 'reviews'"
-                  [attr.aria-selected]="activeTab === 'reviews'">نظرات</button>
+            class="product-detail__tab"
+            [class.product-detail__tab--active]="activeTab === 'reviews'"
+          [attr.aria-selected]="activeTab === 'reviews'">نظرات</button>
         </div>
-
         <div class="product-detail__tab-body" role="tabpanel">
-          <div *ngIf="activeTab === 'description'" [@fadeIn] class="product-detail__description">
-            {{ product.fullDescription || product.shortDescription || 'توضیحاتی برای این محصول ثبت نشده است.' }}
-          </div>
-
-          <div *ngIf="activeTab === 'specs'" [@fadeIn]>
-            <dl class="product-detail__specs">
-              <div *ngFor="let spec of specs" class="product-detail__spec">
-                <dt class="product-detail__spec-label">{{ spec.label }}</dt>
-                <dd class="product-detail__spec-value">{{ spec.value }}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div *ngIf="activeTab === 'reviews'" [@fadeIn]>
-            <div class="product-detail__review-summary">
-              <span class="product-detail__review-rating">{{ product.ratingAverage ?? 0 | persianNumber:1:1 }}</span>
-              <div>
-                <span *ngFor="let star of [1, 2, 3, 4, 5]" class="product-detail__star"
+          @if (activeTab === 'description') {
+            <div [@fadeIn] class="product-detail__description">
+              {{ product.fullDescription || product.shortDescription || 'توضیحاتی برای این محصول ثبت نشده است.' }}
+            </div>
+          }
+          @if (activeTab === 'specs') {
+            <div [@fadeIn]>
+              <dl class="product-detail__specs">
+                @for (spec of specs; track spec) {
+                  <div class="product-detail__spec">
+                    <dt class="product-detail__spec-label">{{ spec.label }}</dt>
+                    <dd class="product-detail__spec-value">{{ spec.value }}</dd>
+                  </div>
+                }
+              </dl>
+            </div>
+          }
+          @if (activeTab === 'reviews') {
+            <div [@fadeIn]>
+              <div class="product-detail__review-summary">
+                <span class="product-detail__review-rating">{{ product.ratingAverage ?? 0 | persianNumber:1:1 }}</span>
+                <div>
+                  @for (star of [1, 2, 3, 4, 5]; track star) {
+                    <span class="product-detail__star"
                       [class.product-detail__star--on]="star <= (product.ratingAverage ?? 0)"
                       [class.product-detail__star--off]="star > (product.ratingAverage ?? 0)"
-                      aria-hidden="true">★</span>
-                <p class="product-detail__review-count">بر اساس {{ product.ratingCount | persianNumber }} نظر</p>
+                    aria-hidden="true">★</span>
+                  }
+                  <p class="product-detail__review-count">بر اساس {{ product.ratingCount | persianNumber }} نظر</p>
+                </div>
               </div>
+              @if (!reviews.length) {
+                <p class="product-detail__review-empty">هنوز نظری برای این محصول ثبت نشده است.</p>
+              }
             </div>
-            <p *ngIf="!reviews.length" class="product-detail__review-empty">هنوز نظری برای این محصول ثبت نشده است.</p>
-          </div>
+          }
         </div>
       </section>
-
       <!-- Related products -->
-      <section *ngIf="relatedProducts.length" class="product-detail__related">
-        <div class="product-detail__related-head">
-          <h2 class="product-detail__related-title">محصولات مرتبط</h2>
-          <button type="button" class="product-detail__compare-toggle"
-                  [class.product-detail__compare-toggle--active]="compareMode"
-                  (click)="compareMode ? closeCompare() : openCompare()">
-            {{ compareMode ? 'بستن مقایسه' : 'مقایسه محصولات' }}
-          </button>
-        </div>
-
-        <!-- نوار انتخاب مقایسه -->
-        <p *ngIf="compareMode && compareColumns.length < 2" class="product-detail__compare-hint">
-          برای مقایسه، حداکثر {{ (compareLimit - 1) | persianNumber }} محصول را از زیر انتخاب کنید
-          ({{ compareColumns.length | persianNumber }} انتخاب‌شده)
-        </p>
-
-        <div class="product-detail__related-grid"
-             [class.product-detail__related-grid--selectable]="compareMode">
-          <app-product-card *ngFor="let related of relatedProducts" [product]="related" [@slideUp]></app-product-card>
-        </div>
-
-        <!-- لایه انتخاب روی کارت‌ها -->
-        <ng-container *ngIf="compareMode">
-          <div class="product-detail__compare-picks">
-            <button type="button" *ngFor="let related of relatedProducts"
-                    class="product-detail__compare-pick"
-                    [class.product-detail__compare-pick--selected]="compareIds.includes(related.id)"
-                    [disabled]="!compareIds.includes(related.id) && compareColumns.length >= compareLimit"
-                    (click)="toggleCompare(related.id)">
-              {{ compareIds.includes(related.id) ? '✓ ' + related.name : '+ ' + related.name }}
+      @if (relatedProducts.length) {
+        <section class="product-detail__related">
+          <div class="product-detail__related-head">
+            <h2 class="product-detail__related-title">محصولات مرتبط</h2>
+            <button type="button" class="product-detail__compare-toggle"
+              [class.product-detail__compare-toggle--active]="compareMode"
+              (click)="compareMode ? closeCompare() : openCompare()">
+              {{ compareMode ? 'بستن مقایسه' : 'مقایسه محصولات' }}
             </button>
           </div>
-
-          <!-- جدول مقایسه -->
-          <div *ngIf="compareColumns.length >= 2" class="product-detail__compare-table-wrap">
-            <table class="product-detail__compare-table">
-              <thead>
-                <tr>
-                  <th class="product-detail__compare-th product-detail__compare-th--label" scope="row">ویژگی</th>
-                  <th *ngFor="let col of compareColumns" class="product-detail__compare-th"
-                      [class.product-detail__compare-th--current]="col.id === product.id">
-                    {{ col.id === product.id ? 'این محصول' : col.name }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of compareRows">
-                  <th class="product-detail__compare-th product-detail__compare-th--label" scope="row">{{ row.label }}</th>
-                  <td *ngFor="let value of row.values; let i = index"
-                      class="product-detail__compare-td"
-                      [class.product-detail__compare-td--current]="compareColumns[i].id === product.id">
-                    {{ value }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- نوار انتخاب مقایسه -->
+          @if (compareMode && compareColumns.length < 2) {
+            <p class="product-detail__compare-hint">
+              برای مقایسه، حداکثر {{ (compareLimit - 1) | persianNumber }} محصول را از زیر انتخاب کنید
+              ({{ compareColumns.length | persianNumber }} انتخاب‌شده)
+            </p>
+          }
+          <div class="product-detail__related-grid"
+            [class.product-detail__related-grid--selectable]="compareMode">
+            @for (related of relatedProducts; track related) {
+              <app-product-card [product]="related" [@slideUp]></app-product-card>
+            }
           </div>
-
-          <button type="button" class="product-detail__compare-close" (click)="closeCompare()">پاک‌کردن مقایسه</button>
-        </ng-container>
-      </section>
-    </ng-container>
+          <!-- لایه انتخاب روی کارت‌ها -->
+          @if (compareMode) {
+            <div class="product-detail__compare-picks">
+              @for (related of relatedProducts; track related) {
+                <button type="button"
+                  class="product-detail__compare-pick"
+                  [class.product-detail__compare-pick--selected]="compareIds.includes(related.id)"
+                  [disabled]="!compareIds.includes(related.id) && compareColumns.length >= compareLimit"
+                  (click)="toggleCompare(related.id)">
+                  {{ compareIds.includes(related.id) ? '✓ ' + related.name : '+ ' + related.name }}
+                </button>
+              }
+            </div>
+            <!-- جدول مقایسه -->
+            @if (compareColumns.length >= 2) {
+              <div class="product-detail__compare-table-wrap">
+                <table class="product-detail__compare-table">
+                  <thead>
+                    <tr>
+                      <th class="product-detail__compare-th product-detail__compare-th--label" scope="row">ویژگی</th>
+                      @for (col of compareColumns; track col) {
+                        <th class="product-detail__compare-th"
+                          [class.product-detail__compare-th--current]="col.id === product.id">
+                          {{ col.id === product.id ? 'این محصول' : col.name }}
+                        </th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of compareRows; track row) {
+                      <tr>
+                        <th class="product-detail__compare-th product-detail__compare-th--label" scope="row">{{ row.label }}</th>
+                        @for (value of row.values; track value; let i = $index) {
+                          <td
+                            class="product-detail__compare-td"
+                            [class.product-detail__compare-td--current]="compareColumns[i].id === product.id">
+                            {{ value }}
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+            <button type="button" class="product-detail__compare-close" (click)="closeCompare()">پاک‌کردن مقایسه</button>
+          }
+        </section>
+      }
+    }
   </div>
 </section>

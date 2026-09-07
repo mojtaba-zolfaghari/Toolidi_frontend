@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { Order, OrderService, OrderTracking, OrderTimeline, OrderTimelineStage } from '../../core/services/api/order.service';
@@ -6,8 +6,10 @@ import { TimelineStep } from '../../shared/components/tracking-timeline/tracking
 
 /** صفحه جزئیات و پیگیری سفارش */
 @Component({
-  selector: 'app-order-detail',
-  templateUrl: './order-detail.component.html'
+    selector: 'app-order-detail',
+    templateUrl: './order-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class OrderDetailComponent implements OnInit {
   order: Order | null = null;

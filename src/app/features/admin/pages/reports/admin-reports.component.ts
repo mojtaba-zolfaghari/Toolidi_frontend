@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { BarChartDatum } from '../../../../shared/components/bar-chart/bar-chart.component';
 import { AdminService, AdminSeller } from '../../../../core/services/api/admin.service';
 import { ReportsService, SalesReport, SellerPerformanceReport, TopProductReport } from '../../../../core/services/api/reports.service';
 
 @Component({
-  selector: 'app-admin-reports',
-  templateUrl: './admin-reports.component.html'
+    selector: 'app-admin-reports',
+    templateUrl: './admin-reports.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminReportsComponent implements OnInit {
   dailyDate = this.toDateInput(new Date());

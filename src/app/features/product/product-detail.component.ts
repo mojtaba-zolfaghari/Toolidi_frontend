@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -37,10 +37,12 @@ interface SpecRow {
  * تنوع‌ها، افزودن به سبد و محصولات مرتبط.
  */
 @Component({
-  selector: 'app-product-detail',
-  templateUrl: './product-detail.component.html',
-  styleUrls: ['./product-detail.component.scss'],
-  animations: [fadeIn, slideUp, scaleUp, imageSwap]
+    selector: 'app-product-detail',
+    templateUrl: './product-detail.component.html',
+    styleUrls: ['./product-detail.component.scss'],
+    animations: [fadeIn, slideUp, scaleUp, imageSwap],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ProductDetailComponent implements OnInit, OnDestroy {
   product: Product | null = null;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
@@ -45,9 +45,11 @@ const SMS_FIELDS: SettingField[] = [
  * خواندن از API تب‌بندی‌شده، ذخیره از طریق upsert کلید-مقدار.
  */
 @Component({
-  selector: 'app-admin-settings',
-  templateUrl: './admin-settings.component.html',
-  styleUrls: ['./admin-settings.component.scss']
+    selector: 'app-admin-settings',
+    templateUrl: './admin-settings.component.html',
+    styleUrls: ['./admin-settings.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminSettingsComponent implements OnInit {
   activeTab: SettingsTab = 'basic';

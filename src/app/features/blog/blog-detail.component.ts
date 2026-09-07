@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { fadeIn } from '../../shared/animations';
@@ -7,10 +7,12 @@ import { SeoService } from '../../core/services/seo.service';
 
 /** صفحه جزئیات پست وبلاگ */
 @Component({
-  selector: 'app-blog-detail',
-  templateUrl: './blog-detail.component.html',
-  styleUrls: ['./blog-detail.component.scss'],
-  animations: [fadeIn]
+    selector: 'app-blog-detail',
+    templateUrl: './blog-detail.component.html',
+    styleUrls: ['./blog-detail.component.scss'],
+    animations: [fadeIn],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class BlogDetailComponent implements OnInit {
   post: BlogPost | null = null;

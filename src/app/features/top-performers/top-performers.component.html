@@ -9,24 +9,26 @@
         <p>عملکرد فروشندگان و کالارسان‌ها را بر اساس امتیاز، سفارش و سرعت تحویل مقایسه کنید.</p>
       </div>
 
-      <div *ngIf="stats" class="hero-stats">
-        <article class="hero-stat">
-          <span class="hero-stat-icon" aria-hidden="true">🏭</span>
-          <div><strong>{{ stats.sellers | persianNumber }}</strong><span>فروشنده فعال</span></div>
-        </article>
-        <article class="hero-stat">
-          <span class="hero-stat-icon" aria-hidden="true">📦</span>
-          <div><strong>{{ stats.products | persianNumber }}+</strong><span>محصول قابل عرضه</span></div>
-        </article>
-        <article class="hero-stat">
-          <span class="hero-stat-icon" aria-hidden="true">⚡</span>
-          <div><strong>{{ stats.orders | persianNumber }}+</strong><span>سفارش تکمیل‌شده</span></div>
-        </article>
-        <article class="hero-stat">
-          <span class="hero-stat-icon" aria-hidden="true">★</span>
-          <div><strong>{{ stats.avgRating | persianNumber:1:1 }}/۵</strong><span>میانگین رضایت</span></div>
-        </article>
-      </div>
+      @if (stats) {
+        <div class="hero-stats">
+          <article class="hero-stat">
+            <span class="hero-stat-icon" aria-hidden="true">🏭</span>
+            <div><strong>{{ stats.sellers | persianNumber }}</strong><span>فروشنده فعال</span></div>
+          </article>
+          <article class="hero-stat">
+            <span class="hero-stat-icon" aria-hidden="true">📦</span>
+            <div><strong>{{ stats.products | persianNumber }}+</strong><span>محصول قابل عرضه</span></div>
+          </article>
+          <article class="hero-stat">
+            <span class="hero-stat-icon" aria-hidden="true">⚡</span>
+            <div><strong>{{ stats.orders | persianNumber }}+</strong><span>سفارش تکمیل‌شده</span></div>
+          </article>
+          <article class="hero-stat">
+            <span class="hero-stat-icon" aria-hidden="true">★</span>
+            <div><strong>{{ stats.avgRating | persianNumber:1:1 }}/۵</strong><span>میانگین رضایت</span></div>
+          </article>
+        </div>
+      }
     </div>
   </section>
 
@@ -43,13 +45,15 @@
 
       <div class="sort-switcher" aria-label="مرتب‌سازی برترین‌ها">
         <span class="sort-label">مرتب‌سازی:</span>
-        <button type="button" *ngFor="let opt of [
+        @for (opt of [
           { value: 'rating', label: 'امتیاز', icon: '★' },
           { value: 'orders', label: 'سفارش', icon: '▣' },
           { value: 'delivery', label: 'سرعت', icon: '⚡' }
-        ]" (click)="switchSort(opt.value)" [class.is-active]="sortBy === opt.value">
-          <span aria-hidden="true">{{ opt.icon }}</span>{{ opt.label }}
-        </button>
+          ]; track opt) {
+          <button type="button" (click)="switchSort(opt.value)" [class.is-active]="sortBy === opt.value">
+            <span aria-hidden="true">{{ opt.icon }}</span>{{ opt.label }}
+          </button>
+        }
       </div>
     </div>
 
@@ -58,47 +62,80 @@
         <span class="section-kicker">رتبه‌بندی زنده</span>
         <h2>{{ activeTab === 'sellers' ? 'فروشندگان مورد اعتماد خریداران' : 'کالارسان‌های سریع و خوش‌امتیاز' }}</h2>
       </div>
-      <span class="result-count" *ngIf="!loading">{{ (activeTab === 'sellers' ? sellers.length : couriers.length) | persianNumber }} نفر</span>
+      @if (!loading) {
+        <span class="result-count">{{ (activeTab === 'sellers' ? sellers.length : couriers.length) | persianNumber }} نفر</span>
+      }
     </div>
 
-    <div *ngIf="loading" class="leaderboard-grid loading-grid" aria-live="polite" aria-label="در حال بارگذاری">
-      <div class="performer-skeleton" *ngFor="let item of [1, 2, 3, 4, 5, 6]"></div>
-    </div>
+    @if (loading) {
+      <div class="leaderboard-grid loading-grid" aria-live="polite" aria-label="در حال بارگذاری">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="performer-skeleton"></div>
+        }
+      </div>
+    }
 
-    <ng-container *ngIf="!loading && activeTab === 'sellers'">
-      <div *ngIf="sellers.length; else emptyState" class="leaderboard-grid">
-        <article *ngFor="let seller of sellers; let i = index; trackBy: trackById" class="performer-card" [class.is-gold]="i === 0" [class.is-silver]="i === 1" [class.is-bronze]="i === 2" [style.animation-delay]="(i * 60) + 'ms'">
-          <div class="card-topline"><span class="rank-number">{{ getRankBadge(i) }}</span><span class="rank-label">{{ i < 3 ? 'رتبه ویژه' : 'رتبه ' + (i + 1 | persianNumber) }}</span><span *ngIf="seller.isVerified" class="verified-badge">✓ تاییدشده</span></div>
-          <div class="performer-identity">
-            <div class="performer-avatar seller-avatar">{{ (seller.companyName || 'ف').charAt(0) }}</div>
-            <div class="identity-copy"><h3>{{ seller.companyName || 'فروشنده تولیدی' }}</h3><p><span aria-hidden="true">⌖</span> {{ seller.city || 'ایران' }}<span *ngIf="seller.province">، {{ seller.province }}</span></p></div>
+    @if (!loading && activeTab === 'sellers') {
+      @if (sellers.length) {
+        <div class="leaderboard-grid">
+          @for (seller of sellers; track trackById(i, seller); let i = $index) {
+            <article class="performer-card" [class.is-gold]="i === 0" [class.is-silver]="i === 1" [class.is-bronze]="i === 2" [style.animation-delay]="(i * 60) + 'ms'">
+              <div class="card-topline"><span class="rank-number">{{ getRankBadge(i) }}</span><span class="rank-label">{{ i < 3 ? 'رتبه ویژه' : 'رتبه ' + (i + 1 | persianNumber) }}</span>@if (seller.isVerified) {
+              <span class="verified-badge">✓ تاییدشده</span>
+            }</div>
+            <div class="performer-identity">
+              <div class="performer-avatar seller-avatar">{{ (seller.companyName || 'ف').charAt(0) }}</div>
+              <div class="identity-copy"><h3>{{ seller.companyName || 'فروشنده تولیدی' }}</h3><p><span aria-hidden="true">⌖</span> {{ seller.city || 'ایران' }}@if (seller.province) {
+              <span>، {{ seller.province }}</span>
+            }</p></div>
           </div>
-          <p *ngIf="seller.description" class="performer-description">{{ seller.description }}</p>
+          @if (seller.description) {
+            <p class="performer-description">{{ seller.description }}</p>
+          }
           <div class="primary-metric"><span>امتیاز عملکرد</span><strong>{{ (seller.rating || 0) | persianNumber:1:1 }}<small>/۵</small></strong><div class="rating-bar"><i [style.width.%]="((seller.rating || 0) / 5) * 100"></i></div></div>
-          <div class="metric-row"><div><strong>{{ seller.ratingCount || 0 | persianNumber }}</strong><span>نظر ثبت‌شده</span></div><div><strong>{{ seller.totalOrdersCompleted || 0 | persianNumber }}</strong><span>سفارش موفق</span></div><div><strong>{{ seller.cityDeliveryDays ? (seller.cityDeliveryDays | persianNumber) : '-' }}<small *ngIf="seller.cityDeliveryDays"> روز</small></strong><span>تحویل محلی</span></div></div>
-          <div class="card-footer"><span><i class="status-dot"></i> فعال در شبکه</span><span *ngIf="seller.nationwideDeliveryDays">ارسال کشوری: {{ seller.nationwideDeliveryDays | persianNumber }} روز</span></div>
-        </article>
-      </div>
-    </ng-container>
+          <div class="metric-row"><div><strong>{{ seller.ratingCount || 0 | persianNumber }}</strong><span>نظر ثبت‌شده</span></div><div><strong>{{ seller.totalOrdersCompleted || 0 | persianNumber }}</strong><span>سفارش موفق</span></div><div><strong>{{ seller.cityDeliveryDays ? (seller.cityDeliveryDays | persianNumber) : '-' }}@if (seller.cityDeliveryDays) {
+          <small> روز</small>
+          }</strong><span>تحویل محلی</span></div></div>
+          <div class="card-footer"><span><i class="status-dot"></i> فعال در شبکه</span>@if (seller.nationwideDeliveryDays) {
+          <span>ارسال کشوری: {{ seller.nationwideDeliveryDays | persianNumber }} روز</span>
+        }</div>
+      </article>
+    }
+  </div>
+} @else {
+  <div class="empty-state"><div class="empty-icon">🏆</div><h3>هنوز رتبه‌ای ثبت نشده است</h3><p>با افزایش امتیاز و تکمیل سفارش‌ها، این بخش به‌زودی به‌روز می‌شود.</p></div>
+}
+}
 
-    <ng-container *ngIf="!loading && activeTab === 'couriers'">
-      <div *ngIf="couriers.length; else emptyState" class="leaderboard-grid">
-        <article *ngFor="let courier of couriers; let i = index; trackBy: trackById" class="performer-card" [class.is-gold]="i === 0" [class.is-silver]="i === 1" [class.is-bronze]="i === 2" [style.animation-delay]="(i * 60) + 'ms'">
-          <div class="card-topline"><span class="rank-number">{{ getRankBadge(i) }}</span><span class="rank-label">{{ i < 3 ? 'رتبه ویژه' : 'رتبه ' + (i + 1 | persianNumber) }}</span><span *ngIf="courier.isVerified" class="verified-badge">✓ تاییدشده</span></div>
-          <div class="performer-identity">
-            <div class="performer-avatar courier-avatar">{{ (courier.fullName || 'ک').charAt(0) }}</div>
-            <div class="identity-copy"><h3>{{ courier.fullName || 'کالارسان تولیدی' }}</h3><p><span aria-hidden="true">⌖</span> {{ courier.city || 'ایران' }}<span *ngIf="courier.province">، {{ courier.province }}</span></p></div>
-          </div>
-          <p *ngIf="courier.vehicleType" class="performer-description"><span aria-hidden="true">▣</span> {{ courier.vehicleType }}<span *ngIf="courier.vehiclePlate"> · {{ courier.vehiclePlate }}</span></p>
-          <div class="primary-metric"><span>امتیاز عملکرد</span><strong>{{ (courier.rating || 0) | persianNumber:1:1 }}<small>/۵</small></strong><div class="rating-bar"><i [style.width.%]="((courier.rating || 0) / 5) * 100"></i></div></div>
-          <div class="metric-row"><div><strong>{{ courier.ratingCount || 0 | persianNumber }}</strong><span>نظر ثبت‌شده</span></div><div><strong>{{ courier.totalOrdersCompleted || 0 | persianNumber }}</strong><span>تحویل موفق</span></div><div><strong>{{ courier.maxConcurrentOrders ? (courier.maxConcurrentOrders | persianNumber) : '-' }}</strong><span>ظرفیت همزمان</span></div></div>
-          <div class="card-footer"><span><i class="status-dot"></i> آماده ارسال</span><span>پوشش {{ courier.city || 'شهری' }}</span></div>
-        </article>
+@if (!loading && activeTab === 'couriers') {
+  @if (couriers.length) {
+    <div class="leaderboard-grid">
+      @for (courier of couriers; track trackById(i, courier); let i = $index) {
+        <article class="performer-card" [class.is-gold]="i === 0" [class.is-silver]="i === 1" [class.is-bronze]="i === 2" [style.animation-delay]="(i * 60) + 'ms'">
+          <div class="card-topline"><span class="rank-number">{{ getRankBadge(i) }}</span><span class="rank-label">{{ i < 3 ? 'رتبه ویژه' : 'رتبه ' + (i + 1 | persianNumber) }}</span>@if (courier.isVerified) {
+          <span class="verified-badge">✓ تاییدشده</span>
+        }</div>
+        <div class="performer-identity">
+          <div class="performer-avatar courier-avatar">{{ (courier.fullName || 'ک').charAt(0) }}</div>
+          <div class="identity-copy"><h3>{{ courier.fullName || 'کالارسان تولیدی' }}</h3><p><span aria-hidden="true">⌖</span> {{ courier.city || 'ایران' }}@if (courier.province) {
+          <span>، {{ courier.province }}</span>
+        }</p></div>
       </div>
-    </ng-container>
+      @if (courier.vehicleType) {
+        <p class="performer-description"><span aria-hidden="true">▣</span> {{ courier.vehicleType }}@if (courier.vehiclePlate) {
+        <span> · {{ courier.vehiclePlate }}</span>
+      }</p>
+    }
+    <div class="primary-metric"><span>امتیاز عملکرد</span><strong>{{ (courier.rating || 0) | persianNumber:1:1 }}<small>/۵</small></strong><div class="rating-bar"><i [style.width.%]="((courier.rating || 0) / 5) * 100"></i></div></div>
+    <div class="metric-row"><div><strong>{{ courier.ratingCount || 0 | persianNumber }}</strong><span>نظر ثبت‌شده</span></div><div><strong>{{ courier.totalOrdersCompleted || 0 | persianNumber }}</strong><span>تحویل موفق</span></div><div><strong>{{ courier.maxConcurrentOrders ? (courier.maxConcurrentOrders | persianNumber) : '-' }}</strong><span>ظرفیت همزمان</span></div></div>
+    <div class="card-footer"><span><i class="status-dot"></i> آماده ارسال</span><span>پوشش {{ courier.city || 'شهری' }}</span></div>
+  </article>
+}
+</div>
+} @else {
+  <div class="empty-state"><div class="empty-icon">🏆</div><h3>هنوز رتبه‌ای ثبت نشده است</h3><p>با افزایش امتیاز و تکمیل سفارش‌ها، این بخش به‌زودی به‌روز می‌شود.</p></div>
+}
+}
 
-    <ng-template #emptyState>
-      <div class="empty-state"><div class="empty-icon">🏆</div><h3>هنوز رتبه‌ای ثبت نشده است</h3><p>با افزایش امتیاز و تکمیل سفارش‌ها، این بخش به‌زودی به‌روز می‌شود.</p></div>
-    </ng-template>
-  </main>
+</main>
 </section>

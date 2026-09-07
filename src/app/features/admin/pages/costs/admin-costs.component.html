@@ -11,79 +11,95 @@
     </div>
   </header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
   <div class="admin-page__tablewrap">
-    <div *ngIf="loading" class="admin-page__loading">در حال بارگذاری هزینه‌ها…</div>
-    <table *ngIf="!loading" class="admin-page__table">
-      <thead>
-        <tr>
-          <th>عنوان</th>
-          <th>مبلغ</th>
-          <th>نوع</th>
-          <th>ماه</th>
-          <th>وضعیت</th>
-          <th>عملیات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let cost of costs">
-          <td class="admin-page__cell-strong">{{ cost.name }}</td>
-          <td>{{ cost.amount | persianNumber }} تومان</td>
-          <td>{{ costTypeLabel(cost.costType) }}</td>
-          <td>{{ cost.month || (cost.createdAt | persianDate:'yyyy/MM') }}</td>
-          <td>
-            <span class="admin-badge admin-badge--success">توزیع‌شده</span>
-          </td>
-          <td>
-            <button type="button" (click)="distribute(cost)" class="admin-page__link admin-page__link--primary">توزیع مجدد</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p *ngIf="!loading && !costs.length" class="admin-page__empty">هزینه‌ای برای نمایش وجود ندارد.</p>
+    @if (loading) {
+      <div class="admin-page__loading">در حال بارگذاری هزینه‌ها…</div>
+    }
+    @if (!loading) {
+      <table class="admin-page__table">
+        <thead>
+          <tr>
+            <th>عنوان</th>
+            <th>مبلغ</th>
+            <th>نوع</th>
+            <th>ماه</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cost of costs; track cost) {
+            <tr>
+              <td class="admin-page__cell-strong">{{ cost.name }}</td>
+              <td>{{ cost.amount | persianNumber }} تومان</td>
+              <td>{{ costTypeLabel(cost.costType) }}</td>
+              <td>{{ cost.month || (cost.createdAt | persianDate:'yyyy/MM') }}</td>
+              <td>
+                <span class="admin-badge admin-badge--success">توزیع‌شده</span>
+              </td>
+              <td>
+                <button type="button" (click)="distribute(cost)" class="admin-page__link admin-page__link--primary">توزیع مجدد</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if (!loading && !costs.length) {
+      <p class="admin-page__empty">هزینه‌ای برای نمایش وجود ندارد.</p>
+    }
   </div>
 
-  <div *ngIf="formOpen" class="admin-modal" (click)="closeForm()">
-    <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card admin-modal__card--wide">
-      <div class="admin-modal__header">
-        <h2 class="admin-modal__title">ثبت هزینه جدید</h2>
-        <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
-      </div>
-      <p class="admin-modal__note">پس از ثبت، هزینه به‌صورت خودکار بین فروشندگان فعال توزیع می‌شود.</p>
-      <div class="admin-form-grid">
-        <label>
-          <span class="admin-form-grid__label">عنوان *</span>
-          <input formControlName="name" class="admin-form-grid__input" />
-        </label>
-        <label>
-          <span class="admin-form-grid__label">مبلغ *</span>
-          <input formControlName="amount" type="number" min="1" class="admin-form-grid__input" />
-        </label>
-        <label>
-          <span class="admin-form-grid__label">نوع هزینه *</span>
-          <select formControlName="costType" class="admin-form-grid__input">
-            <option value="Server">سرور</option>
-            <option value="SMS">پیامک</option>
-            <option value="Advertising">تبلیغات</option>
-            <option value="Other">سایر</option>
-          </select>
-        </label>
-        <label>
-          <span class="admin-form-grid__label">تاریخ هزینه *</span>
-          <input formControlName="costDate" type="date" class="admin-form-grid__input" />
-        </label>
-        <div class="admin-form-grid__full">
-          <label class="admin-form-grid__label">توضیحات</label>
-          <textarea formControlName="description" rows="3" class="admin-form-grid__input"></textarea>
+  @if (formOpen) {
+    <div class="admin-modal" (click)="closeForm()">
+      <form [formGroup]="form" (ngSubmit)="save()" (click)="$event.stopPropagation()" class="admin-modal__card admin-modal__card--wide">
+        <div class="admin-modal__header">
+          <h2 class="admin-modal__title">ثبت هزینه جدید</h2>
+          <button type="button" (click)="closeForm()" class="admin-modal__close">×</button>
         </div>
-      </div>
-      <p *ngIf="formError" class="admin-alert admin-alert--error">{{ formError }}</p>
-      <div class="admin-form-actions">
-        <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
-        <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ثبت…' : 'ثبت هزینه' }}</button>
-      </div>
-    </form>
-  </div>
+        <p class="admin-modal__note">پس از ثبت، هزینه به‌صورت خودکار بین فروشندگان فعال توزیع می‌شود.</p>
+        <div class="admin-form-grid">
+          <label>
+            <span class="admin-form-grid__label">عنوان *</span>
+            <input formControlName="name" class="admin-form-grid__input" />
+          </label>
+          <label>
+            <span class="admin-form-grid__label">مبلغ *</span>
+            <input formControlName="amount" type="number" min="1" class="admin-form-grid__input" />
+          </label>
+          <label>
+            <span class="admin-form-grid__label">نوع هزینه *</span>
+            <select formControlName="costType" class="admin-form-grid__input">
+              <option value="Server">سرور</option>
+              <option value="SMS">پیامک</option>
+              <option value="Advertising">تبلیغات</option>
+              <option value="Other">سایر</option>
+            </select>
+          </label>
+          <label>
+            <span class="admin-form-grid__label">تاریخ هزینه *</span>
+            <input formControlName="costDate" type="date" class="admin-form-grid__input" />
+          </label>
+          <div class="admin-form-grid__full">
+            <label class="admin-form-grid__label">توضیحات</label>
+            <textarea formControlName="description" rows="3" class="admin-form-grid__input"></textarea>
+          </div>
+        </div>
+        @if (formError) {
+          <p class="admin-alert admin-alert--error">{{ formError }}</p>
+        }
+        <div class="admin-form-actions">
+          <button type="button" (click)="closeForm()" class="admin-btn-outline">انصراف</button>
+          <button mat-flat-button type="submit" [disabled]="saving" class="admin-btn-primary">{{ saving ? 'در حال ثبت…' : 'ثبت هزینه' }}</button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

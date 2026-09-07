@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/api/auth.service';
@@ -15,9 +15,11 @@ import { RegistrationUxService } from '../register/registration-ux.service';
  * - Persian RTL preserved
  */
 @Component({
-  selector: 'app-seller-register',
-  templateUrl: './seller-register.component.html',
-  styleUrls: ['./seller-register.component.scss']
+    selector: 'app-seller-register',
+    templateUrl: './seller-register.component.html',
+    styleUrls: ['./seller-register.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerRegisterComponent implements OnInit, OnDestroy {
   form: FormGroup;

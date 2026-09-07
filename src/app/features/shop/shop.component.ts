@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -51,10 +51,12 @@ const DEFAULT_FILTERS: ShopFilters = {
  * query string منعکس می‌شوند (لینک‌پذیری + بازگشت با دکمه‌ی مرورگر).
  */
 @Component({
-  selector: 'app-shop',
-  templateUrl: './shop.component.html',
-  styleUrls: ['./shop.component.scss'],
-  animations: [slideUp]
+    selector: 'app-shop',
+    templateUrl: './shop.component.html',
+    styleUrls: ['./shop.component.scss'],
+    animations: [slideUp],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ShopComponent implements OnInit, OnDestroy {
   products: Product[] = [];

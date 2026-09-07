@@ -6,249 +6,250 @@
     [actions]="headerActions">
   </app-page-header>
 
-  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
-  <p *ngIf="successMessage" class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  @if (errorMessage) {
+    <p class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="admin-alert admin-alert--success">{{ successMessage }}</p>
+  }
 
-  <div *ngIf="loading" class="set-loading">
-    <mat-spinner diameter="36"></mat-spinner>
-    <span>در حال بارگذاری تنظیمات…</span>
-  </div>
+  @if (loading) {
+    <div class="set-loading">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>در حال بارگذاری تنظیمات…</span>
+    </div>
+  }
 
-  <mat-tab-group
-    *ngIf="!loading"
-    [formGroup]="form"
-    class="set-tabs"
-    animationDuration="200ms"
-    [selectedIndex]="activeTabIndex"
-    (selectedIndexChange)="onTabIndexChange($event)">
-
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TAB: Basic                                                  -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <mat-tab label="پایه">
-      <mat-card appearance="outlined" class="set-card">
-        <mat-card-content>
-          <h2 class="set-section-title">تنظیمات پایه</h2>
-
-          <div class="set-form-grid set-form-grid--narrow">
-            <mat-form-field appearance="outline">
-              <mat-label>نرخ مالیات (٪)</mat-label>
-              <input matInput formControlName="taxRate" type="number" min="0" max="100" />
-              <mat-icon matSuffix>percent</mat-icon>
-              <mat-error>نرخ مالیات باید بین ۰ تا ۱۰۰ باشد.</mat-error>
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
-
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TAB: Payment                                                -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <mat-tab label="پرداخت">
-      <mat-card appearance="outlined" class="set-card">
-        <mat-card-content>
-          <h2 class="set-section-title">درگاه‌های پرداخت</h2>
-          <p class="set-section-hint">این مقادیر مستقیماً توسط درگاه‌های زرین‌پال و سپ در زمان پرداخت خوانده می‌شوند.</p>
-
-          <div class="set-form-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>شناسه مرچنت زرین‌پال</mat-label>
-              <input matInput formControlName="zarinpalMerchantId" />
-              <mat-icon matSuffix>credit_card</mat-icon>
-            </mat-form-field>
-
-            <div class="set-toggle-row">
-              <mat-slide-toggle formControlName="zarinpalSandbox" color="primary">زرین‌پال در حالت آزمایشی</mat-slide-toggle>
-            </div>
-
-            <mat-form-field appearance="outline">
-              <mat-label>شناسه ترمینال سپ</mat-label>
-              <input matInput formControlName="sepTerminalId" />
-              <mat-icon matSuffix>confirmation_number</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>شناسه مرچنت سپ</mat-label>
-              <input matInput formControlName="sepMerchantId" />
-              <mat-icon matSuffix>account_balance</mat-icon>
-            </mat-form-field>
-
-            <div class="set-toggle-row">
-              <mat-slide-toggle formControlName="sepSandbox" color="primary">سپ در حالت آزمایشی</mat-slide-toggle>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
-
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TAB: SMS                                                    -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <mat-tab label="پیامک">
-      <mat-card appearance="outlined" class="set-card">
-        <mat-card-content>
-          <h2 class="set-section-title">پیامک اطلاع‌رسانی (کاوه‌نگار / SMS.ir)</h2>
-
-          <div class="set-form-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>سرویس‌دهنده</mat-label>
-              <mat-select formControlName="smsProvider">
-                <mat-option value="kavenegar">کاوه‌نگار (Kavenegar)</mat-option>
-                <mat-option value="smsir">SMS.ir</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>شماره فرستنده</mat-label>
-              <input matInput formControlName="smsSenderNumber" placeholder="مثلاً 10004346" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="set-span-2">
-              <mat-label>کلید API</mat-label>
-              <input matInput formControlName="smsApiKey" type="password" autocomplete="off" class="set-mono" />
-              <mat-icon matSuffix>key</mat-icon>
-            </mat-form-field>
-
-            <div class="set-toggle-row set-span-2">
-              <mat-slide-toggle formControlName="smsOrderStatusEnabled" color="primary">
-                ارسال پیامک تغییر وضعیت سفارش به مشتری
-              </mat-slide-toggle>
-            </div>
-          </div>
-
-          <mat-divider class="set-divider"></mat-divider>
-
-          <div class="set-test-row">
-            <button type="button" mat-stroked-button color="primary" (click)="testSms()" [disabled]="testing">
-              <mat-icon>sms</mat-icon>
-              {{ testing ? 'در حال ارسال…' : 'ارسال پیامک آزمایشی' }}
-            </button>
-            <p *ngIf="smsTestMessage" class="set-test-message" [class.set-test-message--ok]="smsTestSuccess" [class.set-test-message--fail]="!smsTestSuccess">
-              {{ smsTestMessage }}
-            </p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </mat-tab>
-
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <!-- TAB: Markup                                                 -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
-    <mat-tab label="حاشیه سود">
-      <div class="set-markup-stack">
-
-        <!-- Global markup -->
+  @if (!loading) {
+    <mat-tab-group
+      [formGroup]="form"
+      class="set-tabs"
+      animationDuration="200ms"
+      [selectedIndex]="activeTabIndex"
+      (selectedIndexChange)="onTabIndexChange($event)">
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- TAB: Basic                                                  -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <mat-tab label="پایه">
         <mat-card appearance="outlined" class="set-card">
           <mat-card-content>
-            <h2 class="set-section-title">حاشیه سود جهانی</h2>
-            <p class="set-section-hint">درصدی که روی قیمت همه محصولات اعمال می‌شود. اولویت: محصول &gt; دسته‌بندی &gt; جهانی.</p>
-
+            <h2 class="set-section-title">تنظیمات پایه</h2>
             <div class="set-form-grid set-form-grid--narrow">
               <mat-form-field appearance="outline">
-                <mat-label>درصد حاشیه سود جهانی</mat-label>
-                <input matInput formControlName="globalMarkup" type="number" min="0" max="200" step="0.5" />
-                <mat-icon matSuffix>trending_up</mat-icon>
-                <mat-error>درصد باید بین ۰ تا ۲۰۰ باشد.</mat-error>
+                <mat-label>نرخ مالیات (٪)</mat-label>
+                <input matInput formControlName="taxRate" type="number" min="0" max="100" />
+                <mat-icon matSuffix>percent</mat-icon>
+                <mat-error>نرخ مالیات باید بین ۰ تا ۱۰۰ باشد.</mat-error>
               </mat-form-field>
             </div>
-
-            <p *ngIf="form.get('globalMarkup')?.value > 0" class="set-hint-box">
-              نمونه: کالای ۱۰۰,۰۰۰ تومانی با این درصد → {{ 100000 * (1 + form.get('globalMarkup')?.value / 100) | persianNumber }} تومان
-            </p>
           </mat-card-content>
         </mat-card>
-
-        <!-- Category markups -->
+      </mat-tab>
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- TAB: Payment                                                -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <mat-tab label="پرداخت">
         <mat-card appearance="outlined" class="set-card">
           <mat-card-content>
-            <h3 class="set-section-title set-section-title--sub">حاشیه سود دسته‌بندی</h3>
-
-            <div class="set-add-row">
-              <mat-form-field appearance="outline" class="set-add-row__main">
-                <mat-label>دسته‌بندی</mat-label>
-                <mat-select [(ngModel)]="markupCategory" name="markupCategory" [ngModelOptions]="{standalone: true}">
-                  <mat-option value="" disabled>انتخاب دسته…</mat-option>
-                  <mat-option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</mat-option>
+            <h2 class="set-section-title">درگاه‌های پرداخت</h2>
+            <p class="set-section-hint">این مقادیر مستقیماً توسط درگاه‌های زرین‌پال و سپ در زمان پرداخت خوانده می‌شوند.</p>
+            <div class="set-form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>شناسه مرچنت زرین‌پال</mat-label>
+                <input matInput formControlName="zarinpalMerchantId" />
+                <mat-icon matSuffix>credit_card</mat-icon>
+              </mat-form-field>
+              <div class="set-toggle-row">
+                <mat-slide-toggle formControlName="zarinpalSandbox" color="primary">زرین‌پال در حالت آزمایشی</mat-slide-toggle>
+              </div>
+              <mat-form-field appearance="outline">
+                <mat-label>شناسه ترمینال سپ</mat-label>
+                <input matInput formControlName="sepTerminalId" />
+                <mat-icon matSuffix>confirmation_number</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>شناسه مرچنت سپ</mat-label>
+                <input matInput formControlName="sepMerchantId" />
+                <mat-icon matSuffix>account_balance</mat-icon>
+              </mat-form-field>
+              <div class="set-toggle-row">
+                <mat-slide-toggle formControlName="sepSandbox" color="primary">سپ در حالت آزمایشی</mat-slide-toggle>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- TAB: SMS                                                    -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <mat-tab label="پیامک">
+        <mat-card appearance="outlined" class="set-card">
+          <mat-card-content>
+            <h2 class="set-section-title">پیامک اطلاع‌رسانی (کاوه‌نگار / SMS.ir)</h2>
+            <div class="set-form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>سرویس‌دهنده</mat-label>
+                <mat-select formControlName="smsProvider">
+                  <mat-option value="kavenegar">کاوه‌نگار (Kavenegar)</mat-option>
+                  <mat-option value="smsir">SMS.ir</mat-option>
                 </mat-select>
               </mat-form-field>
-
-              <mat-form-field appearance="outline" class="set-add-row__percent">
-                <mat-label>درصد</mat-label>
-                <input matInput [(ngModel)]="markupCategoryPercent" name="markupCategoryPercent" type="number" min="0" max="200" [ngModelOptions]="{standalone: true}" />
+              <mat-form-field appearance="outline">
+                <mat-label>شماره فرستنده</mat-label>
+                <input matInput formControlName="smsSenderNumber" placeholder="مثلاً 10004346" />
               </mat-form-field>
-
-              <button type="button" mat-flat-button color="primary" [disabled]="!markupCategory" (click)="addCategoryMarkup()">
-                <mat-icon>add</mat-icon>
-                افزودن
+              <mat-form-field appearance="outline" class="set-span-2">
+                <mat-label>کلید API</mat-label>
+                <input matInput formControlName="smsApiKey" type="password" autocomplete="off" class="set-mono" />
+                <mat-icon matSuffix>key</mat-icon>
+              </mat-form-field>
+              <div class="set-toggle-row set-span-2">
+                <mat-slide-toggle formControlName="smsOrderStatusEnabled" color="primary">
+                  ارسال پیامک تغییر وضعیت سفارش به مشتری
+                </mat-slide-toggle>
+              </div>
+            </div>
+            <mat-divider class="set-divider"></mat-divider>
+            <div class="set-test-row">
+              <button type="button" mat-stroked-button color="primary" (click)="testSms()" [disabled]="testing">
+                <mat-icon>sms</mat-icon>
+                {{ testing ? 'در حال ارسال…' : 'ارسال پیامک آزمایشی' }}
               </button>
+              @if (smsTestMessage) {
+                <p class="set-test-message" [class.set-test-message--ok]="smsTestSuccess" [class.set-test-message--fail]="!smsTestSuccess">
+                  {{ smsTestMessage }}
+                </p>
+              }
             </div>
-
-            <mat-list *ngIf="categoryMarkups.length">
-              <mat-list-item *ngFor="let cm of categoryMarkups">
-                <span matListItemTitle class="set-list-title">{{ cm.categoryName }}</span>
-                <span matListItemMeta class="set-list-meta">{{ cm.percent }}٪</span>
-                <button mat-icon-button matListItemMeta matTooltip="حذف" (click)="removeCategoryMarkup(cm.categoryId)">
-                  <mat-icon class="set-icon-danger">delete</mat-icon>
-                </button>
-              </mat-list-item>
-            </mat-list>
-            <p *ngIf="!categoryMarkups.length" class="set-empty">حاشیه سودی برای دسته‌بندی‌ها ثبت نشده است.</p>
           </mat-card-content>
         </mat-card>
-
-        <!-- Product markups -->
-        <mat-card appearance="outlined" class="set-card">
-          <mat-card-content>
-            <h3 class="set-section-title set-section-title--sub">حاشیه سود محصول خاص</h3>
-
-            <div class="set-add-row">
-              <mat-form-field appearance="outline" class="set-add-row__main">
-                <mat-label>جستجوی محصول</mat-label>
-                <input matInput
-                       [(ngModel)]="productSearch"
-                       (input)="searchProducts()"
-                       [matAutocomplete]="auto"
-                       name="productSearch"
-                       [ngModelOptions]="{standalone: true}"
-                       placeholder="حداقل ۲ حرف…" />
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProduct.bind(this)">
-                  <mat-option *ngFor="let p of productResults" [value]="p" (onSelectionChange)="addProductMarkup(p)">
-                    <span>{{ p.name }}</span>
-                    <small class="set-option-sku">{{ p.sku }}</small>
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="set-add-row__percent">
-                <mat-label>درصد</mat-label>
-                <input matInput [(ngModel)]="markupProductPercent" name="markupProductPercent" type="number" min="0" max="200" [ngModelOptions]="{standalone: true}" />
-              </mat-form-field>
-            </div>
-
-            <mat-list *ngIf="productMarkups.length">
-              <mat-list-item *ngFor="let pm of productMarkups">
-                <span matListItemTitle class="set-list-title">{{ pm.productName }}</span>
-                <span matListItemMeta class="set-list-meta">{{ pm.percent }}٪</span>
-                <button mat-icon-button matListItemMeta matTooltip="حذف" (click)="removeProductMarkup(pm.productId)">
-                  <mat-icon class="set-icon-danger">delete</mat-icon>
+      </mat-tab>
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- TAB: Markup                                                 -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <mat-tab label="حاشیه سود">
+        <div class="set-markup-stack">
+          <!-- Global markup -->
+          <mat-card appearance="outlined" class="set-card">
+            <mat-card-content>
+              <h2 class="set-section-title">حاشیه سود جهانی</h2>
+              <p class="set-section-hint">درصدی که روی قیمت همه محصولات اعمال می‌شود. اولویت: محصول &gt; دسته‌بندی &gt; جهانی.</p>
+              <div class="set-form-grid set-form-grid--narrow">
+                <mat-form-field appearance="outline">
+                  <mat-label>درصد حاشیه سود جهانی</mat-label>
+                  <input matInput formControlName="globalMarkup" type="number" min="0" max="200" step="0.5" />
+                  <mat-icon matSuffix>trending_up</mat-icon>
+                  <mat-error>درصد باید بین ۰ تا ۲۰۰ باشد.</mat-error>
+                </mat-form-field>
+              </div>
+              @if (form.get('globalMarkup')?.value > 0) {
+                <p class="set-hint-box">
+                  نمونه: کالای ۱۰۰,۰۰۰ تومانی با این درصد → {{ 100000 * (1 + $safeNavigationMigration(form.get('globalMarkup')?.value) / 100) | persianNumber }} تومان
+                </p>
+              }
+            </mat-card-content>
+          </mat-card>
+          <!-- Category markups -->
+          <mat-card appearance="outlined" class="set-card">
+            <mat-card-content>
+              <h3 class="set-section-title set-section-title--sub">حاشیه سود دسته‌بندی</h3>
+              <div class="set-add-row">
+                <mat-form-field appearance="outline" class="set-add-row__main">
+                  <mat-label>دسته‌بندی</mat-label>
+                  <mat-select [(ngModel)]="markupCategory" name="markupCategory" [ngModelOptions]="{standalone: true}">
+                    <mat-option value="" disabled>انتخاب دسته…</mat-option>
+                    @for (c of categories; track c) {
+                      <mat-option [value]="c.id">{{ c.name }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="set-add-row__percent">
+                  <mat-label>درصد</mat-label>
+                  <input matInput [(ngModel)]="markupCategoryPercent" name="markupCategoryPercent" type="number" min="0" max="200" [ngModelOptions]="{standalone: true}" />
+                </mat-form-field>
+                <button type="button" mat-flat-button color="primary" [disabled]="!markupCategory" (click)="addCategoryMarkup()">
+                  <mat-icon>add</mat-icon>
+                  افزودن
                 </button>
-              </mat-list-item>
-            </mat-list>
-            <p *ngIf="!productMarkups.length" class="set-empty">حاشیه سودی برای محصولات خاص ثبت نشده است.</p>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+              </div>
+              @if (categoryMarkups.length) {
+                <mat-list>
+                  @for (cm of categoryMarkups; track cm) {
+                    <mat-list-item>
+                      <span matListItemTitle class="set-list-title">{{ cm.categoryName }}</span>
+                      <span matListItemMeta class="set-list-meta">{{ cm.percent }}٪</span>
+                      <button mat-icon-button matListItemMeta matTooltip="حذف" (click)="removeCategoryMarkup(cm.categoryId)">
+                        <mat-icon class="set-icon-danger">delete</mat-icon>
+                      </button>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              }
+              @if (!categoryMarkups.length) {
+                <p class="set-empty">حاشیه سودی برای دسته‌بندی‌ها ثبت نشده است.</p>
+              }
+            </mat-card-content>
+          </mat-card>
+          <!-- Product markups -->
+          <mat-card appearance="outlined" class="set-card">
+            <mat-card-content>
+              <h3 class="set-section-title set-section-title--sub">حاشیه سود محصول خاص</h3>
+              <div class="set-add-row">
+                <mat-form-field appearance="outline" class="set-add-row__main">
+                  <mat-label>جستجوی محصول</mat-label>
+                  <input matInput
+                    [(ngModel)]="productSearch"
+                    (input)="searchProducts()"
+                    [matAutocomplete]="auto"
+                    name="productSearch"
+                    [ngModelOptions]="{standalone: true}"
+                    placeholder="حداقل ۲ حرف…" />
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProduct.bind(this)">
+                    @for (p of productResults; track p) {
+                      <mat-option [value]="p" (onSelectionChange)="addProductMarkup(p)">
+                        <span>{{ p.name }}</span>
+                        <small class="set-option-sku">{{ p.sku }}</small>
+                      </mat-option>
+                    }
+                  </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="set-add-row__percent">
+                  <mat-label>درصد</mat-label>
+                  <input matInput [(ngModel)]="markupProductPercent" name="markupProductPercent" type="number" min="0" max="200" [ngModelOptions]="{standalone: true}" />
+                </mat-form-field>
+              </div>
+              @if (productMarkups.length) {
+                <mat-list>
+                  @for (pm of productMarkups; track pm) {
+                    <mat-list-item>
+                      <span matListItemTitle class="set-list-title">{{ pm.productName }}</span>
+                      <span matListItemMeta class="set-list-meta">{{ pm.percent }}٪</span>
+                      <button mat-icon-button matListItemMeta matTooltip="حذف" (click)="removeProductMarkup(pm.productId)">
+                        <mat-icon class="set-icon-danger">delete</mat-icon>
+                      </button>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              }
+              @if (!productMarkups.length) {
+                <p class="set-empty">حاشیه سودی برای محصولات خاص ثبت نشده است.</p>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
 
   <!-- Save bar -->
-  <mat-card *ngIf="!loading" appearance="outlined" class="set-savebar">
-    <mat-card-content class="set-savebar__row">
-      <p class="set-savebar__hint">تغییرات پس از ذخیره بلافاصله روی سایت اعمال می‌شوند (حاشیه سود تا ۳۰ ثانیه کش می‌شود).</p>
-      <button type="button" mat-flat-button color="primary" (click)="save()" [disabled]="saving">
-        {{ saving ? 'در حال ذخیره…' : 'ذخیره تنظیمات' }}
-      </button>
-    </mat-card-content>
-  </mat-card>
+  @if (!loading) {
+    <mat-card appearance="outlined" class="set-savebar">
+      <mat-card-content class="set-savebar__row">
+        <p class="set-savebar__hint">تغییرات پس از ذخیره بلافاصله روی سایت اعمال می‌شوند (حاشیه سود تا ۳۰ ثانیه کش می‌شود).</p>
+        <button type="button" mat-flat-button color="primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'در حال ذخیره…' : 'ذخیره تنظیمات' }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
 </section>

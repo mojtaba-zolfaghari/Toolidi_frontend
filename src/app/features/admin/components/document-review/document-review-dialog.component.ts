@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import {
@@ -27,9 +27,11 @@ export interface DocumentReviewDialogData {
  * پیش‌نمایش تصویر یا لینک PDF برای هر مدرک + دکمه‌های تأیید/رد با ورود دلیل.
  */
 @Component({
-  selector: 'app-document-review-dialog',
-  templateUrl: './document-review-dialog.component.html',
-  styleUrls: ['./document-review-dialog.component.scss']
+    selector: 'app-document-review-dialog',
+    templateUrl: './document-review-dialog.component.html',
+    styleUrls: ['./document-review-dialog.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DocumentReviewDialogComponent {
   note = '';

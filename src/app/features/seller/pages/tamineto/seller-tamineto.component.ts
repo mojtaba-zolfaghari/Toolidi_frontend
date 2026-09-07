@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { TaminetoService, TaminetoConnection, TaminetoProductLog, TaminetoOrderLog } from '../../../../core/services/api/tamineto.service';
 
 @Component({
-  selector: 'app-seller-tamineto',
-  templateUrl: './seller-tamineto.component.html'
+    selector: 'app-seller-tamineto',
+    templateUrl: './seller-tamineto.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerTaminetoComponent implements OnInit {
   connection: TaminetoConnection | null = null;

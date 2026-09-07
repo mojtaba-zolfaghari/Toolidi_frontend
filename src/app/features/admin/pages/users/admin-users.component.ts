@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 import {
@@ -13,8 +13,10 @@ import { TableColumn, TableAction } from '../../../../shared/components/data-tab
 type UserDetailTab = 'info' | 'orders' | 'addresses';
 
 @Component({
-  selector: 'app-admin-users',
-  templateUrl: './admin-users.component.html'
+    selector: 'app-admin-users',
+    templateUrl: './admin-users.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class AdminUsersComponent implements OnInit {
   users: AdminUser[] = [];

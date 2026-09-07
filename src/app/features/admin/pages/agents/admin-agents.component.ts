@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AdminAgent, AdminService, CreateAgentData } from '../../../../core/services/api/admin.service';
@@ -7,7 +7,11 @@ import { TableColumn, TableAction } from '../../../../shared/components/data-tab
 import { LocationService, Province, City } from '../../../../core/services/api/location.service';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
-@Component({ selector: 'app-admin-agents', templateUrl: './admin-agents.component.html' })
+@Component({
+    selector: 'app-admin-agents', templateUrl: './admin-agents.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
+})
 export class AdminAgentsComponent implements OnInit {
   headerActions = [
     { label: 'افزودن کارپخش', icon: '➕', color: 'primary', click: () => this.openCreate() },

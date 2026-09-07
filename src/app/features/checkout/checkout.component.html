@@ -10,155 +10,187 @@
 
     <!-- ═══ شاخص مراحل ═══ -->
     <div class="step-indicator flex items-center justify-center gap-0 mb-10 max-w-lg mx-auto">
-      <ng-container *ngFor="let s of [1, 2, 3]; let i = index">
+      @for (s of [1, 2, 3]; track s; let i = $index) {
         <div class="flex flex-col items-center relative z-10">
           <div class="step-circle w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500"
-               [ngClass]="{ 'step-done': step > s, 'step-active': step === s, 'step-pending': step < s }">
-            <svg *ngIf="step > s" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-            <span *ngIf="step <= s">{{ s }}</span>
+            [ngClass]="{ 'step-done': step > s, 'step-active': step === s, 'step-pending': step < s }">
+            @if (step > s) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            }
+            @if (step <= s) {
+              <span>{{ s }}</span>
+            }
           </div>
           <span class="text-[11px] mt-1.5 font-medium"
-                [ngClass]="{ 'text-primary': step >= s, 'text-gray-400': step < s }">
+            [ngClass]="{ 'text-primary': step >= s, 'text-gray-400': step < s }">
             {{ s === 1 ? 'آدرس' : s === 2 ? 'ارسال' : 'پرداخت' }}
           </span>
         </div>
-        <div *ngIf="i < 2"
-             class="step-line w-16 sm:w-24 h-0.5 mx-1 mt-[-18px] transition-all duration-500"
-             [ngClass]="{ 'bg-primary': step > s, 'bg-gray-200': step <= s }"></div>
-      </ng-container>
+        @if (i < 2) {
+          <div
+            class="step-line w-16 sm:w-24 h-0.5 mx-1 mt-[-18px] transition-all duration-500"
+          [ngClass]="{ 'bg-primary': step > s, 'bg-gray-200': step <= s }"></div>
+        }
+      }
     </div>
 
     <!-- لودینگ -->
-    <div *ngIf="loadingOptions" class="bg-white rounded-2xl shadow-card py-16 text-center">
-      <div class="inline-block w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
-      <p class="text-gray-400">در حال دریافت اطلاعات…</p>
-    </div>
+    @if (loadingOptions) {
+      <div class="bg-white rounded-2xl shadow-card py-16 text-center">
+        <div class="inline-block w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-400">در حال دریافت اطلاعات…</p>
+      </div>
+    }
 
     <!-- ═══════════════════ مرحله ۱: آدرس ═══════════════════ -->
-    <div *ngIf="!loadingOptions && step === 1" class="animate-in space-y-5">
-
-      <div *ngIf="!addresses.length" class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-2xl px-5 py-4 flex items-center gap-3">
-        <span class="text-2xl">📍</span>
-        <div>
-          <p class="font-bold text-orange-700 text-sm">هنوز آدرسی ثبت نکرده‌اید</p>
-          <p class="text-orange-600 text-xs mt-0.5">لطفاً یک آدرس اضافه کنید.</p>
-        </div>
-      </div>
-
-      <!-- آدرس ارسال -->
-      <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
-        <div class="flex items-center gap-2 mb-4">
-          <span class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-lg">📍</span>
-          <h2 class="font-bold text-secondary">آدرس ارسال</h2>
-        </div>
-        <div class="space-y-3">
-          <label *ngFor="let address of shippingAddresses"
-                 class="address-card flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
-                 [ngClass]="shippingAddressId === address.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
-            <input type="radio" name="shippingAddress"
-                   [checked]="shippingAddressId === address.id"
-                   (change)="selectAddress('shipping', address.id)" class="mt-1 accent-primary" />
-            <div class="flex-1">
-              <div class="flex items-center gap-2">
-                <strong class="text-secondary text-sm">{{ address.city }}، {{ address.addressLine }}</strong>
-                <span *ngIf="address.isDefault" class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">پیش‌فرض</span>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">{{ address.state }} — کد پستی {{ address.postalCode }}</p>
+    @if (!loadingOptions && step === 1) {
+      <div class="animate-in space-y-5">
+        @if (!addresses.length) {
+          <div class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-2xl px-5 py-4 flex items-center gap-3">
+            <span class="text-2xl">📍</span>
+            <div>
+              <p class="font-bold text-orange-700 text-sm">هنوز آدرسی ثبت نکرده‌اید</p>
+              <p class="text-orange-600 text-xs mt-0.5">لطفاً یک آدرس اضافه کنید.</p>
             </div>
-            <span *ngIf="shippingAddressId === address.id" class="text-orange-500 text-lg mt-1">✓</span>
-          </label>
+          </div>
+        }
+        <!-- آدرس ارسال -->
+        <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-lg">📍</span>
+            <h2 class="font-bold text-secondary">آدرس ارسال</h2>
+          </div>
+          <div class="space-y-3">
+            @for (address of shippingAddresses; track address) {
+              <label
+                class="address-card flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
+                [ngClass]="shippingAddressId === address.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
+                <input type="radio" name="shippingAddress"
+                  [checked]="shippingAddressId === address.id"
+                  (change)="selectAddress('shipping', address.id)" class="mt-1 accent-primary" />
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <strong class="text-secondary text-sm">{{ address.city }}، {{ address.addressLine }}</strong>
+                    @if (address.isDefault) {
+                      <span class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">پیش‌فرض</span>
+                    }
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">{{ address.state }} — کد پستی {{ address.postalCode }}</p>
+                </div>
+                @if (shippingAddressId === address.id) {
+                  <span class="text-orange-500 text-lg mt-1">✓</span>
+                }
+              </label>
+            }
+          </div>
         </div>
-      </div>
-
-      <!-- آدرس صورتحساب -->
-      <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
-        <div class="flex items-center gap-2 mb-4">
-          <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">📄</span>
-          <h2 class="font-bold text-secondary">آدرس صورتحساب</h2>
+        <!-- آدرس صورتحساب -->
+        <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">📄</span>
+            <h2 class="font-bold text-secondary">آدرس صورتحساب</h2>
+          </div>
+          <div class="space-y-3">
+            @for (address of billingAddresses; track address) {
+              <label
+                class="address-card flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
+                [ngClass]="billingAddressId === address.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
+                <input type="radio" name="billingAddress"
+                  [checked]="billingAddressId === address.id"
+                  (change)="selectAddress('billing', address.id)" class="mt-1 accent-primary" />
+                <span>
+                  <strong class="block text-secondary text-sm">{{ address.city }}، {{ address.addressLine }}</strong>
+                  <span class="text-xs text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
+                </span>
+              </label>
+            }
+          </div>
+          @if (!billingAddresses.length) {
+            <p class="rounded-xl bg-blue-50 px-4 py-3 text-xs text-blue-700">برای صورتحساب، یک آدرس با نوع «صورتحساب» یا «ارسال و صورتحساب» اضافه کنید.</p>
+          }
         </div>
-        <div class="space-y-3">
-          <label *ngFor="let address of billingAddresses"
-                 class="address-card flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all duration-200"
-                 [ngClass]="billingAddressId === address.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 hover:border-gray-200'">
-            <input type="radio" name="billingAddress"
-                   [checked]="billingAddressId === address.id"
-                   (change)="selectAddress('billing', address.id)" class="mt-1 accent-primary" />
-            <span>
-              <strong class="block text-secondary text-sm">{{ address.city }}، {{ address.addressLine }}</strong>
-              <span class="text-xs text-gray-500">{{ address.state }} — کد پستی {{ address.postalCode }}</span>
-            </span>
-          </label>
-        </div>
-        <p *ngIf="!billingAddresses.length" class="rounded-xl bg-blue-50 px-4 py-3 text-xs text-blue-700">برای صورتحساب، یک آدرس با نوع «صورتحساب» یا «ارسال و صورتحساب» اضافه کنید.</p>
-      </div>
-
-      <!-- فرم آدرس جدید -->
-      <button type="button" (click)="showAddressForm = !showAddressForm"
-              class="text-primary font-medium text-sm hover:underline flex items-center gap-1">
-        <span class="text-lg">+</span> {{ showAddressForm ? 'انصراف' : 'افزودن آدرس جدید' }}
-      </button>
-
-      <form *ngIf="showAddressForm" [formGroup]="addressForm" (ngSubmit)="saveAddress()"
+        <!-- فرم آدرس جدید -->
+        <button type="button" (click)="showAddressForm = !showAddressForm"
+          class="text-primary font-medium text-sm hover:underline flex items-center gap-1">
+          <span class="text-lg">+</span> {{ showAddressForm ? 'انصراف' : 'افزودن آدرس جدید' }}
+        </button>
+        @if (showAddressForm) {
+          <form [formGroup]="addressForm" (ngSubmit)="saveAddress()"
             class="bg-white rounded-2xl shadow-card p-5 sm:p-6 space-y-4 animate-in">
-        <h3 class="font-bold text-secondary flex items-center gap-2">📝 آدرس جدید</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">نوع آدرس</span>
-            <select formControlName="addressType" class="input-field">
-              <option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option>
-            </select></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کشور</span><input formControlName="country" class="input-field" /></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">استان</span><select formControlName="state" (change)="onProvinceChange()" class="input-field"><option value="">انتخاب استان</option><option *ngFor="let p of provinces" [value]="p.id">{{ p.name }}</option></select></label>
-          <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شهر</span><select formControlName="city" class="input-field" [disabled]="!cities.length && !loadingCities"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : (cities.length ? 'انتخاب شهر' : 'ابتدا استان را انتخاب کنید') }}</option><option *ngFor="let c of cities" [value]="c.name">{{ c.name }}</option></select></label>
+            <h3 class="font-bold text-secondary flex items-center gap-2">📝 آدرس جدید</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">نوع آدرس</span>
+              <select formControlName="addressType" class="input-field">
+                <option value="Both">ارسال و صورتحساب</option><option value="Shipping">ارسال</option><option value="Billing">صورتحساب</option>
+              </select></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کشور</span><input formControlName="country" class="input-field" /></label>
+              <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">استان</span><select formControlName="state" (change)="onProvinceChange()" class="input-field"><option value="">انتخاب استان</option>@for (p of provinces; track p) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }</select></label>
+            <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شهر</span><select formControlName="city" class="input-field" [disabled]="!cities.length && !loadingCities"><option value="">{{ loadingCities ? 'در حال بارگذاری…' : (cities.length ? 'انتخاب شهر' : 'ابتدا استان را انتخاب کنید') }}</option>@for (c of cities; track c) {
+            <option [value]="c.name">{{ c.name }}</option>
+          }</select></label>
           <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">کد پستی</span><input formControlName="postalCode" class="input-field" /></label>
           <label class="block"><span class="block text-secondary font-medium mb-1 text-sm">شماره تماس</span><input formControlName="phoneNumber" class="input-field" /></label>
           <label class="block md:col-span-2"><span class="block text-secondary font-medium mb-1 text-sm">نشانی کامل</span><textarea rows="2" formControlName="addressLine" class="input-field"></textarea></label>
         </div>
-        <p *ngIf="addressError" class="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2">{{ addressError }}</p>
-        <p *ngIf="addressMessage" class="text-green-600 text-sm bg-green-50 rounded-xl px-4 py-2">{{ addressMessage }}</p>
+        @if (addressError) {
+          <p class="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2">{{ addressError }}</p>
+        }
+        @if (addressMessage) {
+          <p class="text-green-600 text-sm bg-green-50 rounded-xl px-4 py-2">{{ addressMessage }}</p>
+        }
         <button type="submit" [disabled]="savingAddress" class="checkout-btn-primary text-sm">{{ savingAddress ? 'در حال ذخیره…' : 'ذخیره آدرس' }}</button>
       </form>
-
-      <div class="flex justify-end pt-2">
-        <button type="button" (click)="next()" [disabled]="!canContinueStep1" class="checkout-btn-primary">
-          ادامه
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
-        </button>
-      </div>
+    }
+    <div class="flex justify-end pt-2">
+      <button type="button" (click)="next()" [disabled]="!canContinueStep1" class="checkout-btn-primary">
+        ادامه
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
     </div>
+  </div>
+}
 
-    <!-- ═══════════════════ مرحله ۲: ارسال هوشمند ═══════════════════ -->
-    <div *ngIf="!loadingOptions && step === 2" class="animate-in checkout-ship">
-      <div class="checkout-ship__card">
-        <div class="checkout-ship__head">
-          <span class="checkout-ship__head-icon">🚚</span>
-          <div>
-            <h2 class="checkout-ship__title">روش ارسال هوشمند</h2>
-            <p class="checkout-ship__subtitle" *ngIf="consolidatedResult">
+<!-- ═══════════════════ مرحله ۲: ارسال هوشمند ═══════════════════ -->
+@if (!loadingOptions && step === 2) {
+  <div class="animate-in checkout-ship">
+    <div class="checkout-ship__card">
+      <div class="checkout-ship__head">
+        <span class="checkout-ship__head-icon">🚚</span>
+        <div>
+          <h2 class="checkout-ship__title">روش ارسال هوشمند</h2>
+          @if (consolidatedResult) {
+            <p class="checkout-ship__subtitle">
               {{ consolidatedResult.sellerCount | persianNumber }} فروشنده ·
               سریع‌ترین آماده‌سازی در
               {{ etaText(consolidatedResult.slowestLegEtaDays) }}
             </p>
-            <p class="checkout-ship__subtitle" *ngIf="!consolidatedResult">در حال محاسبه…</p>
-          </div>
+          }
+          @if (!consolidatedResult) {
+            <p class="checkout-ship__subtitle">در حال محاسبه…</p>
+          }
         </div>
-
-        <!-- لودینگ محاسبه ارسال -->
-        <div *ngIf="loadingShipping" class="checkout-ship__loading">
+      </div>
+      <!-- لودینگ محاسبه ارسال -->
+      @if (loadingShipping) {
+        <div class="checkout-ship__loading">
           <span class="checkout-ship__loading-spinner"></span>
           در حال محاسبه‌ی بهترین گزینه‌های ارسال…
         </div>
-
-        <!-- خطا (مثلاً سبد خالی/آدرس یافت نشد) → فهرست ساده روش‌ها -->
-        <ng-container *ngIf="!loadingShipping && shippingError">
-          <p class="checkout-ship__error">{{ shippingError }}</p>
-          <div class="checkout-ship__options">
-            <label *ngFor="let method of shippingMethods"
-                   class="ship-option"
-                   [class.ship-option--selected]="shippingMethodId === method.id">
+      }
+      <!-- خطا (مثلاً سبد خالی/آدرس یافت نشد) → فهرست ساده روش‌ها -->
+      @if (!loadingShipping && shippingError) {
+        <p class="checkout-ship__error">{{ shippingError }}</p>
+        <div class="checkout-ship__options">
+          @for (method of shippingMethods; track method) {
+            <label
+              class="ship-option"
+              [class.ship-option--selected]="shippingMethodId === method.id">
               <input type="radio" name="shippingMethod" [checked]="shippingMethodId === method.id"
-                     (change)="shippingMethodId = method.id" />
+                (change)="shippingMethodId = method.id" />
               <span class="ship-option__body">
                 <strong class="ship-option__name">{{ method.name }}</strong>
                 <span class="ship-option__desc">{{ method.description || '' }}</span>
@@ -167,78 +199,95 @@
                 <strong>{{ method.baseCost | persianNumber }} تومان</strong>
               </span>
             </label>
-          </div>
-        </ng-container>
-
-        <!-- گزینه‌های تجمیعی -->
-        <ng-container *ngIf="!loadingShipping && !shippingError && consolidatedOptions.length">
-          <div class="checkout-ship__options">
-            <label *ngFor="let option of consolidatedOptions"
-                   class="ship-option"
-                   [class.ship-option--selected]="shippingMethodId === option.shippingMethodId"
-                   (click)="selectConsolidatedOption(option)">
+          }
+        </div>
+      }
+      <!-- گزینه‌های تجمیعی -->
+      @if (!loadingShipping && !shippingError && consolidatedOptions.length) {
+        <div class="checkout-ship__options">
+          @for (option of consolidatedOptions; track option) {
+            <label
+              class="ship-option"
+              [class.ship-option--selected]="shippingMethodId === option.shippingMethodId"
+              (click)="selectConsolidatedOption(option)">
               <input type="radio" name="consolidatedShipping" [checked]="shippingMethodId === option.shippingMethodId" />
-
               <span class="ship-option__body">
                 <span class="ship-option__name-row">
                   <strong class="ship-option__name">{{ option.methodName }}</strong>
-                  <span *ngIf="option.isRecommended" class="ship-option__tag ship-option__tag--recommended">پیشنهاد ما</span>
-                  <span *ngIf="option.isFastest && !option.isRecommended" class="ship-option__tag ship-option__tag--fastest">سریع‌ترین</span>
-                  <span *ngIf="option.isFreeShipping" class="ship-option__tag ship-option__tag--free">ارسال رایگان</span>
+                  @if (option.isRecommended) {
+                    <span class="ship-option__tag ship-option__tag--recommended">پیشنهاد ما</span>
+                  }
+                  @if (option.isFastest && !option.isRecommended) {
+                    <span class="ship-option__tag ship-option__tag--fastest">سریع‌ترین</span>
+                  }
+                  @if (option.isFreeShipping) {
+                    <span class="ship-option__tag ship-option__tag--free">ارسال رایگان</span>
+                  }
                 </span>
                 <span class="ship-option__desc">
                   یک مرسوله‌ی تجمیعی از {{ option.legs.length | persianNumber }} انبار ·
                   تحویل حداکثر {{ etaText(option.maxEtaDays) }}
                 </span>
               </span>
-
               <span class="ship-option__cost">
-                <strong *ngIf="option.isFreeShipping">رایگان</strong>
-                <strong *ngIf="!option.isFreeShipping">{{ option.totalCost | persianNumber }} تومان</strong>
+                @if (option.isFreeShipping) {
+                  <strong>رایگان</strong>
+                }
+                @if (!option.isFreeShipping) {
+                  <strong>{{ option.totalCost | persianNumber }} تومان</strong>
+                }
                 <span class="ship-option__eta">{{ etaText(option.maxEtaDays) }}</span>
               </span>
             </label>
-          </div>
-
-          <!-- جدول زمان‌بندی هر انبار (خانواده گزینه‌ها یکسان است؛ فقط اولی را نشان بده) -->
-          <details class="ship-legs">
-            <summary class="ship-legs__summary">زمان‌بندی آماده‌سازی هر فروشنده</summary>
-            <div class="ship-legs__body">
-              <div *ngFor="let leg of consolidatedOptions[0].legs" class="ship-leg">
+          }
+        </div>
+        <!-- جدول زمان‌بندی هر انبار (خانواده گزینه‌ها یکسان است؛ فقط اولی را نشان بده) -->
+        <details class="ship-legs">
+          <summary class="ship-legs__summary">زمان‌بندی آماده‌سازی هر فروشنده</summary>
+          <div class="ship-legs__body">
+            @for (leg of consolidatedOptions[0].legs; track leg) {
+              <div class="ship-leg">
                 <span class="ship-leg__seller">{{ leg.sellerName }}</span>
-                <span class="ship-leg__meta" *ngIf="leg.originCity">از {{ leg.originCity }}</span>
-                <span class="ship-leg__meta" *ngIf="leg.productionLeadDays > 0">
-                  تولید {{ etaText(leg.productionLeadDays) }}
-                </span>
+                @if (leg.originCity) {
+                  <span class="ship-leg__meta">از {{ leg.originCity }}</span>
+                }
+                @if (leg.productionLeadDays > 0) {
+                  <span class="ship-leg__meta">
+                    تولید {{ etaText(leg.productionLeadDays) }}
+                  </span>
+                }
                 <span class="ship-leg__meta">تحویل به پست {{ etaText(leg.handOffDays) }}</span>
                 <strong class="ship-leg__eta">آماده‌ی ارسال در {{ etaText(leg.etaDays) }}</strong>
               </div>
-              <p class="ship-legs__note">
-                تحویل نهایی = آماده‌سازی کندترین فروشنده + زمان حمل روش انتخابی.
-              </p>
-            </div>
-          </details>
-        </ng-container>
-
-        <p *ngIf="!loadingShipping && !shippingError && !consolidatedOptions.length" class="checkout-ship__error">
+            }
+            <p class="ship-legs__note">
+              تحویل نهایی = آماده‌سازی کندترین فروشنده + زمان حمل روش انتخابی.
+            </p>
+          </div>
+        </details>
+      }
+      @if (!loadingShipping && !shippingError && !consolidatedOptions.length) {
+        <p class="checkout-ship__error">
           روش ارسالی موجود نیست.
         </p>
-      </div>
-
-      <div class="flex justify-between pt-2">
-        <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
-        <button type="button" (click)="next()" class="checkout-btn-primary">
-          ادامه
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
-        </button>
-      </div>
+      }
     </div>
+    <div class="flex justify-between pt-2">
+      <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
+      <button type="button" (click)="next()" class="checkout-btn-primary">
+        ادامه
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+}
 
-    <!-- ═══════════════════ مرحله ۳: پرداخت ═══════════════════ -->
-    <div *ngIf="!loadingOptions && step === 3" class="animate-in">
-
-      <!-- پیام موفقیت -->
-      <div *ngIf="successMessage" class="bg-white rounded-2xl shadow-card p-8 text-center success-card">
+<!-- ═══════════════════ مرحله ۳: پرداخت ═══════════════════ -->
+@if (!loadingOptions && step === 3) {
+  <div class="animate-in">
+    <!-- پیام موفقیت -->
+    @if (successMessage) {
+      <div class="bg-white rounded-2xl shadow-card p-8 text-center success-card">
         <div class="mb-4" style="font-size:64px">✅</div>
         <p class="font-bold text-xl text-secondary mb-2">{{ successMessage }}</p>
         <p class="text-sm text-gray-500 mb-6">شماره سفارش: <strong class="text-primary">{{ orderNumber }}</strong></p>
@@ -247,152 +296,181 @@
           <button type="button" (click)="goToOrders()" class="checkout-btn-success">لیست سفارش‌ها</button>
         </div>
       </div>
-
-      <ng-container *ngIf="!successMessage">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
-
-          <!-- ستون اصلی -->
-          <div class="lg:col-span-3 space-y-5">
-
-            <!-- درگاه پرداخت -->
-            <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
-              <div class="flex items-center gap-2 mb-5">
-                <span class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-lg">💳</span>
-                <h2 class="font-bold text-secondary">انتخاب درگاه پرداخت</h2>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" *ngIf="gateways.length">
-                <div *ngFor="let gw of gateways; let gi = index"
-                     class="gateway-card relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-300"
-                     [ngClass]="paymentGatewayId === gw.id ? 'border-orange-400 shadow-lg' : 'border-gray-100 hover:border-gray-200'"
-                     [style.animation-delay]="gi * 100 + 'ms'"
-                     (click)="paymentGatewayId = gw.id">
-
-                  <div *ngIf="paymentGatewayId === gw.id"
-                       class="absolute top-3 left-3 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                    </svg>
-                  </div>
-
-                  <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center text-3xl mb-3">
-                    <span *ngIf="gw.displayName && gw.displayName.includes('Zarin')">💎</span>
-                    <span *ngIf="gw.displayName && gw.displayName.includes('Sep')">🏦</span>
-                    <span *ngIf="!gw.displayName || (!gw.displayName.includes('Zarin') && !gw.displayName.includes('Sep'))">💳</span>
-                  </div>
-
-                  <h3 class="font-bold text-secondary text-base mb-1">{{ gw.displayName || gw.name }}</h3>
-                  <p class="text-xs text-gray-500 mb-3">پرداخت امن و رمزنگاری‌شده</p>
-
-                  <div class="flex flex-wrap gap-2">
-                    <span *ngIf="gw.isSandbox"
+    }
+    @if (!successMessage) {
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <!-- ستون اصلی -->
+        <div class="lg:col-span-3 space-y-5">
+          <!-- درگاه پرداخت -->
+          <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+            <div class="flex items-center gap-2 mb-5">
+              <span class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-lg">💳</span>
+              <h2 class="font-bold text-secondary">انتخاب درگاه پرداخت</h2>
+            </div>
+            @if (gateways.length) {
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @for (gw of gateways; track gw; let gi = $index) {
+                  <div
+                    class="gateway-card relative rounded-2xl border-2 p-5 cursor-pointer transition-all duration-300"
+                    [ngClass]="paymentGatewayId === gw.id ? 'border-orange-400 shadow-lg' : 'border-gray-100 hover:border-gray-200'"
+                    [style.animation-delay]="gi * 100 + 'ms'"
+                    (click)="paymentGatewayId = gw.id">
+                    @if (paymentGatewayId === gw.id) {
+                      <div
+                        class="absolute top-3 left-3 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      </div>
+                    }
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center text-3xl mb-3">
+                      @if (gw.displayName && gw.displayName.includes('Zarin')) {
+                        <span>💎</span>
+                      }
+                      @if (gw.displayName && gw.displayName.includes('Sep')) {
+                        <span>🏦</span>
+                      }
+                      @if (!gw.displayName || (!gw.displayName.includes('Zarin') && !gw.displayName.includes('Sep'))) {
+                        <span>💳</span>
+                      }
+                    </div>
+                    <h3 class="font-bold text-secondary text-base mb-1">{{ gw.displayName || gw.name }}</h3>
+                    <p class="text-xs text-gray-500 mb-3">پرداخت امن و رمزنگاری‌شده</p>
+                    <div class="flex flex-wrap gap-2">
+                      @if (gw.isSandbox) {
+                        <span
                           class="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full font-medium border border-orange-200">
-                      ⚠️ آزمایشی
-                    </span>
-                    <span *ngIf="!gw.isSandbox"
+                          ⚠️ آزمایشی
+                        </span>
+                      }
+                      @if (!gw.isSandbox) {
+                        <span
                           class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium border border-green-200">
-                      ✅ فعال
-                    </span>
+                          ✅ فعال
+                        </span>
+                      }
+                    </div>
                   </div>
-                </div>
+                }
               </div>
-
-              <div *ngIf="!gateways.length" class="text-center py-8">
+            }
+            @if (!gateways.length) {
+              <div class="text-center py-8">
                 <div class="mb-3" style="font-size:48px">🔒</div>
                 <p class="text-gray-400 text-sm">درگاه فعالی برای انتخاب موجود نیست.</p>
               </div>
-            </div>
-
-            <!-- تضمین‌های امنیتی -->
-            <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
-              <h3 class="font-bold text-secondary mb-3 text-sm">تضمین‌های امنیتی</h3>
-              <div class="grid grid-cols-3 gap-3">
-                <div class="text-center p-3 rounded-xl bg-gray-50">
-                  <div class="mb-1" style="font-size:24px">🔒</div>
-                  <div class="text-[11px] text-gray-600 font-medium">رمزنگاری SSL</div>
-                </div>
-                <div class="text-center p-3 rounded-xl bg-gray-50">
-                  <div class="mb-1" style="font-size:24px">🛡️</div>
-                  <div class="text-[11px] text-gray-600 font-medium">پرداخت امن</div>
-                </div>
-                <div class="text-center p-3 rounded-xl bg-gray-50">
-                  <div class="mb-1" style="font-size:24px">✅</div>
-                  <div class="text-[11px] text-gray-600 font-medium">تأیید بانکی</div>
-                </div>
+            }
+          </div>
+          <!-- تضمین‌های امنیتی -->
+          <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+            <h3 class="font-bold text-secondary mb-3 text-sm">تضمین‌های امنیتی</h3>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="text-center p-3 rounded-xl bg-gray-50">
+                <div class="mb-1" style="font-size:24px">🔒</div>
+                <div class="text-[11px] text-gray-600 font-medium">رمزنگاری SSL</div>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-gray-50">
+                <div class="mb-1" style="font-size:24px">🛡️</div>
+                <div class="text-[11px] text-gray-600 font-medium">پرداخت امن</div>
+              </div>
+              <div class="text-center p-3 rounded-xl bg-gray-50">
+                <div class="mb-1" style="font-size:24px">✅</div>
+                <div class="text-[11px] text-gray-600 font-medium">تأیید بانکی</div>
               </div>
             </div>
-
-            <!-- یادداشت -->
-            <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
-              <label class="block">
-                <span class="block text-secondary font-medium mb-2 text-sm">یادداشت سفارش (اختیاری)</span>
-                <textarea rows="3" [(ngModel)]="userNotes" placeholder="توضیحات سفارش، زمان تحویل مورد نظر و…"
-                          class="input-field w-full"></textarea>
-              </label>
-            </div>
           </div>
-
-          <!-- ستون کناری -->
-          <div class="lg:col-span-2">
-            <div class="lg:sticky lg:top-20">
-              <div class="summary-card bg-white rounded-2xl shadow-card p-5 space-y-4">
-                <h3 class="font-bold text-secondary flex items-center gap-2">
-                  <span>📋</span> خلاصه سفارش
-                </h3>
-                <div *ngIf="selectedShipping" class="flex items-center justify-between text-sm">
+          <!-- یادداشت -->
+          <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+            <label class="block">
+              <span class="block text-secondary font-medium mb-2 text-sm">یادداشت سفارش (اختیاری)</span>
+              <textarea rows="3" [(ngModel)]="userNotes" placeholder="توضیحات سفارش، زمان تحویل مورد نظر و…"
+              class="input-field w-full"></textarea>
+            </label>
+          </div>
+        </div>
+        <!-- ستون کناری -->
+        <div class="lg:col-span-2">
+          <div class="lg:sticky lg:top-20">
+            <div class="summary-card bg-white rounded-2xl shadow-card p-5 space-y-4">
+              <h3 class="font-bold text-secondary flex items-center gap-2">
+                <span>📋</span> خلاصه سفارش
+              </h3>
+              @if (selectedShipping) {
+                <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">هزینه ارسال</span>
                   <span class="font-medium">{{ selectedShipping.baseCost | persianNumber }} تومان</span>
                 </div>
-
-                <!-- Estimated Delivery -->
-                <div *ngIf="estimatedDeliveries.length" class="border-t pt-3">
+              }
+              <!-- Estimated Delivery -->
+              @if (estimatedDeliveries.length) {
+                <div class="border-t pt-3">
                   <h4 class="text-xs font-bold text-secondary mb-2">زمان تقریبی تحویل</h4>
-                  <div *ngFor="let ed of estimatedDeliveries" class="flex items-center justify-between text-xs mb-1.5">
-                    <span class="text-gray-500 truncate max-w-[60%]">{{ ed.productName }}</span>
-                    <span *ngIf="ed.capacitySet && ed.estimatedDeliveryDate" class="font-bold text-primary">{{ ed.estimatedDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
-                    <span *ngIf="!ed.capacitySet" class="text-orange-500">در انتظار تأیید</span>
-                  </div>
-                  <div *ngIf="maxEstimatedDelivery" class="mt-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 text-center">
-                    <span class="text-xs text-gray-500">حداکثر زمان تحویل: </span>
-                    <span class="text-sm font-extrabold text-primary">{{ maxEstimatedDelivery | persianDate:'yyyy/MM/dd' }}</span>
-                  </div>
+                  @for (ed of estimatedDeliveries; track ed) {
+                    <div class="flex items-center justify-between text-xs mb-1.5">
+                      <span class="text-gray-500 truncate max-w-[60%]">{{ ed.productName }}</span>
+                      @if (ed.capacitySet && ed.estimatedDeliveryDate) {
+                        <span class="font-bold text-primary">{{ ed.estimatedDeliveryDate | persianDate:'yyyy/MM/dd' }}</span>
+                      }
+                      @if (!ed.capacitySet) {
+                        <span class="text-orange-500">در انتظار تأیید</span>
+                      }
+                    </div>
+                  }
+                  @if (maxEstimatedDelivery) {
+                    <div class="mt-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 text-center">
+                      <span class="text-xs text-gray-500">حداکثر زمان تحویل: </span>
+                      <span class="text-sm font-extrabold text-primary">{{ maxEstimatedDelivery | persianDate:'yyyy/MM/dd' }}</span>
+                    </div>
+                  }
                 </div>
-                <div *ngIf="paymentGatewayId" class="flex items-center justify-between text-sm">
+              }
+              @if (paymentGatewayId) {
+                <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">درگاه پرداخت</span>
                   <span class="font-medium text-green-600">انتخاب شده ✓</span>
                 </div>
-                <!-- هشدار حداقل سفارش -->
-                <div *ngIf="minimumOrderWarnings.length" class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+              }
+              <!-- هشدار حداقل سفارش -->
+              @if (minimumOrderWarnings.length) {
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
                   <p class="text-sm text-amber-700 font-bold flex items-center gap-2 mb-2">
                     <span>⚠️</span> حداقل سفارش رعایت نشده
                   </p>
-                  <div *ngFor="let w of minimumOrderWarnings" class="text-xs text-amber-600 mb-1">• {{ w }}</div>
+                  @for (w of minimumOrderWarnings; track w) {
+                    <div class="text-xs text-amber-600 mb-1">• {{ w }}</div>
+                  }
                   <p class="text-xs text-amber-500 mt-2">لطفاً به سبد خرید بازگردید و مقدار سفارش را افزایش دهید.</p>
                 </div>
-
-                <p *ngIf="errorMessage" class="text-red-500 text-sm bg-red-50 rounded-xl px-3 py-2">{{ errorMessage }}</p>
-                <button type="button" (click)="submit()" [disabled]="loading || minimumOrderWarnings.length > 0"
-                        [class.opacity-50]="minimumOrderWarnings.length > 0"
-                        class="checkout-btn-primary w-full text-center justify-center">
-                  <span *ngIf="!loading">💳 ثبت سفارش و پرداخت</span>
-                  <span *ngIf="loading" class="inline-flex items-center gap-2">
+              }
+              @if (errorMessage) {
+                <p class="text-red-500 text-sm bg-red-50 rounded-xl px-3 py-2">{{ errorMessage }}</p>
+              }
+              <button type="button" (click)="submit()" [disabled]="loading || minimumOrderWarnings.length > 0"
+                [class.opacity-50]="minimumOrderWarnings.length > 0"
+                class="checkout-btn-primary w-full text-center justify-center">
+                @if (!loading) {
+                  <span>💳 ثبت سفارش و پرداخت</span>
+                }
+                @if (loading) {
+                  <span class="inline-flex items-center gap-2">
                     <span class="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                     در حال ثبت…
                   </span>
-                </button>
-                <div class="flex items-center justify-center gap-1.5 text-xs text-gray-400 pt-1">
-                  <span>🔒</span> پرداخت امن و رمزنگاری‌شده
-                </div>
+                }
+              </button>
+              <div class="flex items-center justify-center gap-1.5 text-xs text-gray-400 pt-1">
+                <span>🔒</span> پرداخت امن و رمزنگاری‌شده
               </div>
             </div>
           </div>
         </div>
-
-        <div class="flex justify-start pt-4">
-          <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
-        </div>
-      </ng-container>
-    </div>
-
+      </div>
+      <div class="flex justify-start pt-4">
+        <button type="button" (click)="back()" class="checkout-btn-secondary">بازگشت</button>
+      </div>
+    }
   </div>
+}
+
+</div>
 </section>

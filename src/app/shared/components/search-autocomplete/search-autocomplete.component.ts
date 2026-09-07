@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, Output, ElementRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Subject, Subscription, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 import { Router } from '@angular/router';
 import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSuggestionCategory, SearchSuggestionSupplier } from '../../../core/services/api/product.service';
 
 @Component({
-  selector: 'app-search-autocomplete',
-  template: `
+    selector: 'app-search-autocomplete',
+    template: `
     <div class="search-autocomplete" [class.search-open]="isOpen">
       <!-- Desktop -->
       <div class="search-desktop">
@@ -25,100 +25,121 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
               placeholder="جستجوی محصول، دسته‌بندی، تأمین‌کننده..."
               class="search-input"
               autocomplete="off"
-            />
-            <button *ngIf="query" type="button" (click)="clearQuery()" class="search-clear">✕</button>
+              />
+            @if (query) {
+              <button type="button" (click)="clearQuery()" class="search-clear">✕</button>
+            }
           </div>
         </form>
-
+    
         <!-- Desktop Dropdown -->
-        <div *ngIf="isOpen && (loading || hasResults)" class="search-dropdown">
-          <div *ngIf="loading" class="search-loading">
-            <span class="search-spinner"></span>
-            <span>در حال جستجو...</span>
+        @if (isOpen && (loading || hasResults)) {
+          <div class="search-dropdown">
+            @if (loading) {
+              <div class="search-loading">
+                <span class="search-spinner"></span>
+                <span>در حال جستجو...</span>
+              </div>
+            }
+            @if (!loading && suggestions) {
+              <!-- Products -->
+              @if (suggestions.products.length) {
+                <div class="search-group">
+                  <div class="search-group-header">
+                    <span class="search-group-icon">📦</span>
+                    <span>محصولات</span>
+                    <span class="search-group-count">{{ suggestions.products.length }}</span>
+                  </div>
+                  @for (p of suggestions.products; track p) {
+                    <a
+                      [routerLink]="['/product', 'slug', p.slug]"
+                      (click)="close()"
+                      class="search-item search-item-product">
+                      @if (p.imageUrl) {
+                        <div class="search-item-img">
+                          <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+                        </div>
+                      }
+                      @if (!p.imageUrl) {
+                        <div class="search-item-img-placeholder">📦</div>
+                      }
+                      <div class="search-item-info">
+                        <span class="search-item-name">{{ p.name }}</span>
+                        <span class="search-item-meta">{{ p.categoryName }} · {{ p.supplierName }}</span>
+                      </div>
+                      <span class="search-item-price">{{ p.price | persianNumber }} تومان</span>
+                    </a>
+                  }
+                </div>
+              }
+              <!-- Categories -->
+              @if (suggestions.categories.length) {
+                <div class="search-group">
+                  <div class="search-group-header">
+                    <span class="search-group-icon">📂</span>
+                    <span>دسته‌بندی‌ها</span>
+                    <span class="search-group-count">{{ suggestions.categories.length }}</span>
+                  </div>
+                  @for (c of suggestions.categories; track c) {
+                    <a
+                      [routerLink]="['/shop']"
+                      [queryParams]="{ categoryId: c.id }"
+                      (click)="close()"
+                      class="search-item search-item-category">
+                      <div class="search-item-img-placeholder">📂</div>
+                      <div class="search-item-info">
+                        <span class="search-item-name">{{ c.name }}</span>
+                        <span class="search-item-meta">{{ c.productCount | persianNumber }} محصول</span>
+                      </div>
+                      <span class="search-item-arrow">←</span>
+                    </a>
+                  }
+                </div>
+              }
+              <!-- Suppliers -->
+              @if (suggestions.suppliers.length) {
+                <div class="search-group">
+                  <div class="search-group-header">
+                    <span class="search-group-icon">🏭</span>
+                    <span>تأمین‌کنندگان</span>
+                    <span class="search-group-count">{{ suggestions.suppliers.length }}</span>
+                  </div>
+                  @for (s of suggestions.suppliers; track s) {
+                    <a
+                      [routerLink]="['/shop']"
+                      [queryParams]="{ city: s.city }"
+                      (click)="close()"
+                      class="search-item search-item-supplier">
+                      <div class="search-item-img-placeholder">🏭</div>
+                      <div class="search-item-info">
+                        <span class="search-item-name">{{ s.companyName }}</span>
+                        <span class="search-item-meta">{{ s.city }}، {{ s.province }} · {{ s.productCount | persianNumber }} محصول</span>
+                      </div>
+                      <span class="search-item-arrow">←</span>
+                    </a>
+                  }
+                </div>
+              }
+              <!-- No results -->
+              @if (!hasResults && query.length >= 2) {
+                <div class="search-empty">
+                  <span>🔍</span>
+                  <span>نتیجه‌ای برای «{{ query }}» یافت نشد</span>
+                </div>
+              }
+            }
+            <!-- Footer -->
+            @if (hasResults && !loading) {
+              <div class="search-footer">
+                <button type="button" (click)="onSubmit()" class="search-footer-link">
+                  مشاهده همه نتایج «{{ query }}» ←
+                </button>
+              </div>
+            }
           </div>
-
-          <ng-container *ngIf="!loading && suggestions">
-            <!-- Products -->
-            <div *ngIf="suggestions.products.length" class="search-group">
-              <div class="search-group-header">
-                <span class="search-group-icon">📦</span>
-                <span>محصولات</span>
-                <span class="search-group-count">{{ suggestions.products.length }}</span>
-              </div>
-              <a *ngFor="let p of suggestions.products"
-                 [routerLink]="['/product', 'slug', p.slug]"
-                 (click)="close()"
-                 class="search-item search-item-product">
-                <div class="search-item-img" *ngIf="p.imageUrl">
-                  <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
-                </div>
-                <div *ngIf="!p.imageUrl" class="search-item-img-placeholder">📦</div>
-                <div class="search-item-info">
-                  <span class="search-item-name">{{ p.name }}</span>
-                  <span class="search-item-meta">{{ p.categoryName }} · {{ p.supplierName }}</span>
-                </div>
-                <span class="search-item-price">{{ p.price | persianNumber }} تومان</span>
-              </a>
-            </div>
-
-            <!-- Categories -->
-            <div *ngIf="suggestions.categories.length" class="search-group">
-              <div class="search-group-header">
-                <span class="search-group-icon">📂</span>
-                <span>دسته‌بندی‌ها</span>
-                <span class="search-group-count">{{ suggestions.categories.length }}</span>
-              </div>
-              <a *ngFor="let c of suggestions.categories"
-                 [routerLink]="['/shop']"
-                 [queryParams]="{ categoryId: c.id }"
-                 (click)="close()"
-                 class="search-item search-item-category">
-                <div class="search-item-img-placeholder">📂</div>
-                <div class="search-item-info">
-                  <span class="search-item-name">{{ c.name }}</span>
-                  <span class="search-item-meta">{{ c.productCount | persianNumber }} محصول</span>
-                </div>
-                <span class="search-item-arrow">←</span>
-              </a>
-            </div>
-
-            <!-- Suppliers -->
-            <div *ngIf="suggestions.suppliers.length" class="search-group">
-              <div class="search-group-header">
-                <span class="search-group-icon">🏭</span>
-                <span>تأمین‌کنندگان</span>
-                <span class="search-group-count">{{ suggestions.suppliers.length }}</span>
-              </div>
-              <a *ngFor="let s of suggestions.suppliers"
-                 [routerLink]="['/shop']"
-                 [queryParams]="{ city: s.city }"
-                 (click)="close()"
-                 class="search-item search-item-supplier">
-                <div class="search-item-img-placeholder">🏭</div>
-                <div class="search-item-info">
-                  <span class="search-item-name">{{ s.companyName }}</span>
-                  <span class="search-item-meta">{{ s.city }}، {{ s.province }} · {{ s.productCount | persianNumber }} محصول</span>
-                </div>
-                <span class="search-item-arrow">←</span>
-              </a>
-            </div>
-
-            <!-- No results -->
-            <div *ngIf="!hasResults && query.length >= 2" class="search-empty">
-              <span>🔍</span>
-              <span>نتیجه‌ای برای «{{ query }}» یافت نشد</span>
-            </div>
-          </ng-container>
-
-          <!-- Footer -->
-          <div *ngIf="hasResults && !loading" class="search-footer">
-            <button type="button" (click)="onSubmit()" class="search-footer-link">
-              مشاهده همه نتایج «{{ query }}» ←
-            </button>
-          </div>
-        </div>
+        }
       </div>
-
+    
       <!-- Mobile -->
       <div class="search-mobile">
         <button type="button" (click)="openMobile()" class="search-mobile-trigger" aria-label="جستجو">
@@ -126,117 +147,137 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
           </svg>
         </button>
-
+    
         <!-- Mobile Overlay -->
-        <div *ngIf="mobileOpen" class="search-mobile-overlay" (click)="closeMobile()">
-          <div class="search-mobile-container" (click)="$event.stopPropagation()">
-            <div class="search-mobile-bar">
-              <div class="search-mobile-input-wrap">
-                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
-                </svg>
-                <input
-                  #mobileInput
-                  type="text"
-                  [(ngModel)]="query"
-                  name="mobileSearch"
-                  (input)="onInput($event)"
-                  placeholder="جستجوی محصول، دسته‌بندی..."
-                  class="search-mobile-input"
-                  autocomplete="off"
-                />
-                <button *ngIf="query" type="button" (click)="clearQuery()" class="search-clear-mobile">✕</button>
+        @if (mobileOpen) {
+          <div class="search-mobile-overlay" (click)="closeMobile()">
+            <div class="search-mobile-container" (click)="$event.stopPropagation()">
+              <div class="search-mobile-bar">
+                <div class="search-mobile-input-wrap">
+                  <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+                  </svg>
+                  <input
+                    #mobileInput
+                    type="text"
+                    [(ngModel)]="query"
+                    name="mobileSearch"
+                    (input)="onInput($event)"
+                    placeholder="جستجوی محصول، دسته‌بندی..."
+                    class="search-mobile-input"
+                    autocomplete="off"
+                    />
+                  @if (query) {
+                    <button type="button" (click)="clearQuery()" class="search-clear-mobile">✕</button>
+                  }
+                </div>
+                <button type="button" (click)="closeMobile()" class="search-mobile-cancel">لغو</button>
               </div>
-              <button type="button" (click)="closeMobile()" class="search-mobile-cancel">لغو</button>
-            </div>
-
-            <div class="search-mobile-results">
-              <div *ngIf="loading" class="search-loading">
-                <span class="search-spinner"></span>
-                <span>در حال جستجو...</span>
-              </div>
-
-              <ng-container *ngIf="!loading && suggestions">
-                <!-- Products -->
-                <div *ngIf="suggestions.products.length" class="search-group">
-                  <div class="search-group-header">
-                    <span class="search-group-icon">📦</span>
-                    <span>محصولات</span>
+              <div class="search-mobile-results">
+                @if (loading) {
+                  <div class="search-loading">
+                    <span class="search-spinner"></span>
+                    <span>در حال جستجو...</span>
                   </div>
-                  <a *ngFor="let p of suggestions.products"
-                     [routerLink]="['/product', 'slug', p.slug]"
-                     (click)="closeMobile()"
-                     class="search-item search-item-product">
-                    <div class="search-item-img" *ngIf="p.imageUrl">
-                      <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+                }
+                @if (!loading && suggestions) {
+                  <!-- Products -->
+                  @if (suggestions.products.length) {
+                    <div class="search-group">
+                      <div class="search-group-header">
+                        <span class="search-group-icon">📦</span>
+                        <span>محصولات</span>
+                      </div>
+                      @for (p of suggestions.products; track p) {
+                        <a
+                          [routerLink]="['/product', 'slug', p.slug]"
+                          (click)="closeMobile()"
+                          class="search-item search-item-product">
+                          @if (p.imageUrl) {
+                            <div class="search-item-img">
+                              <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+                            </div>
+                          }
+                          @if (!p.imageUrl) {
+                            <div class="search-item-img-placeholder">📦</div>
+                          }
+                          <div class="search-item-info">
+                            <span class="search-item-name">{{ p.name }}</span>
+                            <span class="search-item-meta">{{ p.categoryName }} · {{ p.supplierName }}</span>
+                          </div>
+                          <span class="search-item-price">{{ p.price | persianNumber }} ت</span>
+                        </a>
+                      }
                     </div>
-                    <div *ngIf="!p.imageUrl" class="search-item-img-placeholder">📦</div>
-                    <div class="search-item-info">
-                      <span class="search-item-name">{{ p.name }}</span>
-                      <span class="search-item-meta">{{ p.categoryName }} · {{ p.supplierName }}</span>
+                  }
+                  <!-- Categories -->
+                  @if (suggestions.categories.length) {
+                    <div class="search-group">
+                      <div class="search-group-header">
+                        <span class="search-group-icon">📂</span>
+                        <span>دسته‌بندی‌ها</span>
+                      </div>
+                      @for (c of suggestions.categories; track c) {
+                        <a
+                          [routerLink]="['/shop']"
+                          [queryParams]="{ categoryId: c.id }"
+                          (click)="closeMobile()"
+                          class="search-item search-item-category">
+                          <div class="search-item-img-placeholder">📂</div>
+                          <div class="search-item-info">
+                            <span class="search-item-name">{{ c.name }}</span>
+                            <span class="search-item-meta">{{ c.productCount | persianNumber }} محصول</span>
+                          </div>
+                          <span class="search-item-arrow">←</span>
+                        </a>
+                      }
                     </div>
-                    <span class="search-item-price">{{ p.price | persianNumber }} ت</span>
-                  </a>
-                </div>
-
-                <!-- Categories -->
-                <div *ngIf="suggestions.categories.length" class="search-group">
-                  <div class="search-group-header">
-                    <span class="search-group-icon">📂</span>
-                    <span>دسته‌بندی‌ها</span>
+                  }
+                  <!-- Suppliers -->
+                  @if (suggestions.suppliers.length) {
+                    <div class="search-group">
+                      <div class="search-group-header">
+                        <span class="search-group-icon">🏭</span>
+                        <span>تأمین‌کنندگان</span>
+                      </div>
+                      @for (s of suggestions.suppliers; track s) {
+                        <a
+                          [routerLink]="['/shop']"
+                          [queryParams]="{ city: s.city }"
+                          (click)="closeMobile()"
+                          class="search-item search-item-supplier">
+                          <div class="search-item-img-placeholder">🏭</div>
+                          <div class="search-item-info">
+                            <span class="search-item-name">{{ s.companyName }}</span>
+                            <span class="search-item-meta">{{ s.city }}، {{ s.province }}</span>
+                          </div>
+                          <span class="search-item-arrow">←</span>
+                        </a>
+                      }
+                    </div>
+                  }
+                  @if (!hasResults && query.length >= 2) {
+                    <div class="search-empty">
+                      <span>🔍</span>
+                      <span>نتیجه‌ای یافت نشد</span>
+                    </div>
+                  }
+                }
+                @if (hasResults && !loading) {
+                  <div class="search-footer">
+                    <button type="button" (click)="onSubmit(); closeMobile()" class="search-footer-link">
+                      مشاهده همه نتایج ←
+                    </button>
                   </div>
-                  <a *ngFor="let c of suggestions.categories"
-                     [routerLink]="['/shop']"
-                     [queryParams]="{ categoryId: c.id }"
-                     (click)="closeMobile()"
-                     class="search-item search-item-category">
-                    <div class="search-item-img-placeholder">📂</div>
-                    <div class="search-item-info">
-                      <span class="search-item-name">{{ c.name }}</span>
-                      <span class="search-item-meta">{{ c.productCount | persianNumber }} محصول</span>
-                    </div>
-                    <span class="search-item-arrow">←</span>
-                  </a>
-                </div>
-
-                <!-- Suppliers -->
-                <div *ngIf="suggestions.suppliers.length" class="search-group">
-                  <div class="search-group-header">
-                    <span class="search-group-icon">🏭</span>
-                    <span>تأمین‌کنندگان</span>
-                  </div>
-                  <a *ngFor="let s of suggestions.suppliers"
-                     [routerLink]="['/shop']"
-                     [queryParams]="{ city: s.city }"
-                     (click)="closeMobile()"
-                     class="search-item search-item-supplier">
-                    <div class="search-item-img-placeholder">🏭</div>
-                    <div class="search-item-info">
-                      <span class="search-item-name">{{ s.companyName }}</span>
-                      <span class="search-item-meta">{{ s.city }}، {{ s.province }}</span>
-                    </div>
-                    <span class="search-item-arrow">←</span>
-                  </a>
-                </div>
-
-                <div *ngIf="!hasResults && query.length >= 2" class="search-empty">
-                  <span>🔍</span>
-                  <span>نتیجه‌ای یافت نشد</span>
-                </div>
-              </ng-container>
-
-              <div *ngIf="hasResults && !loading" class="search-footer">
-                <button type="button" (click)="onSubmit(); closeMobile()" class="search-footer-link">
-                  مشاهده همه نتایج ←
-                </button>
+                }
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: inline-block; }
 
     .search-desktop { display: none; }
@@ -530,7 +571,9 @@ import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSugge
     .search-mobile-results .search-item-name { font-size: 14px; }
     .search-mobile-results .search-item-meta { font-size: 12px; }
     .search-mobile-results .search-item-price { font-size: 13px; }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SearchAutocompleteComponent implements OnDestroy {
   @Output() searchSubmitted = new EventEmitter<string>();

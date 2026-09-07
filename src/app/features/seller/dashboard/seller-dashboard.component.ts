@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { BarChartDatum } from '../../../shared/components/bar-chart/bar-chart.component';
@@ -14,9 +14,11 @@ import {
 
 /** داشبورد آماری فروشنده */
 @Component({
-  selector: 'app-seller-dashboard',
-  templateUrl: './seller-dashboard.component.html',
-  styleUrls: ['./seller-dashboard.component.scss']
+    selector: 'app-seller-dashboard',
+    templateUrl: './seller-dashboard.component.html',
+    styleUrls: ['./seller-dashboard.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerDashboardComponent implements OnInit {
   dashboard: DashboardSummary | null = null;

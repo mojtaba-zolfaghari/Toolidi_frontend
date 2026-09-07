@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -50,10 +50,12 @@ const ORDER_STATUS_COLOR: Record<string, string> = {
  * شامل: نمای کلی، سفارشات، آدرس‌ها، امنیت
  */
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss'],
-  animations: [fadeIn, slideUp]
+    selector: 'app-profile',
+    templateUrl: './profile.component.html',
+    styleUrls: ['./profile.component.scss'],
+    animations: [fadeIn, slideUp],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ProfileComponent implements OnInit {
   profile: UserProfile | null = null;

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 import { ProductService, SearchSuggestions, SearchSuggestionProduct, SearchSuggestionCategory, SearchSuggestionSupplier } from '../../core/services/api/product.service';
@@ -15,8 +15,8 @@ interface BlogResult {
 }
 
 @Component({
-  selector: 'app-search-page',
-  template: `
+    selector: 'app-search-page',
+    template: `
     <div class="search-page">
       <!-- Header -->
       <div class="search-header">
@@ -25,7 +25,7 @@ interface BlogResult {
             <span class="search-logo-mark">T</span>
             <span>تولیدی</span>
           </a>
-
+    
           <div class="search-box">
             <svg class="search-box-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
@@ -39,8 +39,10 @@ interface BlogResult {
               placeholder="جستجو کنید..."
               class="search-box-input"
               autofocus
-            />
-            <button *ngIf="query" type="button" (click)="clearQuery()" class="search-box-clear">✕</button>
+              />
+            @if (query) {
+              <button type="button" (click)="clearQuery()" class="search-box-clear">✕</button>
+            }
             <button type="button" (click)="search()" class="search-box-submit">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
@@ -49,155 +51,194 @@ interface BlogResult {
           </div>
         </div>
       </div>
-
+    
       <!-- Tabs -->
-      <div class="search-tabs-wrap" *ngIf="query.length >= 2">
-        <div class="search-tabs">
-          <button
-            *ngFor="let tab of tabs"
-            type="button"
-            [class.active]="activeTab === tab.id"
-            (click)="setTab(tab.id)"
-            class="search-tab">
-            <span class="search-tab-icon">{{ tab.icon }}</span>
-            <span>{{ tab.label }}</span>
-            <span *ngIf="getTabCount(tab.id) > 0" class="search-tab-count">{{ getTabCount(tab.id) | persianNumber }}</span>
-          </button>
+      @if (query.length >= 2) {
+        <div class="search-tabs-wrap">
+          <div class="search-tabs">
+            @for (tab of tabs; track tab) {
+              <button
+                type="button"
+                [class.active]="activeTab === tab.id"
+                (click)="setTab(tab.id)"
+                class="search-tab">
+                <span class="search-tab-icon">{{ tab.icon }}</span>
+                <span>{{ tab.label }}</span>
+                @if (getTabCount(tab.id) > 0) {
+                  <span class="search-tab-count">{{ getTabCount(tab.id) | persianNumber }}</span>
+                }
+              </button>
+            }
+          </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Results -->
-      <div class="search-results-wrap" *ngIf="query.length >= 2">
-        <div class="search-results">
-
-          <!-- Loading -->
-          <div *ngIf="loading" class="search-loading">
-            <div class="search-loading-spinner"></div>
-            <span>در حال جستجوی «{{ query }}»...</span>
-          </div>
-
-          <!-- PRODUCTS TAB -->
-          <div *ngIf="activeTab === 'products' && !loading">
-            <div *ngIf="suggestions?.products?.length; else noProducts" class="search-results-grid">
-              <a *ngFor="let p of suggestions!.products"
-                 [routerLink]="['/product', 'slug', p.slug]"
-                 class="search-result-card">
-                <div class="search-result-img" *ngIf="p.imageUrl">
-                  <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
-                </div>
-                <div *ngIf="!p.imageUrl" class="search-result-img-placeholder">📦</div>
-                <div class="search-result-body">
-                  <h3 class="search-result-title">{{ p.name }}</h3>
-                  <div class="search-result-meta">
-                    <span class="search-result-badge">📂 {{ p.categoryName }}</span>
-                    <span class="search-result-badge">🏭 {{ p.supplierName }}</span>
-                  </div>
-                  <div class="search-result-price">{{ p.price | persianNumber }} تومان</div>
-                </div>
-              </a>
-            </div>
-            <ng-template #noProducts>
-              <div class="search-empty-state">
-                <span class="search-empty-icon">📦</span>
-                <p>محصولی برای «{{ query }}» یافت نشد</p>
+      @if (query.length >= 2) {
+        <div class="search-results-wrap">
+          <div class="search-results">
+            <!-- Loading -->
+            @if (loading) {
+              <div class="search-loading">
+                <div class="search-loading-spinner"></div>
+                <span>در حال جستجوی «{{ query }}»...</span>
               </div>
-            </ng-template>
-          </div>
-
-          <!-- BLOG TAB -->
-          <div *ngIf="activeTab === 'blog' && !loading">
-            <div *ngIf="blogResults.length; else noBlog" class="search-results-list">
-              <a *ngFor="let b of blogResults"
-                 [routerLink]="['/blog', b.slug]"
-                 class="search-blog-card">
-                <div class="search-blog-img" *ngIf="b.coverImageUrl">
-                  <img [src]="b.coverImageUrl" [alt]="b.title" loading="lazy" />
-                </div>
-                <div class="search-blog-body">
-                  <h3 class="search-blog-title">{{ b.title }}</h3>
-                  <p *ngIf="b.excerpt" class="search-blog-excerpt">{{ b.excerpt }}</p>
-                  <div class="search-blog-meta">
-                    <span *ngIf="b.authorName">✍️ {{ b.authorName }}</span>
-                    <span *ngIf="b.publishedAt">📅 {{ b.publishedAt }}</span>
+            }
+            <!-- PRODUCTS TAB -->
+            @if (activeTab === 'products' && !loading) {
+              <div>
+                @if (suggestions?.products?.length) {
+                  <div class="search-results-grid">
+                    @for (p of suggestions!.products; track p) {
+                      <a
+                        [routerLink]="['/product', 'slug', p.slug]"
+                        class="search-result-card">
+                        @if (p.imageUrl) {
+                          <div class="search-result-img">
+                            <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+                          </div>
+                        }
+                        @if (!p.imageUrl) {
+                          <div class="search-result-img-placeholder">📦</div>
+                        }
+                        <div class="search-result-body">
+                          <h3 class="search-result-title">{{ p.name }}</h3>
+                          <div class="search-result-meta">
+                            <span class="search-result-badge">📂 {{ p.categoryName }}</span>
+                            <span class="search-result-badge">🏭 {{ p.supplierName }}</span>
+                          </div>
+                          <div class="search-result-price">{{ p.price | persianNumber }} تومان</div>
+                        </div>
+                      </a>
+                    }
                   </div>
-                </div>
-              </a>
-            </div>
-            <ng-template #noBlog>
-              <div class="search-empty-state">
-                <span class="search-empty-icon">📝</span>
-                <p>مقاله‌ای برای «{{ query }}» یافت نشد</p>
-              </div>
-            </ng-template>
-          </div>
-
-          <!-- SUPPLIERS TAB -->
-          <div *ngIf="activeTab === 'suppliers' && !loading">
-            <div *ngIf="suggestions?.suppliers?.length; else noSuppliers" class="search-results-list">
-              <a *ngFor="let s of suggestions!.suppliers"
-                 [routerLink]="['/shop']"
-                 [queryParams]="{ city: s.city }"
-                 class="search-supplier-card">
-                <div class="search-supplier-avatar">
-                  <span>{{ s.companyName.charAt(0) }}</span>
-                </div>
-                <div class="search-supplier-body">
-                  <h3 class="search-supplier-name">{{ s.companyName }}</h3>
-                  <div class="search-supplier-meta">
-                    <span>📍 {{ s.city }}، {{ s.province }}</span>
-                    <span>📦 {{ s.productCount | persianNumber }} محصول</span>
+                } @else {
+                  <div class="search-empty-state">
+                    <span class="search-empty-icon">📦</span>
+                    <p>محصولی برای «{{ query }}» یافت نشد</p>
                   </div>
-                </div>
-                <span class="search-supplier-arrow">←</span>
-              </a>
-            </div>
-            <ng-template #noSuppliers>
-              <div class="search-empty-state">
-                <span class="search-empty-icon">🏭</span>
-                <p>تأمین‌کننده‌ای برای «{{ query }}» یافت نشد</p>
+                }
               </div>
-            </ng-template>
+            }
+            <!-- BLOG TAB -->
+            @if (activeTab === 'blog' && !loading) {
+              <div>
+                @if (blogResults.length) {
+                  <div class="search-results-list">
+                    @for (b of blogResults; track b) {
+                      <a
+                        [routerLink]="['/blog', b.slug]"
+                        class="search-blog-card">
+                        @if (b.coverImageUrl) {
+                          <div class="search-blog-img">
+                            <img [src]="b.coverImageUrl" [alt]="b.title" loading="lazy" />
+                          </div>
+                        }
+                        <div class="search-blog-body">
+                          <h3 class="search-blog-title">{{ b.title }}</h3>
+                          @if (b.excerpt) {
+                            <p class="search-blog-excerpt">{{ b.excerpt }}</p>
+                          }
+                          <div class="search-blog-meta">
+                            @if (b.authorName) {
+                              <span>✍️ {{ b.authorName }}</span>
+                            }
+                            @if (b.publishedAt) {
+                              <span>📅 {{ b.publishedAt }}</span>
+                            }
+                          </div>
+                        </div>
+                      </a>
+                    }
+                  </div>
+                } @else {
+                  <div class="search-empty-state">
+                    <span class="search-empty-icon">📝</span>
+                    <p>مقاله‌ای برای «{{ query }}» یافت نشد</p>
+                  </div>
+                }
+              </div>
+            }
+            <!-- SUPPLIERS TAB -->
+            @if (activeTab === 'suppliers' && !loading) {
+              <div>
+                @if (suggestions?.suppliers?.length) {
+                  <div class="search-results-list">
+                    @for (s of suggestions!.suppliers; track s) {
+                      <a
+                        [routerLink]="['/shop']"
+                        [queryParams]="{ city: s.city }"
+                        class="search-supplier-card">
+                        <div class="search-supplier-avatar">
+                          <span>{{ s.companyName.charAt(0) }}</span>
+                        </div>
+                        <div class="search-supplier-body">
+                          <h3 class="search-supplier-name">{{ s.companyName }}</h3>
+                          <div class="search-supplier-meta">
+                            <span>📍 {{ s.city }}، {{ s.province }}</span>
+                            <span>📦 {{ s.productCount | persianNumber }} محصول</span>
+                          </div>
+                        </div>
+                        <span class="search-supplier-arrow">←</span>
+                      </a>
+                    }
+                  </div>
+                } @else {
+                  <div class="search-empty-state">
+                    <span class="search-empty-icon">🏭</span>
+                    <p>تأمین‌کننده‌ای برای «{{ query }}» یافت نشد</p>
+                  </div>
+                }
+              </div>
+            }
+            <!-- CATEGORIES (shown in products tab) -->
+            @if (activeTab === 'products' && !loading && suggestions?.categories?.length) {
+              <div class="search-categories-section">
+                <h3 class="search-section-title">📂 دسته‌بندی‌های مرتبط</h3>
+                <div class="search-categories-grid">
+                  @for (c of suggestions!.categories; track c) {
+                    <a
+                      [routerLink]="['/shop']"
+                      [queryParams]="{ categoryId: c.id }"
+                      class="search-category-chip">
+                      <span>{{ c.name }}</span>
+                      <small>{{ c.productCount | persianNumber }} محصول</small>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+            <!-- No results at all -->
+            @if (!loading && query.length >= 2 && !hasAnyResults) {
+              <div class="search-no-results">
+                <span class="search-no-results-icon">🔍</span>
+                <h3>نتیجه‌ای یافت نشد</h3>
+                <p>برای «{{ query }}» نتیجه‌ای پیدا نشد. کلمات کلیدی دیگری امتحان کنید.</p>
+              </div>
+            }
           </div>
-
-          <!-- CATEGORIES (shown in products tab) -->
-          <div *ngIf="activeTab === 'products' && !loading && suggestions?.categories?.length" class="search-categories-section">
-            <h3 class="search-section-title">📂 دسته‌بندی‌های مرتبط</h3>
-            <div class="search-categories-grid">
-              <a *ngFor="let c of suggestions!.categories"
-                 [routerLink]="['/shop']"
-                 [queryParams]="{ categoryId: c.id }"
-                 class="search-category-chip">
-                <span>{{ c.name }}</span>
-                <small>{{ c.productCount | persianNumber }} محصول</small>
-              </a>
-            </div>
-          </div>
-
-          <!-- No results at all -->
-          <div *ngIf="!loading && query.length >= 2 && !hasAnyResults" class="search-no-results">
-            <span class="search-no-results-icon">🔍</span>
-            <h3>نتیجه‌ای یافت نشد</h3>
-            <p>برای «{{ query }}» نتیجه‌ای پیدا نشد. کلمات کلیدی دیگری امتحان کنید.</p>
-          </div>
-
         </div>
-      </div>
-
+      }
+    
       <!-- Empty state (no query) -->
-      <div *ngIf="query.length < 2" class="search-welcome">
-        <div class="search-welcome-inner">
-          <span class="search-welcome-icon">🔍</span>
-          <h2>در تولیدی جستجو کنید</h2>
-          <p>محصولات، مقالات وبلاگ و تأمین‌کنندگان را پیدا کنید</p>
-          <div class="search-suggestions">
-            <span>پیشنهادات:</span>
-            <button *ngFor="let s of quickSuggestions" type="button" (click)="quickSearch(s)" class="search-suggestion-chip">{{ s }}</button>
+      @if (query.length < 2) {
+        <div class="search-welcome">
+          <div class="search-welcome-inner">
+            <span class="search-welcome-icon">🔍</span>
+            <h2>در تولیدی جستجو کنید</h2>
+            <p>محصولات، مقالات وبلاگ و تأمین‌کنندگان را پیدا کنید</p>
+            <div class="search-suggestions">
+              <span>پیشنهادات:</span>
+              @for (s of quickSuggestions; track s) {
+                <button type="button" (click)="quickSearch(s)" class="search-suggestion-chip">{{ s }}</button>
+              }
+            </div>
           </div>
         </div>
-      </div>
+      }
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     :host { display: block; min-height: 100vh; background: #f7f8fc; }
 
     /* ─── Header ─── */
@@ -564,7 +605,9 @@ interface BlogResult {
       .search-blog-card { flex-direction: column; }
       .search-blog-img { width: 100%; height: 160px; }
     }
-  `]
+  `],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SearchPageComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;

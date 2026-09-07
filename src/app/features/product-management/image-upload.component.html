@@ -15,26 +15,32 @@
     </label>
   </div>
 
-  <div *ngIf="images.length" class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-    <div *ngFor="let image of images; let i = index" class="group relative overflow-hidden rounded-xl border border-gray-200">
-      <img [src]="image.dataUrl" [alt]="image.altText" class="h-28 w-full object-cover" />
-      <button
-        type="button"
-        (click)="setPrimary(i)"
-        [title]="image.isPrimary ? 'تصویر اصلی' : 'انتخاب به عنوان اصلی'"
-        class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-lg shadow transition-colors"
-        [class.text-yellow-500]="image.isPrimary"
-        [class.text-gray-400]="!image.isPrimary">
-        ★
-      </button>
-      <button
-        type="button"
-        (click)="remove(i)"
-        title="حذف تصویر"
-        class="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-lg text-red-500 shadow transition-colors hover:bg-red-500 hover:text-white">
-        ×
-      </button>
-      <span *ngIf="image.isPrimary" class="absolute bottom-2 right-2 rounded bg-primary px-2 py-0.5 text-xs font-bold text-white">اصلی</span>
+  @if (images.length) {
+    <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      @for (image of images; track image; let i = $index) {
+        <div class="group relative overflow-hidden rounded-xl border border-gray-200">
+          <img [src]="image.dataUrl" [alt]="image.altText" class="h-28 w-full object-cover" />
+          <button
+            type="button"
+            (click)="setPrimary(i)"
+            [title]="image.isPrimary ? 'تصویر اصلی' : 'انتخاب به عنوان اصلی'"
+            class="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-lg shadow transition-colors"
+            [class.text-yellow-500]="image.isPrimary"
+            [class.text-gray-400]="!image.isPrimary">
+            ★
+          </button>
+          <button
+            type="button"
+            (click)="remove(i)"
+            title="حذف تصویر"
+            class="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-lg text-red-500 shadow transition-colors hover:bg-red-500 hover:text-white">
+            ×
+          </button>
+          @if (image.isPrimary) {
+            <span class="absolute bottom-2 right-2 rounded bg-primary px-2 py-0.5 text-xs font-bold text-white">اصلی</span>
+          }
+        </div>
+      }
     </div>
-  </div>
+  }
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator } from '@angular/material/paginator';
@@ -36,9 +36,11 @@ interface SellerVerificationRow extends AdminSeller {
  * جدول فروشندگان + وضعیت مدارک؛ مدال پیش‌نمایش و تأیید/رد هر مدرک.
  */
 @Component({
-  selector: 'app-seller-verification',
-  templateUrl: './seller-verification.component.html',
-  styleUrls: ['./seller-verification.component.scss']
+    selector: 'app-seller-verification',
+    templateUrl: './seller-verification.component.html',
+    styleUrls: ['./seller-verification.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SellerVerificationComponent implements OnInit {
   headerActions = [

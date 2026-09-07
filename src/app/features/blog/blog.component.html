@@ -17,112 +17,134 @@
   <!-- ═══ فیلتر دسته‌بندی ═══ -->
   <div class="blog-container blog-cats">
     <nav class="blog-cats__nav" aria-label="دسته‌بندی مقالات">
-      <button *ngFor="let cat of categories"
-              type="button"
-              class="blog-cat"
-              [class.blog-cat--active]="selectedCategory === cat.slug"
-              (click)="selectCategory(cat.slug)">
-        <span class="blog-cat__icon">{{ cat.icon }}</span>
-        {{ cat.name }}
-      </button>
+      @for (cat of categories; track cat) {
+        <button
+          type="button"
+          class="blog-cat"
+          [class.blog-cat--active]="selectedCategory === cat.slug"
+          (click)="selectCategory(cat.slug)">
+          <span class="blog-cat__icon">{{ cat.icon }}</span>
+          {{ cat.name }}
+        </button>
+      }
     </nav>
   </div>
 
   <!-- ═══ لودینگ ═══ -->
-  <div *ngIf="loading" class="blog-container blog-state">
-    <mat-progress-spinner mode="indeterminate" [diameter]="44" />
-    <p class="blog-state__text">در حال بارگذاری مقالات…</p>
-  </div>
+  @if (loading) {
+    <div class="blog-container blog-state">
+      <mat-progress-spinner mode="indeterminate" [diameter]="44" />
+      <p class="blog-state__text">در حال بارگذاری مقالات…</p>
+    </div>
+  }
 
   <!-- ═══ خطا ═══ -->
-  <div *ngIf="!loading && errorMessage" class="blog-container blog-state">
-    <mat-card appearance="outlined" class="blog-error">
-      <mat-card-content>⚠️ {{ errorMessage }}</mat-card-content>
-    </mat-card>
-  </div>
+  @if (!loading && errorMessage) {
+    <div class="blog-container blog-state">
+      <mat-card appearance="outlined" class="blog-error">
+        <mat-card-content>⚠️ {{ errorMessage }}</mat-card-content>
+      </mat-card>
+    </div>
+  }
 
   <!-- ═══ پست ویژه ═══ -->
-  <div *ngIf="!loading && featuredPost && !selectedCategory" class="blog-container blog-featured-wrap">
-    <mat-card class="blog-featured" (click)="openPost(featuredPost.id)">
-      <div class="blog-featured__media">
-        <img *ngIf="featuredPost.featuredImage"
-             [src]="featuredPost.featuredImage" [alt]="featuredPost.title"
-             loading="lazy"
-             width="800" height="450" />
-        <div *ngIf="!featuredPost.featuredImage" class="blog-featured__placeholder">✦</div>
-        <div class="blog-featured__shade"></div>
-      </div>
-      <div class="blog-featured__overlay">
-        <span class="blog-featured__badge">
-          ⭐ ویژه · {{ (featuredPost.viewCount || 0) | persianNumber }} بازدید
-        </span>
-        <h2 class="blog-featured__title">{{ featuredPost.title }}</h2>
-        <p class="blog-featured__excerpt">
-          {{ excerpt(featuredPost.shortDescription || '', 180) }}
-        </p>
-        <div class="blog-featured__meta">
-          <span>{{ featuredPost.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
-          <span>·</span>
-          <span>تیم تولیدی</span>
+  @if (!loading && featuredPost && !selectedCategory) {
+    <div class="blog-container blog-featured-wrap">
+      <mat-card class="blog-featured" (click)="openPost(featuredPost.id)">
+        <div class="blog-featured__media">
+          @if (featuredPost.featuredImage) {
+            <img
+              [src]="featuredPost.featuredImage" [alt]="featuredPost.title"
+              loading="lazy"
+              width="800" height="450" />
+          }
+          @if (!featuredPost.featuredImage) {
+            <div class="blog-featured__placeholder">✦</div>
+          }
+          <div class="blog-featured__shade"></div>
         </div>
-      </div>
-    </mat-card>
-  </div>
+        <div class="blog-featured__overlay">
+          <span class="blog-featured__badge">
+            ⭐ ویژه · {{ (featuredPost.viewCount || 0) | persianNumber }} بازدید
+          </span>
+          <h2 class="blog-featured__title">{{ featuredPost.title }}</h2>
+          <p class="blog-featured__excerpt">
+            {{ excerpt(featuredPost.shortDescription || '', 180) }}
+          </p>
+          <div class="blog-featured__meta">
+            <span>{{ featuredPost.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
+            <span>·</span>
+            <span>تیم تولیدی</span>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  }
 
   <!-- ═══ لیست پست‌ها (شبکه ریسپانسیو MatGridList) ═══ -->
-  <div *ngIf="!loading && !errorMessage" class="blog-container blog-list">
-    <mat-grid-list [cols]="gridCols" [rowHeight]="390" gutterSize="20px" class="blog-grid">
-      <mat-grid-tile *ngFor="let post of (selectedCategory ? posts : regularPosts); let i = index"
-                     class="blog-tile"
-                     [style.animation-delay]="i * 80 + 'ms'">
-        <mat-card class="blog-card" (click)="openPost(post.id)">
-          <!-- تصویر -->
-          <div class="blog-card__media">
-            <img *ngIf="post.featuredImage"
-                 [src]="post.featuredImage" [alt]="post.title"
-                 loading="lazy"
-                 width="400" height="225" />
-            <div *ngIf="!post.featuredImage" class="blog-card__media-placeholder">✦</div>
-            <!-- بج بازدید -->
-            <div class="blog-card__views">
-              <mat-icon [inline]="true">visibility</mat-icon>
-              {{ (post.viewCount || 0) | persianNumber }}
-            </div>
-          </div>
-
-          <!-- محتوا -->
-          <mat-card-content class="blog-card__body">
-            <h3 class="blog-card__title">{{ post.title }}</h3>
-            <p class="blog-card__excerpt">{{ excerpt(post.shortDescription || post.content) }}</p>
-            <div class="blog-card__meta">
-              <span class="blog-card__date">{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
-              <span class="blog-card__read">
-                مطالعه
-                <mat-icon [inline]="true">arrow_back</mat-icon>
-              </span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </mat-grid-tile>
-    </mat-grid-list>
-
-    <!-- پیام خالی -->
-    <app-empty-state *ngIf="(!selectedCategory && !regularPosts.length) || (selectedCategory && !posts.length)"
-                     icon="📭"
-                     title="مطلبی یافت نشد"
-                     message="در این دسته‌بندی هنوز مقاله‌ای منتشر نشده است.">
-    </app-empty-state>
-  </div>
+  @if (!loading && !errorMessage) {
+    <div class="blog-container blog-list">
+      <mat-grid-list [cols]="gridCols" [rowHeight]="390" gutterSize="20px" class="blog-grid">
+        @for (post of (selectedCategory ? posts : regularPosts); track post; let i = $index) {
+          <mat-grid-tile
+            class="blog-tile"
+            [style.animation-delay]="i * 80 + 'ms'">
+            <mat-card class="blog-card" (click)="openPost(post.id)">
+              <!-- تصویر -->
+              <div class="blog-card__media">
+                @if (post.featuredImage) {
+                  <img
+                    [src]="post.featuredImage" [alt]="post.title"
+                    loading="lazy"
+                    width="400" height="225" />
+                }
+                @if (!post.featuredImage) {
+                  <div class="blog-card__media-placeholder">✦</div>
+                }
+                <!-- بج بازدید -->
+                <div class="blog-card__views">
+                  <mat-icon [inline]="true">visibility</mat-icon>
+                  {{ (post.viewCount || 0) | persianNumber }}
+                </div>
+              </div>
+              <!-- محتوا -->
+              <mat-card-content class="blog-card__body">
+                <h3 class="blog-card__title">{{ post.title }}</h3>
+                <p class="blog-card__excerpt">{{ excerpt(post.shortDescription || post.content) }}</p>
+                <div class="blog-card__meta">
+                  <span class="blog-card__date">{{ post.publishedAt | persianDate:'yyyy/MM/dd' }}</span>
+                  <span class="blog-card__read">
+                    مطالعه
+                    <mat-icon [inline]="true">arrow_back</mat-icon>
+                  </span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </mat-grid-tile>
+        }
+      </mat-grid-list>
+      <!-- پیام خالی -->
+      @if ((!selectedCategory && !regularPosts.length) || (selectedCategory && !posts.length)) {
+        <app-empty-state
+          icon="📭"
+          title="مطلبی یافت نشد"
+          message="در این دسته‌بندی هنوز مقاله‌ای منتشر نشده است.">
+        </app-empty-state>
+      }
+    </div>
+  }
 
   <!-- ═══ صفحه‌بندی (MatPaginator) ═══ -->
-  <div *ngIf="!loading && posts.length > 0 && totalPages > 1" class="blog-container blog-pager">
-    <mat-paginator
-      [length]="totalCount"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[9, 18, 27]"
-      [pageIndex]="page - 1"
-      (page)="onPageEvent($event)"
-      showFirstLastButtons>
-    </mat-paginator>
-  </div>
+  @if (!loading && posts.length > 0 && totalPages > 1) {
+    <div class="blog-container blog-pager">
+      <mat-paginator
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[9, 18, 27]"
+        [pageIndex]="page - 1"
+        (page)="onPageEvent($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  }
 </section>
