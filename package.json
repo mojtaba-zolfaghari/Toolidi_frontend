@@ -22,7 +22,7 @@
         "@angular/material": "^22.1.5",
         "@angular/platform-browser": "^22.1.5",
         "@angular/platform-browser-dynamic": "^22.1.5",
-        "@angular/pwa": "^18.2.21",
+        "@angular/pwa": "^22.1.7",
         "@angular/router": "^22.1.5",
         "@angular/service-worker": "^22.1.5",
         "rxjs": "~7.8.0",
