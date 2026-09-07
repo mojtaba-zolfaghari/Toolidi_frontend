@@ -36,13 +36,13 @@ const ORDER_STATUS_ICON: Record<string, string> = {
   'Cancelled': '❌'
 };
 
-/** رنگ وضعیت سفارش */
+/** رنگ وضعیت سفارش — کلاس BEM (استایل در SCSS با توکن‌های متریال) */
 const ORDER_STATUS_COLOR: Record<string, string> = {
-  'Pending': 'bg-amber-50 text-amber-700 ring-amber-200',
-  'Processing': 'bg-blue-50 text-blue-700 ring-blue-200',
-  'Shipped': 'bg-indigo-50 text-indigo-700 ring-indigo-200',
-  'Delivered': 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-  'Cancelled': 'bg-red-50 text-red-700 ring-red-200'
+  'Pending': 'profile__order-badge--pending',
+  'Processing': 'profile__order-badge--processing',
+  'Shipped': 'profile__order-badge--shipped',
+  'Delivered': 'profile__order-badge--delivered',
+  'Cancelled': 'profile__order-badge--cancelled'
 };
 
 /**
@@ -150,9 +150,9 @@ export class ProfileComponent implements OnInit {
     return ORDER_STATUS_ICON[status] ?? '📦';
   }
 
-  /** دریافت کلاس رنگ وضعیت سفارش */
+  /** دریافت کلاس رنگ وضعیت سفارش (BEM — بدون کلاس ابزار Tailwind) */
   orderStatusColor(status: string): string {
-    return ORDER_STATUS_COLOR[status] ?? 'bg-gray-50 text-gray-700 ring-gray-200';
+    return ORDER_STATUS_COLOR[status] ?? '';
   }
 
   /** دریافت حرف اول نام */

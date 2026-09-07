@@ -627,6 +627,37 @@
       color: var(--pf-ok);
       border-color: #bbf7d0;
     }
+
+    /* وضعیت سفارش‌ها — جایگزین کلاس‌های Tailwind */
+    &--pending {
+      background: #fffbeb;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
+    &--processing {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+
+    &--shipped {
+      background: #eef2ff;
+      color: #4338ca;
+      border-color: #c7d2fe;
+    }
+
+    &--delivered {
+      background: var(--pf-ok-bg);
+      color: var(--pf-ok);
+      border-color: #a7f3d0;
+    }
+
+    &--cancelled {
+      background: var(--pf-err-bg);
+      color: var(--pf-err);
+      border-color: #fecaca;
+    }
   }
 
   &__order-meta {

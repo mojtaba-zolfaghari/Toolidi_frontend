@@ -85,14 +85,8 @@
 
     <!-- ═══ تب‌ها ═══ -->
     <mat-tab-group class="profile__tabs-group" [(selectedIndex)]="activeTabIndex" (selectedIndexChange)="setTabFromIndex($event)">
-      <mat-tab label=" اطلاعات من"></mat-tab>
-      <mat-tab label=" سفارشات"></mat-tab>
-      <mat-tab label=" آدرس‌ها"></mat-tab>
-      <mat-tab label=" امنیت"></mat-tab>
-
       <!-- ═══ محتوای تب‌ها ═══ -->
-      <div class="profile__tab-panes">
-        <!-- ─── تب: اطلاعات من ─── -->
+      <mat-tab label="اطلاعات من">
         <div *ngIf="activeTab === 'overview'" class="profile__tab-body">
           <div class="profile__overview-grid">
 
@@ -183,10 +177,12 @@
             </mat-card>
           </div>
         </div>
+      </mat-tab>
 
-        <!-- ─── تب: سفارشات ─── -->
+      <!-- ─── تب: سفارشات ─── -->
+      <mat-tab label="سفارشات">
         <div *ngIf="activeTab === 'orders'" class="profile__tab-body">
-          <div *ngIf="ordersLoading" class="profile__loading profile__loading--compact" fxLayout="row" fxLayoutAlign="center center">
+          <div *ngIf="ordersLoading" class="profile__loading profile__loading--compact">
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
             <p class="profile__loading-text">در حال بارگذاری سفارشات…</p>
           </div>
@@ -213,7 +209,7 @@
                     <div class="profile__order-info">
                       <div class="profile__order-top">
                         <strong class="profile__order-number">#{{ order.orderNumber }}</strong>
-                        <span class="profile__order-badge" [class]="orderStatusColor(order.status)">
+                        <span class="profile__order-badge" [ngClass]="orderStatusColor(order.status)">
                           {{ orderStatusLabel(order.status) }}
                         </span>
                         <span *ngIf="order.isPaid" class="profile__order-badge profile__order-badge--paid">
@@ -255,15 +251,17 @@
             </mat-card>
           </div>
         </div>
+      </mat-tab>
 
-        <!-- ─── تب: آدرس‌ها ─── -->
+      <!-- ─── تب: آدرس‌ها ─── -->
+      <mat-tab label="آدرس‌ها">
         <div *ngIf="activeTab === 'addresses'" class="profile__tab-body">
           <div class="profile__addresses-grid">
             <!-- لیست آدرس‌ها -->
             <div class="profile__addresses-list">
               <h2 class="profile__section-title">نشانی‌های من</h2>
 
-              <div *ngIf="addressesLoading" class="profile__loading profile__loading--compact" fxLayout="row" fxLayoutAlign="center center">
+              <div *ngIf="addressesLoading" class="profile__loading profile__loading--compact">
                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                 <p class="profile__loading-text">در حال بارگذاری…</p>
               </div>
@@ -367,8 +365,10 @@
             </mat-card>
           </div>
         </div>
+      </mat-tab>
 
-        <!-- ─── تب: امنیت ─── -->
+      <!-- ─── تب: امنیت ─── -->
+      <mat-tab label="امنیت">
         <div *ngIf="activeTab === 'security'" class="profile__tab-body">
           <mat-card class="profile__card">
             <mat-card-header>
@@ -430,7 +430,7 @@
             </div>
           </mat-card>
         </div>
-      </div>
+      </mat-tab>
     </mat-tab-group>
 
   </ng-container>
