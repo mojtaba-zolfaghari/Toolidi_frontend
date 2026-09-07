@@ -1,7 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.6 - Test FTP connection first
+# Version: 2.7 - Using ncftp like before
 name: CI/CD Frontend Deploy
 
 on:
@@ -75,25 +75,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
-      - name: Test FTP connection
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          echo "Testing FTP connection..."
-          echo "FTP Server: $FTP_SERVER"
-          echo "FTP User: $FTP_USERNAME"
-          
-          # Test basic connection and login
-          ftp_response=$(curl -s -v --ftp-port - -u "$FTP_USERNAME:$FTP_PASSWORD" ftp://$FTP_SERVER/ 2>&1 || true)
-          echo "FTP Response: $ftp_response"
-          
-          # Try to list directory
-          ftp_list=$(curl -s --ftp-port - -u "$FTP_USERNAME:$FTP_PASSWORD" ftp://$FTP_SERVER/ 2>&1 || true)
-          echo "FTP List: $ftp_list"
-
-      - name: Deploy via FTP (curl with active mode, ignore errors)
+      - name: 📂 Sync files with FTP using ncftp
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -101,37 +83,35 @@ jobs:
           LOCAL_DIR: ./dist/toolidi
           REMOTE_DIR: ${{ env.FTP_REMOTE_DIR }}
         run: |
-          echo "🚀 Starting FTP deployment with curl (active mode)..."
+          echo "🔧 Installing ncftp..."
+          sudo apt-get update
+          sudo apt-get install -y ncftp
           
-          # Get local IP for active mode (GitHub Actions runner external IP)
-          LOCAL_IP=$(curl -s https://api.ipify.org)
-          echo "Local IP: $LOCAL_IP"
+          echo "📁 Creating ncftp configuration..."
+          mkdir -p ~/.ncftp
+          echo "host $FTP_SERVER" > ~/.ncftp/ncftpput.cfg
+          echo "user $FTP_USERNAME" >> ~/.ncftp/ncftpput.cfg
+          echo "pass $FTP_PASSWORD" >> ~/.ncftp/ncftpput.cfg
           
-          # Get all files to upload
-          cd ./dist/toolidi
-          FILES=$(find . -type f | sed 's|^\./||')
+          echo "📂 Current directory contents:"
+          ls -la ./dist/toolidi/
           
-          echo "Files to upload: $FILES"
+          echo "🚀 Uploading files to FTP server..."
+          # Upload files using ncftpput with retry and timeout
+          ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 30 -T 30 "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+            echo "First attempt failed, retrying in 10 seconds..."
+            sleep 10
+            ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 30 -T 30 "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+              echo "Second attempt failed, trying with passive mode..."
+              # Try with passive mode
+              ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 30 -T 30 -o usePASV=true "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+                echo "All FTP attempts failed"
+                exit 1
+              }
+            }
+          }
           
-          # Create remote directory structure and upload each file
-          for file in $FILES; do
-            remote_path="${{ env.FTP_REMOTE_DIR }}$file"
-            remote_dir=$(dirname "$remote_path")
-            
-            echo "📤 Uploading: $file"
-            
-            # Use curl with active mode (--ftp-port) and create directories
-            # Ignore curl errors to see if upload works anyway
-            curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-              --ftp-create-dirs \
-              --ftp-port "$LOCAL_IP" \
-              --upload-file "$file" \
-              "ftp://${{ secrets.FTP_SERVER }}$remote_path" || echo "Curl failed but continuing..."
-            
-            echo "✅ Attempted upload: $file"
-          done
-          
-          echo "✅ All files attempted upload!"
+          echo "✅ FTP upload completed successfully!"
 
       - name: Verify deployment
         run: |
@@ -141,7 +121,7 @@ jobs:
           if [ "$HTTP_CODE" -eq 200 ]; then
             echo "✅ Site is accessible"
           else
-            echo "⚠️ Site returned $HTTP_CODE (may be old content if upload failed)"
+            echo "⚠️ Site returned $HTTP_CODE"
           fi
 
       - name: Deployment notification
