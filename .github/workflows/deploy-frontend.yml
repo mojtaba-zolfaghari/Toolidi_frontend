@@ -1,8 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.0 - Enhanced with rollback, notifications, and versioning
-
+# Version: 2.1 - Removed backup due to FTP command issues
 name: CI/CD Frontend Deploy
 
 on:
@@ -97,25 +96,6 @@ jobs:
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
           echo "Deploying version: $VERSION at $TIMESTAMP"
 
-      - name: Create backup before deploy
-        id: backup
-        run: |
-          BACKUP_DIR="${{ env.FTP_REMOTE_DIR }}backups/"
-          TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
-          echo "backup_dir=$BACKUP_DIR$TIMESTAMP" >> $GITHUB_OUTPUT
-          echo "Creating backup of current deployment..."
-          
-          # Backup using FTP commands
-          echo "mkdir -p ${{ env.FTP_REMOTE_DIR }}backups/$TIMESTAMP" | curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" ftp://${{ secrets.FTP_SERVER }}/${{ env.FTP_REMOTE_DIR }} > /dev/null
-          
-          # Copy current deployment to backup
-          curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            --upload "-${{ env.FTP_REMOTE_DIR }}" | \
-            curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            "ftp://${{ secrets.FTP_SERVER }}/${{ env.FTP_REMOTE_DIR }}backups/$TIMESTAMP/" > /dev/null
-          
-          echo "Backup created at: $BACKUP_DIR$TIMESTAMP"
-
       - name: Deploy to FTP Server
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -136,7 +116,7 @@ jobs:
         run: |
           echo "Verifying deployment..."
           curl -s -o /dev/null -w "%{http_code}" https://toolidi.ir/
-          
+
       - name: Deployment notification
         if: always()
         uses: appleboy/telegram-action@master
@@ -209,4 +189,3 @@ jobs:
             *Branch:* ${{ github.ref }}
             *Rollback to:* ${{ steps.backup.outputs.latest_backup }}
             *Status:* ${{ job.status }}
-
