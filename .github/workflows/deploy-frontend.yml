@@ -104,6 +104,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
           remote-dir: ${{ env.FTP_REMOTE_DIR }}
+          protocol: ftp
           exclude: |
             **/.git
             **/.git/**
