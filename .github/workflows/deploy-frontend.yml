@@ -20,7 +20,7 @@ on:
 # TELEGRAM_CHAT_ID: <your-chat-id>
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '22'
   FTP_REMOTE_DIR: /home/ftpuser/toolidi/
 
 jobs:
