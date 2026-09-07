@@ -1,7 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.1 - Removed backup due to FTP command issues
+# Version: 2.2 - Active mode FTP deployment
 name: CI/CD Frontend Deploy
 
 on:
@@ -9,19 +9,11 @@ on:
     branches: [main, dev]
   workflow_dispatch:
 
-# Environment variables (store in GitHub repo secrets)
-# FTP_SERVER: 192.236.168.180
-# FTP_USERNAME: ftpuser
-# FTP_PASSWORD: Aa@123456
-# TELEGRAM_BOT_TOKEN: <your-bot-token>
-# TELEGRAM_CHAT_ID: <your-chat-id>
-
 env:
   NODE_VERSION: '22'
   FTP_REMOTE_DIR: /home/ftpuser/toolidi/
 
 jobs:
-  # ─── Frontend Build ────────────────────────────────
   frontend-build:
     name: Frontend Build & Test
     runs-on: ubuntu-latest
@@ -43,28 +35,16 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Lint
-        run: npx ng lint --quiet 2>/dev/null || true
-
       - name: Build
         run: npx ng build --configuration production
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-build-${{ github.sha }}
-          path: dist/
+          name: frontend-build
+          path: dist/toolidi/
           retention-days: 7
 
-      - name: Upload source maps
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: source-maps-${{ github.sha }}
-          path: dist/**/*.map
-          retention-days: 7
-
-  # ─── FTP Deploy ─────────────────────────────────────
   deploy-frontend:
     name: FTP Deploy to Production
     runs-on: ubuntu-latest
@@ -81,8 +61,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build-${{ github.sha }}
-          path: ./dist/
+          name: frontend-build
+          path: ./dist/toolidi/
 
       - name: Verify build output
         run: ls -la ./dist/toolidi/ | head -20
@@ -94,24 +74,66 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
-          echo "Deploying version: $VERSION at $TIMESTAMP"
 
-      - name: Deploy to FTP Server
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          remote-dir: ${{ env.FTP_REMOTE_DIR }}
-          protocol: ftp
-          exclude: |
-            **/.git
-            **/.git/**
-            **/node_modules/**
-            **/src/**
-            **/dist/**
-            **/test*/
+      - name: Deploy via FTP (Active Mode)
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          LOCAL_DIR: ./dist/toolidi
+          REMOTE_DIR: ${{ env.FTP_REMOTE_DIR }}
+        run: |
+          python3 - << 'EOF'
+          import os, sys, ftplib
+          from pathlib import Path
+
+          server = os.environ['FTP_SERVER']
+          username = os.environ['FTP_USERNAME']
+          password = os.environ['FTP_PASSWORD']
+          local_dir = os.environ['LOCAL_DIR']
+          remote_dir = os.environ['REMOTE_DIR']
+
+          print(f"Connecting to {server}...")
+          ftp = ftplib.FTP(server)
+          ftp.login(username, password)
+          ftp.set_pasv(False)  # Active mode
+          print("Using active mode")
+
+          ftp.cwd(remote_dir)
+          
+          local_path = Path(local_dir)
+          uploaded = 0
+          
+          for filepath in local_path.rglob('*'):
+              if filepath.is_file():
+                  rel_path = str(filepath.relative_to(local_path))
+                  remote_path = remote_dir.rstrip('/') + '/' + rel_path
+                  
+                  # Create directory structure
+                  remote_parent = os.path.dirname(remote_path)
+                  try:
+                      ftp.cwd(remote_parent)
+                  except ftplib.error_perm:
+                      dirs = remote_parent.replace(remote_dir, '').split('/')
+                      current = remote_dir
+                      for d in dirs:
+                          if d:
+                              current += '/' + d
+                              try:
+                                  ftp.mkd(d)
+                                  ftp.cwd(d)
+                              except:
+                                  ftp.cwd(d)
+                      ftp.cwd(remote_dir)
+                  
+                  print(f"Uploading: {rel_path}")
+                  with open(filepath, 'rb') as f:
+                      ftp.storbinary(f'STOR {remote_path}', f)
+                  uploaded += 1
+          
+          print(f"\n✅ Successfully uploaded {uploaded} files")
+          ftp.quit()
+          EOF
 
       - name: Verify deployment
         run: |
@@ -132,61 +154,4 @@ jobs:
             *Branch:* ${{ github.ref }}
             *Commit:* ${{ github.sha }}
             *Deployed to:* https://toolidi.ir
-            *Timestamp:* ${{ steps.version.outputs.timestamp }}
-            *Status:* ${{ job.status }}
-
-  # ─── Rollback Job ────────────────────────────────────
-  rollback-frontend:
-    name: Rollback Frontend
-    runs-on: ubuntu-latest
-    needs: frontend-build
-    if: github.ref == 'refs/heads/main' && failure()
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build-${{ github.sha }}
-          path: ./dist/
-
-      - name: Find latest backup
-        id: backup
-        run: |
-          # Get the most recent backup directory
-          BACKUP_LIST=$(curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            "ftp://${{ secrets.FTP_SERVER }}/${{ env.FTP_REMOTE_DIR }}backups/" 2>/dev/null | \
-            grep -oP '\d{8}-\d{6}' | sort | tail -1)
-          
-          if [ -z "$BACKUP_LIST" ]; then
-            echo "No backups found! Manual intervention required."
-            exit 1
-          fi
-          
-          echo "latest_backup=$BACKUP_LIST" >> $GITHUB_OUTPUT
-          echo "Rollback to backup: $BACKUP_LIST"
-
-      - name: Restore from backup
-        run: |
-          echo "Restoring from backup: ${{ steps.backup.outputs.latest_backup }}"
-          
-          curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            --upload "-${{ env.FTP_REMOTE_DIR }}backups/${{ steps.backup.outputs.latest_backup }}/" | \
-            curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            "ftp://${{ secrets.FTP_SERVER }}/${{ env.FTP_REMOTE_DIR }}" > /dev/null
-
-      - name: Rollback notification
-        if: always()
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: |
-            🔄 *Rollback Triggered* 🔄
-            
-            *Project:* Toolidi Frontend
-            *Branch:* ${{ github.ref }}
-            *Rollback to:* ${{ steps.backup.outputs.latest_backup }}
             *Status:* ${{ job.status }}
