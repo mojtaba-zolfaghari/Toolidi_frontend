@@ -1,7 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.3 - Fixed directory creation and active mode
+# Version: 2.4 - Using curl with active mode for FTP
 name: CI/CD Frontend Deploy
 
 on:
@@ -75,7 +75,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
-      - name: Deploy via FTP (Active Mode)
+      - name: Deploy via FTP (curl with active mode)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -83,74 +83,39 @@ jobs:
           LOCAL_DIR: ./dist/toolidi
           REMOTE_DIR: ${{ env.FTP_REMOTE_DIR }}
         run: |
-          python3 - << 'EOF'
-          import os, sys, ftplib
-          from pathlib import Path
-
-          server = os.environ['FTP_SERVER']
-          username = os.environ['FTP_USERNAME']
-          password = os.environ['FTP_PASSWORD']
-          local_dir = os.environ['LOCAL_DIR']
-          remote_dir = os.environ['REMOTE_DIR']
-
-          print(f"Connecting to {server}...")
-          ftp = ftplib.FTP(server)
-          ftp.login(username, password)
-          ftp.set_pasv(False)  # Active mode
-          print("Using active mode")
-
-          # Create remote directory recursively
-          print(f"Creating remote directory: {remote_dir}")
-          parts = remote_dir.strip('/').split('/')
-          current = ''
-          for part in parts:
-              current += '/' + part
-              try:
-                  ftp.cwd(current)
-              except:
-                  try:
-                      ftp.mkd(part)
-                      ftp.cwd(current)
-                  except Exception as e:
-                      print(f"Warning: Could not create {current}: {e}")
-
-          ftp.cwd(remote_dir)
-          print(f"Changed to: {remote_dir}")
-
-          local_path = Path(local_dir)
-          uploaded = 0
-
-          for filepath in local_path.rglob('*'):
-              if filepath.is_file():
-                  rel_path = str(filepath.relative_to(local_path))
-                  remote_path = remote_dir.rstrip('/') + '/' + rel_path
-                  
-                  print(f"Uploading: {rel_path}")
-                  
-                  # Create subdirectories
-                  remote_parent = os.path.dirname(remote_path)
-                  try:
-                      ftp.cwd(remote_parent)
-                  except:
-                      parts = remote_parent.replace(remote_dir, '').split('/')
-                      current = remote_dir
-                      for p in parts:
-                          if p:
-                              current += '/' + p
-                              try:
-                                  ftp.mkd(p)
-                                  ftp.cwd(p)
-                              except:
-                                  ftp.cwd(p)
-
-                  # Upload file
-                  with open(filepath, 'rb') as f:
-                      ftp.storbinary(f'STOR {os.path.basename(remote_path)}', f)
-                  uploaded += 1
-
-          print(f"\n✅ Successfully uploaded {uploaded} files")
-          ftp.quit()
-          EOF
+          echo "🚀 Starting FTP deployment with curl (active mode)..."
+          
+          # Get local IP for active mode (GitHub Actions runner external IP)
+          LOCAL_IP=$(curl -s https://api.ipify.org)
+          echo "Local IP: $LOCAL_IP"
+          
+          # Get all files to upload
+          cd ./dist/toolidi
+          FILES=$(find . -type f | sed 's|^\./||')
+          
+          # Create remote directory structure and upload each file
+          for file in $FILES; do
+            remote_path="${{ env.FTP_REMOTE_DIR }}$file"
+            remote_dir=$(dirname "$remote_path")
+            
+            echo "📤 Uploading: $file"
+            
+            # Use curl with active mode (--ftp-port) and create directories
+            curl -s -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+              --ftp-create-dirs \
+              --ftp-port "$LOCAL_IP" \
+              --upload-file "$file" \
+              "ftp://${{ secrets.FTP_SERVER }}$remote_path"
+            
+            if [ $? -eq 0 ]; then
+              echo "✅ Uploaded: $file"
+            else
+              echo "❌ Failed to upload: $file"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All files uploaded successfully!"
 
       - name: Verify deployment
         run: |
