@@ -64,9 +64,10 @@ def main():
         print("Error: Missing FTP credentials")
         sys.exit(1)
 
-    # Force a mode with FTP_MODE=passive|active, otherwise try passive first.
+    # The FTP server does not accept passive mode (PASV). Default to active (PORT).
+    # Only use passive if FTP_MODE=passive is explicitly set.
     forced = os.environ.get('FTP_MODE', '').strip().lower()
-    modes = {'passive': [True], 'active': [False]}.get(forced, [True, False])
+    modes = {'passive': [True], 'active': [False]}.get(forced, [False])  # [False] = active only
 
     last_error = None
     for passive in modes:
