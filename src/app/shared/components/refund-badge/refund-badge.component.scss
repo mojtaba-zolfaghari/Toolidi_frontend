@@ -1,0 +1,32 @@
+:host {
+  display: inline-block;
+}
+
+.refund-badge {
+  --badge-size: 16px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--badge-size);
+  height: var(--badge-size);
+  border-radius: 50%;
+  background: var(--mat-sys-surface-container-outlined, #e5e7eb);
+  transition: transform 180ms ease, background-color 180ms ease;
+
+  &:hover {
+    transform: scale(1.12);
+  }
+
+  &--covered {
+    background: var(--mat-sys-primary, #6c3fc5);
+    color: #fff;
+  }
+
+  &__icon {
+    width: calc(var(--badge-size) * 0.72);
+    height: calc(var(--badge-size) * 0.72);
+    line-height: 1;
+    font-size: calc(var(--badge-size) * 0.72);
+  }
+}

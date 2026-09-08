@@ -219,6 +219,24 @@
           </div>
         </div>
       </div>
+      <!-- Refund protection -->
+      @if (product?.refundEligibility) {
+        <section class="product-detail__refund">
+          <app-refund-protection [eligibility]="product.refundEligibility"></app-refund-protection>
+        </section>
+      }
+
+      <!-- Product info expand (TASK-FE-PRODUCT-DETAIL-INFO) -->
+      @if (productInfoSections) {
+        <section class="product-detail__info-expand">
+          <app-refund-policy-summary [policySummary]="productInfoSections.refundPolicy"></app-refund-policy-summary>
+          <app-certifications-section [certifications]="productInfoSections.certifications"></app-certifications-section>
+          <app-tiered-pricing-block [tiers]="productInfoSections.tieredPricing"></app-tiered-pricing-block>
+          <app-shipping-info-block [shippingInfo]="productInfoSections.shippingInfo"></app-shipping-info-block>
+          <app-qna-section [qaItems]="productInfoSections.qaItems"></app-qna-section>
+        </section>
+      }
+
       <!-- Supplier Info -->
       @if (supplierStats) {
         <section class="product-detail__suppliers">

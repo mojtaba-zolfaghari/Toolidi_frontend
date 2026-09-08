@@ -26,11 +26,11 @@ import { ProductGalleryComponent } from './components/product-gallery/product-ga
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { ImageGalleryComponent } from './components/image-gallery/image-gallery.component';
 import { FieldErrorComponent } from './components/form-validation/form-validation.component';
-import { SearchAutocompleteComponent } from './components/search-autocomplete/search-autocomplete.component';
-import { IranMapComponent } from './components/iran-map/iran-map.component';
 import { LocationSelectorComponent } from './components/location-selector/location-selector.component';
 import { StatusBadgeComponent } from './components/status-badge/status-badge.component';
-import { OrderChatComponent } from './components/order-chat/order-chat.component';
+import { RefundBadgeComponent } from './components/refund-badge/refund-badge.component';
+import { SearchAutocompleteComponent } from './components/search-autocomplete/search-autocomplete.component';
+import { IranMapComponent } from './components/iran-map/iran-map.component';
 
 @NgModule({
   declarations: [
@@ -55,14 +55,14 @@ import { OrderChatComponent } from './components/order-chat/order-chat.component
     EmptySearchComponent,
     ProductQuickViewComponent,
     PersianDatePickerComponent,
-    GlobalErrorComponent,
-    ImageGalleryComponent,
-    FieldErrorComponent,    SearchAutocompleteComponent,
-    IranMapComponent,
     ProductGalleryComponent,
     LoadingSpinnerComponent,
+    ImageGalleryComponent,
+    FieldErrorComponent,
     LocationSelectorComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    SearchAutocompleteComponent,
+    IranMapComponent,
   ],
 
   imports: [
@@ -72,7 +72,7 @@ import { OrderChatComponent } from './components/order-chat/order-chat.component
     PersianDatePipe,
     PersianNumberPipe,
     RouterModule,
-    OrderChatComponent
+    RefundBadgeComponent,
   ],
   exports: [
     CommonModule,
@@ -99,16 +99,15 @@ import { OrderChatComponent } from './components/order-chat/order-chat.component
     EmptySearchComponent,
     ProductQuickViewComponent,
     PersianDatePickerComponent,
-    GlobalErrorComponent,
-    ImageGalleryComponent,
-    FieldErrorComponent,
-    SearchAutocompleteComponent,
-    IranMapComponent,
     ProductGalleryComponent,
     LoadingSpinnerComponent,
+    ImageGalleryComponent,
+    FieldErrorComponent,
     LocationSelectorComponent,
     StatusBadgeComponent,
-    OrderChatComponent
+    SearchAutocompleteComponent,
+    IranMapComponent,
+    RefundBadgeComponent,
   ]
 })
 export class SharedModule { }

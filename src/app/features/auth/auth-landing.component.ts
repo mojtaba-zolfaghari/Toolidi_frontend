@@ -8,9 +8,12 @@ interface RoleOption {
   description: string;
   route: string;
   matIcon: string;
-  tint: string;
+  /** رنگ شاخص نقش — روی کارت به‌صورت CSS variable تزریق می‌شود */
+  accent: string;
+  accentSoft: string;
   cta: string;
   ariaLabel: string;
+  features: string[];
 }
 
 /**
@@ -22,122 +25,7 @@ interface RoleOption {
 @Component({
     selector: 'app-auth-landing',
     templateUrl: './auth-landing.component.html',
-    styles: [
-        `
-      .role-card {
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        border: 1px solid rgb(229 231 235);
-      }
-      .role-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 28px rgb(0 0 0 / 0.12);
-        border-color: rgb(124 58 237 / 0.45);
-      }
-      .role-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 3.5rem;
-        height: 3.5rem;
-        border-radius: 1rem;
-      }
-      .role-icon mat-icon {
-        font-size: 1.9rem;
-        width: 1.9rem;
-        height: 1.9rem;
-      }
-
-      /* ─── صفحه ─── */
-      .al-page {
-        max-width: 64rem;
-        margin-inline: auto;
-        padding: 3rem 1rem;
-      }
-      .al-head {
-        max-width: 42rem;
-        margin-inline: auto;
-        text-align: center;
-      }
-      .al-head__kicker {
-        font-size: 0.875rem;
-        font-weight: 700;
-        color: var(--mat-sys-primary, #7c3aed);
-      }
-      .al-head__title {
-        margin-top: 0.5rem;
-        font-size: 1.875rem;
-        font-weight: 800;
-        color: var(--mat-sys-secondary, #1e293b);
-      }
-      .al-head__sub {
-        margin-top: 0.75rem;
-        color: #6b7280;
-      }
-      .al-grid {
-        margin-top: 2.5rem;
-        display: grid;
-        gap: 1.25rem;
-        grid-template-columns: 1fr;
-      }
-      @media (min-width: 768px) {
-        .al-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-      @media (min-width: 1024px) {
-        .al-grid {
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-        }
-      }
-      .role-card__body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 1.5rem 1rem 1rem;
-      }
-      .role-card__title {
-        margin-top: 1rem;
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: var(--mat-sys-secondary, #1e293b);
-      }
-      .role-card__desc {
-        margin-top: 0.5rem;
-        min-height: 2.5rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        color: #6b7280;
-      }
-      .role-card__cta {
-        margin-top: 1rem;
-        width: 100%;
-      }
-      .al-login-hint {
-        max-width: 42rem;
-        margin: 2.5rem auto 0;
-        border: 1px solid rgb(229 231 235);
-        border-radius: 1rem;
-        background: var(--mat-sys-surface, #fff);
-        padding: 1.25rem;
-        text-align: center;
-        box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
-      }
-      .al-login-hint__text {
-        font-size: 0.875rem;
-        color: #4b5563;
-      }
-      .al-login-hint__link {
-        font-weight: 700;
-        color: var(--mat-sys-primary, #7c3aed);
-        text-decoration: none;
-      }
-      .al-login-hint__link:hover {
-        text-decoration: underline;
-      }
-    `,
-    ],
+    styleUrls: ['./auth-landing.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -166,39 +54,47 @@ export class AuthLandingComponent implements OnInit {
   readonly roles: RoleOption[] = [
     {
       title: 'خریدار',
-      description: 'مشاهده محصولات و ثبت سفارش عمده',
-      route: '/auth/login',
+      description: 'خرید عمده از تولیدکنندگان و فروشندگان سراسر ایران',
+      route: '/auth/register',
       matIcon: 'shopping_cart',
-      tint: 'rgb(237 233 254)',
+      accent: '#4f8de8',
+      accentSoft: 'rgba(79, 141, 232, 0.12)',
       cta: 'ورود / ثبت‌نام خریدار',
       ariaLabel: 'ورود یا ثبت‌نام به عنوان خریدار',
+      features: ['پیشنهادهای شخصی', 'پیگیری ساده سفارش', 'خرید مطمئن'],
     },
     {
       title: 'فروشنده',
-      description: 'ساخت فروشگاه و عرضه محصولات',
+      description: 'فروشگاه بسازید و محصولات را به تمام ایران عرضه کنید',
       route: '/auth/seller-register',
       matIcon: 'storefront',
-      tint: 'rgb(220 252 231)',
+      accent: '#2bb98a',
+      accentSoft: 'rgba(43, 185, 138, 0.12)',
       cta: 'ثبت‌نام فروشنده',
       ariaLabel: 'ثبت‌نام به عنوان فروشنده',
+      features: ['کاتالوگ یکپارچه', 'فروش سراسری', 'پرداخت امن'],
     },
     {
       title: 'تأمین‌کننده',
-      description: 'تأمین کالا و همکاری در زنجیره تأمین',
+      description: 'محصولات کارخانه را به هزاران فروشنده بفروشید',
       route: '/auth/supplier-register',
       matIcon: 'inventory_2',
-      tint: 'rgb(254 249 195)',
+      accent: '#e0a52e',
+      accentSoft: 'rgba(224, 165, 46, 0.12)',
       cta: 'ثبت‌نام تأمین‌کننده',
       ariaLabel: 'ثبت‌نام به عنوان تأمین‌کننده',
+      features: ['فروش به ۳۱ استان', 'مدیریت یکپارچه', 'قرارداد شفاف'],
     },
     {
       title: 'کارپخش',
-      description: 'مدیریت ارسال و دریافت درآمد',
+      description: 'به شبکه پیک‌های شهری بپیوندید و درآمد کسب کنید',
       route: '/auth/agent-register',
       matIcon: 'electric_moped',
-      tint: 'rgb(224 242 254)',
+      accent: '#8c7cff',
+      accentSoft: 'rgba(140, 124, 255, 0.12)',
       cta: 'ثبت‌نام کارپخش',
       ariaLabel: 'ثبت‌نام به عنوان کارپخش',
+      features: ['سفارش‌های نزدیک', 'پرداخت امن', 'امتیاز حرفه‌ای'],
     },
   ];
 }

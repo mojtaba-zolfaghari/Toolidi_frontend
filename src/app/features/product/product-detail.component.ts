@@ -14,6 +14,7 @@ import {
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { SeoService } from '../../core/services/seo.service';
 import { CartButtonState } from '../../shared/components/add-to-cart-button/add-to-cart-button.component';
+import { ProductInfoSections, ShippingMethod, PriceTier } from './product-info/product-info.models';
 
 /** انیمیشن تعویض تصویر اصلی با محو شدن */
 const imageSwap = trigger('imageSwap', [
@@ -48,6 +49,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   product: Product | null = null;
   relatedProducts: Product[] = [];
   supplierStats: { totalSuppliers: number; citiesCount: number; cities: { city: string; count: number }[] } | null = null;
+  productInfoSections: Partial<ProductInfoSections> | null = null;
   loading = true;
   errorMessage = '';
   quantity = 1;
@@ -379,6 +381,84 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   /** کم و زیاد کردن تعداد */
   changeQuantity(delta: number): void {
     this.quantity = Math.max(1, this.quantity + delta);
+  }
+
+  /** به‌روزرسانی بسیاری اطلاعات محصولات برای نمایش بخش‌های اضافی */
+  updateProductInfoSections(): void {
+    if (!this.product) return;
+
+    const certifications: ProductInfoSections['certifications'] = [
+      {
+        code: 'ISO9001',
+        title: 'استاندارد سیستم مدیریت کیفیت ISO 9001',
+        description: 'سازگاری با استاندارد بین‌المللی مدیریت کیفیت ISO 9001:2015.',
+        icon: 'fact_check'
+      },
+      {
+        code: 'CE',
+        title: 'گواهی مناسبیت CE',
+        description: 'سازگاری با الزامات فنی و ایمنی پذیرفته شده در بازار اروپا.',
+        icon: 'verified'
+      },
+      {
+        code: 'RoHS',
+        title: 'گواهی عدم وجود مواد ممنوعه RoHS',
+        description: 'سازگاری با ممنوعیت مواد سمیک طبق RoHS در سخت‌افزار برای بازار اروپا.',
+        icon: 'eco'
+      },
+      {
+        code: 'Halal',
+        title: 'گواهی حلال (ISO 22000 و آنالیز رژیم نسبتاً)',
+        description: 'تأیید رژیم حلال بر اساس استانداردهای المان análisis و فواید缘κος استاندارد.',
+        icon: 'star_half'
+      }
+    ];
+
+    const tieredPricing: ProductInfoSections['tieredPricing'] = [
+      this.toTier(1, this.product.unitPrice, undefined),
+      this.toTier(10, Math.round(this.product.unitPrice * 0.92), 8),
+      this.toTier(50, Math.round(this.product.unitPrice * 0.85), 15),
+      this.toTier(100, Math.round(this.product.unitPrice * 0.80), 20)
+    ];
+
+    const shippingMethods: ShippingMethod[] = [
+      { id: 'local-post', name: 'ارسال محلی (پست)', byCity: true, byNationwide: false, deliveryDays: this.deliveryInfo.cityDays, cost: 0, note: 'ترخیص و در دسترس در خانه' },
+      { id: 'national-courier', name: 'ارسال سراسری (کوریر)', byCity: false, byNationwide: true, deliveryDays: this.deliveryInfo.nationwideDays, cost: 15000, note: 'هزینه ارسال به سراسر کشور' },
+      { id: 'supplier-local', name: 'ارسال توسط فروشنده', byCity: true, byNationwide: false, deliveryDays: 1, cost: 0, note: 'ارسال مستقیم توسط فروشنده' }
+    ];
+
+    const shippingInfo: ProductInfoSections['shippingInfo'] = {
+      city: this.deliveryInfo.city,
+      cityDays: this.deliveryInfo.cityDays,
+      nationwideDays: this.deliveryInfo.nationwideDays,
+      methods: shippingMethods,
+      moq: 1,
+      leadTimeNote: this.productionLeadDays > 0 ? `این محصول با تأخیر تولید در فروشنده دارد؛ زمان تحویل تخمینی با در نظر گرفتن ${this.productionLeadDays} روز تولید است.` : undefined
+    };
+
+    const refundPolicy: ProductInfoSections['refundPolicy'] = {
+      short: 'برای محصولات خالص‌شده، خریدار می‌تواند محصول را تا ۱۴ روز پس از دریافت بازگرداند و وجه را پس گرفته کند. شرایط پس‌گیری و استرداد کامل وجه با توجه به وضعیت محصول، نشانی الاسترداد، و تحویل به فروشنده است.',
+      detailUrl: '/help/refund-policy',
+      highlight: 'برای محصولات تایید شده، ضمانت بازگشت وجه از طریق پلتفرم فعال است.'
+    };
+
+    const qaItems: ProductInfoSections['qaItems'] = [
+      { question: 'آیا برای این محصول ضمانت بازگشت وجه وجود دارد؟', answer: 'بله؛ اگر تأمین‌کننده و فروشنده تایید شده باشند، ضمانت بازگشت وجه پلتفرم بر seller کاربر محافظت می‌کند.', askedBy: 'خریدار' },
+      { question: 'قیمت ارسال چقدر است؟', answer: 'هزینه ارسال به شهر‌های مختلف متفاوت است و در اطلاعات ارسال محصول نمایش داده می‌شود.', askedBy: 'خریدار' },
+      { question: 'آیا می‌توانم محصول با کمتر از MOQ سفارش دهم؟', answer: 'بله، می‌توانید با کمتر از MOQ سفارش دهید، اما قیمت Poultry خواهد بود.', askedBy: 'خریدار' }
+    ];
+
+    this.productInfoSections = {
+      certifications,
+      tieredPricing,
+      shippingInfo,
+      refundPolicy,
+      qaItems
+    };
+  }
+
+  private toTier(minQty: number, unitPrice: number, discountPercent: number | undefined): PriceTier {
+    return { minQty, unitPrice, discountPercent };
   }
 
   /** افزودن محصول به سبد خرید با انیمیشن */

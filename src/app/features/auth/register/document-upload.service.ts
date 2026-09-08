@@ -86,6 +86,12 @@ export class DocumentUploadService {
   }
 }
 
+/** A document the seller has uploaded during registration (minimal shape for now). */
+export interface UploadedDocument {
+  fileName: string;
+  uploadedAt: Date;
+}
+
 export interface DocumentValidationResult {
   ok: boolean;
   reason: string;

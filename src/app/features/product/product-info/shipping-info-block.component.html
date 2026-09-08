@@ -1,0 +1,65 @@
+<section class="shipping-info-block" aria-labelledby="si-heading">
+  <div class="shipping-info-block__header">
+    <mat-icon class="shipping-info-block__icon" aria-hidden="true">local_shipping</mat-icon>
+    <div>
+      <h3 id="si-heading" class="shipping-info-block__title">اطلاعات ارسال</h3>
+      <p class="shipping-info-block__sub">روش‌های حمل و زمان تخمینی ارسال</p>
+    </div>
+  </div>
+
+  @if (hasShippingInfo && shippingInfo) {
+    <mat-card class="shipping-info-block__card">
+      <mat-list class="shipping-info-block__list">
+        @for (method of shippingInfo.methods; track method.id) {
+          <mat-list-item class="shipping-info-block__item">
+            <mat-icon
+              class="shipping-info-block__item-icon"
+              matListItemIcon
+              [matTooltip]="method.note || ''"
+              matTooltipPosition="above"
+              [attr.aria-label]="method.note || ''"
+            >
+              {{ method.byCity ? 'location_on' : 'flight' }}
+            </mat-icon>
+
+            <div matListItemTitle>
+              <p class="shipping-info-block__item-name">{{ method.name }}</p>
+              <p class="shipping-info-block__item-detail">
+                @if (method.byCity) {
+                  ارسال به شهر {{ shippingInfo.city }}
+                } @else {
+                  ارسال به سراسر ایران
+                }
+                @if (method.deliveryDays) {
+                  · {{ method.deliveryDays | persianNumber }} روز کاری
+                }
+              </p>
+            </div>
+
+            @if (method.cost !== undefined && method.cost !== null) {
+              <span class="shipping-info-block__item-cost">
+                {{ method.cost | persianNumber }} تومان
+              </span>
+            }
+          </mat-list-item>
+        }
+      </mat-list>
+
+      @if (shippingInfo.moq !== undefined && shippingInfo.moq !== null) {
+        <div class="shipping-info-block__moq-note">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          <span>حداقل تعداد سفارش: {{ shippingInfo.moq | persianNumber }} عدد</span>
+        </div>
+      }
+    </mat-card>
+  } @else {
+    <mat-card class="shipping-info-block__card shipping-info-block__card--empty">
+      <div class="shipping-info-block__empty">
+        <mat-icon aria-hidden="true">home</mat-icon>
+        <p class="shipping-info-block__empty-text">
+          اطلاعات ارسال برای این محصول در حال حاضر در دسترس نیست.
+        </p>
+      </div>
+    </mat-card>
+  }
+</section>

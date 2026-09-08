@@ -1,37 +1,68 @@
 <section dir="rtl" class="al-page">
+  <div class="al-glow al-glow--one" aria-hidden="true"></div>
+  <div class="al-glow al-glow--two" aria-hidden="true"></div>
+
+  <header class="al-topbar">
+    <a routerLink="/" class="al-brand" aria-label="بازگشت به خانه تولیدی">
+      <span class="al-brand__mark">ت</span>
+      <span class="al-brand__name">تولیدی</span>
+    </a>
+    <a routerLink="/auth/login" class="al-topbar__login">قبلاً عضو هستید؟ <strong>ورود</strong></a>
+  </header>
+
   <div class="al-head">
-    <p class="al-head__kicker">به تولیدی خوش آمدید</p>
+    <span class="al-head__kicker"><span class="al-head__pulse"></span> یک پلتفرم، چهار مسیر حرفه‌ای</span>
     <h1 class="al-head__title">برای شروع، مسیر خود را انتخاب کنید</h1>
     <p class="al-head__sub">
-      هر نقش مسیر و پنل مخصوص خود را دارد؛ وارد شوید یا ثبت‌نام کنید.
+      هر نقش پنل و ابزارهای مخصوص خود را دارد؛ حساب بسازید و در کمتر از یک دقیقه وارد بازار شوید.
     </p>
   </div>
 
   <div class="al-grid">
-    @for (role of roles; track role) {
-      <mat-card
-        class="role-card"
+    @for (role of roles; track role.route) {
+      <a
+        class="al-card"
         [routerLink]="role.route"
-        matRipple>
-        <mat-card-content class="role-card__body">
-          <div class="role-icon" [style.background]="role.tint">
-            <mat-icon aria-hidden="true">{{ role.matIcon }}</mat-icon>
-          </div>
-          <h2 class="role-card__title">{{ role.title }}</h2>
-          <p class="role-card__desc">{{ role.description }}</p>
-          <button mat-flat-button color="primary" class="role-card__cta" [attr.aria-label]="role.ariaLabel">
-            {{ role.cta }}
-          </button>
-        </mat-card-content>
-      </mat-card>
+        [style.--al-accent]="role.accent"
+        [style.--al-accent-soft]="role.accentSoft"
+        [attr.aria-label]="role.ariaLabel">
+        <span class="al-card__icon" aria-hidden="true">
+          <mat-icon>{{ role.matIcon }}</mat-icon>
+        </span>
+        <h2 class="al-card__title">{{ role.title }}</h2>
+        <p class="al-card__desc">{{ role.description }}</p>
+
+        <ul class="al-card__features">
+          @for (feature of role.features; track feature) {
+            <li>
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              <span>{{ feature }}</span>
+            </li>
+          }
+        </ul>
+
+        <span class="al-card__cta">
+          <span>{{ role.cta }}</span>
+          <span class="al-card__cta-arrow" aria-hidden="true">←</span>
+        </span>
+      </a>
     }
   </div>
 
   <div class="al-login-hint">
+    <span class="al-login-hint__icon" aria-hidden="true">
+      <mat-icon>badge</mat-icon>
+    </span>
     <p class="al-login-hint__text">
       حساب کاربری دارید؟
       <a routerLink="/auth/login" class="al-login-hint__link">ورود به حساب</a>
       — ورود برای همه نقش‌ها یکسان است و پس از ورود به پنل همان نقش هدایت می‌شوید.
     </p>
+  </div>
+
+  <div class="al-trust" aria-label="مزایای عضویت">
+    <span>✓ ثبت‌نام رایگان</span>
+    <span>✓ تأیید خودکار خریداران</span>
+    <span>✓ پشتیبانی فروشندگان و تأمین‌کنندگان</span>
   </div>
 </section>

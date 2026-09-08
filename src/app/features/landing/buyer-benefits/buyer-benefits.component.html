@@ -1,0 +1,75 @@
+<section class="landing-shell" dir="rtl">
+  <div class="landing-hero">
+    <div class="landing-hero__bg"></div>
+    <div class="landing-hero__content">
+      <span class="landing-kicker">خریدارеверه</span>
+      <h1 class="landing-title">خرید محمّل، بدون نگرانی</h1>
+      <p class="landing-subtitle">
+        از تأمین‌کنندگان تاییدشده، پرداخت امانی، تخفیف‌های عمده و پشتیبانی صریح —
+        هر خرید در تولیدی، معامله‌ای مطمئن.
+      </p>
+      <div class="landing-cta">
+        <a mat-flat-button routerLink="/register" class="landing-cta__btn">
+          شروع خرید ←
+        </a>
+        <a mat-stroked-button routerLink="/shop" class="landing-cta__btn--ghost">
+          مرور بازار
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <section class="landing-benefits">
+    <div class="landing-section__header">
+      <h2 class="landing-section__title">چرا تولیدی؟</h2>
+      <p class="landing-section__subtitle">چهره‌های信頼할수있는 شبکه فروش خوب را اینجا می‌بینید: ۶ عامل که خرید تو را متفاوت می‌کنند.</p>
+    </div>
+    <mat-grid-list cols="3" rowHeight="300px" gutterSize="24px" class="landing-grid">
+      @for (b of benefits; track b.title) {
+        <mat-grid-tile>
+          <mat-card class="benefit-card" [class.benefit-card--accent]="b.color">
+            <mat-card-content>
+              <div class="benefit-card__head">
+                <mat-icon class="benefit-card__icon" [style.color]="b.color">{{ b.icon }}</mat-icon>
+                <h3 class="benefit-card__title">{{ b.title }}</h3>
+              </div>
+              <p class="benefit-card__desc">{{ b.description }}</p>
+            </mat-card-content>
+          </mat-card>
+        </mat-grid-tile>
+      }
+    </mat-grid-list>
+  </section>
+
+  <section class="landing-stats">
+    <div class="stats-ring">
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.suppliers | number }}</span>
+        <span class="stat-label">تأمین‌کننده تاییدشده</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.products | number }}</span>
+        <span class="stat-label">محصول در شبکه</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.orders | number }}</span>
+        <span class="stat-label">سفارش موفق</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.cities }}</span>
+        <span class="stat-label">استان پوشش‌دهد</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-cta-section">
+    <div class="landing-cta-section__inner">
+      <h2 class="landing-cta-section__title">آماده buying بهتر هستی؟</h2>
+      <p class="landing-cta-section__desc">حساب خریدار بساز و از اولین تخفیف عمده لذت ببر.</p>
+      <a mat-flat-button routerLink="/register" class="landing-cta-section__btn">ثبت‌نام خریدار ←</a>
+    </div>
+  </section>
+</section>

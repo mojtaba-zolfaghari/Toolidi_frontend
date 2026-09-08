@@ -109,8 +109,51 @@
 }
 @case (3) {
   <section class="seller-step" aria-labelledby="seller-catalog-title">
-    <div class="seller-step-heading"><span>03</span><div><h3 id="seller-catalog-title">کاتالوگت را آماده کن</h3><p>حوزه فعالیت و داستان کسب‌وکارت را به خریداران نشان بده.</p></div></div>
-    <div class="seller-category-grid">@for (category of categories; track category) {
+    <div class="seller-step-heading"><span>03</span><div><h3 id="seller-catalog-title">کاتالوگت را آماده کن</h3><p>حوزه فعالیت و داستان کسب‌وکارت را به خریداران نشان بده.</p></div></div>                    <!-- TASK-FE-REGISTER-SELLER-ENHANCE: آپلود مدارک (شناسنامه، پروانه کسب، صورت‌حساب بانکی) -->
+                    <div class="seller-docs-area">
+                      <div class="seller-file-dropzone" #sellerDropZone>
+                        <input type="file" #sellerFileInput id="seller-doc-files" multiple accept=".pdf,.jpg,.jpeg,.png" class="seller-file-input"
+                          (change)="onSellerFilesSelected(sellerFileInput.files)" />
+                        <label for="seller-doc-files" class="seller-dropzone-label">
+                          <span class="seller-dropzone-icon">📎</span>
+                          <span class="seller-dropzone-text">فایل‌های خود را اینجا رها کنید یا کلیک کنید</span>
+                          <span class="seller-dropzone-hint">PDF، JPG یا PNG — حداکثر ۵ مگابایت (شناسنامه، پروانه کسب، صورت‌حساب بانکی)</span>
+                        </label>
+                      </div>
+                      @if (sellerUploadingDocuments.length) {
+                        <div class="seller-upload-progress-row">
+                          @for (f of sellerUploadingDocuments; track f) {
+                            <div class="upload-item">
+                              <span class="upload-name">{{ f.name }}</span>
+                              <div class="upload-bar"><div class="upload-fill" [style.width.%]="f.progress || 0"></div></div>
+                              <span class="upload-pct">{{ f.progress }}٪</span>
+                              @if (f.error) {
+                                <span class="upload-err">{{ f.error }}</span>
+                              }
+                              @if (!f.error && f.progress === 100) {
+                                <span class="upload-ok">✓ بارگذاری شد</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (sellerUploadedDocuments.length) {
+                        <div class="seller-doc-list">
+                          @for (doc of sellerUploadedDocuments; track doc.name) {
+                            <div class="seller-doc-chip">
+                              <span>📄</span>
+                              <div>
+                                <span class="seller-doc-name">{{ doc.name }}</span>
+                                <span class="seller-doc-size">{{ doc.size | number }} بایت</span>
+                              </div>
+                              <button type="button" class="seller-remove-doc" (click)="removeSellerDocument(sellerUploadedDocuments.indexOf(doc))" aria-label="حذف {{ doc.name }}">×</button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <div class="seller-category-grid">@for (category of categories; track category) {
       <button type="button" class="seller-category" [class.selected]="form.get('category')?.value === category" (click)="form.get('category')?.setValue(category)"><span>{{ category === 'زیورآلات و بدلیجات' ? '◇' : category === 'ابزار و تجهیزات معدن' ? '⚒' : category === 'لباس و پوشاک' ? '✦' : '◌' }}</span>{{ category }}</button>
     }</div>
     @if (hasError('category')) {

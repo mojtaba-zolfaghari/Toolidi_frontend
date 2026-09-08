@@ -1,0 +1,53 @@
+<section class="certifications-section" aria-labelledby="cs-heading">
+  <div class="certifications-section__header">
+    <mat-icon class="certifications-section__icon" aria-hidden="true">gavel</mat-icon>
+    <div>
+      <h3 id="cs-heading" class="certifications-section__title">گواهی‌ها و استانداردها</h3>
+      <p class="certifications-section__sub">گواهی‌های رسمی مربوط به این محصول</p>
+    </div>
+  </div>
+
+  @if (hasCertifications && certifications) {
+    <mat-card class="certifications-section__card">
+      <mat-list class="certifications-section__list">
+        @for (cert of certifications; track cert.code) {
+          <mat-list-item class="certifications-section__item">
+            <mat-icon
+              class="certifications-section__item-icon"
+              matListItemIcon
+              [matTooltip]="cert.description"
+              matTooltipPosition="above"
+              [attr.aria-label]="'توضیح: ' + cert.description"
+            >
+              {{ cert.icon || fallbackIcon }}
+            </mat-icon>
+
+            <div matListItemTitle>
+              <p class="certifications-section__item-code">{{ cert.code }}</p>
+              <p class="certifications-section__item-title">{{ cert.title }}</p>
+            </div>
+
+            <button
+              type="button"
+              mat-icon-button
+              class="certifications-section__item-more"
+              matTooltip="توضیح درباره {{ cert.title }}"
+              aria-label="مشاهده توضیح درباره {{ cert.title }}"
+              >
+              <mat-icon aria-hidden="true">info</mat-icon>
+            </button>
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-card>
+  } @else {
+    <mat-card class="certifications-section__card certifications-section__card--empty">
+      <div class="certifications-section__empty">
+        <mat-icon aria-hidden="true">inbox</mat-icon>
+        <p class="certifications-section__empty-text">
+          این محصول هنوز گواهی رسمی ثبت نکرده است.
+        </p>
+      </div>
+    </mat-card>
+  }
+</section>

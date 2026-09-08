@@ -1,0 +1,51 @@
+<section class="qna-section" aria-labelledby="qna-heading">
+  <div class="qna-section__header">
+    <mat-icon class="qna-section__icon" aria-hidden="true">question_answer</mat-icon>
+    <div>
+      <h3 id="qna-heading" class="qna-section__title">سوالات خریداران</h3>
+      <p class="qna-section__sub">سوالات متداول درباره این محصول</p>
+    </div>
+  </div>
+
+  @if (hasItems && qaItems) {
+    <mat-card class="qna-section__card">
+      <mat-list class="qna-section__list">
+        @for (item of qaItems; track item.question) {
+          <mat-list-item class="qna-section__item">
+            <mat-icon class="qna-section__item-icon" matListItemIcon aria-hidden="true">help_outline</mat-icon>
+
+            <div matListItemTitle class="qna-section__item-main">
+              <p class="qna-section__item-question">{{ item.question }}</p>
+              <p class="qna-section__item-answer">{{ item.answer }}</p>
+            </div>
+
+            @if (item.askedBy) {
+              <span class="qna-section__item-by">{{ item.askedBy }}</span>
+            }
+          </mat-list-item>
+        }
+      </mat-list>
+
+      <div class="qna-section__ask">
+        <button type="button" mat-stroked-button class="qna-section__ask-btn">
+          <mat-icon aria-hidden="true">add</mat-icon>
+          مطرح کردن سوال нового
+        </button>
+      </div>
+    </mat-card>
+  } @else {
+    <mat-card class="qna-section__card qna-section__card--empty">
+      <div class="qna-section__empty">
+        <mat-icon aria-hidden="true">chat_bubble_outline</mat-icon>
+        <p class="qna-section__empty-text">
+          هنوز سوالی برای این محصول پرسیده نشده است. شما می‌توانید اولین نفر باشید.
+        </p>
+
+        <button type="button" mat-stroked-button class="qna-section__ask-btn">
+          <mat-icon aria-hidden="true">add</mat-icon>
+          مطرح کردن سوال
+        </button>
+      </div>
+    </mat-card>
+  }
+</section>

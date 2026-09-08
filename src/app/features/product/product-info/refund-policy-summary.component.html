@@ -1,0 +1,31 @@
+<section class="refund-policy-summary" aria-labelledby="rps-heading">
+  <div class="refund-policy-summary__header">
+    <mat-icon class="refund-policy-summary__icon" aria-hidden="true">policy</mat-icon>
+    <div>
+      <h3 id="rps-heading" class="refund-policy-summary__title">سیاست بازگشت وجه</h3>
+      <p class="refund-policy-summary__sub">خلاصه سیاست بازگشت وجه برای این محصول</p>
+    </div>
+  </div>
+
+  <mat-card class="refund-policy-summary__card">
+    <div class="refund-policy-summary__body">
+      <p class="refund-policy-summary__short">
+        {{ policySummary?.short || 'سیاست بازگشت وجه برای این محصول در حال حاضر تعیین نشده است.' }}
+      </p>
+
+      @if (policySummary?.highlight) {
+        <div class="refund-policy-summary__highlight">
+          <mat-icon aria-hidden="true">lightbulb</mat-icon>
+          <span>{{ policySummary.highlight }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="refund-policy-summary__action">
+      <a [routerLink]="policySummary?.detailUrl ?? docUrl" mat-stroked-button class="refund-policy-summary__link-btn">
+        <mat-icon aria-hidden="true">how_to_reg</mat-icon>
+        خواندن سیاست کامل بازگشت وجه
+      </a>
+    </div>
+  </mat-card>
+</section>

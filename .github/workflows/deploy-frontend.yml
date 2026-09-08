@@ -1,7 +1,7 @@
 # TASK-FE-CICD-FRONTEND-DEPLOY: CI/CD Pipeline for Frontend Deployment via FTP
 # Triggers: push to main/dev branches
 # Deploy to: ftp://192.236.168.180 (ftpuser / Aa@123456)
-# Version: 2.8 - Using ncftp with forced passive mode
+# Version: 2.9 - Python FTP uploader (passive first, active fallback)
 name: CI/CD Frontend Deploy
 
 on:
@@ -75,7 +75,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
-      - name: 📂 Sync files with FTP using ncftp (Passive Mode)
+      - name: 📂 Sync files with FTP (passive first, active fallback)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -83,31 +83,19 @@ jobs:
           LOCAL_DIR: ./dist/toolidi
           REMOTE_DIR: ${{ env.FTP_REMOTE_DIR }}
         run: |
-          echo "🔧 Installing ncftp..."
-          sudo apt-get update
-          sudo apt-get install -y ncftp
-          
-          echo "📁 Creating ncftp configuration..."
-          mkdir -p ~/.ncftp
-          echo "host $FTP_SERVER" > ~/.ncftp/ncftpput.cfg
-          echo "user $FTP_USERNAME" >> ~/.ncftp/ncftpput.cfg
-          echo "pass $FTP_PASSWORD" >> ~/.ncftp/ncftpput.cfg
-          
           echo "📁 Current directory contents:"
           ls -la ./dist/toolidi/
-          
-          echo "🚀 Uploading files to FTP server using PASSIVE MODE..."
-          # Upload files using ncftpput with forced passive mode (-o usePASV=true)
-          # This is crucial for GitHub Actions runners which are behind NAT
-          ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 60 -T 60 -o usePASV=true "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+
+          echo "🚀 Uploading via scripts/ftp-deploy.py (passive mode, falls back to active)..."
+          python3 scripts/ftp-deploy.py || {
             echo "First attempt failed, retrying in 15 seconds..."
             sleep 15
-            ncftpput -f ~/.ncftp/ncftpput.cfg -R -v -t 60 -T 60 -o usePASV=true "$REMOTE_DIR" "$LOCAL_DIR"/* || {
+            python3 scripts/ftp-deploy.py || {
               echo "Second attempt failed"
               exit 1
             }
           }
-          
+
           echo "✅ FTP upload completed successfully!"
 
       - name: Verify deployment

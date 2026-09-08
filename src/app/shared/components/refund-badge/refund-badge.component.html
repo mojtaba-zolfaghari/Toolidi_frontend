@@ -1,0 +1,12 @@
+<span
+  class="refund-badge"
+  [class.refund-badge--covered]="covered"
+  matTooltip="بازگشت وجه محافظت‌شده: تولیدکننده → فروشنده → خریدار"
+  matTooltipPosition="above"
+  role="status"
+  [attr.aria-label]="covered ? 'بازگشت وجه محافظت‌شده' : 'بازگشت وجه محافظت‌نشده'"
+>
+  <mat-icon class="refund-badge__icon" aria-hidden="true">
+    {{ covered ? 'shield_check' : 'shield' }}
+  </mat-icon>
+</span>

@@ -20,6 +20,9 @@ const loadDealsChildren = () => import('./features/deals/deals.module').then(m =
 const loadTopPerformersChildren = () => import('./features/top-performers/top-performers.module').then(m => m.TopPerformersModule);
 const loadShippingChildren = () => import('./features/shipping/shipping.module').then(m => m.ShippingModule);
 const loadAuthChildren = () => import('./features/auth/auth.module').then(m => m.AuthModule);
+const loadBuyerBenefits = () => import('./features/landing/buyer-benefits/buyer-benefits.component').then(m => m.BuyerBenefitsComponent);
+const loadSellerBenefits = () => import('./features/landing/seller-benefits/seller-benefits.component').then(m => m.SellerBenefitsComponent);
+const loadSupplierBenefits = () => import('./features/landing/supplier-benefits/supplier-benefits.component').then(m => m.SupplierBenefitsComponent);
 const loadProfileChildren = () => import('./features/profile/profile.module').then(m => m.ProfileModule);
 const loadOrdersChildren = () => import('./features/orders/orders.module').then(m => m.OrdersModule);
 const loadCartChildren = () => import('./features/cart/cart.module').then(m => m.CartModule);
@@ -45,6 +48,9 @@ const panelRoute = (path: string, guards: NonNullable<Route['canActivate']>, loa
 });
 
 export const routes: Routes = [
+  { path: 'buyer/benefits', loadComponent: loadBuyerBenefits },
+  { path: 'seller/benefits', loadComponent: loadSellerBenefits },
+  { path: 'supplier/benefits', loadComponent: loadSupplierBenefits },
   {
     path: '',
     loadChildren: loadHomeChildren

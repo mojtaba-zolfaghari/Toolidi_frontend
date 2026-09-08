@@ -1,0 +1,103 @@
+<section class="refund-protection" aria-labelledby="rp-heading">
+  <div class="refund-protection__header">
+    <mat-icon class="refund-protection__icon" aria-hidden="true">
+      {{ hasAnyCoverage ? 'shield_check' : 'shield' }}
+    </mat-icon>
+    <div>
+      <h2 id="rp-heading" class="refund-protection__title">حفاظت بازگشت وجه</h2>
+      <p class="refund-protection__sub">
+        {{ hasAnyCoverage
+          ? 'محصولات خالص‌شده در تولیدی تحت ضمانت بازگشت وجه خریدار هستند.'
+          : 'نحوه اعمال ضمانت بازگشت وجه در شبکه تولیدی.'
+        }}
+      </p>
+    </div>
+  </div>
+
+  @if (hasAnyCoverage && eligibility) {
+    <mat-card class="refund-protection__card">
+      <mat-list class="refund-protection__list">
+        <!-- تأمین‌کننده تاییدشده -->
+        <mat-list-item class="refund-protection__row">
+          <mat-icon class="refund-protection__row-icon" matListItemIcon
+            [class.refund-protection__icon--ok]="eligibility.supplierVerified"
+            [class.refund-protection__icon--no]="!eligibility.supplierVerified">
+            {{ eligibility.supplierVerified ? 'check_circle' : 'cancel' }}
+          </mat-icon>
+          <div matListItemTitle>
+            <p class="refund-protection__level">تأمین‌کننده تاییدشده</p>
+            <p class="refund-protection__desc">
+              {{ eligibility.supplierVerified
+                ? 'تأمین‌کننده انتظامی به قانونی ثبت شده و هویت فیزیکی فاکتور خالص تأیید شده است.'
+                : 'تأمین‌کننده هنوز تأیید نشده است.' }}
+            </p>
+          </div>
+          <span class="refund-protection__status" [class.refund-protection__status--ok]="eligibility.supplierVerified">
+            {{ eligibility.supplierVerified ? 'بله' : 'خیر' }}
+          </span>
+        </mat-list-item>
+
+        <!-- فروشنده تاییدشده -->
+        <mat-list-item class="refund-protection__row">
+          <mat-icon class="refund-protection__row-icon" matListItemIcon
+            [class.refund-protection__icon--ok]="eligibility.sellerVerified"
+            [class.refund-protection__icon--no]="!eligibility.sellerVerified">
+            {{ eligibility.sellerVerified ? 'check_circle' : 'cancel' }}
+          </mat-icon>
+          <div matListItemTitle>
+            <p class="refund-protection__level">فروشنده تاییدشده</p>
+            <p class="refund-protection__desc">
+              {{ eligibility.sellerVerified
+                ? 'فروشنده عضو شبکه تولیدی بوده و پروفایل تجاری + نشانی مالی تایید شده است.'
+                : 'فروشنده هنوز تأیید نشده است.' }}
+            </p>
+          </div>
+          <span class="refund-protection__status" [class.refund-protection__status--ok]="eligibility.sellerVerified">
+            {{ eligibility.sellerVerified ? 'بله' : 'خیر' }}
+          </span>
+        </mat-list-item>
+
+        <!-- ضمانت پلتفرم -->
+        <mat-list-item class="refund-protection__row">
+          <mat-icon class="refund-protection__row-icon" matListItemIcon
+            [class.refund-protection__icon--ok]="eligibility.platformGuarantee"
+            [class.refund-protection__icon--no]="!eligibility.platformGuarantee">
+            {{ eligibility.platformGuarantee ? 'verified' : 'cancel' }}
+          </mat-icon>
+          <div matListItemTitle>
+            <p class="refund-protection__level">ضمانت پلتفرم</p>
+            <p class="refund-protection__desc">
+              {{ eligibility.platformGuarantee
+                ? 'اگر فروشنده یا تأمین‌کننده اصلاً مرخص نشود، پلتفرم بازگشت وجه خریدار را تکلیف می‌کند.'
+                : 'ضمانت پلتفرم برای این محصول فعلاً اعمال نشده است.' }}
+            </p>
+          </div>
+          <span class="refund-protection__status" [class.refund-protection__status--ok]="eligibility.platformGuarantee">
+            {{ eligibility.platformGuarantee ? 'فعال' : 'غیرفعال' }}
+          </span>
+        </mat-list-item>
+      </mat-list>
+
+      <div class="refund-protection__note">
+        <p>برای اطلاعات بیشتر درباره نحوه کلیه، لطفاً صفحه توضیحات ضمانت را مطالعه کنید.</p>
+        <button type="button" mat-stroked-button (click)="navigateToDoc()" class="refund-protection__link-btn">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          اطلاعات بیشتر درباره ضمانت بازگشت وجه
+        </button>
+      </div>
+    </mat-card>
+  } @else {
+    <mat-card class="refund-protection__card refund-protection__card--empty">
+      <div class="refund-protection__empty-state">
+        <mat-icon class="refund-protection__empty-icon" aria-hidden="true">priority_high</mat-icon>
+        <p class="refund-protection__empty-text">
+          برای محصولات غیرتأیید شده، ضمانت بازگشت وجه خالص پلتفرم فعال نیست.
+        </p>
+        <button type="button" mat-stroked-button (click)="navigateToDoc()" class="refund-protection__link-btn">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          نحوه اعمال ضمانت بازگشت وجه
+        </button>
+      </div>
+    </mat-card>
+  }
+</section>

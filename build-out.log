@@ -1,0 +1,170 @@
+npm notice run toolidi-frontend@0.1.0 npx
+npm notice run ng build --configuration production
+The "@angular-devkit/build-angular:browser-esbuild" builder is deprecated as part of Angular's Webpack support deprecation. Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.
+❯ Building...
+✔ Building...
+Application bundle generation failed. [6.401 seconds] - 2026-09-07T22:25:19.456Z
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/features/home/home.component.scss:9:8:
+[37m      9 │ @import [32m[37m'./home-role-section.scss';
+        ╵         [32m^[0m
+
+
+  Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/styles.scss:508:8:
+[37m      508 │ @import [32m[37m'./admin-redesign';
+          ╵         [32m^[0m
+
+
+  Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+  The plugin "angular-sass" was triggered by this import
+
+    angular:styles/global:styles:1:8:
+[37m      1 │ @import [32m'src/styles.scss'[37m;
+        ╵         [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-card' is not a known element:
+1. If 'mat-card' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'mat-card' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message. Find more at https://next.angular.dev/errors/NG8001[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product-info/refund-policy-summary.component.html:10:2:
+[37m      10 │   [32m<mat-card class="refund-policy-summary__card">[37m
+         ╵   [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component RefundPolicySummaryComponent.
+
+    src/app/features/product/product-info/refund-policy-summary.component.ts:16:15:
+[37m      16 │   templateUrl: [32m'./refund-policy-summary.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'routerLink' since it isn't a known property of 'a'. Find more at https://next.angular.dev/errors/NG8002[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product-info/refund-policy-summary.component.html:25:9:
+[37m      25 │       <a [32m[routerLink]="policySummary?.detailUrl ?? docUrl"[37m mat-str...
+         ╵          [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component RefundPolicySummaryComponent.
+
+    src/app/features/product/product-info/refund-policy-summary.component.ts:16:15:
+[37m      16 │   templateUrl: [32m'./refund-policy-summary.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8004: No pipe found with name 'persianNumber'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product-info/shipping-info-block.component.html:34:45:
+[37m      34 │ ...      · {{ method.deliveryDays |[32m persianNumbe[37mr }} روز کاری
+         ╵                                    [32m~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component ShippingInfoBlockComponent.
+
+    src/app/features/product/product-info/shipping-info-block.component.ts:20:15:
+[37m      20 │   templateUrl: [32m'./shipping-info-block.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8004: No pipe found with name 'persianNumber'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product-info/shipping-info-block.component.html:41:33:
+[37m      41 │                 {{ method.cost | [32mpersianNumber[37m }} تومان
+         ╵                                  [32m~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component ShippingInfoBlockComponent.
+
+    src/app/features/product/product-info/shipping-info-block.component.ts:20:15:
+[37m      20 │   templateUrl: [32m'./shipping-info-block.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8004: No pipe found with name 'persianNumber'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product-info/shipping-info-block.component.html:51:57:
+[37m      51 │ ...�اد سفارش: {{ ship[32mpingInfo.moq [37m| persianNumber }} عدد...
+         ╵                      [32m~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component ShippingInfoBlockComponent.
+
+    src/app/features/product/product-info/shipping-info-block.component.ts:20:15:
+[37m      20 │   templateUrl: [32m'./shipping-info-block.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8004: No pipe found with name 'persianNumber'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product-info/tiered-pricing-block.component.html:17:78:
+[37m      17 │ ...rice">{{ tier.unitPrice | [32mpersianNumber[37m }} تومان / عدد</p>
+         ╵                              [32m~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component TieredPricingBlockComponent.
+
+    src/app/features/product/product-info/tiered-pricing-block.component.ts:19:15:
+[37m      19 │   templateUrl: [32m'./tiered-pricing-block.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'app-order-chat' is not a known element:
+1. If 'app-order-chat' is an Angular component, then verify that it is part of this module.
+2. If 'app-order-chat' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message. Find more at https://next.angular.dev/errors/NG8001[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/seller/pages/orders/seller-orders.component.ts:117:10:
+[37m      117 │           [32m<app-order-chat [orderId]="chatOrderId" (closed)="close[37m...
+          ╵           [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'orderId' since it isn't a known property of 'app-order-chat'.
+1. If 'app-order-chat' is an Angular component and it has 'orderId' input, then verify that it is part of this module.
+2. If 'app-order-chat' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. Find more at https://next.angular.dev/errors/NG8002[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/seller/pages/orders/seller-orders.component.ts:117:26:
+[37m      117 │ ...    <app-order-chat [32m[orderId]="chatOrderId"[37m (closed)="closeCha...
+          ╵                        [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'app-order-chat' is not a known element:
+1. If 'app-order-chat' is an Angular component, then verify that it is part of this module.
+2. If 'app-order-chat' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message. Find more at https://next.angular.dev/errors/NG8001[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/supplier/orders/supplier-orders.component.ts:90:10:
+[37m      90 │           [32m<app-order-chat [orderId]="chatOrderId" (closed)="closeC[37m...
+         ╵           [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'orderId' since it isn't a known property of 'app-order-chat'.
+1. If 'app-order-chat' is an Angular component and it has 'orderId' input, then verify that it is part of this module.
+2. If 'app-order-chat' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. Find more at https://next.angular.dev/errors/NG8002[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/supplier/orders/supplier-orders.component.ts:90:26:
+[37m      90 │ ...    <app-order-chat [32m[orderId]="chatOrderId"[37m (closed)="closeChat...
+         ╵                        [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-icon' is not a known element:
+1. If 'mat-icon' is an Angular component, then verify that it is included in the '@Component.imports' of this component.
+2. If 'mat-icon' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message. Find more at https://next.angular.dev/errors/NG8001[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/components/refund-badge/refund-badge.component.html:9:2:
+[37m      9 │   [32m<mat-icon class="refund-badge__icon" aria-hidden="true">[37m
+        ╵   [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component RefundBadgeComponent.
+
+    src/app/shared/components/refund-badge/refund-badge.component.ts:17:15:
+[37m      17 │   templateUrl: [32m'./refund-badge.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+

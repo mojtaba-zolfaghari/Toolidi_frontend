@@ -1,0 +1,84 @@
+:host {
+  display: block;
+}
+
+.refund-policy-summary {
+  --rps-primary: var(--mat-sys-primary, #6C3FC5);
+  --rps-surface: #ffffff;
+  --rps-line: rgba(108, 63, 197, 0.14);
+  --rps-ink: var(--mat-sys-on-surface, #1B2A4A);
+  --rps-muted: #6b7280;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &__icon {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    color: var(--rps-primary);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--rps-ink);
+  }
+
+  &__sub {
+    margin: 0.1rem 0 0;
+    color: var(--rps-muted);
+    font-size: 0.8rem;
+  }
+
+  &__card {
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--rps-line);
+    background: var(--rps-surface);
+  }
+
+  &__body {
+    padding: 1rem 1.25rem;
+    border-block-end: 1px solid var(--rps-line);
+  }
+
+  &__short {
+    margin: 0;
+    color: var(--rps-ink);
+    line-height: 1.6;
+    font-size: 0.9rem;
+  }
+
+  &__highlight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.6rem;
+    background: rgba(217, 119, 6, 0.08);
+    color: #92400e;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  &__icon { font-size: 0.9rem; }
+
+  &__action {
+    padding: 0.75rem 1.25rem 1rem;
+    background: rgba(108, 63, 197, 0.03);
+  }
+
+  &__link-btn {
+    width: 100%;
+    justify-content: center;
+    border-color: var(--rps-primary);
+    color: var(--rps-primary);
+  }
+}

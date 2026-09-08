@@ -23,6 +23,10 @@
       [showIcon]="cartState === 'idle'"
       class="product-card__cart-btn">
     </app-add-to-cart-button>
+
+    @if (product.refundEligibility?.supplierVerified || product.refundEligibility?.sellerVerified || product.refundEligibility?.platformGuarantee) {
+      <app-refund-badge class="product-card__refund-badge" [covered]="isRefundCovered"></app-refund-badge>
+    }
   </div>
 
   <div class="product-card-body">

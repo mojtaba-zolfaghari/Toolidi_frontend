@@ -115,7 +115,7 @@
 <!-- Step 3: مدارک + ارسال -->
 @case (3) {
   <section class="supplier-step" aria-labelledby="supplier-docs-title">
-    <div class="supplier-step-heading"><span>03</span><div><h3 id="supplier-docs-title">آپلود مدارک و آمادهسازی</h3><p>مدارک هویتی یا تجاری خود را آپلود کنید. بررسی مدارک پس از ثبت انجام میشود.</p></div></div>
+    <div class="supplier-step-heading"><span>03</span><div><h3 id="supplier-docs-title">آپلود مدارک و آمادهسازی</h3><p>مدارک هویتی یا تجاری خود را آپلود کنید: شناسنامه ملی، گواهی مالیاتی، صورت‌حساب بانکی. بررسی مدارک پس از ثبت انجام میشود.</p></div></div>
     <div class="supplier-docs-area">
       <div class="supplier-file-dropzone" #dropZone>
         <input type="file" #fileInput id="supplier-doc-files" multiple accept=".pdf,.jpg,.jpeg,.png" class="supplier-file-input"
@@ -123,7 +123,7 @@
         <label for="supplier-doc-files" class="supplier-dropzone-label">
           <span class="supplier-dropzone-icon">📎</span>
           <span class="supplier-dropzone-text">فایل‌های خود را اینجا رها کنید یا کلیک کنید</span>
-          <span class="supplier-dropzone-hint">PDF، JPG یا PNG — حداکثر ۵ مگابایت</span>
+          <span class="supplier-dropzone-hint">PDF، JPG یا PNG — حداکثر ۵ مگابایت (شناسنامه ملی، گواهی مالیاتی، صورت‌حساب بانکی)</span>
         </label>
       </div>
       @if (supplierUploadingFiles.length) {

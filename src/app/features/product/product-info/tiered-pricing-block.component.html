@@ -1,0 +1,43 @@
+<section class="tiered-pricing-block" aria-labelledby="tp-heading">
+  <div class="tiered-pricing-block__header">
+    <mat-icon class="tiered-pricing-block__icon" aria-hidden="true">trending_up</mat-icon>
+    <div>
+      <h3 id="tp-heading" class="tiered-pricing-block__title">قیمت پلکانی بر اساس تعداد</h3>
+      <p class="tiered-pricing-block__sub">تخفیف خودکار با افزایش تعداد سفارش</p>
+    </div>
+  </div>
+
+  @if (hasTiers && tiers) {
+    <mat-card class="tiered-pricing-block__card">
+      <mat-list class="tiered-pricing-block__list">
+        @for (tier of tiers; track tier.minQty) {
+          <mat-list-item class="tiered-pricing-block__item">
+            <div class="tiered-pricing-block__item-main">
+              <p class="tiered-pricing-block__item-tier">{{ tierLabel(tier) }}</p>
+              <p class="tiered-pricing-block__item-price">{{ tier.unitPrice | persianNumber }} تومان / عدد</p>
+            </div>
+
+            <span class="tiered-pricing-block__item-discount" [matTooltip]="tier.discountPercent ? ('تخفیف ' + tier.discountPercent + '٪ نسبت به قیمت پایه') : 'نهIcons تخفیف'">
+              @if (tier.discountPercent && tier.discountPercent > 0) {
+                <mat-icon aria-hidden="true">redeem</mat-icon>
+                {{ tier.discountPercent }}٪
+              } @else {
+                <mat-icon aria-hidden="true">remove</mat-icon>
+                بدون تخفیف
+              }
+            </span>
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-card>
+  } @else {
+    <mat-card class="tiered-pricing-block__card tiered-pricing-block__card--empty">
+      <div class="tiered-pricing-block__empty">
+        <mat-icon aria-hidden="true">stagnant</mat-icon>
+        <p class="tiered-pricing-block__empty-text">
+          برای این محصول قیمت‌گذاری پلکانی تعریف نشده است.
+        </p>
+      </div>
+    </mat-card>
+  }
+</section>

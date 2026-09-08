@@ -107,8 +107,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         'پرداخت سریع و تضمینشده',
         'پشتیبانی لجستیک و ارسال'
       ],
-      ctaText: 'ثبتنام تولیدکننده',
-      ctaLink: '/auth/supplier-register',
+      ctaText: 'مزایای تولیدکننده',
+      ctaLink: '/supplier/benefits',
       gradient: 'linear-gradient(135deg, #6C3FC5 0%, #4A2E9E 100%)'
     },
     {
@@ -122,8 +122,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         'ابزارهای تحلیل فروش و گزارشگیری',
         'پشتیبانی ۲۴ ساعته'
       ],
-      ctaText: 'ثبتنام فروشنده',
-      ctaLink: '/auth/seller-register',
+      ctaText: 'مزایای فروشنده',
+      ctaLink: '/seller/benefits',
       gradient: 'linear-gradient(135deg, #1B2A4A 0%, #2A3F6B 100%)'
     },
     {
@@ -138,7 +138,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         'ارسال سریع به سراسر کشور'
       ],
       ctaText: 'شروع خرید',
-      ctaLink: '/auth/register',
+      ctaLink: '/shop',
       gradient: 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
     }
   ];

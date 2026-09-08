@@ -201,6 +201,12 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.supplierUploadedFiles.length === 0) {
+      this.snackBar.open('حداقل یک مدارک (شناسنامه ملی، گواهی مالیاتی یا صورت‌حساب بانکی) آپلود کنید.', 'بستن', { duration: 5000 });
+      this.currentStep = 3;
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -229,7 +235,7 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
         this.loading = false;
         if (result.isSuccess) {
           this.submitted = true;
-          this.successMessage = 'ثبتنام تأمینکننده با موفقیت انجام شد! اکنون حساب شما در حال بررسی است.';
+          this.successMessage = 'ثبت‌نام تأمین‌کننده با موفقیت انجام شد. در حال بررسی مدارک شما هستیم (کمتر از ۳ روز کاری). اکنون می‌توانید وارد پنل تأمین‌کننده خود شوید.';
         } else {
           this.errorMessage = result.errorMessage ?? 'ثبتنام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
         }

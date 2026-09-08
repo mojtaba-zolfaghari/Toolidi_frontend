@@ -1,0 +1,177 @@
+npm notice run toolidi-frontend@0.1.0 npx
+npm notice run ng build --configuration production
+The "@angular-devkit/build-angular:browser-esbuild" builder is deprecated as part of Angular's Webpack support deprecation. Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.
+❯ Building...
+✔ Building...
+Application bundle generation failed. [5.552 seconds] - 2026-09-07T21:43:41.448Z
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/app/features/home/home.component.scss:9:8:
+[37m      9 │ @import [32m[37m'./home-role-section.scss';
+        ╵         [32m^[0m
+
+
+  Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mDeprecation[0m [1m[35m[plugin angular-sass][0m
+
+    src/styles.scss:508:8:
+[37m      508 │ @import [32m[37m'./admin-redesign';
+          ╵         [32m^[0m
+
+
+  Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+  
+  More info and automated migrator: [4mhttps://sass-lang.com/d/import[0m
+
+  The plugin "angular-sass" was triggered by this import
+
+    angular:styles/global:styles:1:8:
+[37m      1 │ @import [32m'src/styles.scss'[37m;
+        ╵         [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/app.module.ts:58:4:
+[37m      58 │     [32mSharedModule[37m,
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/admin/admin.module.ts:70:62:
+[37m      70 │ ...ule, ReactiveFormsModule, [32mSharedModule[37m, PanelSharedModule, Rout...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/agent/agent.module.ts:29:4:
+[37m      29 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/blog/blog.module.ts:26:4:
+[37m      26 │     [32mSharedModule[37m,
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/cart/cart.module.ts:19:4:
+[37m      19 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/checkout/checkout.module.ts:22:4:
+[37m      22 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/deals/deals.module.ts:11:57:
+[37m      11 │ ...ports: [CommonModule, RouterModule.forChild(routes), [32mSharedModule[37m]
+         ╵                                                         [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/home/home.module.ts:32:4:
+[37m      32 │     [32mSharedModule[37m,
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/orders/orders.module.ts:19:4:
+[37m      19 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product-management/product-management.module.ts:31:4:
+[37m      31 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/product/product.module.ts:23:4:
+[37m      23 │     [32mSharedModule[37m,
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/search/search.module.ts:14:39:
+[37m      14 │ ...ommonModule, FormsModule, [32mSharedModule[37m, RouterModule.forChild(r...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/seller/seller.module.ts:47:4:
+[37m      47 │     [32mSharedModule[37m,
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/seller/seller.module.ts:49:4:
+[37m      49 │     [32mProductManagementModule[37m
+         ╵     [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/shop/shop.module.ts:21:4:
+[37m      21 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/supplier/supplier.module.ts:38:4:
+[37m      38 │     [32mSharedModule[37m
+         ╵     [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6008: Component RefundBadgeComponent is standalone, and cannot be declared in an NgModule. Did you mean to import it instead?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/components/refund-badge/refund-badge.module.ts:9:17:
+[37m      9 │   declarations: [[32mRefundBadgeComponent[37m],
+        ╵                  [32m~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6004: Can't be exported from this NgModule, as it must be imported first[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/components/refund-badge/refund-badge.module.ts:11:12:
+[37m      11 │   exports: [[32mRefundBadgeComponent[37m],
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6002: This import contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/shared.module.ts:71:4:
+[37m      71 │     [32mRefundBadgeModule[37m,
+         ╵     [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6003: This export contains errors, which may affect components that depend on this NgModule.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/shared/shared.module.ts:104:4:
+[37m      104 │     [32mRefundBadgeModule[37m,
+          ╵     [32m~~~~~~~~~~~~~~~~~[0m
+
+

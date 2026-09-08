@@ -1,0 +1,75 @@
+<section class="landing-shell" dir="rtl">
+  <div class="landing-hero">
+    <div class="landing-hero__bg"></div>
+    <div class="landing-hero__content">
+      <span class="landing-kicker">فروشندهateway</span>
+      <h1 class="landing-title">فروشگاهت را به بازار ایران ببر</h1>
+      <p class="landing-subtitle">
+        شبکه‌ای از تأمین‌کنندگان تاییدشده، ابزارهای продвижения و پشتیبانی لجستیک —
+        هر فروشنده تولیدی، پلتفرمی برای رشد واقعی.
+      </p>
+      <div class="landing-cta">
+        <a mat-flat-button routerLink="/seller-register" class="landing-cta__btn">
+          شروع فروش ←
+        </a>
+        <a mat-stroked-button routerLink="/shop" class="landing-cta__btn--ghost">
+          مرور فروشگاه‌ها
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <section class="landing-benefits">
+    <div class="landing-section__header">
+      <h2 class="landing-section__title">چرا تولیدی برای فروشنده؟</h2>
+      <p class="landing-section__subtitle">۶ عامل کلیدی که فروشگاهت را به شبکه palmier می‌رساند و رشدت را تسریع می‌کند.</p>
+    </div>
+    <mat-grid-list cols="3" rowHeight="300px" gutterSize="24px" class="landing-grid">
+      @for (b of benefits; track b.title) {
+        <mat-grid-tile>
+          <mat-card class="benefit-card" [class.benefit-card--accent]="b.color">
+            <mat-card-content>
+              <div class="benefit-card__head">
+                <mat-icon class="benefit-card__icon" [style.color]="b.color">{{ b.icon }}</mat-icon>
+                <h3 class="benefit-card__title">{{ b.title }}</h3>
+              </div>
+              <p class="benefit-card__desc">{{ b.description }}</p>
+            </mat-card-content>
+          </mat-card>
+        </mat-grid-tile>
+      }
+    </mat-grid-list>
+  </section>
+
+  <section class="landing-stats">
+    <div class="stats-ring">
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.sellers | number }}</span>
+        <span class="stat-label">فروشنده در شبکه</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.products | number }}</span>
+        <span class="stat-label">محصول منتشرشده</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.orders | number }}</span>
+        <span class="stat-label">سفارش پردازش‌شده</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">{{ stats.growth }}%</span>
+        <span class="stat-label">رشد سالانه</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-cta-section">
+    <div class="landing-cta-section__inner">
+      <h2 class="landing-cta-section__title">فروشگاهت را روشن کن</h2>
+      <p class="landing-cta-section__desc">ثبت‌نام فروشنده، تأیید سريع و ورود به شبکه با بیش از ۱۲۰۰ فروشنده فعال.</p>
+      <a mat-flat-button routerLink="/seller-register" class="landing-cta-section__btn">ثبت‌نام فروشنده ←</a>
+    </div>
+  </section>
+</section>

@@ -75,6 +75,13 @@ export class ProductCardComponent {
     return city;
   }
 
+  /** آیا حفاظت بازگشت وجه روی این محصول فعال است (تأمین‌کننده یا فروشنده تایید شده یا ضمانت پلتفرم). */
+  get isRefundCovered(): boolean {
+    const e = this.product.refundEligibility;
+    if (!e) return false;
+    return !!(e.supplierVerified || e.sellerVerified || e.platformGuarantee);
+  }
+
   /** هدایت به صفحه جزئیات محصول */
   openDetail(): void {
     this.router.navigate(['/product', this.product.id]);

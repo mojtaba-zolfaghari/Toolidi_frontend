@@ -5,6 +5,8 @@ import { AuthService } from '../../../core/services/api/auth.service';
 import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
 import { RegistrationUxService } from '../register/registration-ux.service';
+import { DocumentUploadService, UploadedDocument } from '../register/document-upload.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
  * TODO(task: TASK-FE-REGISTRATION-UX-INCOMPLETE)
@@ -51,12 +53,19 @@ export class SellerRegisterComponent implements OnInit, OnDestroy {
 
   private readonly UNSAVED_MESSAGE = 'شما تغییرات ذخیره‌نشده‌ای دارید. آیا می‌خواهید از این صفحه خارج شوید؟';
 
+  // TASK-FE-REGISTER-SELLER-ENHANCE — document upload states
+  sellerUploadedDocuments: UploadedDocument[] = [];
+  sellerUploadingDocuments: Array<{ name: string; progress: number; error: string }> = [];
+  sellerDocStepDone = false;
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly locationService: LocationService,
-    private readonly ux: RegistrationUxService
+    private readonly ux: RegistrationUxService,
+    private readonly docService: DocumentUploadService,
+    private readonly snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
       nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -170,7 +179,7 @@ export class SellerRegisterComponent implements OnInit, OnDestroy {
     return this.stepFields(step).every((field) => this.form.get(field)?.valid);
   }
 
-  /** ارسال اطلاعات حساب فروشنده به endpoint موجود احراز هویت. */
+  /** ارسال اطلاعات حساب فروشنده به endpoint موجود احراز هویت + آپلود مدارک. */
   submit(): void {
     this.touchStep(4);
     const value = this.form.getRawValue();
@@ -181,6 +190,11 @@ export class SellerRegisterComponent implements OnInit, OnDestroy {
     }
     if (value.password !== value.confirmPassword) {
       this.errorMessage = 'رمز عبور و تکرار آن یکسان نیستند.';
+      return;
+    }
+    if (!this.hasRequiredDocuments()) {
+      this.snackBar.open('حداقل یک مدارک (شناسنامه، پروانه کسب یا صورت‌حساب بانکی) آپلود کنید.', 'بستن', { duration: 5000 });
+      this.currentStep = 3;
       return;
     }
 
@@ -197,7 +211,7 @@ export class SellerRegisterComponent implements OnInit, OnDestroy {
         this.loading = false;
         if (result.isSuccess) {
           this.submitted = true;
-          this.successMessage = 'حساب فروشنده با موفقیت ایجاد شد. اکنون می‌توانید وارد پنل فروش خود شوید.';
+          this.successMessage = 'حساب فروشنده با موفقیت ایجاد شد. در حال بررسی مدارک شما هستیم (کمتر از ۳ روز کاری). اکنون می‌توانید وارد پنل فروش خود شوید.';
         } else {
           this.errorMessage = result.errorMessage ?? 'ثبت‌نام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
         }
@@ -242,6 +256,12 @@ export class SellerRegisterComponent implements OnInit, OnDestroy {
       4: ['terms']
     };
     return fields[step] ?? [];
+  }
+
+  /** TASK-FE-REGISTER-SELLER-ENHANCE — 유효성 검사는 문서 업로드 여부와 무관하게 진행되며,
+   *  제출 시점에 최소 1개 문서가 업로드되어 있어야 한다. */
+  hasRequiredDocuments(): boolean {
+    return this.sellerUploadedDocuments.length > 0;
   }
 
   private touchStep(step: number): void {

@@ -1,0 +1,118 @@
+:host {
+  display: block;
+}
+
+.certifications-section {
+  --cs-primary: var(--mat-sys-primary, #6C3FC5);
+  --cs-surface: #ffffff;
+  --cs-line: rgba(108, 63, 197, 0.14);
+  --cs-ink: var(--mat-sys-on-surface, #1B2A4A);
+  --cs-muted: #6b7280;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &__icon {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    color: var(--cs-primary);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--cs-ink);
+  }
+
+  &__sub {
+    margin: 0.1rem 0 0;
+    color: var(--cs-muted);
+    font-size: 0.8rem;
+  }
+
+  &__card {
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--cs-line);
+    background: var(--cs-surface);
+  }
+
+  &__card--empty {
+    background: linear-gradient(135deg, #f3f4f6 0%, var(--cs-surface) 100%);
+    border-color: rgba(107, 114, 128, 0.3);
+  }
+
+  &__list {
+    padding: 0;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+
+    &:not(:last-child) {
+      border-block-end: 1px solid #f1f5f9;
+    }
+  }
+
+  &__item-icon {
+    width: 1.4rem;
+    height: 1.4rem;
+    flex: 0 0 auto;
+    color: var(--cs-primary);
+  }
+
+  &__item-code {
+    margin: 0 0 0.1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--cs-primary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__item-title {
+    margin: 0;
+    font-weight: 600;
+    color: var(--cs-ink);
+    font-size: 0.95rem;
+  }
+
+  &__item-more {
+    margin-inline-start: auto;
+    color: var(--cs-muted);
+
+    &:hover {
+      color: var(--cs-primary);
+    }
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 1.25rem 1.25rem;
+  }
+
+  &__icon {
+    width: 1.8rem;
+    height: 1.8rem;
+    color: var(--cs-muted);
+  }
+
+  &__empty-text {
+    margin: 0;
+    color: var(--cs-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}

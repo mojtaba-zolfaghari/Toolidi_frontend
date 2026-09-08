@@ -1,0 +1,371 @@
+:host {
+  display: block;
+}
+
+/* ─── صفحه ─── */
+.al-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 32px 20px 48px;
+  background: #f6f8fc;
+  color: #17233d;
+}
+
+.al-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(4px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.al-glow--one {
+  width: 280px;
+  height: 280px;
+  top: -120px;
+  right: 6%;
+  background: rgba(79, 141, 232, 0.16);
+}
+
+.al-glow--two {
+  width: 240px;
+  height: 240px;
+  bottom: -110px;
+  left: 6%;
+  background: rgba(255, 181, 71, 0.14);
+}
+
+/* ─── نوار بالا ─── */
+.al-topbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1120px;
+  margin: 0 auto 8px;
+}
+
+.al-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #17233d;
+  font-size: 20px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.al-brand__mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  color: #fff;
+  background: linear-gradient(145deg, #4f8de8, #6ca9f3);
+  box-shadow: 0 8px 24px rgba(79, 141, 232, 0.35);
+}
+
+.al-topbar__login {
+  color: #64748b;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.al-topbar__login strong {
+  color: #4b82d5;
+  font-weight: 800;
+}
+
+/* ─── سرصفحه ─── */
+.al-head {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 28px auto 0;
+  text-align: center;
+}
+
+.al-head__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid rgba(79, 141, 232, 0.25);
+  border-radius: 999px;
+  color: #3f74c4;
+  background: rgba(79, 141, 232, 0.08);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.al-head__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2bb98a;
+  box-shadow: 0 0 0 6px rgba(43, 185, 138, 0.12);
+  animation: al-pulse 2s ease-in-out infinite;
+}
+
+.al-head__title {
+  margin: 18px 0 0;
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.al-head__sub {
+  max-width: 520px;
+  margin: 12px auto 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 2;
+}
+
+/* ─── شبکه کارت‌ها ─── */
+.al-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 18px;
+  max-width: 1120px;
+  margin: 36px auto 0;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .al-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .al-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ─── کارت نقش ─── */
+.al-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 22px 20px;
+  border: 1px solid rgba(226, 232, 241, 0.9);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 34px rgba(33, 52, 91, 0.08);
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.al-card:hover,
+.al-card:focus-visible {
+  transform: translateY(-5px);
+  border-color: var(--al-accent, #4f8de8);
+  box-shadow: 0 18px 44px rgba(33, 52, 91, 0.14);
+}
+
+.al-card__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: var(--al-accent, #4f8de8);
+  background: var(--al-accent-soft, rgba(79, 141, 232, 0.12));
+  box-shadow: inset 0 0 0 1px var(--al-accent-soft, transparent);
+}
+
+.al-card__icon mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.al-card__title {
+  margin: 16px 0 0;
+  color: #162342;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.al-card__desc {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.9;
+  min-height: 44px;
+}
+
+.al-card__features {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.al-card__features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 11.5px;
+}
+
+.al-card__features mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--al-accent, #4f8de8);
+}
+
+.al-card__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 0 14px 0 12px;
+  margin-top: 18px;
+  border-radius: 13px;
+  color: var(--al-accent, #4f8de8);
+  background: var(--al-accent-soft, rgba(79, 141, 232, 0.12));
+  font-size: 12.5px;
+  font-weight: 800;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.al-card:hover .al-card__cta {
+  color: #fff;
+  background: var(--al-accent, #4f8de8);
+}
+
+.al-card__cta-arrow {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+.al-card:hover .al-card__cta-arrow {
+  transform: translateX(-4px);
+}
+
+/* ─── راهنمای ورود ─── */
+.al-login-hint {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 720px;
+  margin: 30px auto 0;
+  padding: 16px 20px;
+  border: 1px solid rgba(226, 232, 241, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 22px rgba(33, 52, 91, 0.06);
+}
+
+.al-login-hint__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: #4f8de8;
+  background: rgba(79, 141, 232, 0.1);
+}
+
+.al-login-hint__text {
+  margin: 0;
+  color: #475569;
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+
+.al-login-hint__link {
+  color: #4b82d5;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.al-login-hint__link:hover {
+  text-decoration: underline;
+}
+
+/* ─── ردیف اعتماد ─── */
+.al-trust {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 22px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+@keyframes al-pulse {
+  50% {
+    transform: scale(1.2);
+    opacity: 0.65;
+  }
+}
+
+/* ─── واکنش‌گرا ─── */
+@media (max-width: 699px) {
+  .al-page {
+    padding: 20px 14px 36px;
+  }
+
+  .al-topbar {
+    margin-bottom: 0;
+  }
+
+  .al-topbar__login {
+    font-size: 11px;
+  }
+
+  .al-head {
+    margin-top: 20px;
+  }
+
+  .al-head__title {
+    font-size: 24px;
+  }
+
+  .al-head__sub {
+    font-size: 12px;
+  }
+
+  .al-card {
+    padding: 22px 18px 18px;
+  }
+
+  .al-card__desc {
+    min-height: 0;
+  }
+
+  .al-login-hint {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

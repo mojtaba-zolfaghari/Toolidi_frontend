@@ -105,6 +105,16 @@ export interface Product {
   images?: ProductImage[];
   variations?: ProductVariation[];
   attributes?: ProductAttribute[];
+
+  /** حفاظت بازگشت وجه — TODO(task: TASK-FE-PRODUCT-CARD-REFUND-DISPLAY، TASK-FE-PRODUCT-DETAIL-REFUND-DETAIL):
+   * سطوح اعمال ضمانت‌ها روی این محصول.
+   * هر سطح false㎡당 قید پلتفرم اعمال می‌شود.
+   * 기억: BE should populate this when refund-guard logic lands (TASK-BE-REFUND-LOGIC-3LEVEL). */
+  refundEligibility?: {
+    supplierVerified?: boolean;
+    sellerVerified?: boolean;
+    platformGuarantee?: boolean;
+  };
 }
 
 /** داده‌ی ایجاد محصول جدید */

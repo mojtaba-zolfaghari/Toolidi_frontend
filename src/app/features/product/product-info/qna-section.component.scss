@@ -1,0 +1,138 @@
+:host {
+  display: block;
+}
+
+.qna-section {
+  --qna-primary: var(--mat-sys-primary, #6C3FC5);
+  --qna-surface: #ffffff;
+  --qna-line: rgba(108, 63, 197, 0.14);
+  --qna-ink: var(--mat-sys-on-surface, #1B2A4A);
+  --qna-muted: #6b7280;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &__icon {
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    color: var(--qna-primary);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--qna-ink);
+  }
+
+  &__sub {
+    margin: 0.1rem 0 0;
+    color: var(--qna-muted);
+    font-size: 0.8rem;
+  }
+
+  &__card {
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--qna-line);
+    background: var(--qna-surface);
+  }
+
+  &__card--empty {
+    background: linear-gradient(135deg, #f3f4f6 0%, var(--qna-surface) 100%);
+    border-color: rgba(107, 114, 128, 0.3);
+  }
+
+  &__list {
+    padding: 0;
+  }
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+
+    &:not(:last-child) {
+      border-block-end: 1px solid #f1f5f9;
+    }
+  }
+
+  &__item-icon {
+    width: 1.4rem;
+    height: 1.4rem;
+    flex: 0 0 auto;
+    margin-block-start: 0.1rem;
+    color: var(--qna-primary);
+  }
+
+  &__item-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  &__item-question {
+    margin: 0;
+    font-weight: 600;
+    color: var(--qna-ink);
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  &__item-answer {
+    margin: 0;
+    color: var(--qna-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  &__item-by {
+    font-size: 0.7rem;
+    color: var(--qna-muted);
+    white-space: nowrap;
+    border-inline-end: 1px solid var(--qna-line);
+    padding-inline-end: 0.5rem;
+    margin-inline-end: 0.5rem;
+  }
+
+  &__ask {
+    padding: 0.9rem 1rem 1rem;
+    border-block-start: 1px solid var(--qna-line);
+  }
+
+  &__ask-btn {
+    width: 100%;
+    justify-content: center;
+    border-color: var(--qna-primary);
+    color: var(--qna-primary);
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 1.25rem;
+  }
+
+  &__icon {
+    width: 1.8rem;
+    height: 1.8rem;
+    color: var(--qna-muted);
+  }
+
+  &__empty-text {
+    margin: 0;
+    color: var(--qna-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
