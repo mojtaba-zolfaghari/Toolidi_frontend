@@ -13,6 +13,7 @@ import { SellerPayoutsComponent } from './pages/payouts/seller-payouts.component
 import { SellerSurveysComponent } from './pages/surveys/seller-surveys.component';
 import { SellerCostsComponent } from './pages/costs/seller-costs.component';
 import { SellerOrdersComponent } from './pages/orders/seller-orders.component';
+import { OrderChatComponent } from '../../shared/components/order-chat/order-chat.component';
 import { SellerProfileComponent } from './pages/profile/seller-profile.component';
 import { SellerTaminetoComponent } from './pages/tamineto/seller-tamineto.component';
 
@@ -42,6 +43,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
+    OrderChatComponent,
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     SharedModule,

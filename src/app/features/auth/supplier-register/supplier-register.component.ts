@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/api/auth.service';
 import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
 import { RegistrationUxService } from '../register/registration-ux.service';
+import { DocumentUploadService } from '../register/document-upload.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
@@ -60,7 +61,7 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
 
   // Document upload state
   private readonly UNSAVED_MESSAGE = 'شما تغییرات ذخیرهنشدهای دارید. آیا میخواهید از این صفحه خارج شوید؟';
-  supplierUploadedFiles: Array<{ name: string; url?: string; size?: number }> = [];
+  supplierUploadedFiles: Array<{ file: File; name: string; url?: string; size?: number }> = [];
   supplierUploadingFiles: UploadFileState[] = [];
 
   constructor(
@@ -69,7 +70,8 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly locationService: LocationService,
     private readonly ux: RegistrationUxService,
-    private readonly snackBar: MatSnackBar
+    private readonly snackBar: MatSnackBar,
+    private readonly docService: DocumentUploadService
   ) {
     this.form = this.fb.group({
       nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -186,7 +188,7 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
 
   hasError(field: string): boolean {
     const control = this.form.get(field);
-    return !!control?.invalid && !!control?.touched;
+    return !!(control && control.invalid && control.touched);
   }
 
   submit(): void {
@@ -231,20 +233,44 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
     };
 
     this.authService.registerSeller(data).subscribe({
-      next: (result) => {
-        this.loading = false;
-        if (result.isSuccess) {
-          this.submitted = true;
-          this.successMessage = 'ثبت‌نام تأمین‌کننده با موفقیت انجام شد. در حال بررسی مدارک شما هستیم (کمتر از ۳ روز کاری). اکنون می‌توانید وارد پنل تأمین‌کننده خود شوید.';
-        } else {
-          this.errorMessage = result.errorMessage ?? 'ثبتنام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
+      next: async (regResult) => {
+        if (!regResult.isSuccess) {
+          this.loading = false;
+          this.errorMessage = regResult.errorMessage ?? 'ثبت‌نام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
+          return;
         }
+
+        // آپلود مدارک روی سرور پس از دریافت توکن JWT
+        await this.uploadSupplierDocuments();
+
+        this.submitted = true;
+        this.successMessage = 'ثبت‌نام تأمین‌کننده با موفقیت انجام شد. مدارک شما در حال بررسی هستند (کمتر از ۳ روز کاری). اکنون می‌توانید وارد پنل تأمین‌کننده خود شوید.';
       },
       error: (err: Error) => {
         this.loading = false;
         this.errorMessage = err?.message ?? 'خطا در ارتباط با سرور';
       }
     });
+  }
+
+  /** آپلود همه‌ی مدارک تأمینکننده روی سرور پس از ثبت‌نام. */
+  private async uploadSupplierDocuments(): Promise<void> {
+    for (const entry of this.supplierUploadedFiles) {
+      this.docService.upload(
+        entry.file,
+        '/api/v1/suppliers/documents',
+        { documentType: 'other' }
+      ).subscribe({
+        next: (uploadResult) => {
+          if (!uploadResult.ok) {
+            console.warn(`آپلود فایل ${entry.name} ناموفق بود: ${uploadResult.error}`);
+          }
+        },
+        error: (err: Error) => {
+          console.warn(`خطا در آپلود ${entry.name}:`, err.message);
+        }
+      });
+    }
   }
 
   goToSupplierPanel(): void {
@@ -289,7 +315,7 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
         continue;
       }
       this.supplierUploadingFiles.push({ file, progress: 100, error: '' });
-      this.supplierUploadedFiles.push({ name: file.name, size: file.size });
+      this.supplierUploadedFiles.push({ file, name: file.name, size: file.size });
     }
   }
 

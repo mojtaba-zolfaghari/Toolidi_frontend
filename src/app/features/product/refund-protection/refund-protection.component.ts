@@ -1,6 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  Input,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { Router } from '@angular/router';
@@ -21,7 +25,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./refund-protection.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatCardModule, MatListModule],
+  imports: [CommonModule, MatCardModule, MatListModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class RefundProtectionComponent {
   @Input() eligibility:

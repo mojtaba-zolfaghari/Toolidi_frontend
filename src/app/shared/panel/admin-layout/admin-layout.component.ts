@@ -202,6 +202,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
             { label: 'سفارشات', path: '/supplier/orders', icon: '🧾', matIcon: 'receipt_long', badge: () => this.unreadChatCount },
             { label: 'ظرفیت تولید', path: '/supplier/production-capacity', icon: '🏭', matIcon: 'factory' },
             { label: 'زمان‌بندی تولید', path: '/supplier/production-schedule', icon: '📅', matIcon: 'schedule' },
+            { label: 'مدارک تأیید', path: '/supplier/documents', icon: '📄', matIcon: 'badge' },
             { label: 'پروفایل', path: '/supplier/profile', icon: '⚙️', matIcon: 'settings' }
           ]
         }

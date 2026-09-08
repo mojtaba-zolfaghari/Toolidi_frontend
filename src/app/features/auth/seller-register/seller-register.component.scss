@@ -1,4 +1,4 @@
-:host { display: block; }
+:host { display: block; height: 100vh; overflow: hidden; }
 
 .seller-register-shell {
   --seller-ink: #15152f;
@@ -6,7 +6,7 @@
   --seller-purple: #6557d8;
   --seller-gold: #f5c86b;
   --seller-mint: #5be3b0;
-  min-height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   padding: 1.25rem;
@@ -42,7 +42,7 @@
 /* ─── layout ─── */
 .seller-register-layout {
   width: min(1180px, 100%);
-  min-height: calc(100vh - 2.5rem);
+  height: 100%;
   margin: auto;
   display: grid;
   grid-template-columns: minmax(390px, .9fr) minmax(520px, 1.1fr);
@@ -271,6 +271,9 @@
 
 /* ─── form panel ─── */
 .seller-form-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding: clamp(1.5rem, 4vw, 4rem);
   background: rgba(255,255,255,.9);
 }
@@ -278,7 +281,16 @@
 .seller-form-eyebrow { color: #6557d8; }
 .seller-login-link { color: #687492; font-size: .78rem; font-weight: 700; text-decoration: none; }
 .seller-login-link:hover { color: #5146bd; }
-.seller-form-content { max-width: 38rem; margin: clamp(3rem, 8vh, 6rem) auto 0; }
+.seller-form-content {
+  flex: 1;
+  min-height: 0;
+  max-width: 38rem;
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: clamp(1.5rem, 5vh, 3rem) .25rem clamp(1rem, 3vh, 2rem);
+  scrollbar-width: thin;
+  scrollbar-color: #cfd6e4 transparent;
+}
 .seller-form-heading { display: flex; align-items: center; gap: 1rem; }
 .seller-form-icon {
   display: grid;
@@ -337,7 +349,7 @@
 }
 
 /* ─── steps ─── */
-.seller-step { min-height: 22rem; animation: sellerStepIn .35s ease both; }
+.seller-step { min-height: min(22rem, 100%); animation: sellerStepIn .35s ease both; }
 .seller-step-heading { display: flex; gap: .85rem; align-items: flex-start; margin-bottom: 1.7rem; }
 .seller-step-heading > span { color: #6557d8; font-size: .72rem; font-weight: 900; }
 .seller-step-heading h3 { margin: 0; font-size: 1.08rem; }
@@ -675,7 +687,12 @@
    Responsive
    ═══════════════════════════════════════════════════ */
 @media (max-width: 880px) {
-  .seller-register-layout { grid-template-columns: 1fr; }
+  /* stacked layout: release the viewport lock and scroll normally */
+  :host { height: auto; overflow: visible; }
+  .seller-register-shell { height: auto; }
+  .seller-register-layout { height: auto; grid-template-columns: 1fr; }
+  .seller-form-panel { display: block; overflow: visible; }
+  .seller-form-content { overflow: visible; padding: clamp(2rem, 6vh, 3rem) 0 0; }
   .seller-visual-panel { min-height: auto; }
   .seller-visual-copy { margin-top: 3rem; }
   .seller-benefits { grid-template-columns: repeat(3, 1fr); }

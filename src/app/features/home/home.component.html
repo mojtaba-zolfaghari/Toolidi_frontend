@@ -16,9 +16,9 @@
       <div class="hero__copy" [class.animate-in]="heroLoaded">
         <p class="hero__badge">
           <span class="hero__badge-dot" aria-hidden="true"></span>
-          پلتفرم B2B برای خرید و فروش عمده
+          بازار B2B تولیدی
         </p>
-        <h1 class="hero-title">خرید عمده از <span class="hero__title-accent">تامین‌کنندگان</span> معتبر</h1>
+        <h1 class="hero-title">خرید و فروش عمده از <span class="hero__title-accent">تامین‌کنندگان</span> معتبر</h1>
         <p class="hero__subtitle">قیمت کارخانه، تحویل سریع و مدیریت کامل فروش در یک پلتفرم.</p>
 
         <div class="hero__actions">
@@ -112,6 +112,29 @@
               </a>
             </mat-card-actions>
           </mat-card>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
+  <section class="how-it-works" data-section="workflow">
+    <div class="home-container">
+      <header class="section-head section-head--center">
+        <p class="section-kicker">چطور کار می‌کند</p>
+        <h2 class="section-title">چهار مرحله تا شروع</h2>
+        <p class="section-sub">ثبت‌نام، تأیید، فعالیت و فروش — همه در چهار گام ساده.</p>
+      </header>
+
+      <div class="workflow-steps-grid" [class.animate-in]="sectionVisibility['workflow']">
+        @for (step of workflowSteps; track step.id; let i = $index) {
+          <div class="workflow-step" [class.workflow-step--active]="step.status === 'active'" [class.workflow-step--done]="step.status === 'completed'">
+            <div class="workflow-step__number">{{ step.id }}</div>
+            <div class="workflow-step__icon">{{ step.icon }}</div>
+            <h3 class="workflow-step__title">{{ step.title }}</h3>
+            <p class="workflow-step__desc">{{ step.description }}</p>
+            <span class="workflow-step__role">{{ step.role === 'producer' ? 'تولیدکننده' : step.role === 'buyer' ? 'خریدار' : 'پیک' }}</span>
+          </div>
         }
       </div>
     </div>

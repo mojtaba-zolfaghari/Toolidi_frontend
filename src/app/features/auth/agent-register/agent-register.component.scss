@@ -1,6 +1,4 @@
-:host {
-  display: block;
-}
+:host { display: block; height: 100vh; overflow: hidden; }
 
 .agent-register-shell {
   --ink: #101b35;
@@ -8,7 +6,7 @@
   --mint: #55e6b0;
   --blue: #63a6ff;
   --gold: #f6c85f;
-  min-height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   padding: 1.25rem;
@@ -43,7 +41,7 @@
 
 .agent-register-layout {
   width: min(1180px, 100%);
-  min-height: calc(100vh - 2.5rem);
+  height: 100%;
   margin: auto;
   display: grid;
   grid-template-columns: minmax(390px, 0.9fr) minmax(520px, 1.1fr);
@@ -202,12 +200,27 @@
 .agent-benefits small { margin-top: 0.2rem; color: rgba(255,255,255,0.48); font-size: 0.66rem; }
 .benefit-icon { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 0.7rem; color: #0c1934; background: rgba(255,255,255,0.88); }
 
-.agent-form-panel { padding: clamp(1.5rem, 4vw, 4rem); background: rgba(255,255,255,0.88); }
+.agent-form-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: clamp(1.5rem, 4vw, 4rem);
+  background: rgba(255,255,255,0.88);
+}
 .agent-form-topline { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .agent-form-eyebrow { color: #4c65a5; }
 .agent-login-link { color: #687492; font-size: 0.78rem; font-weight: 700; text-decoration: none; }
 .agent-login-link:hover { color: #3155ad; }
-.agent-form-content { max-width: 38rem; margin: clamp(3rem, 8vh, 6rem) auto 0; }
+.agent-form-content {
+  flex: 1;
+  min-height: 0;
+  max-width: 38rem;
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: clamp(1.5rem, 5vh, 3rem) 0.25rem clamp(1rem, 3vh, 2rem);
+  scrollbar-width: thin;
+  scrollbar-color: #cfd6e4 transparent;
+}
 .agent-form-heading { display: flex; align-items: center; gap: 1rem; }
 .form-icon { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border: 1px solid rgba(99,166,255,0.24); border-radius: 1.2rem; font-size: 1.65rem; background: linear-gradient(145deg, #eef6ff, #f1fff9); box-shadow: 0 12px 25px rgba(68, 109, 185, 0.12); }
 .agent-form-heading h2 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.1rem); line-height: 1.35; }
@@ -222,7 +235,7 @@
 .progress-line { height: 3px; margin: -0.95rem 1.5rem 2.2rem; overflow: hidden; border-radius: 999px; background: #edf0f6; }
 .progress-line span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), var(--blue)); transition: width 0.45s cubic-bezier(0.2,0.8,0.2,1); }
 
-.agent-step { min-height: 22rem; animation: stepIn 0.38s ease both; }
+.agent-step { min-height: min(22rem, 100%); animation: stepIn 0.38s ease both; }
 .step-heading { display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 1.7rem; }
 .step-heading > span { color: #5a7bd0; font-size: 0.72rem; font-weight: 900; }
 .step-heading h3 { margin: 0; font-size: 1.08rem; }
@@ -267,7 +280,7 @@
 .secondary-action { border: 1px solid #e1e6ef; color: #687492; background: #fff; }
 .secondary-action:hover { border-color: #9fb2dd; color: #3155ad; }
 
-.agent-success-state { max-width: 34rem; margin: clamp(4rem, 12vh, 9rem) auto 0; text-align: center; }
+.agent-success-state { max-width: 34rem; margin: clamp(1.5rem, 6vh, 4rem) auto 0; text-align: center; }
 .success-ring { display: grid; place-items: center; width: 5rem; height: 5rem; margin: 0 auto 1.5rem; border: 1px solid rgba(85,230,176,0.45); border-radius: 50%; color: #087c5a; background: #e3fff4; box-shadow: 0 0 0 12px rgba(85,230,176,0.08); animation: successPop 0.65s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
 .success-ring span { font-size: 2rem; font-weight: 900; }
 .agent-success-state h2 { margin-top: 1rem; font-size: 2rem; }
@@ -285,7 +298,12 @@
 @keyframes successPop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
 
 @media (max-width: 880px) {
-  .agent-register-layout { grid-template-columns: 1fr; }
+  /* stacked layout: release the viewport lock and scroll normally */
+  :host { height: auto; overflow: visible; }
+  .agent-register-shell { height: auto; }
+  .agent-register-layout { height: auto; grid-template-columns: 1fr; }
+  .agent-form-panel { display: block; overflow: visible; }
+  .agent-form-content { overflow: visible; padding: clamp(2rem, 6vh, 3rem) 0 0; }
   .agent-visual-panel { min-height: auto; }
   .agent-visual-copy { margin-top: 3rem; }
   .agent-benefits { grid-template-columns: repeat(3, 1fr); }

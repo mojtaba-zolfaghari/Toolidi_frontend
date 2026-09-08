@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
+import { PersianNumberPipe } from '../../../shared/persian-number.pipe';
 
 import { PriceTier } from './product-info.models';
 
@@ -20,7 +21,7 @@ import { PriceTier } from './product-info.models';
   styleUrls: ['./tiered-pricing-block.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatTooltipModule, MatListModule, MatCardModule],
+  imports: [CommonModule, PersianNumberPipe, MatIconModule, MatTooltipModule, MatListModule, MatCardModule],
 })
 export class TieredPricingBlockComponent {
   @Input() tiers?: PriceTier[] | null = null;

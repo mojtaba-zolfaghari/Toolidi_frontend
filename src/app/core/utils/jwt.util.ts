@@ -39,6 +39,20 @@ export function getRoleFromToken(token: string): string | null {
   );
 }
 
+/** استخراج شناسه تولیدکننده (supplierId) از توکن JWT. */
+export function getSupplierIdFromToken(token: string): string | null {
+  const payload = decodeJwtPayload(token);
+  if (!payload) {
+    return null;
+  }
+
+  return (
+    (payload['supplierId'] as string | undefined) ??
+    (payload['SupplierId'] as string | undefined) ??
+    null
+  );
+}
+
 /** استخراج نام کاربری از توکن JWT. */
 export function getUsernameFromToken(token: string): string | null {
   const payload = decodeJwtPayload(token);

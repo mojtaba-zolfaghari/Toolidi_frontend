@@ -100,4 +100,31 @@ export class SupplierService {
   updateProfile(data: any): Observable<Result<any>> {
     return this.api.put<Result<any>>('/v1/suppliers/profile', data);
   }
+
+  /** مدرک بارگذاری‌شده‌ی تولیدکننده */
+  uploadDocument(file: File, documentType: string): Observable<Result<string>> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    form.append('documentType', documentType);
+    return this.api.post<Result<string>>('/v1/suppliers/documents', form);
+  }
+
+  /** فهرست مدارک تولیدکننده جاری (شناسه از توکن) */
+  getMyDocuments(supplierId: string): Observable<Result<SupplierDocument[]>> {
+    return this.api.get<Result<SupplierDocument[]>>(`/v1/suppliers/documents/${supplierId}`);
+  }
+}
+
+/** مدرک بارگذاری‌شده‌ی تولیدکننده (سمت خودِ تولیدکننده) */
+export interface SupplierDocument {
+  id: string;
+  supplierId: string;
+  documentType: string;
+  fileName: string;
+  url: string;
+  contentType: string;
+  fileSizeBytes: number;
+  isVerified: boolean;
+  verificationNote?: string;
+  createdAt: string;
 }

@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
+import { ApiService } from '../../../core/services/api.service';
 import { Result } from '../../../core/models/api-response.model';
 
 /**
- * TODO(task: TASK-FE-REGISTER-SELLER-ENHANCE, TASK-FE-REGISTER-SUPPLIER-ENHANCE):
  * بهبود فرم ثبت‌نام فروشنده/تولیدکننده — آپلود مدارک + جریان تأیید
  *
  * Shared helper for document uploads so seller and supplier flows do not
@@ -17,16 +18,22 @@ import { Result } from '../../../core/models/api-response.model';
  * - نمایش نوار پیشرفت هنگام آپلود
  * - پیام خطا/موفقیت برای هر فایل
  *
- * Current backend does NOT expose POST /api/v1/sellers/documents or
- * POST /api/v1/suppliers/documents yet. This service simulates upload
- * progress and returns mock results so UI and validation can be tested now.
- * Replace simulateUploadWithProgress with a real multipart call when the
- * backend is ready.
+ * Backend endpoints used (both require JWT):
+ *   POST /api/v1/sellers/documents      — SellerController.UploadDocument
+ *   POST /api/v1/suppliers/documents    — SupplierDocumentController.Upload
+ *
+ * Flow: register first (gets JWT via AuthService) → then upload documents.
  */
 @Injectable({ providedIn: 'root' })
 export class DocumentUploadService {
   readonly allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
   readonly maxBytes = 5 * 1024 * 1024; // 5 MB
+
+  private readonly isBrowser: boolean;
+
+  constructor(private readonly api: ApiService, @Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   /** Validate one file and return a Persian-ready status. */
   validate(file: File): DocumentValidationResult {
@@ -42,51 +49,48 @@ export class DocumentUploadService {
     return { ok: true, reason: '' };
   }
 
-  /** Upload one file and emit progress + final result. */
+  /** واقعی — آپلود روی سرور با HTTP multipart (دسترس‌پذیر با JWT). */
   upload(
     file: File,
     endpoint: string,
-    options?: { simulateProgress?: boolean }
+    additionalFields?: Record<string, string | number | boolean>
   ): Observable<DocumentUploadResult> {
     const validation = this.validate(file);
     if (!validation.ok) {
       return of({ ok: false, fileName: file.name, progress: 100, error: validation.reason });
     }
 
-    return this.simulateUploadWithProgress(file, options).pipe(
-      map((progress) => ({
-        ok: true,
+    if (!this.isBrowser) {
+      // SSR context falls back to synthetic success
+      return of({ ok: true, fileName: file.name, progress: 100, error: '' });
+    }
+
+    return this.api.upload<Result<{ id: string; url: string; fileName: string }>>(
+      endpoint,
+      file,
+      additionalFields ?? {}
+    ).pipe(
+      map((result) => ({
+        ok: result.isSuccess,
         fileName: file.name,
-        progress,
-        error: ''
+        progress: 100,
+        error: result.isSuccess ? '' : (result.errorMessage ?? 'خطا در آپلود فایل')
       }))
     );
   }
 
-  /**
-   * Simulate upload progress for UI testing.
-   * TODO: replace with real multipart POST when backend endpoints exist.
-   */
-  private simulateUploadWithProgress(
-    file: File,
-    options?: { simulateProgress?: boolean }
-  ): Observable<number> {
-    const steps = options?.simulateProgress ? [0, 30, 70, 100] : [100];
-    return of(...steps).pipe(delay(0));
-  }
-
-  /** Mock document submission that returns a pending-review status. */
+  /** ارسال لیست اسناد برای بررسی (دسترسی پس از پیاده‌سازی endpoint واقعی). */
   submitDocuments(endpoint: string, ids: string[]): Observable<Result<{ status: string; estimatedMinutes: number }>> {
-    // When backend endpoints exist, POST /api/v1/sellers/documents or
-    // POST /api/v1/suppliers/documents should be used here.
+    // پس از پیاده‌سازی endpoint واقعی، این روش باید آی‌دی‌های گزارش را به سرور می‌فرستد.
+    // در حال حاضر به‌عنوان UX stub عمل می‌کند.
     return of({
       isSuccess: true,
       data: { status: 'PendingReview', estimatedMinutes: 180 }
-    }).pipe(delay(0));
+    }).pipe(map(() => ({ isSuccess: true, data: { status: 'PendingReview', estimatedMinutes: 180 } })));
   }
 }
 
-/** A document the seller has uploaded during registration (minimal shape for now). */
+/** سندی که در حین ثبت‌نام آپلود شده است (شکل UI فقط). */
 export interface UploadedDocument {
   fileName: string;
   uploadedAt: Date;

@@ -17,6 +17,8 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './refund-badge.component.html',
   styleUrls: ['./refund-badge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [CommonModule, MatIconModule, MatTooltipModule]
 })
 export class RefundBadgeComponent {
   /** آیا دو طرف (تأمین‌کننده و فروشنده) تایید شده‌اند یا ضمانت پلتفرم شامل می‌شود. */

@@ -130,6 +130,126 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   How It Works Section
+   ═══════════════════════════════════════════════════════════════ */
+
+.how-it-works {
+  background: var(--mat-sys-surface-container-high);
+  padding-block: 5rem;
+}
+
+.workflow-steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .workflow-steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .workflow-steps-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.workflow-step {
+  position: relative;
+  background: var(--mat-sys-surface);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.workflow-step.animate-in {
+  animation: workflowStepIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.workflow-step:nth-child(1).animate-in { animation-delay: 0.1s; }
+.workflow-step:nth-child(2).animate-in { animation-delay: 0.2s; }
+.workflow-step:nth-child(3).animate-in { animation-delay: 0.3s; }
+.workflow-step:nth-child(4).animate-in { animation-delay: 0.4s; }
+
+.workflow-step--active {
+  border-color: var(--mat-sys-primary);
+  box-shadow: 0 0 0 3px rgba(108, 63, 197, 0.12), 0 8px 24px rgba(108, 63, 197, 0.1);
+}
+
+.workflow-step--done {
+  border-color: #10b981;
+  background: linear-gradient(135deg, var(--mat-sys-surface) 0%, #ecfdf5 100%);
+}
+
+.workflow-step__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--mat-sys-primary);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.workflow-step--done .workflow-step__number {
+  background: #10b981;
+}
+
+.workflow-step__icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.workflow-step__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--mat-sys-on-surface);
+}
+
+.workflow-step__desc {
+  margin: 0 0 1rem;
+  color: var(--mat-sys-outline);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.workflow-step__role {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.workflow-step--done .workflow-step__role {
+  background: #10b981;
+  color: #fff;
+}
+
+@keyframes workflowStepIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Section Header Centered
    ═══════════════════════════════════════════════════════════════ */
 

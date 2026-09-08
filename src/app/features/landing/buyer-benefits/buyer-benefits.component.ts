@@ -1,9 +1,11 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe, NgFor } from '@angular/common';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 
@@ -22,7 +24,7 @@ import { MatRippleModule } from '@angular/material/core';
     styleUrls: ['./buyer-benefits.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [RouterLink, MatButtonModule, MatCardModule, MatIconModule, MatRippleModule]
+    imports: [RouterLink, NgFor, DecimalPipe, MatButtonModule, MatCardModule, MatGridListModule, MatIconModule, MatRippleModule]
 })
 export class BuyerBenefitsComponent {
   readonly benefits = [

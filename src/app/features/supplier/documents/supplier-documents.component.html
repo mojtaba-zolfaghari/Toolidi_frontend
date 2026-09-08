@@ -1,0 +1,133 @@
+<section dir="rtl" class="supdoc-page">
+
+  <app-page-header
+    title="مدارک تأیید هویت"
+    subtitle="بارگذاری و پیگیری مدارک تأیید تولیدکننده"
+    [breadcrumbs]="[{ label: 'پنل تأمین‌کننده', link: '/supplier' }, { label: 'مدارک' }]">
+  </app-page-header>
+
+  <!-- Overall status banner -->
+  <div class="supdoc-status" [ngClass]="'supdoc-status--' + overallStatus">
+    <mat-icon [ngSwitch]="overallStatus">
+      <ng-container *ngSwitchCase="'verified'">verified</ng-container>
+      <ng-container *ngSwitchCase="'rejected'">error</ng-container>
+      <ng-container *ngSwitchCase="'pending'">hourglass_top</ng-container>
+      <ng-container *ngSwitchDefault>info</ng-container>
+    </mat-icon>
+    <div>
+      <strong>{{ statusLabels[overallStatus] }}</strong>
+      @if (overallStatus === 'none') {
+        <p>برای فعال‌سازی حساب خود، مدارک تأیید هویت را بارگذاری کنید.</p>
+      } @else if (overallStatus === 'pending') {
+        <p>مدارک شما در انتظار بررسی توسط پشتیبانی است.</p>
+      } @else if (overallStatus === 'rejected') {
+        <p>یکی از مدارک رد شده است؛ دلیل را در جدول ببینید و فایل اصلاح‌شده را بارگذاری کنید.</p>
+      } @else {
+        <p>همه مدارک شما تأیید شده است.</p>
+      }
+    </div>
+  </div>
+
+  <p *ngIf="errorMessage" class="admin-alert admin-alert--error">{{ errorMessage }}</p>
+
+  <!-- Upload form -->
+  <mat-card class="supdoc-upload">
+    <mat-card-header>
+      <mat-card-title>بارگذاری مدرک جدید</mat-card-title>
+      <mat-card-subtitle>فرمت‌های مجاز: PDF، JPG، PNG — حداکثر ۵ مگابایت</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="supdoc-upload__fields">
+        <mat-form-field appearance="outline">
+          <mat-label>نوع مدرک</mat-label>
+          <mat-select [(value)]="selectedType">
+            @for (t of documentTypes; track t.value) {
+              <mat-option [value]="t.value">{{ t.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <label class="supdoc-upload__file-label">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)" hidden />
+          <span class="supdoc-upload__file-btn" matRipple>
+            <mat-icon>upload_file</mat-icon>
+            {{ selectedFile ? selectedFile.name : 'انتخاب فایل…' }}
+          </span>
+        </label>
+
+        <button
+          mat-flat-button
+          color="primary"
+          [disabled]="!selectedFile || uploading"
+          (click)="upload()">
+          @if (uploading) {
+            <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+          } @else {
+            <mat-icon>cloud_upload</mat-icon>
+          }
+          بارگذاری
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Documents table -->
+  <mat-card class="supdoc-list">
+    <mat-card-header>
+      <mat-card-title>مدارک من</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      @if (loading) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      } @else if (documents.length === 0) {
+        <app-empty-state
+          icon="folder_off"
+          title="هنوز مدرکی بارگذاری نکرده‌اید"
+          message="اولین مدرک خود را از فرم بالا بارگذاری کنید."></app-empty-state>
+      } @else {
+        <table mat-table [dataSource]="documents" class="supdoc-table">
+
+          <ng-container matColumnDef="documentType">
+            <th mat-header-cell *matHeaderCellDef>نوع مدرک</th>
+            <td mat-cell *matCellDef="let doc">{{ typeLabel(doc) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fileName">
+            <th mat-header-cell *matHeaderCellDef>فایل</th>
+            <td mat-cell *matCellDef="let doc">
+              <a [href]="fileUrl(doc)" target="_blank" rel="noopener" class="supdoc-table__link">
+                <mat-icon>picture_as_pdf</mat-icon>
+                {{ doc.fileName }}
+              </a>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fileSize">
+            <th mat-header-cell *matHeaderCellDef>حجم</th>
+            <td mat-cell *matCellDef="let doc">{{ formatSize(doc.fileSizeBytes) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>تاریخ بارگذاری</th>
+            <td mat-cell *matCellDef="let doc">{{ doc.createdAt | date: 'yyyy/MM/dd' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>وضعیت</th>
+            <td mat-cell *matCellDef="let doc">
+              <span class="doc-status" [ngClass]="statusClass(doc)">{{ statusLabel(doc) }}</span>
+              @if (!doc.isVerified && doc.verificationNote) {
+                <p class="supdoc-table__note">دلیل رد: {{ doc.verificationNote }}</p>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['documentType', 'fileName', 'fileSize', 'createdAt', 'status']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['documentType', 'fileName', 'fileSize', 'createdAt', 'status'];"></tr>
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+
+</section>

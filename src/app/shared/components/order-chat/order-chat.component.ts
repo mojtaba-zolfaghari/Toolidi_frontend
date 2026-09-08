@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 import { OrderChatService, OrderChatMessage } from '../../../core/services/api/order-chat.service';
 
@@ -10,7 +10,7 @@ import { OrderChatService, OrderChatMessage } from '../../../core/services/api/o
  */
 @Component({
     selector: 'app-order-chat',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, DatePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
     template: `
     <div class="flex flex-col h-full min-h-[420px]">

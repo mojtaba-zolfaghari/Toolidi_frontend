@@ -1,10 +1,8 @@
-:host {
-  display: block;
-}
+:host { display: block; height: 100vh; overflow: hidden; }
 
 .quick-register-shell {
   position: relative;
-  min-height: 100vh;
+  height: 100%;
   overflow: hidden;
   background: #f6f8fc;
   color: #17233d;
@@ -29,7 +27,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
   max-width: 1120px;
-  min-height: calc(100vh - 64px);
+  height: 100%;
   margin: 0 auto;
   border: 1px solid rgba(255,255,255,.8);
   border-radius: 28px;
@@ -87,7 +85,16 @@
 .route-line-b { left: 11%; top: 53%; width: 39%; transform: rotate(19deg); border-color: rgba(246,199,91,.65); }
 .route-package { position: absolute; right: 40%; top: 39%; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; color: #132446; background: #fff; box-shadow: 0 0 18px rgba(255,255,255,.8); animation: packageTravel 4s ease-in-out infinite; }
 
-.quick-register-card { align-self: center; width: min(100%, 470px); margin: 0 auto; padding: 44px 48px; }
+.quick-register-card {
+  align-self: center;
+  width: min(100%, 470px);
+  max-height: 100%;
+  margin: 0 auto;
+  padding: 44px 48px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cfd6e4 transparent;
+}
 .card-topline, .label-row, .trust-row, .business-link { display: flex; align-items: center; justify-content: space-between; }
 .step-counter { color: #4f8de8; font-size: 12px; font-weight: 800; }
 .step-counter i { color: #aab4c8; font-style: normal; font-weight: 500; }
@@ -142,8 +149,11 @@
 @keyframes packageTravel { 0%, 100% { transform: translate(-5px, 3px); } 50% { transform: translate(10px, -10px); } }
 
 @media (max-width: 840px) {
-  .quick-register-shell { padding: 0; }
-  .quick-register-layout { display: block; min-height: 100vh; border: 0; border-radius: 0; }
+  /* stacked layout: release the viewport lock and scroll normally */
+  :host { height: auto; overflow: visible; }
+  .quick-register-shell { height: auto; padding: 0; }
+  .quick-register-layout { display: block; height: auto; min-height: 100vh; border: 0; border-radius: 0; }
+  .quick-register-card { max-height: none; overflow: visible; }
   .quick-register-story { min-height: 280px; padding: 26px 22px 38px; }
   .story-copy { margin-top: 35px; }
   .story-copy h1 { margin-top: 14px; font-size: 30px; }

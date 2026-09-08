@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
+import { PersianNumberPipe } from '../../../shared/persian-number.pipe';
 
 import { ShippingInfo } from './product-info.models';
 
@@ -21,7 +22,7 @@ import { ShippingInfo } from './product-info.models';
   styleUrls: ['./shipping-info-block.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatTooltipModule, MatListModule, MatCardModule],
+  imports: [CommonModule, PersianNumberPipe, MatIconModule, MatTooltipModule, MatListModule, MatCardModule],
 })
 export class ShippingInfoBlockComponent {
   @Input() shippingInfo?: ShippingInfo | null = null;

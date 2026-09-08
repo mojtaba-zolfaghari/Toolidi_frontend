@@ -52,10 +52,12 @@ export class AppComponent implements OnInit, OnDestroy {
           event.urlAfterRedirects.startsWith('/seller') ||
           event.urlAfterRedirects.startsWith('/agent') ||
           event.urlAfterRedirects.startsWith('/supplier');
-        this.isStandaloneAuthPage = event.urlAfterRedirects === '/auth/agent-register' || event.urlAfterRedirects === '/auth/seller-register' || event.urlAfterRedirects === '/auth/register';
+        const path = event.urlAfterRedirects.split('?')[0];
+        this.isStandaloneAuthPage = path === '/auth/agent-register' || path === '/auth/seller-register' || path === '/auth/supplier-register' || path === '/auth/register';
       });
     this.isAdminArea = this.router.url.startsWith('/admin') || this.router.url.startsWith('/seller') || this.router.url.startsWith('/agent') || this.router.url.startsWith('/supplier');
-    this.isStandaloneAuthPage = this.router.url === '/auth/agent-register' || this.router.url === '/auth/seller-register' || this.router.url === '/auth/register';
+    const path = this.router.url.split('?')[0];
+    this.isStandaloneAuthPage = path === '/auth/agent-register' || path === '/auth/seller-register' || path === '/auth/supplier-register' || path === '/auth/register';
 
     // Only register the service worker in production builds — /sw.js does not
     // exist on the dev server, so registering it there logs a 404 console error

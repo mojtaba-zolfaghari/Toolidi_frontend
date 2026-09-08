@@ -1,4 +1,4 @@
-:host { display: block; }
+:host { display: block; height: 100vh; overflow: hidden; }
 
 .supplier-register-shell {
   --supplier-ink: #15152f;
@@ -6,7 +6,7 @@
   --supplier-green: #16a34a;
   --supplier-green-light: #dcfce7;
   --supplier-green-dark: #15803d;
-  min-height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   padding: 1.25rem;
@@ -47,7 +47,7 @@
 /* ─── layout ─── */
 .supplier-register-layout {
   width: min(1180px, 100%);
-  min-height: calc(100vh - 2.5rem);
+  height: 100%;
   margin: auto;
   display: grid;
   grid-template-columns: minmax(390px, .9fr) minmax(520px, 1.1fr);
@@ -60,9 +60,12 @@
 }
 
 @media (max-width: 767px) {
+  /* stacked layout: release the viewport lock and scroll normally */
+  :host { height: auto; overflow: visible; }
+  .supplier-register-shell { height: auto; }
   .supplier-register-layout {
     grid-template-columns: 1fr;
-    min-height: auto;
+    height: auto;
   }
   .supplier-visual-panel { display: none; }
 }
@@ -269,6 +272,7 @@
   padding: clamp(1.6rem, 4vw, 2.5rem);
   display: flex;
   flex-direction: column;
+  min-height: 0;
   overflow-y: auto;
   position: relative;
 }

@@ -42,6 +42,20 @@ export class ApiService {
       .pipe(catchError((error) => this.handleError(error)));
   }
 
+  /** آپلود فایل با multipart/form-data (برای مدارک و kemungkinan изображений) */
+  upload<T>(url: string, file: File, additionalFields?: Record<string, string | number | boolean>): Observable<T> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (additionalFields) {
+      for (const [key, value] of Object.entries(additionalFields)) {
+        formData.append(key, String(value));
+      }
+    }
+    return this.http
+      .post<T>(`${this.baseUrl}${url}`, formData)
+      .pipe(catchError((error) => this.handleError(error)));
+  }
+
   /** مدیریت خطاها با پیام‌های فارسی */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let message = this.extractServerMessage(error) ?? 'خطا در ارتباط با سرور';

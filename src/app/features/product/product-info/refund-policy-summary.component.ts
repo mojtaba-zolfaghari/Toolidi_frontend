@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe, NgIf, NgFor } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterLink } from '@angular/router';
 import { RefundPolicySummary } from './product-info.models';
 
 /**
@@ -17,7 +19,10 @@ import { RefundPolicySummary } from './product-info.models';
   styleUrls: ['./refund-policy-summary.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, RouterLink,
+  DecimalPipe,
+  NgIf,
+  NgFor, MatIconModule, MatButtonModule, MatTooltipModule, MatCardModule],
 })
 export class RefundPolicySummaryComponent {
   @Input() policySummary?: RefundPolicySummary | null = null;
