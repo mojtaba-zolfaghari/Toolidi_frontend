@@ -70,6 +70,18 @@ export interface RegisterSellerData {
   confirmPassword: string;
 }
 
+/** داده‌ی درخواست ثبت‌نام تأمین‌کننده */
+export interface RegisterSupplierData {
+  name: string;
+  contactInfo: string;
+  location: string;
+  email: string;
+  username: string;
+  password: string;
+  nationalCode: string;
+  mobileNumber: string;
+}
+
 /** داده‌ی درخواست عضویت پیک شهری */
 export interface AgentRegistrationData {
   fullName: string;
@@ -155,6 +167,11 @@ export class AuthService {
     return this.api
       .post<Result<LoginResponse>>('/Auth/register/seller', data)
       .pipe(tap((result) => this.storeTokens(result)));
+  }
+
+  /** ثبت درخواست ثبت‌نام تأمین‌کننده — مدارک و حساب کاربری پس از تأیید ادمین فعال می‌شود. */
+  registerSupplier(data: RegisterSupplierData): Observable<Result<string>> {
+    return this.api.post<Result<string>>('/v1/supplier-registrations', data);
   }
 
   /** ثبت درخواست عضویت پیک شهری */

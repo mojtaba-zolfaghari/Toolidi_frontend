@@ -5,7 +5,6 @@ import { AuthService } from '../../../core/services/api/auth.service';
 import { LocationService, Province, City } from '../../../core/services/api/location.service';
 import { IRAN_CITY_NAMES, IRAN_PROVINCE_NAMES } from '../../../shared/iran-locations';
 import { RegistrationUxService } from '../register/registration-ux.service';
-import { DocumentUploadService } from '../register/document-upload.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
@@ -70,8 +69,7 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly locationService: LocationService,
     private readonly ux: RegistrationUxService,
-    private readonly snackBar: MatSnackBar,
-    private readonly docService: DocumentUploadService
+    private readonly snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
       nationalCode: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -203,74 +201,40 @@ export class SupplierRegisterComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.supplierUploadedFiles.length === 0) {
-      this.snackBar.open('حداقل یک مدارک (شناسنامه ملی، گواهی مالیاتی یا صورت‌حساب بانکی) آپلود کنید.', 'بستن', { duration: 5000 });
-      this.currentStep = 3;
-      return;
-    }
+    // مدارک پس از ورود به پورتال تأمین‌کننده بارگذاری می‌شوند (حساب کاربری پس از تأیید ادمین ساخته می‌شود).
 
     this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
     const data = {
-      nationalCode: this.form.value.nationalCode,
+      name: this.form.value.companyName,
+      contactInfo: this.form.value.email,
+      location: this.form.value.address || this.form.value.cityId || 'ایران',
+      email: this.form.value.email,
       username: this.form.value.username,
       password: this.form.value.password,
-      confirmPassword: this.form.value.confirmPassword,
-      companyName: this.form.value.companyName,
-      provinceId: this.form.value.provinceId,
-      cityId: this.form.value.cityId,
-      phone: this.form.value.phone,
-      email: this.form.value.email,
-      address: this.form.value.address,
-      description: this.form.value.description,
-      capacity: this.form.value.capacity,
-      leadTimeDays: this.form.value.leadTimeDays,
-      minOrderAmount: this.form.value.minOrderAmount,
-      acceptsReturns: this.form.value.acceptsReturns,
-      selectedCategories: this.selectedCategories
+      nationalCode: this.form.value.nationalCode,
+      mobileNumber: this.form.value.phone
     };
 
-    this.authService.registerSeller(data).subscribe({
-      next: async (regResult) => {
+    // ثبت درخواست ثبت‌نام — حساب کاربری و مدارک پس از تأیید ادمین فعال می‌شوند.
+    this.authService.registerSupplier(data).subscribe({
+      next: (regResult) => {
+        this.loading = false;
         if (!regResult.isSuccess) {
-          this.loading = false;
           this.errorMessage = regResult.errorMessage ?? 'ثبت‌نام ناموفق بود؛ لطفاً دوباره تلاش کنید.';
           return;
         }
 
-        // آپلود مدارک روی سرور پس از دریافت توکن JWT
-        await this.uploadSupplierDocuments();
-
         this.submitted = true;
-        this.successMessage = 'ثبت‌نام تأمین‌کننده با موفقیت انجام شد. مدارک شما در حال بررسی هستند (کمتر از ۳ روز کاری). اکنون می‌توانید وارد پنل تأمین‌کننده خود شوید.';
+        this.successMessage = 'درخواست ثبت‌نام تأمین‌کننده شما ثبت شد. پس از بررسی و تأیید توسط پشتیبانی، حساب کاربری شما فعال می‌شود و می‌توانید با همین نام کاربری و رمز عبور وارد پنل شوید.';
       },
       error: (err: Error) => {
         this.loading = false;
         this.errorMessage = err?.message ?? 'خطا در ارتباط با سرور';
       }
     });
-  }
-
-  /** آپلود همه‌ی مدارک تأمینکننده روی سرور پس از ثبت‌نام. */
-  private async uploadSupplierDocuments(): Promise<void> {
-    for (const entry of this.supplierUploadedFiles) {
-      this.docService.upload(
-        entry.file,
-        '/api/v1/suppliers/documents',
-        { documentType: 'other' }
-      ).subscribe({
-        next: (uploadResult) => {
-          if (!uploadResult.ok) {
-            console.warn(`آپلود فایل ${entry.name} ناموفق بود: ${uploadResult.error}`);
-          }
-        },
-        error: (err: Error) => {
-          console.warn(`خطا در آپلود ${entry.name}:`, err.message);
-        }
-      });
-    }
   }
 
   goToSupplierPanel(): void {
